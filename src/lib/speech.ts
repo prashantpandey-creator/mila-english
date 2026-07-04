@@ -1,19 +1,13 @@
 // ── The speech seam ─────────────────────────────────────────────────────────
 // Reinvented: no server, no vendor, no cold start. The pronunciation model runs
 // ON THE DEVICE via transformers.js (WebGPU, WASM fallback) inside a web worker.
-// Audio never leaves the phone — private, and it works offline (on a plane).
-//   speak()  — hear the phrase. Browser TTS today; ElevenLabs pre-baked accent
-//              audio (static files) is the drop-in upgrade — still zero runtime cost.
-//   assess() — record, resample to 16kHz, transcribe on-device, score.
-//              wav2vec2 CTC is acoustic — it surfaces mispronunciations. A converted
-//              espeak-IPA model swaps in here for true per-phoneme GOP, same rails.
+// Audio never leaves the phone — private, and it works offline.
+//   speak()          — hear the phrase (browser TTS today; ElevenLabs pre-baked next).
+//   warmModel()      — background one-time model download, with progress.
+//   startListening() — record with VAD auto-stop OR manual stop, score on-device.
 
 export type Accent = {
-  id: string;
-  label: string;
-  flag: string;
-  locale: string;
-  azureVoice: string; // legacy field name; used as the ElevenLabs/voice hint later
+  id: string; label: string; flag: string; locale: string; azureVoice: string;
 };
 
 export const ACCENTS: Accent[] = [
@@ -25,6 +19,7 @@ export const ACCENTS: Accent[] = [
 export type Verdict = 'good' | 'close' | 'miss';
 export type WordScore = { word: string; verdict: Verdict };
 export type Assessment = { score: number; words: WordScore[]; tip: string; heard: string };
+export type Session = { stop: () => Promise<Assessment> };
 
 // ── speak() ──────────────────────────────────────────────────────────────────
 export function speak(text: string, accent: Accent): Promise<void> {
@@ -35,9 +30,7 @@ export function speak(text: string, accent: Accent): Promise<void> {
     u.lang = accent.locale;
     u.rate = 0.9;
     const voices = window.speechSynthesis.getVoices();
-    const exact = voices.find((v) => v.lang === accent.locale);
-    const anyEn = voices.find((v) => v.lang?.toLowerCase().startsWith('en'));
-    const picked = exact || anyEn;
+    const picked = voices.find((v) => v.lang === accent.locale) || voices.find((v) => v.lang?.toLowerCase().startsWith('en'));
     if (picked) u.voice = picked;
     u.onend = () => resolve();
     u.onerror = () => resolve();
@@ -45,25 +38,45 @@ export function speak(text: string, accent: Accent): Promise<void> {
   });
 }
 
-// ── on-device worker singleton ───────────────────────────────────────────────
+// ── on-device worker singleton + progress plumbing ───────────────────────────
 let _worker: Worker | null = null;
 let _reqId = 0;
 let _warmed = false;
 const _pending = new Map<number, { resolve: (t: string) => void; reject: (e: Error) => void }>();
 
+export type ModelProgress = { ready: boolean; percent: number };
+const _files = new Map<string, { loaded: number; total: number }>();
+const _progressListeners = new Set<(p: ModelProgress) => void>();
+
+export function onModelProgress(cb: (p: ModelProgress) => void): () => void {
+  _progressListeners.add(cb);
+  cb(currentProgress());
+  return () => _progressListeners.delete(cb);
+}
+function currentProgress(): ModelProgress {
+  if (_warmed) return { ready: true, percent: 100 };
+  let loaded = 0, total = 0;
+  _files.forEach((f) => { loaded += f.loaded || 0; total += f.total || 0; });
+  return { ready: false, percent: total > 0 ? Math.min(99, Math.round((loaded / total) * 100)) : 0 };
+}
+function emitProgress() { const p = currentProgress(); _progressListeners.forEach((cb) => cb(p)); }
+
 function worker(): Worker {
   if (_worker) return _worker;
   _worker = new Worker('/asr.worker.js', { type: 'module' });
   _worker.onmessage = (e: MessageEvent) => {
-    const { type, id, text, error } = (e.data || {}) as any;
+    const { type, id, text, error, data } = (e.data || {}) as any;
     if (type === 'result') { _pending.get(id)?.resolve(text); _pending.delete(id); }
     else if (type === 'error') { _pending.get(id)?.reject(new Error(error)); _pending.delete(id); }
-    else if (type === 'warmed') { _warmed = true; }
+    else if (type === 'warmed') { _warmed = true; emitProgress(); }
+    else if (type === 'progress' && data?.file) {
+      if (data.status === 'progress' || data.total) _files.set(data.file, { loaded: data.loaded || 0, total: data.total || 0 });
+      emitProgress();
+    }
   };
   return _worker;
 }
 
-// Kick off the one-time model download in the background (call on page mount).
 export function warmModel(): void {
   if (typeof window === 'undefined') return;
   try { worker().postMessage({ type: 'warm' }); } catch { /* no-op */ }
@@ -79,25 +92,71 @@ function transcribe(audio: Float32Array): Promise<string> {
   });
 }
 
-// ── assess() — record → 16kHz mono → on-device transcribe → score ────────────
-export async function assess(reference: string, _accent: Accent): Promise<Assessment> {
-  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-    throw new Error('unsupported');
-  }
+// ── startListening() — VAD auto-stop OR manual stop, whichever fires first ────
+export async function startListening(
+  reference: string,
+  _accent: Accent,
+  onAutoStop?: (a: Assessment) => void,
+): Promise<Session> {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
+
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   const rec = new MediaRecorder(stream);
   const chunks: Blob[] = [];
   rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
-  const stopped = new Promise<void>((res) => { rec.onstop = () => res(); });
+  const recStopped = new Promise<void>((res) => { rec.onstop = () => res(); });
   rec.start();
-  await new Promise((r) => setTimeout(r, 4000)); // fixed 4s window (VAD is a later refinement)
-  rec.stop();
-  stream.getTracks().forEach((t) => t.stop());
-  await stopped;
 
-  const audio = await blobTo16kMono(new Blob(chunks));
-  const heard = await transcribe(audio);
-  return scoreAgainst(reference, heard);
+  // Voice-activity detection over the live mic.
+  const AC: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
+  const actx = new AC();
+  const analyser = actx.createAnalyser();
+  analyser.fftSize = 512;
+  actx.createMediaStreamSource(stream).connect(analyser);
+  const buf = new Float32Array(analyser.fftSize);
+
+  const THRESH = 0.015, SILENCE_MS = 900, MIN_MS = 700, MAX_MS = 7000;
+  const t0 = performance.now();
+  let spoke = false, lastVoice = t0, raf = 0;
+
+  let finalized = false;
+  let resolveResult!: (a: Assessment) => void;
+  let rejectResult!: (e: Error) => void;
+  const resultP = new Promise<Assessment>((res, rej) => { resolveResult = res; rejectResult = rej; });
+
+  const finalize = (): Promise<Assessment> => {
+    if (finalized) return resultP;
+    finalized = true;
+    cancelAnimationFrame(raf);
+    try { rec.stop(); } catch { /* no-op */ }
+    stream.getTracks().forEach((t) => t.stop());
+    actx.close().catch(() => {});
+    (async () => {
+      try {
+        await recStopped;
+        const audio = await blobTo16kMono(new Blob(chunks));
+        resolveResult(scoreAgainst(reference, await transcribe(audio)));
+      } catch (e: any) { rejectResult(e instanceof Error ? e : new Error(String(e))); }
+    })();
+    return resultP;
+  };
+
+  const tick = () => {
+    analyser.getFloatTimeDomainData(buf);
+    let sum = 0; for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+    const rms = Math.sqrt(sum / buf.length);
+    const now = performance.now();
+    if (rms > THRESH) { spoke = true; lastVoice = now; }
+    const elapsed = now - t0;
+    if (elapsed > MAX_MS || (spoke && elapsed > MIN_MS && now - lastVoice > SILENCE_MS)) {
+      finalize().then((a) => onAutoStop?.(a)).catch(() => {});
+      return;
+    }
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+
+  return { stop: () => finalize() };
 }
 
 async function blobTo16kMono(blob: Blob): Promise<Float32Array> {
@@ -147,9 +206,7 @@ function scoreAgainst(reference: string, heard: string): Assessment {
   const weak = words.find((x) => x.verdict !== 'good');
   const tip = !heard
     ? "Didn't catch that — tap the mic and say it again."
-    : weak
-      ? `Focus on “${weak.word}” — hear it once more, then repeat.`
-      : 'Clean run. Try the next one.';
+    : weak ? `Focus on “${weak.word}” — hear it once more, then repeat.` : 'Clean run. Try the next one.';
 
   return { score, words, tip, heard };
 }

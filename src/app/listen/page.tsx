@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
-import { ACCENTS, speak, assess, warmModel } from '@/lib/speech';
+import { ACCENTS, speak, startListening, warmModel, onModelProgress } from '@/lib/speech';
 import { PHRASES } from '@/lib/phrases';
 
 const VERDICT = {
@@ -21,16 +21,21 @@ export default function ListenPage() {
   const [m, setM] = useState(false);
   const [accent, setAccent] = useState(ACCENTS[0]);
   const [idx, setIdx] = useState(0);
-  const [phase, setPhase] = useState<'idle'|'speaking'|'recording'|'scored'|'error'>('idle');
+  const [phase, setPhase] = useState<'idle'|'speaking'|'recording'|'scoring'|'scored'|'error'>('idle');
   const [result, setResult] = useState<any>(null);
   const [errMsg, setErrMsg] = useState('');
+  const [modelReady, setModelReady] = useState(false);
+  const [modelPct, setModelPct] = useState(0);
+  const [session, setSession] = useState<any>(null);
 
   useEffect(() => { setM(true); }, []);
-  // Warm the voice list + kick off the one-time on-device model download.
+  // Warm the voice list + kick off the one-time on-device model download, tracking progress.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     window.speechSynthesis?.getVoices();
+    const off = onModelProgress((p) => { setModelReady(p.ready); setModelPct(p.percent); });
     warmModel();
+    return off;
   }, [m]);
   if (!m) return null;
 
@@ -42,20 +47,32 @@ export default function ListenPage() {
     setPhase(p => (p === 'speaking' ? 'idle' : p));
   };
 
-  const onSpeak = async () => {
-    setErrMsg(''); setResult(null); setPhase('recording');
-    try {
-      const r = await assess(phrase.text, accent);
-      setResult(r); setPhase('scored');
-    } catch (e: any) {
-      setErrMsg(e?.message === 'unsupported'
-        ? (lang==='ru' ? 'Микрофон не поддерживается — открой в Chrome.' : 'Speech input needs Chrome — open there to practice.')
-        : (lang==='ru' ? 'Не расслышала. Попробуй ещё раз.' : "Didn't catch that. Try again."));
-      setPhase('error');
-    }
+  const settle = (r: any) => { setResult(r); setPhase('scored'); setSession(null); };
+  const fail = (e: any) => {
+    setErrMsg(e?.message === 'unsupported'
+      ? (lang==='ru' ? 'Микрофон не поддерживается — открой в Chrome.' : 'Speech input needs Chrome — open there to practice.')
+      : (lang==='ru' ? 'Не расслышала. Попробуй ещё раз.' : "Didn't catch that. Try again."));
+    setPhase('error'); setSession(null);
   };
 
-  const next = () => { setIdx(i => (i + 1) % PHRASES.length); setResult(null); setPhase('idle'); setErrMsg(''); };
+  // Tap to start; tap again to stop — or it auto-stops when you finish speaking.
+  const onMic = async () => {
+    if (phase === 'recording' && session) {
+      setPhase('scoring');
+      try { settle(await session.stop()); } catch (e) { fail(e); }
+      return;
+    }
+    setErrMsg(''); setResult(null); setPhase('recording');
+    try {
+      const s = await startListening(phrase.text, accent, (a) => {
+        setSession(null); setPhase('scoring'); settle(a);
+      });
+      setSession(s);
+    } catch (e) { fail(e); }
+  };
+
+  const next = () => { setIdx(i => (i + 1) % PHRASES.length); setResult(null); setPhase('idle'); setErrMsg(''); setSession(null); };
+  const micBusy = phase === 'scoring' || (phase === 'recording' && !session);
 
   const ring = (score: number) => {
     const r = 26, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
@@ -147,25 +164,46 @@ export default function ListenPage() {
             style={{flex:1,height:52,borderRadius:16,border:'1.5px solid #efe0d4',background:'white',color:C.warm,fontWeight:600,fontSize:'0.95rem',cursor:'pointer'}}>
             {lang==='ru'?'Следующая →':'Next phrase →'}
           </button>
-          <button onClick={onSpeak} disabled={phase==='recording'}
-            aria-label={lang==='ru'?'Произнести':'Say it back'}
-            style={{width:64,height:64,borderRadius:'50%',border:'none',cursor:phase==='recording'?'default':'pointer',
-              background:phase==='recording'?C.gold:C.rose,color:'white',fontSize:'1.6rem',
+          <button onClick={onMic} disabled={!modelReady || micBusy}
+            aria-label={phase==='recording'?(lang==='ru'?'Остановить':'Stop'):(lang==='ru'?'Произнести':'Say it back')}
+            style={{width:64,height:64,borderRadius:'50%',border:'none',
+              cursor:(!modelReady||micBusy)?'default':'pointer',opacity:modelReady?1:0.45,
+              background:phase==='recording'?C.gold:phase==='scoring'?C.purple:C.rose,color:'white',fontSize:'1.5rem',
               boxShadow:`0 6px 20px ${phase==='recording'?'rgba(245,158,11,.4)':'rgba(233,30,99,.35)'}`,
               animation:phase==='recording'?'pulse 1.2s ease-in-out infinite':'none'}}>
-            🎙️
+            {phase==='recording' ? '⏹' : phase==='scoring' ? '⏳' : '🎙️'}
           </button>
         </div>
-        <div style={{textAlign:'center',fontSize:'0.78rem',color:phase==='recording'?C.gold:'#b0a89f',marginTop:10,fontWeight:phase==='recording'?700:400}}>
-          {phase==='recording' ? (lang==='ru'?'Слушаю… говори сейчас':'Listening… speak now') : (lang==='ru'?'Нажми и произнеси вслух':'Tap the mic and say it aloud')}
+        <div style={{textAlign:'center',fontSize:'0.78rem',marginTop:10,
+          color:phase==='recording'?C.gold:phase==='scoring'?C.purple:'#b0a89f',
+          fontWeight:(phase==='recording'||phase==='scoring')?700:400}}>
+          {phase==='recording'
+            ? (lang==='ru'?'Слушаю… говори, потом нажми ⏹ (или просто закончи)':'Listening… speak, then tap ⏹ (or just finish)')
+            : phase==='scoring'
+            ? (lang==='ru'?'Оцениваю на устройстве…':'Scoring on your device…')
+            : (lang==='ru'?'Нажми и произнеси вслух':'Tap the mic and say it aloud')}
         </div>
 
-        {/* on-device badge */}
-        <div style={{textAlign:'center',fontSize:'0.72rem',color:'#c0b8af',marginTop:18,lineHeight:1.5}}>
-          {lang==='ru'
-            ? '🔒 Работает на твоём устройстве — приватно и без интернета. Первый раз модель загрузится, потом мгновенно.'
-            : '🔒 Runs on your device — private, works offline. First use downloads a small model, then it’s instant.'}
-        </div>
+        {/* warming banner (first load only) or on-device badge */}
+        {!modelReady ? (
+          <div style={{marginTop:18,background:'white',borderRadius:14,padding:'12px 16px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
+            <div style={{fontSize:'0.78rem',color:C.dark,fontWeight:600,marginBottom:8,textAlign:'center'}}>
+              {lang==='ru'?`⚙️ Готовлю тренера на устройстве… ${modelPct}%`:`⚙️ Preparing your on-device coach… ${modelPct}%`}
+            </div>
+            <div style={{height:6,borderRadius:4,background:'#f0ece7',overflow:'hidden'}}>
+              <div style={{height:'100%',width:`${Math.max(4,modelPct)}%`,background:C.sage,borderRadius:4,transition:'width .3s'}}/>
+            </div>
+            <div style={{fontSize:'0.7rem',color:'#b0a89f',marginTop:7,textAlign:'center',lineHeight:1.5}}>
+              {lang==='ru'?'Один раз. Потом всё работает мгновенно и без интернета.':'One time only. Then it’s instant and works offline.'}
+            </div>
+          </div>
+        ) : (
+          <div style={{textAlign:'center',fontSize:'0.72rem',color:'#c0b8af',marginTop:18,lineHeight:1.5}}>
+            {lang==='ru'
+              ? '🔒 Работает на твоём устройстве — приватно и без интернета.'
+              : '🔒 Runs on your device — private, works offline.'}
+          </div>
+        )}
       </div>
     </div>
   );

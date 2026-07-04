@@ -10,11 +10,14 @@ const MODEL = 'Xenova/wav2vec2-base-960h';
 let asr = null;
 let loading = null;
 
+// Forward download progress so the UI can show a real "preparing" state.
+const onProgress = (p) => self.postMessage({ type: 'progress', data: p });
+
 async function getASR() {
   if (asr) return asr;
   if (!loading) {
-    loading = pipeline('automatic-speech-recognition', MODEL, { device: 'webgpu' })
-      .catch(() => pipeline('automatic-speech-recognition', MODEL)); // WASM fallback
+    loading = pipeline('automatic-speech-recognition', MODEL, { device: 'webgpu', progress_callback: onProgress })
+      .catch(() => pipeline('automatic-speech-recognition', MODEL, { progress_callback: onProgress })); // WASM fallback
   }
   asr = await loading;
   return asr;
