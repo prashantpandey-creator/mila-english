@@ -1,5 +1,26 @@
+// @ts-nocheck
 'use client';
 
+import { C } from '@/lib/theme';
+
+const SOUNDS = [
+  { ipa: '/θ/', ex: 'think' }, { ipa: '/ð/', ex: 'this' }, { ipa: '/w/', ex: 'world' },
+  { ipa: '/r/', ex: 'river' }, { ipa: '/æ/', ex: 'cat' }, { ipa: '/ʃ/', ex: 'she' },
+  { ipa: '/dʒ/', ex: 'job' }, { ipa: '/ŋ/', ex: 'sing' },
+];
+
 export default function PhoneticChart() {
-  return <div className="card" style={{minHeight:'60px'}} />;
+  return (
+    <div style={{background:'white',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.04)',marginTop:16}}>
+      <div style={{fontWeight:700,fontSize:'0.9rem',color:C.dark,marginBottom:14}}>Sounds Russian doesn't have</div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+        {SOUNDS.map((s,i)=>(
+          <div key={i} style={{textAlign:'center',padding:'10px 4px',borderRadius:10,background:C.roseL}}>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:C.rose}}>{s.ipa}</div>
+            <div style={{fontSize:'0.75rem',color:C.warm,marginTop:2}}>{s.ex}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

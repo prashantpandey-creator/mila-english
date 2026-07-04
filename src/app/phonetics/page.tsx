@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import PhoneticChart from '@/components/PhoneticChart'
+import PhoneticGuide from '@/components/PhoneticGuide'
 import WordSearchInput from '@/components/WordSearchInput'
 import AudioPlayer from '@/components/AudioPlayer'
 import MouthDiagram from '@/components/MouthDiagram'
@@ -14,17 +15,15 @@ export default async function PhoneticsPage() {
   const token = (await cookies()).get('token')?.value
   if (!token) redirect('/login')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-  const phonetics = await fetch(`${baseUrl}/api/phonetics/:word`).then(r => r.json()).catch(() => [])
-
   return (
-    <main className="container mx-auto p-4">
+    <main className="container mx-auto p-4" style={{maxWidth:560,padding:'24px 20px'}}>
       <h1 className="text-2xl font-bold">Pronunciation Lab</h1>
       <p className="text-gray-600 mt-2">Interactive phonetics and pronunciation</p>
+      <PhoneticGuide />
       <PhoneticChart />
       <WordSearchInput />
-      <AudioPlayer />
-      <MouthDiagram />
+      <AudioPlayer word="pronunciation" />
+      <MouthDiagram sound="/θ/" />
     </main>
   )
 }

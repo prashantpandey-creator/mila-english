@@ -4,12 +4,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
+import CategoryFilter from '@/components/CategoryFilter';
+import LessonList from '@/components/LessonList';
 import { useI18n } from '@/lib/i18n-provider';
-
-const C = {
-  rose: '#e91e63', roseL: '#fce4ec', sage: '#5b8c5a', sageL: '#e8f5e9',
-  gold: '#f59e0b', goldL: '#fef3c7', warm: '#78716c', dark: '#44403c',
-};
+import { C } from '@/lib/theme';
 
 const LESSONS_RU = [
   {id:1,cat:'🗣️',catName:'Разговор',title:'Знакомство',sub:'Представься и спроси имя',time:'3 мин',diff:'Лёгкий',diffNum:1,
@@ -54,10 +52,10 @@ export default function LessonsPage() {
   const [activeCat, setActiveCat] = useState(0);
   const lessons = lang==='ru' ? LESSONS_RU : LESSONS_EN;
   const cats = lang==='ru' ? CATS_RU : CATS_EN;
-  
+
   const filtered = activeCat === 0 ? lessons : lessons.filter(l => {
     const catName = lang==='ru' ? l.catName : l.catName;
-    return catName === cats[activeCat] || 
+    return catName === cats[activeCat] ||
       (cats[activeCat]==='Speaking' && l.catName==='Разговор') ||
       (cats[activeCat]==='Phonetics' && l.catName==='Фонетика') ||
       (cats[activeCat]==='Vocabulary' && l.catName==='Слова') ||
@@ -65,7 +63,7 @@ export default function LessonsPage() {
   });
 
   return (
-    <div style={{minHeight:'100vh',background:'#fef9f4',fontFamily:"'Nunito','Inter',sans-serif"}}>
+    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
       <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>🌸 Мила</span>
@@ -76,43 +74,8 @@ export default function LessonsPage() {
         <h1 style={{fontSize:'1.5rem',fontWeight:800,color:C.dark,margin:0}}>{t('lessons_title')}</h1>
         <p style={{color:C.warm,margin:'4px 0 20px'}}>{t('lessons_subtitle')}</p>
 
-        {/* Category filter */}
-        <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:20}}>
-          {cats.map((c,i)=>(
-            <button key={i} onClick={()=>setActiveCat(i)}
-              style={{padding:'8px 16px',borderRadius:20,border:'none',cursor:'pointer',fontSize:'0.85rem',fontWeight:600,
-                background:i===activeCat?C.rose:'white',color:i===activeCat?'white':C.warm,
-                boxShadow:i===activeCat?'0 2px 12px rgba(233,30,99,0.25)':'0 1px 4px rgba(0,0,0,0.04)'}}>
-              {c}
-            </button>
-          ))}
-        </div>
-
-        {/* Lesson cards */}
-        <div style={{display:'flex',flexDirection:'column',gap:12}}>
-          {filtered.map(l=>(
-            <div key={l.id} onClick={()=>router.push(`/lessons/${l.id}`)}
-              style={{cursor:'pointer',background:'white',borderRadius:16,padding:'16px 20px',
-                boxShadow:'0 1px 8px rgba(0,0,0,0.04)',display:'flex',alignItems:'center',gap:14,
-                border:'2px solid transparent',transition:'all 0.2s'}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=C.rose;e.currentTarget.style.transform='translateY(-2px)'}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor='transparent';e.currentTarget.style.transform='none'}}>
-              <div style={{width:44,height:44,borderRadius:14,background:C.roseL,
-                display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.4rem',flexShrink:0}}>{l.cat}</div>
-              <div style={{flex:1}}>
-                <div style={{fontWeight:700,fontSize:'1rem',color:C.dark}}>{l.title}</div>
-                <div style={{fontSize:'0.85rem',color:C.warm}}>{l.sub}</div>
-                <div style={{display:'flex',gap:8,marginTop:4}}>
-                  <span style={{fontSize:'0.75rem',color:C.warm}}>⏱ {l.time}</span>
-                  <span style={{fontSize:'0.75rem',color:C.warm}}>
-                    {'🟢'.repeat(l.diffNum)}{'⚪'.repeat(3-l.diffNum)}
-                  </span>
-                </div>
-              </div>
-              <div style={{fontSize:'1.2rem',color:C.rose}}>→</div>
-            </div>
-          ))}
-        </div>
+        <CategoryFilter categories={cats} active={activeCat} onChange={setActiveCat}/>
+        <LessonList lessons={filtered} onSelect={(id)=>router.push(`/lessons/${id}`)}/>
       </div>
     </div>
   );

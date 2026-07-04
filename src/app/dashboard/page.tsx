@@ -4,13 +4,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
+import DailyLessonCard from '@/components/DailyLessonCard';
+import StreakCounter from '@/components/StreakCounter';
+import ProgressSummary from '@/components/ProgressSummary';
+import PronunciationButton from '@/components/PronunciationButton';
+import LeaderboardCard from '@/components/LeaderboardCard';
 import { useI18n } from '@/lib/i18n-provider';
-
-const C = {
-  pageBg: '#fef9f4', rose: '#e91e63', roseL: '#fce4ec',
-  sage: '#5b8c5a', sageL: '#e8f5e9', gold: '#f59e0b', goldL: '#fef3c7',
-  warm: '#78716c', dark: '#44403c',
-};
+import { C } from '@/lib/theme';
 
 export default function DashboardPage() {
   const { t, lang } = useI18n();
@@ -43,41 +43,27 @@ export default function DashboardPage() {
           <h1 style={{fontSize:'1.6rem',fontWeight:800,margin:0,color:C.dark}}>
             {lang==='ru'?'Доброе утро ☀️':'Good morning ☀️'}
           </h1>
-          <p style={{color:C.warm,margin:'4px 0 0'}}>
-            {lang==='ru'?'Готова позаниматься?':'Ready to practice?'}
-          </p>
-        </div>
-
-        {/* Main CTA — Start Lesson */}
-        <div onClick={()=>router.push('/lessons')}
-          style={{cursor:'pointer',borderRadius:20,overflow:'hidden',background:'white',
-            boxShadow:'0 2px 20px rgba(0,0,0,0.06)',marginBottom:20,transition:'all 0.2s',border:'2px solid transparent'}}
-          onMouseEnter={e=>{e.currentTarget.style.borderColor=C.rose;e.currentTarget.style.transform='translateY(-2px)'}}
-          onMouseLeave={e=>{e.currentTarget.style.borderColor='transparent';e.currentTarget.style.transform='none'}}>
-          <div style={{height:6,background:`linear-gradient(90deg,${C.rose},${C.gold},${C.sage})`}}/>
-          <div style={{display:'flex',alignItems:'center',padding:'20px 24px',gap:16}}>
-            <div style={{width:56,height:56,borderRadius:16,background:C.roseL,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.8rem'}}>📖</div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:700,fontSize:'1.1rem',color:C.dark}}>{lang==='ru'?'Начать урок':'Start Today\'s Lesson'}</div>
-              <div style={{fontSize:'0.85rem',color:C.warm,marginTop:2}}>{lang==='ru'?'Разговор • 5 мин • Лёгкий':'Speaking • 5 min • Easy'}</div>
-            </div>
-            <div style={{fontSize:'1.5rem',color:C.rose}}>→</div>
+          <div style={{display:'flex',alignItems:'center',gap:10,marginTop:6}}>
+            <p style={{color:C.warm,margin:0}}>
+              {lang==='ru'?'Готова позаниматься?':'Ready to practice?'}
+            </p>
+            <StreakCounter days={5} lang={lang} />
           </div>
         </div>
 
+        {/* Main CTA — Start Lesson */}
+        <DailyLessonCard
+          title={lang==='ru'?'Начать урок':'Start Today\'s Lesson'}
+          subtitle={lang==='ru'?'Разговор • 5 мин • Лёгкий':'Speaking • 5 min • Easy'}
+          onStart={()=>router.push('/lessons')}
+        />
+
         {/* Stats */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:20}}>
-          {[
-            {emoji:'🔥',val:5,label:lang==='ru'?'Дней':'Streak',bg:C.goldL,color:C.gold},
-            {emoji:'📝',val:8,label:lang==='ru'?'Слов':'Words',bg:C.roseL,color:C.rose},
-            {emoji:'⭐',val:12,label:lang==='ru'?'Уроков':'Lessons',bg:C.sageL,color:C.sage},
-          ].map((s,i)=>(
-            <div key={i} style={{background:'white',borderRadius:16,padding:'16px 12px',textAlign:'center',boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
-              <div style={{fontSize:'1.6rem'}}>{s.emoji}</div>
-              <div style={{fontSize:'1.5rem',fontWeight:800,color:s.color}}>{s.val}</div>
-              <div style={{fontSize:'0.75rem',color:C.warm}}>{s.label}</div>
-            </div>
-          ))}
+        <div style={{marginBottom:20}}>
+          <ProgressSummary items={[
+            {emoji:'📝',val:8,label:lang==='ru'?'Слов':'Words',color:C.rose},
+            {emoji:'⭐',val:12,label:lang==='ru'?'Уроков':'Lessons',color:C.sage},
+          ]}/>
         </div>
 
         {/* Pronunciation */}
@@ -86,25 +72,20 @@ export default function DashboardPage() {
           <p style={{fontSize:'0.85rem',color:C.warm,margin:'0 0 14px'}}>{lang==='ru'?'Нажми и послушай':'Tap to listen'}</p>
           <div style={{display:'flex',justifyContent:'center',gap:20}}>
             {['hello','world','thank you'].map(w=>(
-              <div key={w} style={{textAlign:'center'}}>
-                <div style={{fontWeight:600,fontSize:'1rem',color:C.dark,marginBottom:6}}>{w}</div>
-                <div onClick={()=>{const u=new SpeechSynthesisUtterance(w);u.lang='en-US';u.rate=0.8;speechSynthesis.speak(u)}}
-                  style={{cursor:'pointer',width:52,height:52,borderRadius:'50%',background:C.roseL,
-                    display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',margin:'0 auto'}}>
-                  🔊
-                </div>
-              </div>
+              <PronunciationButton key={w} word={w}/>
             ))}
           </div>
         </div>
 
         {/* Quick links */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:30}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
           {[
             {emoji:'📚',label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons',color:C.sage},
-            {emoji:'📊',label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',color:'#7c3aed'},
+            {emoji:'📊',label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',color:C.purple},
             {emoji:'📖',label:lang==='ru'?'Словарь':'Vocabulary',sub:lang==='ru'?'Повторение':'Review',href:'/vocabulary',color:C.gold},
             {emoji:'🏆',label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements',color:C.rose},
+            {emoji:'🔤',label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics',color:C.sage},
+            {emoji:'🎯',label:lang==='ru'?'Тест':'Assessment',sub:lang==='ru'?'Твой уровень':'Your level',href:'/assessment',color:C.purple},
           ].map((l,i)=>(
             <div key={i} onClick={()=>router.push(l.href)}
               style={{cursor:'pointer',background:'white',borderRadius:16,padding:'16px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',
@@ -115,6 +96,8 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
+
+        <LeaderboardCard lang={lang}/>
       </div>
     </div>
   );

@@ -1,5 +1,15 @@
+// @ts-nocheck
 'use client';
 
-export default function WordSearchInput() {
-  return <div className="card" style={{minHeight:'60px'}} />;
+import { useState } from 'react';
+
+export default function WordSearchInput({ onSearch }: { onSearch?: (q: string) => void }) {
+  const [q, setQ] = useState('');
+  return (
+    <div style={{display:'flex',gap:8,marginTop:16}}>
+      <input value={q} onChange={e=>{setQ(e.target.value); onSearch?.(e.target.value);}}
+        placeholder="Search a word..."
+        style={{flex:1,padding:'10px 14px',borderRadius:10,border:'1.5px solid #e5e0dc',fontSize:'0.9rem',outline:'none'}}/>
+    </div>
+  );
 }

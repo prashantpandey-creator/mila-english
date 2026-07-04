@@ -6,21 +6,7 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import SpeechButton from '@/components/SpeechButton';
 import { useI18n } from '@/lib/i18n-provider';
-
-const C = {
-  pageBg: '#fef9f4',
-  rose: '#e91e63',
-  roseL: '#fce4ec',
-  sage: '#5b8c5a',
-  sageL: '#e8f5e9',
-  gold: '#f59e0b',
-  goldL: '#fef3c7',
-  purple: '#7c3aed',
-  warm: '#78716c',
-  dark: '#44403c',
-  white: '#ffffff',
-  navBg: 'rgba(255,255,255,0.9)',
-};
+import { C } from '@/lib/theme';
 
 export default function HomePage() {
   const { t, lang } = useI18n();
@@ -58,7 +44,7 @@ export default function HomePage() {
 
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
-      
+
       {/* ── NAV ── */}
       <div style={{background:C.navBg,backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(0,0,0,0.04)',position:'sticky',top:0,zIndex:50,
@@ -85,7 +71,11 @@ export default function HomePage() {
             ?'Мила — это уютная платформа для изучения английского, созданная специально для русскоговорящих. Мы знаем, с какими трудностями ты сталкиваешься, и бережно проведём тебя через них.'
             :'Mila is a cozy English learning platform built specifically for Russian speakers. We know exactly what you struggle with — and we\'ll guide you through it, gently.'}
         </p>
-        
+
+        <div style={{marginTop:20}}>
+          <SpeechButton text="Mila is a cozy English learning platform." label={lang==='ru'?'Послушать на английском':'Hear it in English'} />
+        </div>
+
         {/* CTA Buttons */}
         <div style={{display:'flex',gap:12,justifyContent:'center',marginTop:24,flexWrap:'wrap'}}>
           <button onClick={()=>router.push('/register')}

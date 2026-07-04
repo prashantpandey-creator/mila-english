@@ -8,21 +8,20 @@ import { redirect } from 'next/navigation'
 import AssessmentPlayer from '@/components/AssessmentPlayer'
 import LevelIndicator from '@/components/LevelIndicator'
 import SkillRadar from '@/components/SkillRadar'
+import AssessmentHistory from '@/components/AssessmentHistory'
 
 export default async function AssessmentPage() {
   const token = (await cookies()).get('token')?.value
   if (!token) redirect('/login')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-  const assessments = await fetch(`${baseUrl}/api/assessments`).then(r => r.json()).catch(() => [])
-
   return (
-    <main className="container mx-auto p-4">
+    <main className="container mx-auto p-4" style={{maxWidth:560,padding:'24px 20px'}}>
       <h1 className="text-2xl font-bold">Placement Test</h1>
       <p className="text-gray-600 mt-2">Placement test and skill assessment</p>
+      <LevelIndicator level="B1" />
       <AssessmentPlayer />
-      <LevelIndicator />
       <SkillRadar />
+      <AssessmentHistory />
     </main>
   )
 }
