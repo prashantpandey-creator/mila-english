@@ -48,7 +48,7 @@ model Exercise {
   type String
   question String
   correctAnswer String
-  options Json?
+  options String?
   points Int
   hintText String?
   Lesson Lesson @relation(fields: [lessonId], references: [id])
@@ -63,7 +63,7 @@ model Progress {
   completed Boolean @default(false)
   score Int?
   timeSpentSeconds Int?
-  mistakes Json?
+  mistakes String?
   lastAttemptDate DateTime?
   User User @relation(fields: [userId], references: [id])
   Lesson Lesson @relation(fields: [lessonId], references: [id])
@@ -107,7 +107,7 @@ model Assessment {
   score Int
   maxScore Int
   recommendedLevel String?
-  weakAreas Json?
+  weakAreas String?
   takenDate DateTime
   User User @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
