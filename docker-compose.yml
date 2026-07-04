@@ -3,8 +3,6 @@ services:
     build: .
     container_name: mila
     restart: unless-stopped
-    ports:
-      - "3001:3000"
     environment:
       - DATABASE_URL=file:/data/mila.db
       - JWT_SECRET=${JWT_SECRET:-mila-dev-secret-change-in-production}
@@ -13,6 +11,18 @@ services:
     networks:
       - mila
       - coolify
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+      - traefik.http.routers.mila-http.rule=Host(`mila.purangpt.com`)
+      - traefik.http.routers.mila-http.entrypoints=http
+      - traefik.http.routers.mila-http.middlewares=mila-redirect
+      - traefik.http.middlewares.mila-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.mila.rule=Host(`mila.purangpt.com`)
+      - traefik.http.routers.mila.entrypoints=https
+      - traefik.http.routers.mila.tls=true
+      - traefik.http.routers.mila.tls.certresolver=letsencrypt
+      - traefik.http.services.mila.loadbalancer.server.port=3000
 
 volumes:
   mila_data:

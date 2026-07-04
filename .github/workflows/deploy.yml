@@ -20,6 +20,6 @@ jobs:
             echo "JWT_SECRET=${{ secrets.MILA_JWT_SECRET }}" > .env
             docker compose down --remove-orphans 2>/dev/null || true
             docker compose build && docker compose up -d
-            echo "✅ Mila deployed"
             sleep 3
-            curl -sf localhost:3001/ | head -5
+            docker exec mila node -e "require('http').get('http://localhost:3000/',r=>{console.log('status',r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"
+            echo "✅ Mila deployed — routed via Traefik at mila.purangpt.com"
