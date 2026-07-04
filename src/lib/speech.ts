@@ -16,6 +16,25 @@ export const ACCENTS: Accent[] = [
   { id: 'in', label: 'IN', flag: '🇮🇳', locale: 'en-IN', azureVoice: 'en-IN-NeerjaNeural' },
 ];
 
+// Accents with real pre-baked ElevenLabs audio (public/audio/<id>/<phraseIdx>.mp3).
+// Others fall back to browser TTS until they're baked too.
+const BAKED_ACCENTS = new Set(['us']);
+export function hasRealVoice(accent: Accent): boolean { return BAKED_ACCENTS.has(accent.id); }
+
+// Play a phrase: real native audio when baked, browser TTS otherwise.
+export function playPhrase(idx: number, accent: Accent, text: string): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (BAKED_ACCENTS.has(accent.id)) {
+    return new Promise<void>((resolve) => {
+      const a = new Audio(`/audio/${accent.id}/${idx}.mp3`);
+      a.onended = () => resolve();
+      a.onerror = () => { speak(text, accent).then(resolve); }; // missing file → fallback
+      a.play().catch(() => { speak(text, accent).then(resolve); });
+    });
+  }
+  return speak(text, accent);
+}
+
 export type Verdict = 'good' | 'close' | 'miss';
 export type WordScore = { word: string; verdict: Verdict };
 export type Assessment = { score: number; words: WordScore[]; tip: string; heard: string };

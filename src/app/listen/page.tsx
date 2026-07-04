@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
-import { ACCENTS, speak, startListening, warmModel, onModelProgress } from '@/lib/speech';
+import { ACCENTS, playPhrase, hasRealVoice, startListening, warmModel, onModelProgress } from '@/lib/speech';
 import { PHRASES } from '@/lib/phrases';
 
 const VERDICT = {
@@ -43,7 +43,7 @@ export default function ListenPage() {
 
   const onListen = async () => {
     setPhase('speaking');
-    await speak(phrase.text, accent);
+    await playPhrase(idx, accent, phrase.text);
     setPhase(p => (p === 'speaking' ? 'idle' : p));
   };
 
@@ -129,6 +129,11 @@ export default function ListenPage() {
               cursor:phase==='speaking'?'default':'pointer',opacity:phase==='speaking'?0.7:1}}>
             🔊 {phase==='speaking' ? (lang==='ru'?'Звучит…':'Playing…') : `${lang==='ru'?'Прослушать':'Hear it'} — ${accent.flag} ${accent.label}`}
           </button>
+          <div style={{textAlign:'center',fontSize:'0.68rem',color:'#c0b8af',marginTop:8}}>
+            {hasRealVoice(accent)
+              ? (lang==='ru'?'✨ Настоящий голос носителя':'✨ Real native voice')
+              : (lang==='ru'?'Синтетический голос — настоящий акцент скоро':'Synthetic for now — real accent coming')}
+          </div>
         </div>
 
         {/* score / result */}
