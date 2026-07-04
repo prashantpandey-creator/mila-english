@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --rose: #f9a8b8; --rose-light: #fce4ec; --rose-dark: #e91e63;
+  --cream: #fff8f0; --cream-dark: #f5e6d3;
+  --sage: #a8d5ba; --sage-light: #e8f5e9; --sage-dark: #5b8c5a;
+  --lavender: #c4b5fd; --lavender-light: #ede9fe;
+  --gold: #f59e0b; --gold-light: #fef3c7;
+  --warm-gray: #78716c; --warm-dark: #44403c;
+}
+
+body {
+  background: var(--cream);
+  color: var(--warm-dark);
+  font-family: 'Inter', -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  background: white; border-radius: 16px; padding: 1.5rem;
+  box-shadow: 0 4px 24px rgba(120,113,108,0.10);
+  border: 1px solid rgba(249,168,184,0.10);
+  transition: all 0.3s;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(249,168,184,0.15); }
+
+.btn-primary {
+  background: linear-gradient(135deg, #f9a8b8, #e91e63); color: white;
+  padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600;
+  border: none; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(233,30,99,0.25);
+}
+.btn-primary:hover { box-shadow: 0 6px 20px rgba(233,30,99,0.35); transform: translateY(-1px); }
+
+/* Speech pulse */
+.speech-pulse {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--rose-light); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+}
+.speech-pulse.listening {
+  background: var(--rose);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(249,168,184,0.5); }
+  50% { box-shadow: 0 0 0 24px rgba(249,168,184,0); }
+}
+
+.lang-toggle {
+  display: flex; gap: 2px; background: #f5e6d3; border-radius: 999px; padding: 3px;
+}
+.lang-toggle button {
+  background: none; border: none; padding: 6px 14px; border-radius: 999px;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer; color: #78716c; transition: all 0.2s;
+}
+.lang-toggle button.active { background: white; color: #e91e63; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+.streak-card { background: linear-gradient(135deg,#fff8f0,#fef3c7); border: 1.5px solid rgba(245,158,11,0.2); }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.animate-in { animation: fadeIn 0.4s ease; }
