@@ -1,26 +1,25 @@
 services:
-  engfluent:
+  mila:
     build: .
-    container_name: engfluent
+    container_name: mila
     restart: unless-stopped
     ports:
       - "3001:3000"
     environment:
-      - DATABASE_URL=file:/data/engfluent.db
-      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-in-production}
-      - NEXT_PUBLIC_API_URL=http://localhost:3000
+      - DATABASE_URL=file:/data/mila.db
+      - JWT_SECRET=${JWT_SECRET:-mila-dev-secret-change-in-production}
     volumes:
-      - engfluent_data:/data
+      - mila_data:/data
     networks:
-      - engfluent
+      - mila
       - coolify
 
 volumes:
-  engfluent_data:
+  mila_data:
     driver: local
 
 networks:
-  engfluent:
+  mila:
     driver: bridge
   coolify:
     external: true
