@@ -6,6 +6,7 @@ services:
     environment:
       - DATABASE_URL=file:/data/mila.db
       - JWT_SECRET=${JWT_SECRET:-mila-dev-secret-change-in-production}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     volumes:
       - mila_data:/data
     networks:

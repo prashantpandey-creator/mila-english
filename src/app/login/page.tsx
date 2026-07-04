@@ -18,8 +18,7 @@ export default function LoginPage() {
     try {
       const res = await fetch('/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
       if (!res.ok) throw new Error('');
-      document.cookie = `token=${(await res.json()).token}; path=/`;
-      router.push('/');
+      router.push('/dashboard');
     } catch { setError(t('error_try_again')); }
     finally { setLoading(false); }
   };

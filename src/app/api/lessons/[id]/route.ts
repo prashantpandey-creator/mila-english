@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   // Get lesson detail with all exercises
 
   const id = Number(request.nextUrl.pathname.split('/').pop() || '0')
-  const item = await prisma.lesson.findUnique({ where: { id: Number(id) } })
+  const item = await prisma.lesson.findUnique({ where: { id: Number(id) }, include: { Exercises: true } })
   if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(item)
 }

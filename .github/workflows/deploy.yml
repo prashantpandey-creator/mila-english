@@ -18,6 +18,7 @@ jobs:
             cd /root/mila 2>/dev/null || git clone https://github.com/prashantpandey-creator/mila-english.git /root/mila
             cd /root/mila && git pull
             echo "JWT_SECRET=${{ secrets.MILA_JWT_SECRET }}" > .env
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
             docker compose down --remove-orphans 2>/dev/null || true
             docker compose build && docker compose up -d
             sleep 3

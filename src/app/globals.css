@@ -63,3 +63,70 @@ body {
 
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 .animate-in { animation: fadeIn 0.4s ease; }
+
+/* Glassmorphism utilities (from the darshan/AI overhaul) */
+@layer utilities {
+  .glass {
+    @apply bg-white/50 backdrop-blur-xl border border-white/60 shadow-xl shadow-pink-500/5;
+  }
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md border border-white/50 shadow-lg shadow-purple-500/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 rounded-3xl;
+  }
+  .gradient-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600;
+  }
+}
+
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+/* ── Mila Voice Darshan Styles ── */
+.darshan-orb { display: block; }
+.darshan-ripplewrap { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.darshan-ripple {
+  position: absolute; left: 0; top: 0; width: 140px; height: 140px; margin: -70px 0 0 -70px;
+  border-radius: 50%; border: 1px solid rgba(236, 72, 153, 0.6);
+  animation: darshanRipple 3.8s ease-out infinite;
+}
+.darshan-ripple--delay { animation-delay: 1.9s; }
+@keyframes darshanRipple { 0% { transform: scale(0.42); opacity: 0; } 18% { opacity: 0.42; } 100% { transform: scale(2.7); opacity: 0; } }
+
+.darshan-invoke {
+  position: absolute; left: 0; right: 0; top: 22%; text-align: center;
+  font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 300; letter-spacing: 0.05em;
+  color: rgba(253, 242, 248, 0.7); pointer-events: none;
+  opacity: 0; transition: opacity 1.2s ease;
+}
+.darshan-invoke[data-show="1"] { opacity: 0.88; }
+.darshan-invoke-line { display: inline-block; animation: darshanInvoke 6.4s ease-in-out; }
+@keyframes darshanInvoke { 0% { opacity: 0; transform: translateY(6px); } 12% { opacity: 1; transform: translateY(0); } 86% { opacity: 1; } 100% { opacity: 0; } }
+
+.darshan-q {
+  position: absolute; bottom: 35%; left: 10%; right: 10%; text-align: center;
+  font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 300; color: rgba(253, 242, 248, 0.6);
+  font-style: italic; opacity: 0; transform: scale(0.95); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none; z-index: 15;
+}
+.darshan-q.is-on { opacity: 0.92; transform: scale(1); }
+.darshan-q.is-suck { opacity: 0; transform: scale(0.3) translateY(-190px); filter: blur(4px); }
+
+.darshan-ascrim {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 50vh;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  pointer-events: none; z-index: 10;
+  animation: darshanFade 0.9s ease;
+}
+@keyframes darshanFade { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+.darshan-a {
+  position: absolute; bottom: 15%; left: 5%; right: 5%; text-align: center;
+  font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 400; line-height: 1.6;
+  color: #fbcfe8; text-shadow: 0 0 16px rgba(244, 114, 182, 0.4);
+  pointer-events: none; z-index: 20;
+}
+.darshan-aword {
+  display: inline-block; opacity: 0; transform: translateY(12px) scale(0.96); filter: blur(3px);
+  animation: awordAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.darshan-aword.is-init { animation-duration: 2s; }
+@keyframes awordAppear { 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }

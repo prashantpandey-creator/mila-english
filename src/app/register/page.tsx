@@ -18,7 +18,7 @@ export default function RegisterPage() {
     try {
       const res = await fetch('/api/auth/register', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
       if (!res.ok) throw new Error('');
-      router.push('/login?welcome=1');
+      router.push('/dashboard');
     } catch { setError(t('error_try_again')); }
     finally { setLoading(false); }
   };

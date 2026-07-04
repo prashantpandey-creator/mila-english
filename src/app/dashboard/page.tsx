@@ -51,6 +51,30 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Voice Darshan hero — antigravity's WebGL orb experience */}
+        <div onClick={()=>router.push('/darshan')}
+          style={{cursor:'pointer',position:'relative',height:200,borderRadius:24,overflow:'hidden',
+            background:'linear-gradient(135deg,#1a0b2e,#3a1c4a,#4a1d3d)',marginBottom:16,
+            boxShadow:'0 8px 32px rgba(124,58,237,0.25)',display:'flex',flexDirection:'column',justifyContent:'flex-end',padding:24,
+            transition:'transform 0.2s'}}
+          onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)'}}
+          onMouseLeave={e=>{e.currentTarget.style.transform='none'}}>
+          {/* CSS glow orb */}
+          <div style={{position:'absolute',top:'30%',left:'50%',transform:'translate(-50%,-50%)',width:150,height:150}}>
+            <div className="animate-spin-slow" style={{position:'absolute',inset:0,borderRadius:'50%',
+              background:'conic-gradient(from 0deg,#ec4899,#a855f7,#3b82f6,#ec4899)',filter:'blur(20px)',opacity:0.6}}/>
+            <div style={{position:'absolute',inset:16,borderRadius:'50%',background:'rgba(255,255,255,0.1)',backdropFilter:'blur(4px)',border:'1px solid rgba(255,255,255,0.2)'}}/>
+          </div>
+          <div style={{position:'relative',zIndex:1}}>
+            <div style={{fontWeight:800,fontSize:'1.5rem',color:'white',lineHeight:1.1}}>
+              {lang==='ru'?'Голосовой Даршан':'Voice Darshan'}
+            </div>
+            <div style={{fontSize:'0.9rem',color:'#e9d5ff',marginTop:4}}>
+              {lang==='ru'?'Говори с Милой вслух — ИИ ответит':'Speak with Mila aloud — the AI answers'}
+            </div>
+          </div>
+        </div>
+
         {/* Main CTA — Start Lesson */}
         <DailyLessonCard
           title={lang==='ru'?'Начать урок':'Start Today\'s Lesson'}
@@ -86,6 +110,7 @@ export default function DashboardPage() {
             {emoji:'🏆',label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements',color:C.rose},
             {emoji:'🔤',label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics',color:C.sage},
             {emoji:'🎯',label:lang==='ru'?'Тест':'Assessment',sub:lang==='ru'?'Твой уровень':'Your level',href:'/assessment',color:C.purple},
+            {emoji:'🤖',label:lang==='ru'?'ИИ Чат':'AI Chat',sub:lang==='ru'?'Общение':'Converse',href:'/chat',color:C.rose},
           ].map((l,i)=>(
             <div key={i} onClick={()=>router.push(l.href)}
               style={{cursor:'pointer',background:'white',borderRadius:16,padding:'16px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',

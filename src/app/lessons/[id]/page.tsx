@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import LessonContent from '@/components/LessonContent';
@@ -23,16 +23,71 @@ export default function LessonPage() {
   const { t, lang } = useI18n();
   const router = useRouter();
   const params = useParams();
-  const lesson = LESSONS[params?.id as string] || LESSONS['1'];
+  const staticLesson = LESSONS[params?.id as string];
+  const lesson = staticLesson || LESSONS['1'];
   const [currentWord, setCurrentWord] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
   const [step, setStep] = useState<'words'|'phrases'|'practice'>('words');
+  const [dbLesson, setDbLesson] = useState<any>(null);
+
+  // Lessons not in the built-in set are AI-generated ones living in the DB.
+  useEffect(() => {
+    if (staticLesson) return;
+    fetch(`/api/lessons/${params?.id}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(setDbLesson)
+      .catch(() => setDbLesson(null));
+  }, [params?.id, staticLesson]);
 
   const speak = (text: string) => {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US'; u.rate = 0.75;
     speechSynthesis.speak(u);
   };
+
+  // AI-generated lesson: render its content + exercises directly.
+  if (!staticLesson) {
+    return (
+      <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
+        <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
+          borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <span onClick={()=>router.push('/lessons')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>← 🌸 Мила</span>
+          <LangToggle />
+        </div>
+        <div style={{maxWidth:640,margin:'0 auto',padding:'24px 20px'}}>
+          {!dbLesson ? (
+            <p style={{color:C.warm,textAlign:'center',padding:'40px 0'}}>{t('loading')}</p>
+          ) : (
+            <>
+              <div style={{display:'inline-block',background:C.goldL,color:C.gold,fontWeight:700,fontSize:'0.75rem',padding:'4px 12px',borderRadius:20,marginBottom:12}}>✨ {lang==='ru'?'Урок от ИИ':'AI-generated'}</div>
+              <h1 style={{fontSize:'1.5rem',fontWeight:800,color:C.dark,margin:'0 0 12px'}}>{dbLesson.title}</h1>
+              <div style={{background:'white',borderRadius:16,padding:'20px 24px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',color:C.dark,lineHeight:1.7,marginBottom:20,whiteSpace:'pre-wrap'}}>
+                {dbLesson.content}
+              </div>
+              {Array.isArray(dbLesson.Exercises) && dbLesson.Exercises.map((ex:any)=>{
+                let opts:string[] = [];
+                try { opts = typeof ex.options==='string' ? JSON.parse(ex.options) : (ex.options||[]); } catch { opts = []; }
+                return (
+                  <div key={ex.id} style={{background:'white',borderRadius:16,padding:'16px 20px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',marginBottom:12}}>
+                    <div style={{fontWeight:700,color:C.dark,marginBottom:10}}>{ex.question}</div>
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                      {opts.map((o,i)=>(
+                        <div key={i} style={{padding:'10px',borderRadius:10,border:'1.5px solid #e5e0dc',fontSize:'0.9rem',color:C.dark,textAlign:'center'}}>{o}</div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              <button onClick={()=>router.push('/lessons')}
+                style={{width:'100%',padding:'14px',borderRadius:14,border:'none',background:C.rose,color:'white',fontWeight:700,fontSize:'1rem',cursor:'pointer',marginTop:8}}>
+                {lang==='ru'?'← К урокам':'← Back to lessons'}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
