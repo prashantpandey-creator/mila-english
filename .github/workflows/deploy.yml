@@ -1,0 +1,25 @@
+name: Deploy Mila to Hetzner
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 204.168.176.229
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /root/mila 2>/dev/null || git clone https://github.com/prashantpandey-creator/mila-english.git /root/mila
+            cd /root/mila && git pull
+            docker compose down --remove-orphans 2>/dev/null || true
+            docker compose build
+            docker compose up -d
+            cp mila.nginx.conf /etc/nginx/conf.d/mila.conf 2>/dev/null || true
+            nginx -t && nginx -s reload 2>/dev/null || true
+            echo "✅ Mila deployed"
+            curl -s localhost:3001/ | head -5
