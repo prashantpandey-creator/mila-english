@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
-import { ACCENTS, speak, assess, isAzureReady } from '@/lib/speech';
+import { ACCENTS, speak, assess, warmModel } from '@/lib/speech';
 import { PHRASES } from '@/lib/phrases';
 
 const VERDICT = {
@@ -26,12 +26,15 @@ export default function ListenPage() {
   const [errMsg, setErrMsg] = useState('');
 
   useEffect(() => { setM(true); }, []);
-  // Warm up the voice list (some browsers populate async).
-  useEffect(() => { if (typeof window !== 'undefined') window.speechSynthesis?.getVoices(); }, [m]);
+  // Warm the voice list + kick off the one-time on-device model download.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.speechSynthesis?.getVoices();
+    warmModel();
+  }, [m]);
   if (!m) return null;
 
   const phrase = PHRASES[idx];
-  const azure = isAzureReady();
 
   const onListen = async () => {
     setPhase('speaking');
@@ -157,14 +160,12 @@ export default function ListenPage() {
           {phase==='recording' ? (lang==='ru'?'Слушаю… говори сейчас':'Listening… speak now') : (lang==='ru'?'Нажми и произнеси вслух':'Tap the mic and say it aloud')}
         </div>
 
-        {/* honest mode badge */}
-        {!azure && (
-          <div style={{textAlign:'center',fontSize:'0.72rem',color:'#c0b8af',marginTop:18,lineHeight:1.5}}>
-            {lang==='ru'
-              ? 'Приблизительная оценка. Точность по фонемам и живые акценты включатся с Azure.'
-              : 'Approximate scoring. Phoneme-level accuracy and true native accents activate with Azure.'}
-          </div>
-        )}
+        {/* on-device badge */}
+        <div style={{textAlign:'center',fontSize:'0.72rem',color:'#c0b8af',marginTop:18,lineHeight:1.5}}>
+          {lang==='ru'
+            ? '🔒 Работает на твоём устройстве — приватно и без интернета. Первый раз модель загрузится, потом мгновенно.'
+            : '🔒 Runs on your device — private, works offline. First use downloads a small model, then it’s instant.'}
+        </div>
       </div>
     </div>
   );

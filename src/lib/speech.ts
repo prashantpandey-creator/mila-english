@@ -1,19 +1,21 @@
 // ── The speech seam ─────────────────────────────────────────────────────────
-// One module, two jobs: speak a phrase in a chosen accent, and score the user
-// saying it back. Today it runs in DEMO mode on the browser's Web Speech APIs
-// (no keys, works offline-ish). When Azure Speech creds arrive, only the two
-// marked bodies below change: speak() → Azure accented Neural TTS, assess() →
-// Azure Pronunciation Assessment (phoneme-level accuracy). The page never changes.
+// Reinvented: no server, no vendor, no cold start. The pronunciation model runs
+// ON THE DEVICE via transformers.js (WebGPU, WASM fallback) inside a web worker.
+// Audio never leaves the phone — private, and it works offline (on a plane).
+//   speak()  — hear the phrase. Browser TTS today; ElevenLabs pre-baked accent
+//              audio (static files) is the drop-in upgrade — still zero runtime cost.
+//   assess() — record, resample to 16kHz, transcribe on-device, score.
+//              wav2vec2 CTC is acoustic — it surfaces mispronunciations. A converted
+//              espeak-IPA model swaps in here for true per-phoneme GOP, same rails.
 
 export type Accent = {
   id: string;
   label: string;
   flag: string;
-  locale: string;       // BCP-47 — drives browser voice pick + recognition bias
-  azureVoice: string;   // used once Azure is wired
+  locale: string;
+  azureVoice: string; // legacy field name; used as the ElevenLabs/voice hint later
 };
 
-// Ship UK + US + Indian first (Indian = the highest-utility "Asian" accent).
 export const ACCENTS: Accent[] = [
   { id: 'uk', label: 'UK', flag: '🇬🇧', locale: 'en-GB', azureVoice: 'en-GB-SoniaNeural' },
   { id: 'us', label: 'US', flag: '🇺🇸', locale: 'en-US', azureVoice: 'en-US-JennyNeural' },
@@ -24,15 +26,7 @@ export type Verdict = 'good' | 'close' | 'miss';
 export type WordScore = { word: string; verdict: Verdict };
 export type Assessment = { score: number; words: WordScore[]; tip: string; heard: string };
 
-// True once Azure creds are configured (a NEXT_PUBLIC_SPEECH_REGION is present).
-// Kept as a function so the swap is a one-liner and the page can show a mode badge.
-export function isAzureReady(): boolean {
-  return typeof process !== 'undefined' && !!process.env.NEXT_PUBLIC_SPEECH_REGION;
-}
-
 // ── speak() ──────────────────────────────────────────────────────────────────
-// DEMO: browser SpeechSynthesis, best-matching voice for the accent's locale.
-// AZURE (later): SpeechSDK.SpeakSsmlAsync with <voice name={accent.azureVoice}>.
 export function speak(text: string, accent: Accent): Promise<void> {
   return new Promise((resolve) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return resolve();
@@ -42,9 +36,8 @@ export function speak(text: string, accent: Accent): Promise<void> {
     u.rate = 0.9;
     const voices = window.speechSynthesis.getVoices();
     const exact = voices.find((v) => v.lang === accent.locale);
-    const loose = voices.find((v) => v.lang?.toLowerCase().startsWith(accent.locale.slice(0, 2)) && v.lang.includes(accent.locale.slice(3)));
     const anyEn = voices.find((v) => v.lang?.toLowerCase().startsWith('en'));
-    const picked = exact || loose || anyEn;
+    const picked = exact || anyEn;
     if (picked) u.voice = picked;
     u.onend = () => resolve();
     u.onerror = () => resolve();
@@ -52,37 +45,77 @@ export function speak(text: string, accent: Accent): Promise<void> {
   });
 }
 
-// ── assess() ─────────────────────────────────────────────────────────────────
-// DEMO: Web Speech recognition transcript, scored by word-match against the
-// reference. Honest but coarse — it hears *which words* you said, not *how*.
-// AZURE (later): PronunciationAssessmentConfig → per-phoneme AccuracyScore,
-// which replaces the word-match verdicts with true pronunciation accuracy.
-export function assess(reference: string, accent: Accent): Promise<Assessment> {
+// ── on-device worker singleton ───────────────────────────────────────────────
+let _worker: Worker | null = null;
+let _reqId = 0;
+let _warmed = false;
+const _pending = new Map<number, { resolve: (t: string) => void; reject: (e: Error) => void }>();
+
+function worker(): Worker {
+  if (_worker) return _worker;
+  _worker = new Worker('/asr.worker.js', { type: 'module' });
+  _worker.onmessage = (e: MessageEvent) => {
+    const { type, id, text, error } = (e.data || {}) as any;
+    if (type === 'result') { _pending.get(id)?.resolve(text); _pending.delete(id); }
+    else if (type === 'error') { _pending.get(id)?.reject(new Error(error)); _pending.delete(id); }
+    else if (type === 'warmed') { _warmed = true; }
+  };
+  return _worker;
+}
+
+// Kick off the one-time model download in the background (call on page mount).
+export function warmModel(): void {
+  if (typeof window === 'undefined') return;
+  try { worker().postMessage({ type: 'warm' }); } catch { /* no-op */ }
+}
+export function isModelWarm(): boolean { return _warmed; }
+
+function transcribe(audio: Float32Array): Promise<string> {
+  const w = worker();
+  const id = ++_reqId;
   return new Promise((resolve, reject) => {
-    if (typeof window === 'undefined') return reject(new Error('no window'));
-    const Rec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!Rec) return reject(new Error('unsupported'));
-
-    const rec = new Rec();
-    rec.lang = accent.locale;
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-
-    let done = false;
-    const finish = (heard: string) => {
-      if (done) return;
-      done = true;
-      resolve(scoreAgainst(reference, heard));
-    };
-
-    rec.onresult = (e: any) => finish(e.results?.[0]?.[0]?.transcript ?? '');
-    rec.onerror = (e: any) => { if (!done) { done = true; reject(new Error(e.error || 'recognition-failed')); } };
-    rec.onend = () => finish('');
-    try { rec.start(); } catch { reject(new Error('start-failed')); }
+    _pending.set(id, { resolve, reject });
+    w.postMessage({ type: 'transcribe', id, audio }, [audio.buffer]);
   });
 }
 
-// ── word-match scoring (demo) ────────────────────────────────────────────────
+// ── assess() — record → 16kHz mono → on-device transcribe → score ────────────
+export async function assess(reference: string, _accent: Accent): Promise<Assessment> {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    throw new Error('unsupported');
+  }
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const rec = new MediaRecorder(stream);
+  const chunks: Blob[] = [];
+  rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+  const stopped = new Promise<void>((res) => { rec.onstop = () => res(); });
+  rec.start();
+  await new Promise((r) => setTimeout(r, 4000)); // fixed 4s window (VAD is a later refinement)
+  rec.stop();
+  stream.getTracks().forEach((t) => t.stop());
+  await stopped;
+
+  const audio = await blobTo16kMono(new Blob(chunks));
+  const heard = await transcribe(audio);
+  return scoreAgainst(reference, heard);
+}
+
+async function blobTo16kMono(blob: Blob): Promise<Float32Array> {
+  const bytes = await blob.arrayBuffer();
+  const AC: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
+  const ctx = new AC();
+  const decoded = await ctx.decodeAudioData(bytes);
+  const off = new OfflineAudioContext(1, Math.max(1, Math.ceil(decoded.duration * 16000)), 16000);
+  const src = off.createBufferSource();
+  src.buffer = decoded;
+  src.connect(off.destination);
+  src.start();
+  const rendered = await off.startRendering();
+  ctx.close();
+  return rendered.getChannelData(0);
+}
+
+// ── scoring ──────────────────────────────────────────────────────────────────
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z' ]/g, '').trim();
 
 function lev(a: string, b: string): number {
@@ -97,8 +130,7 @@ function lev(a: string, b: string): number {
 
 function scoreAgainst(reference: string, heard: string): Assessment {
   const refWords = norm(reference).split(/\s+/).filter(Boolean);
-  const heardSet = norm(heard).split(/\s+/).filter(Boolean);
-  const remaining = [...heardSet];
+  const remaining = norm(heard).split(/\s+/).filter(Boolean);
 
   const words: WordScore[] = refWords.map((w) => {
     const exactIdx = remaining.indexOf(w);
