@@ -75,11 +75,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Main CTA — Start Lesson */}
+        {/* Main CTA — the listen-and-repeat core loop */}
         <DailyLessonCard
-          title={lang==='ru'?'Начать урок':'Start Today\'s Lesson'}
-          subtitle={lang==='ru'?'Разговор • 5 мин • Лёгкий':'Speaking • 5 min • Easy'}
-          onStart={()=>router.push('/lessons')}
+          title={lang==='ru'?'Слушай и повторяй':'Listen & repeat'}
+          subtitle={lang==='ru'?'Акценты • произношение • 5 мин':'Accents • pronunciation • 5 min'}
+          onStart={()=>router.push('/listen')}
         />
 
         {/* Stats */}

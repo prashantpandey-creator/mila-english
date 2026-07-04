@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { authenticate } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   try {
     // SECURITY FIX: Gate unauthenticated LLM endpoints (Ported from PuranGPT Issue #8)
