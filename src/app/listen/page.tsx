@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
-import { ACCENTS, playPhrase, hasRealVoice, startListening, warmModel, onModelProgress, missedSound } from '@/lib/speech';
+import { ACCENTS, playPhrase, hasRealVoice, startListening, missedSound } from '@/lib/speech';
 import { PHRASES, PACKS, SOUND_INFO } from '@/lib/phrases';
 
 const VERDICT = {
@@ -25,19 +25,11 @@ export default function ListenPage() {
   const [phase, setPhase] = useState<'idle'|'speaking'|'recording'|'scoring'|'scored'|'error'>('idle');
   const [result, setResult] = useState<any>(null);
   const [errMsg, setErrMsg] = useState('');
-  const [modelReady, setModelReady] = useState(false);
-  const [modelPct, setModelPct] = useState(0);
   const [session, setSession] = useState<any>(null);
   const [soundMisses, setSoundMisses] = useState<Record<string,{count:number;example:string}>>({});
 
   useEffect(() => { setM(true); }, []);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.speechSynthesis?.getVoices();
-    const off = onModelProgress((p) => { setModelReady(p.ready); setModelPct(p.percent); });
-    warmModel();
-    return off;
-  }, [m]);
+  useEffect(() => { if (typeof window !== 'undefined') window.speechSynthesis?.getVoices(); }, [m]);
   if (!m) return null;
 
   // Phrases of the current pack, carrying their global index (= audio file index).
@@ -181,6 +173,14 @@ export default function ListenPage() {
                 </div>
               </div>
             </div>
+            {result.words.some((w:any)=>w.phonemes?.length) && (
+              <div style={{display:'flex',flexWrap:'wrap',gap:3,marginTop:12}}>
+                {result.words.flatMap((w:any)=>w.phonemes||[]).map((p:any,i:number)=>(
+                  <span key={i} title={p.acc+'%'} style={{fontSize:'0.72rem',fontWeight:700,fontFamily:'ui-monospace,monospace',
+                    color:VERDICT[p.verdict].fg,background:VERDICT[p.verdict].bg,padding:'2px 6px',borderRadius:5}}>{p.ph}</span>
+                ))}
+              </div>
+            )}
             <div style={{marginTop:11,fontSize:'0.82rem',color:C.warm,lineHeight:1.45,background:C.pageBg,borderRadius:10,padding:'9px 11px'}}>
               💡 {result.tip}
             </div>
@@ -198,10 +198,10 @@ export default function ListenPage() {
             style={{flex:1,height:52,borderRadius:16,border:'1.5px solid #efe0d4',background:'white',color:C.warm,fontWeight:600,fontSize:'0.95rem',cursor:'pointer'}}>
             {lang==='ru'?'Следующая →':'Next phrase →'}
           </button>
-          <button onClick={onMic} disabled={!modelReady || micBusy}
+          <button onClick={onMic} disabled={micBusy}
             aria-label={phase==='recording'?(lang==='ru'?'Остановить':'Stop'):(lang==='ru'?'Произнести':'Say it back')}
             style={{width:64,height:64,borderRadius:'50%',border:'none',
-              cursor:(!modelReady||micBusy)?'default':'pointer',opacity:modelReady?1:0.45,
+              cursor:micBusy?'default':'pointer',opacity:1,
               background:phase==='recording'?C.gold:phase==='scoring'?C.purple:C.rose,color:'white',fontSize:'1.5rem',
               boxShadow:`0 6px 20px ${phase==='recording'?'rgba(245,158,11,.4)':'rgba(233,30,99,.35)'}`,
               animation:phase==='recording'?'pulse 1.2s ease-in-out infinite':'none'}}>
@@ -246,26 +246,11 @@ export default function ListenPage() {
           </div>
         )}
 
-        {/* warming banner (first load only) or on-device badge */}
-        {!modelReady ? (
-          <div style={{marginTop:18,background:'white',borderRadius:14,padding:'12px 16px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
-            <div style={{fontSize:'0.78rem',color:C.dark,fontWeight:600,marginBottom:8,textAlign:'center'}}>
-              {lang==='ru'?`⚙️ Готовлю тренера на устройстве… ${modelPct}%`:`⚙️ Preparing your on-device coach… ${modelPct}%`}
-            </div>
-            <div style={{height:6,borderRadius:4,background:'#f0ece7',overflow:'hidden'}}>
-              <div style={{height:'100%',width:`${Math.max(4,modelPct)}%`,background:C.sage,borderRadius:4,transition:'width .3s'}}/>
-            </div>
-            <div style={{fontSize:'0.7rem',color:'#b0a89f',marginTop:7,textAlign:'center',lineHeight:1.5}}>
-              {lang==='ru'?'Один раз. Потом всё работает мгновенно и без интернета.':'One time only. Then it’s instant and works offline.'}
-            </div>
-          </div>
-        ) : (
-          <div style={{textAlign:'center',fontSize:'0.72rem',color:'#c0b8af',marginTop:18,lineHeight:1.5}}>
-            {lang==='ru'
-              ? '🔒 Работает на твоём устройстве — приватно и без интернета.'
-              : '🔒 Runs on your device — private, works offline.'}
-          </div>
-        )}
+        <div style={{textAlign:'center',fontSize:'0.72rem',color:'#c0b8af',marginTop:18,lineHeight:1.5}}>
+          {lang==='ru'
+            ? '🎯 Оценка по фонемам — модель на нашем сервере, мгновенно.'
+            : '🎯 Phoneme-level scoring by our model — instant.'}
+        </div>
       </div>
     </div>
   );

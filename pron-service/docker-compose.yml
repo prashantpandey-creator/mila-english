@@ -1,0 +1,11 @@
+services:
+  mila-pron:
+    build: .
+    container_name: mila-pron
+    restart: unless-stopped
+    networks:
+      - coolify        # reachable by the mila frontend as http://mila-pron:8000
+
+networks:
+  coolify:
+    external: true

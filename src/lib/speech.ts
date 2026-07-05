@@ -1,14 +1,11 @@
 // ── The speech seam ─────────────────────────────────────────────────────────
-// Reinvented: no server, no vendor, no cold start. The pronunciation model runs
-// ON THE DEVICE via transformers.js (WebGPU, WASM fallback) inside a web worker.
-// Audio never leaves the phone — private, and it works offline.
-//   speak()          — hear the phrase (browser TTS today; ElevenLabs pre-baked next).
-//   warmModel()      — background one-time model download, with progress.
-//   startListening() — record with VAD auto-stop OR manual stop, score on-device.
+// Listen side: real native ElevenLabs audio (pre-baked) with a browser-TTS fallback.
+// Speak side: record the clip and score it on the WARM phoneme endpoint — true
+// per-phoneme GOP from a resident wav2vec2-espeak model on our own metal.
+//   playPhrase()     — hear the phrase (baked accent audio, else browser TTS).
+//   startListening() — record with VAD auto-stop OR manual stop, score server-side.
 
-export type Accent = {
-  id: string; label: string; flag: string; locale: string; azureVoice: string;
-};
+export type Accent = { id: string; label: string; flag: string; locale: string; azureVoice: string };
 
 export const ACCENTS: Accent[] = [
   { id: 'uk', label: 'UK', flag: '🇬🇧', locale: 'en-GB', azureVoice: 'en-GB-SoniaNeural' },
@@ -16,19 +13,16 @@ export const ACCENTS: Accent[] = [
   { id: 'in', label: 'IN', flag: '🇮🇳', locale: 'en-IN', azureVoice: 'en-IN-NeerjaNeural' },
 ];
 
-// Accents with real pre-baked ElevenLabs audio (public/audio/<id>/<phraseIdx>.mp3).
-// Others fall back to browser TTS until they're baked too.
 const BAKED_ACCENTS = new Set(['us', 'uk', 'in']);
 export function hasRealVoice(accent: Accent): boolean { return BAKED_ACCENTS.has(accent.id); }
 
-// Play a phrase: real native audio when baked, browser TTS otherwise.
 export function playPhrase(idx: number, accent: Accent, text: string): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
   if (BAKED_ACCENTS.has(accent.id)) {
     return new Promise<void>((resolve) => {
       const a = new Audio(`/audio/${accent.id}/${idx}.mp3`);
       a.onended = () => resolve();
-      a.onerror = () => { speak(text, accent).then(resolve); }; // missing file → fallback
+      a.onerror = () => { speak(text, accent).then(resolve); };
       a.play().catch(() => { speak(text, accent).then(resolve); });
     });
   }
@@ -36,23 +30,12 @@ export function playPhrase(idx: number, accent: Accent, text: string): Promise<v
 }
 
 export type Verdict = 'good' | 'close' | 'miss';
-export type WordScore = { word: string; verdict: Verdict };
-
-// Given a phrase and a scored result, return the drilled sound to tally as a
-// stumble — or null when the phrase's carrier word was nailed. Pure + tested.
-export function missedSound(
-  phrase: { hard: string; sound: string },
-  r: { words?: { word: string; verdict: Verdict }[] },
-): string | null {
-  if (!r?.words) return null;
-  const h = phrase.hard.toLowerCase().replace(/[^a-z']/g, '');
-  const w = r.words.find((x) => x.word === h);
-  return w && w.verdict !== 'good' ? phrase.sound : null;
-}
-export type Assessment = { score: number; words: WordScore[]; tip: string; heard: string };
+export type Phoneme = { ph: string; acc: number; verdict: Verdict };
+export type WordScore = { word: string; score?: number; verdict: Verdict; phonemes?: Phoneme[] };
+export type Assessment = { score: number; words: WordScore[]; tip: string };
 export type Session = { stop: () => Promise<Assessment> };
 
-// ── speak() ──────────────────────────────────────────────────────────────────
+// ── speak() — browser TTS (fallback voice for not-yet-baked accents) ──────────
 export function speak(text: string, accent: Accent): Promise<void> {
   return new Promise((resolve) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return resolve();
@@ -69,61 +52,31 @@ export function speak(text: string, accent: Accent): Promise<void> {
   });
 }
 
-// ── on-device worker singleton + progress plumbing ───────────────────────────
-let _worker: Worker | null = null;
-let _reqId = 0;
-let _warmed = false;
-const _pending = new Map<number, { resolve: (t: string) => void; reject: (e: Error) => void }>();
-
-export type ModelProgress = { ready: boolean; percent: number };
-const _files = new Map<string, { loaded: number; total: number }>();
-const _progressListeners = new Set<(p: ModelProgress) => void>();
-
-export function onModelProgress(cb: (p: ModelProgress) => void): () => void {
-  _progressListeners.add(cb);
-  cb(currentProgress());
-  return () => _progressListeners.delete(cb);
-}
-function currentProgress(): ModelProgress {
-  if (_warmed) return { ready: true, percent: 100 };
-  let loaded = 0, total = 0;
-  _files.forEach((f) => { loaded += f.loaded || 0; total += f.total || 0; });
-  return { ready: false, percent: total > 0 ? Math.min(99, Math.round((loaded / total) * 100)) : 0 };
-}
-function emitProgress() { const p = currentProgress(); _progressListeners.forEach((cb) => cb(p)); }
-
-function worker(): Worker {
-  if (_worker) return _worker;
-  _worker = new Worker('/asr.worker.js', { type: 'module' });
-  _worker.onmessage = (e: MessageEvent) => {
-    const { type, id, text, error, data } = (e.data || {}) as any;
-    if (type === 'result') { _pending.get(id)?.resolve(text); _pending.delete(id); }
-    else if (type === 'error') { _pending.get(id)?.reject(new Error(error)); _pending.delete(id); }
-    else if (type === 'warmed') { _warmed = true; emitProgress(); }
-    else if (type === 'progress' && data?.file) {
-      if (data.status === 'progress' || data.total) _files.set(data.file, { loaded: data.loaded || 0, total: data.total || 0 });
-      emitProgress();
-    }
-  };
-  return _worker;
+// Given a phrase and a scored result, return the drilled sound to tally as a
+// stumble — or null when the phrase's carrier word was nailed. Pure + tested.
+export function missedSound(
+  phrase: { hard: string; sound: string },
+  r: { words?: { word: string; verdict: Verdict }[] },
+): string | null {
+  if (!r?.words) return null;
+  const h = phrase.hard.toLowerCase().replace(/[^a-z']/g, '');
+  const w = r.words.find((x) => x.word.toLowerCase().replace(/[^a-z']/g, '') === h);
+  return w && w.verdict !== 'good' ? phrase.sound : null;
 }
 
-export function warmModel(): void {
-  if (typeof window === 'undefined') return;
-  try { worker().postMessage({ type: 'warm' }); } catch { /* no-op */ }
-}
-export function isModelWarm(): boolean { return _warmed; }
-
-function transcribe(audio: Float32Array): Promise<string> {
-  const w = worker();
-  const id = ++_reqId;
-  return new Promise((resolve, reject) => {
-    _pending.set(id, { resolve, reject });
-    w.postMessage({ type: 'transcribe', id, audio }, [audio.buffer]);
-  });
+// POST the recorded clip to the warm phoneme endpoint for true GOP scoring.
+async function scoreBlob(blob: Blob, reference: string): Promise<Assessment> {
+  const fd = new FormData();
+  fd.append('audio', blob, 'a.webm');
+  fd.append('reference', reference);
+  const r = await fetch('/api/pronounce', { method: 'POST', body: fd });
+  if (!r.ok) throw new Error('score-failed');
+  const j = await r.json();
+  if (!j || typeof j.score !== 'number' || !Array.isArray(j.words)) throw new Error('score-empty');
+  return j as Assessment;
 }
 
-// ── startListening() — VAD auto-stop OR manual stop, whichever fires first ────
+// ── startListening() — VAD auto-stop OR manual stop; score on the server ──────
 export async function startListening(
   reference: string,
   _accent: Accent,
@@ -138,7 +91,6 @@ export async function startListening(
   const recStopped = new Promise<void>((res) => { rec.onstop = () => res(); });
   rec.start();
 
-  // Voice-activity detection over the live mic.
   const AC: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
   const actx = new AC();
   const analyser = actx.createAnalyser();
@@ -165,8 +117,7 @@ export async function startListening(
     (async () => {
       try {
         await recStopped;
-        const audio = await blobTo16kMono(new Blob(chunks));
-        resolveResult(scoreAgainst(reference, await transcribe(audio)));
+        resolveResult(await scoreBlob(new Blob(chunks, { type: rec.mimeType || 'audio/webm' }), reference));
       } catch (e: any) { rejectResult(e instanceof Error ? e : new Error(String(e))); }
     })();
     return resultP;
@@ -188,56 +139,4 @@ export async function startListening(
   raf = requestAnimationFrame(tick);
 
   return { stop: () => finalize() };
-}
-
-async function blobTo16kMono(blob: Blob): Promise<Float32Array> {
-  const bytes = await blob.arrayBuffer();
-  const AC: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
-  const ctx = new AC();
-  const decoded = await ctx.decodeAudioData(bytes);
-  const off = new OfflineAudioContext(1, Math.max(1, Math.ceil(decoded.duration * 16000)), 16000);
-  const src = off.createBufferSource();
-  src.buffer = decoded;
-  src.connect(off.destination);
-  src.start();
-  const rendered = await off.startRendering();
-  ctx.close();
-  return rendered.getChannelData(0);
-}
-
-// ── scoring ──────────────────────────────────────────────────────────────────
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z' ]/g, '').trim();
-
-function lev(a: string, b: string): number {
-  const m = a.length, n = b.length;
-  const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
-  for (let j = 0; j <= n; j++) d[0][j] = j;
-  for (let i = 1; i <= m; i++)
-    for (let j = 1; j <= n; j++)
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-  return d[m][n];
-}
-
-function scoreAgainst(reference: string, heard: string): Assessment {
-  const refWords = norm(reference).split(/\s+/).filter(Boolean);
-  const remaining = norm(heard).split(/\s+/).filter(Boolean);
-
-  const words: WordScore[] = refWords.map((w) => {
-    const exactIdx = remaining.indexOf(w);
-    if (exactIdx >= 0) { remaining.splice(exactIdx, 1); return { word: w, verdict: 'good' }; }
-    const closeIdx = remaining.findIndex((h) => lev(h, w) <= Math.max(1, Math.floor(w.length / 4)));
-    if (closeIdx >= 0) { remaining.splice(closeIdx, 1); return { word: w, verdict: 'close' }; }
-    return { word: w, verdict: 'miss' };
-  });
-
-  const good = words.filter((x) => x.verdict === 'good').length;
-  const close = words.filter((x) => x.verdict === 'close').length;
-  const score = refWords.length ? Math.round((100 * (good + close * 0.5)) / refWords.length) : 0;
-
-  const weak = words.find((x) => x.verdict !== 'good');
-  const tip = !heard
-    ? "Didn't catch that — tap the mic and say it again."
-    : weak ? `Focus on “${weak.word}” — hear it once more, then repeat.` : 'Clean run. Try the next one.';
-
-  return { score, words, tip, heard };
 }
