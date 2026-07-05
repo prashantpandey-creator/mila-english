@@ -20,7 +20,8 @@ MODEL = "eleven_multilingual_v2"
 
 def phrases():
     ts = open(os.path.join(os.path.dirname(__file__), "..", "src", "lib", "phrases.ts")).read()
-    return re.findall(r"text:\s*'([^']*)'", ts)
+    # text may be single- or double-quoted (double is used for phrases with apostrophes)
+    return ["".join(m) for m in re.findall(r'''text:\s*(?:"([^"]*)"|'([^']*)')''', ts)]
 
 def main():
     accent = sys.argv[1] if len(sys.argv) > 1 else "us"

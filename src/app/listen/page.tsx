@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
-import { ACCENTS, playPhrase, hasRealVoice, startListening, warmModel, onModelProgress } from '@/lib/speech';
-import { PHRASES } from '@/lib/phrases';
+import { ACCENTS, playPhrase, hasRealVoice, startListening, warmModel, onModelProgress, missedSound } from '@/lib/speech';
+import { PHRASES, PACKS, SOUND_INFO } from '@/lib/phrases';
 
 const VERDICT = {
   good:  { fg: '#3f7a3e', bg: '#e8f5e9' },
@@ -20,16 +20,17 @@ export default function ListenPage() {
   const router = useRouter();
   const [m, setM] = useState(false);
   const [accent, setAccent] = useState(ACCENTS[0]);
-  const [idx, setIdx] = useState(0);
+  const [pack, setPack] = useState(PACKS[0].id);
+  const [pos, setPos] = useState(0);
   const [phase, setPhase] = useState<'idle'|'speaking'|'recording'|'scoring'|'scored'|'error'>('idle');
   const [result, setResult] = useState<any>(null);
   const [errMsg, setErrMsg] = useState('');
   const [modelReady, setModelReady] = useState(false);
   const [modelPct, setModelPct] = useState(0);
   const [session, setSession] = useState<any>(null);
+  const [soundMisses, setSoundMisses] = useState<Record<string,{count:number;example:string}>>({});
 
   useEffect(() => { setM(true); }, []);
-  // Warm the voice list + kick off the one-time on-device model download, tracking progress.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     window.speechSynthesis?.getVoices();
@@ -39,15 +40,31 @@ export default function ListenPage() {
   }, [m]);
   if (!m) return null;
 
-  const phrase = PHRASES[idx];
+  // Phrases of the current pack, carrying their global index (= audio file index).
+  const items = PHRASES.map((p, i) => ({ ...p, gi: i })).filter((p) => p.pack === pack);
+  const phrase = items[pos] || items[0];
+
+  const onPack = (id: string) => {
+    setPack(id); setPos(0); setResult(null); setPhase('idle'); setErrMsg(''); setSession(null);
+  };
 
   const onListen = async () => {
     setPhase('speaking');
-    await playPhrase(idx, accent, phrase.text);
+    await playPhrase(phrase.gi, accent, phrase.text);
     setPhase(p => (p === 'speaking' ? 'idle' : p));
   };
 
-  const settle = (r: any) => { setResult(r); setPhase('scored'); setSession(null); };
+  // Tally the drilled sound whenever its carrier word wasn't nailed.
+  const recordMiss = (ph: any, r: any) => {
+    const snd = missedSound(ph, r);
+    if (!snd) return;
+    setSoundMisses(prev => {
+      const cur = prev[snd] || { count: 0, example: ph.hard };
+      return { ...prev, [snd]: { count: cur.count + 1, example: ph.hard } };
+    });
+  };
+
+  const settle = (r: any) => { setResult(r); setPhase('scored'); setSession(null); recordMiss(phrase, r); };
   const fail = (e: any) => {
     setErrMsg(e?.message === 'unsupported'
       ? (lang==='ru' ? 'Микрофон не поддерживается — открой в Chrome.' : 'Speech input needs Chrome — open there to practice.')
@@ -55,7 +72,6 @@ export default function ListenPage() {
     setPhase('error'); setSession(null);
   };
 
-  // Tap to start; tap again to stop — or it auto-stops when you finish speaking.
   const onMic = async () => {
     if (phase === 'recording' && session) {
       setPhase('scoring');
@@ -64,15 +80,14 @@ export default function ListenPage() {
     }
     setErrMsg(''); setResult(null); setPhase('recording');
     try {
-      const s = await startListening(phrase.text, accent, (a) => {
-        setSession(null); setPhase('scoring'); settle(a);
-      });
+      const s = await startListening(phrase.text, accent, (a) => { setSession(null); setPhase('scoring'); settle(a); });
       setSession(s);
     } catch (e) { fail(e); }
   };
 
-  const next = () => { setIdx(i => (i + 1) % PHRASES.length); setResult(null); setPhase('idle'); setErrMsg(''); setSession(null); };
+  const next = () => { setPos(i => (i + 1) % items.length); setResult(null); setPhase('idle'); setErrMsg(''); setSession(null); };
   const micBusy = phase === 'scoring' || (phase === 'recording' && !session);
+  const misses = Object.entries(soundMisses).sort((a, b) => b[1].count - a[1].count).slice(0, 4);
 
   const ring = (score: number) => {
     const r = 26, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
@@ -89,7 +104,6 @@ export default function ListenPage() {
 
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
-      {/* header */}
       <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(0,0,0,0.04)',position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
@@ -101,6 +115,21 @@ export default function ListenPage() {
       </div>
 
       <div style={{maxWidth:460,margin:'0 auto',padding:'22px 20px'}}>
+        {/* pack picker */}
+        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#b08968',marginBottom:8}}>
+          {lang==='ru'?'Ситуация':'Situation'}
+        </div>
+        <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:16}}>
+          {PACKS.map(p=>(
+            <button key={p.id} onClick={()=>onPack(p.id)}
+              style={{flex:'0 0 auto',fontSize:'0.82rem',fontWeight:pack===p.id?700:600,cursor:'pointer',
+                color:pack===p.id?'white':C.warm,background:pack===p.id?C.sage:'white',
+                border:pack===p.id?'none':'1px solid #e0e6da',padding:'7px 13px',borderRadius:20}}>
+              {p.emoji} {lang==='ru'?p.ru:p.en}
+            </button>
+          ))}
+        </div>
+
         {/* accent picker */}
         <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#b08968',marginBottom:8}}>
           {lang==='ru'?'Акцент':'Accent'}
@@ -119,7 +148,7 @@ export default function ListenPage() {
         {/* phrase card */}
         <div style={{background:'white',borderRadius:20,padding:'22px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.05)',marginBottom:14}}>
           <div style={{fontSize:'0.72rem',color:'#a8a29e',fontWeight:600,marginBottom:8}}>
-            {lang==='ru'?'Слушай и повтори':'Listen & repeat'} · {idx+1}/{PHRASES.length}
+            {lang==='ru'?'Слушай и повтори':'Listen & repeat'} · {pos+1}/{items.length}
           </div>
           <div style={{fontSize:'1.4rem',fontWeight:700,color:C.dark,lineHeight:1.3}}>{phrase.text}</div>
           <div style={{fontSize:'0.85rem',color:'#9a8fb0',marginTop:6,fontFamily:'ui-monospace,monospace'}}>{phrase.ipa}</div>
@@ -188,6 +217,34 @@ export default function ListenPage() {
             ? (lang==='ru'?'Оцениваю на устройстве…':'Scoring on your device…')
             : (lang==='ru'?'Нажми и произнеси вслух':'Tap the mic and say it aloud')}
         </div>
+
+        {/* weak-sound recap — grows as the session goes */}
+        {misses.length > 0 && (
+          <div style={{marginTop:18,background:'white',borderRadius:16,padding:'16px 18px',boxShadow:'0 2px 12px rgba(0,0,0,0.05)'}}>
+            <div style={{fontSize:'0.8rem',fontWeight:800,color:C.dark,marginBottom:2}}>
+              {lang==='ru'?'Звуки для тренировки':'Sounds to drill'}
+            </div>
+            <div style={{fontSize:'0.72rem',color:'#a8a29e',marginBottom:12}}>
+              {lang==='ru'?'Где ты чаще спотыкаешься':'Where you keep stumbling'}
+            </div>
+            {misses.map(([snd, info]) => {
+              const meta = SOUND_INFO[snd] || { ex: info.example, en: '', ru: '' };
+              return (
+                <div key={snd} style={{display:'flex',alignItems:'flex-start',gap:11,marginBottom:11}}>
+                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:'#fce4ec',color:C.rose,
+                    fontWeight:800,fontSize:'0.95rem',fontFamily:'ui-monospace,monospace',display:'flex',alignItems:'center',justifyContent:'center'}}>{snd}</span>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:'0.82rem',fontWeight:700,color:C.dark}}>
+                      {lang==='ru'?`как в «${meta.ex}»`:`as in “${meta.ex}”`}
+                      <span style={{fontWeight:600,color:'#b0a89f'}}> · {info.count}×</span>
+                    </div>
+                    <div style={{fontSize:'0.76rem',color:C.warm,lineHeight:1.4,marginTop:1}}>{lang==='ru'?meta.ru:meta.en}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* warming banner (first load only) or on-device badge */}
         {!modelReady ? (

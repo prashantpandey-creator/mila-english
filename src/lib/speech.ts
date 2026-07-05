@@ -37,6 +37,18 @@ export function playPhrase(idx: number, accent: Accent, text: string): Promise<v
 
 export type Verdict = 'good' | 'close' | 'miss';
 export type WordScore = { word: string; verdict: Verdict };
+
+// Given a phrase and a scored result, return the drilled sound to tally as a
+// stumble — or null when the phrase's carrier word was nailed. Pure + tested.
+export function missedSound(
+  phrase: { hard: string; sound: string },
+  r: { words?: { word: string; verdict: Verdict }[] },
+): string | null {
+  if (!r?.words) return null;
+  const h = phrase.hard.toLowerCase().replace(/[^a-z']/g, '');
+  const w = r.words.find((x) => x.word === h);
+  return w && w.verdict !== 'good' ? phrase.sound : null;
+}
 export type Assessment = { score: number; words: WordScore[]; tip: string; heard: string };
 export type Session = { stop: () => Promise<Assessment> };
 
