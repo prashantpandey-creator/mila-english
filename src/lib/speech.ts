@@ -18,7 +18,7 @@ export const ACCENTS: Accent[] = [
 
 // Accents with real pre-baked ElevenLabs audio (public/audio/<id>/<phraseIdx>.mp3).
 // Others fall back to browser TTS until they're baked too.
-const BAKED_ACCENTS = new Set(['us']);
+const BAKED_ACCENTS = new Set(['us', 'uk', 'in']);
 export function hasRealVoice(accent: Accent): boolean { return BAKED_ACCENTS.has(accent.id); }
 
 // Play a phrase: real native audio when baked, browser TTS otherwise.

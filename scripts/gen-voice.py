@@ -13,8 +13,8 @@ import os, sys, re, json, urllib.request
 # ElevenLabs premade voices, chosen for clarity as a pronunciation model.
 VOICES = {
     "us": "EXAVITQu4vr4xnSDxMaL",  # Sarah — American, clear & reassuring
-    # "uk": "<british voice id>",  # add when baking UK
-    # "in": "<indian voice id>",   # add when baking IN
+    "uk": "Xb7hH8MSUJpSbSDYk0k2",  # Alice — British, clear engaging educator
+    "in": "2lO53AUjjzRVJUFIyuzi",  # Ria — Indian English, informative/documentary
 }
 MODEL = "eleven_multilingual_v2"
 
