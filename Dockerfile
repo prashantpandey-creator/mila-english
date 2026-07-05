@@ -1,4 +1,7 @@
 FROM node:20-slim
+# Prisma's query engine needs libssl/openssl at runtime; node:20-slim ships without
+# it, so the client failed to load (silently, until db-push-on-boot made it fatal).
+RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json ./
 RUN npm install
