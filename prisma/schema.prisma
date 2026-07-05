@@ -19,12 +19,40 @@ model User {
   nativeLanguage String
   level String?
   joinDate DateTime
+  // ── Learner model (the person axis) ──
+  ability Float?              // ELO / online-IRT ability estimate θ (speaking level)
+  goal String?               // "travel", "job interview", …
+  tonePreference String?     // companion persona pref: teacher | friend | guide
+  streakDays Int @default(0)
+  learnerProfile String?     // synthesized JSON blob (strengths, weak_summary, learner_arc, focus)
+  learnerProfileAt DateTime?
   Progresses Progress[]
   Assessments Assessment[]
   Achievements Achievement[]
   StudySessions StudySession[]
+  PhonemeStats PhonemeStat[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Quantified per-phoneme state — the math layer (ELO difficulty, FSRS scheduling,
+// BKT mastery) plus the substitution the learner actually produces. One row per
+// (user, phoneme); updated every scored attempt.
+model PhonemeStat {
+  id Int @id @default(autoincrement())
+  userId Int
+  phoneme String             // IPA symbol, e.g. "θ"
+  attempts Int @default(0)
+  lastAcc Int?               // last GOP accuracy 0-100
+  topSubstitution String?    // what they say instead, e.g. "s"
+  mastery Float @default(0)  // BKT P(known) 0-1
+  difficulty Float @default(0) // FSRS Difficulty (also serves item difficulty b)
+  stability Float @default(0)  // FSRS Stability, days until recall = 90%
+  due DateTime?              // FSRS next-review time
+  User User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, phoneme])
 }
 
 model Lesson {
