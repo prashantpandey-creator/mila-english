@@ -16,16 +16,18 @@ export async function GET(req: Request) {
       );
     }
 
-    const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
+    const response = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: "verse",
-        instructions: "You are a warm, highly empathetic, and encouraging English language tutor for a Russian speaker. You are providing a 'Darshan' (a personal, guided experience). Keep responses brief, conversational, and deeply personal. Correct grammar gently, and feel free to use occasional Russian words if it helps clarify a deep concept. Start by warmly greeting the user.",
+        session: {
+          model: "gpt-4o-realtime-preview-2024-12-17",
+          voice: "verse",
+          instructions: "You are a warm, highly empathetic, and encouraging English language tutor for a Russian speaker. You are providing a 'Darshan' (a personal, guided experience). Keep responses brief, conversational, and deeply personal. Correct grammar gently, and feel free to use occasional Russian words if it helps clarify a deep concept. Start by warmly greeting the user.",
+        }
       }),
     });
 
@@ -36,7 +38,11 @@ export async function GET(req: Request) {
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json({
+      client_secret: {
+        value: data.value
+      }
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
