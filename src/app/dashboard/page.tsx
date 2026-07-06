@@ -17,6 +17,16 @@ export default function DashboardPage() {
   const router = useRouter();
   const [m, setM] = useState(false);
   useEffect(()=>{setM(true)},[]);
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error(e);
+    }
+    router.push('/');
+    router.refresh();
+  };
+
   if (!m) return null;
 
   return (
@@ -30,6 +40,11 @@ export default function DashboardPage() {
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <LangToggle />
+          <button onClick={handleLogout}
+            style={{padding:'6px 14px',borderRadius:12,border:`1.5px solid ${C.rose}`,background:'transparent',color:C.rose,
+              fontWeight:600,fontSize:'0.8rem',cursor:'pointer'}}>
+            {lang==='ru'?'Выйти':'Sign Out'}
+          </button>
           <div style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.rose},#c2185b)`,
             display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:700,fontSize:'0.8rem'}}>
             {lang==='ru'?'А':'A'}

@@ -6,7 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 
 export default function LoginPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,8 +19,23 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
       if (!res.ok) throw new Error('');
       router.push('/dashboard');
+      router.refresh();
     } catch { setError(t('error_try_again')); }
     finally { setLoading(false); }
+  };
+
+  const handleGuestLogin = async () => {
+    setLoading(true); setError('');
+    try {
+      const res = await fetch('/api/auth/guest', { method: 'POST' });
+      if (!res.ok) throw new Error('');
+      router.push('/dashboard');
+      router.refresh();
+    } catch {
+      setError(t('error_try_again'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputStyle = {width:'100%',padding:'0.75rem 1rem',borderRadius:10,border:'1.5px solid #e5e0dc',fontSize:'0.95rem',outline:'none'};
@@ -48,6 +63,11 @@ export default function LoginPage() {
             <div><label style={{fontSize:'0.9rem',fontWeight:500,color:'#44403c'}}>{t('login_password')}</label>
               <input type="password" value={password} onChange={e=>setPassword(e.target.value)} style={inputStyle} placeholder="••••••••" required /></div>
             <button type="submit" disabled={loading} style={btnStyle}>{loading ? '...' : t('login_btn')}</button>
+            <div style={{textAlign:'center',color:'#78716c',fontSize:'0.85rem',margin:'0.25rem 0'}}>{lang==='ru'?'или':'or'}</div>
+            <button type="button" onClick={handleGuestLogin} disabled={loading}
+              style={{...btnStyle, background:'linear-gradient(135deg,#a8d5ba,#5b8c5a)', boxShadow:'0 4px 14px rgba(91,140,90,0.25)'}}>
+              {lang==='ru'?'Войти как гость 🌸':'Try as Guest 🌸'}
+            </button>
           </form>
           <p style={{textAlign:'center',marginTop:'1.5rem',color:'#78716c',fontSize:'0.9rem'}}>
             {t('login_no_account')} <a href="/register" style={{color:'#e91e63',fontWeight:600,textDecoration:'none'}}>{t('login_create')}</a></p>

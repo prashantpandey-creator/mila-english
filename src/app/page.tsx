@@ -7,12 +7,12 @@ import LangToggle from '@/components/LangToggle';
 import SpeechButton from '@/components/SpeechButton';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
-
 export default function HomePage() {
   const { t, lang } = useI18n();
   const router = useRouter();
   const [m, setM] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setM(true);
@@ -20,6 +20,20 @@ export default function HomePage() {
       setIsLoggedIn(document.cookie.includes('token='));
     }
   }, []);
+
+  const handleGuestLogin = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/guest', { method: 'POST' });
+      if (!res.ok) throw new Error('');
+      router.push('/dashboard');
+      router.refresh();
+    } catch {
+      alert(lang==='ru'?'Что-то пошло не так. Попробуйте еще раз.':'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!m) return null;
 
@@ -103,13 +117,22 @@ export default function HomePage() {
               {lang==='ru'?'Личный кабинет →':'Dashboard →'}
             </button>
           ) : (
-            <button onClick={()=>router.push('/register')}
-              style={{padding:'14px 32px',borderRadius:16,border:'none',
-                background:`linear-gradient(135deg,${C.rose},#c2185b)`,color:'white',
-                fontWeight:700,fontSize:'1.05rem',cursor:'pointer',
-                boxShadow:'0 4px 18px rgba(233,30,99,0.3)'}}>
-              {lang==='ru'?'Начать учиться →':'Start learning →'}
-            </button>
+            <>
+              <button onClick={()=>router.push('/register')}
+                style={{padding:'14px 32px',borderRadius:16,border:'none',
+                  background:`linear-gradient(135deg,${C.rose},#c2185b)`,color:'white',
+                  fontWeight:700,fontSize:'1.05rem',cursor:'pointer',
+                  boxShadow:'0 4px 18px rgba(233,30,99,0.3)'}}>
+                {lang==='ru'?'Начать учиться →':'Start learning →'}
+              </button>
+              <button onClick={handleGuestLogin} disabled={loading}
+                style={{padding:'14px 32px',borderRadius:16,border:'none',
+                  background:'linear-gradient(135deg,#a8d5ba,#5b8c5a)',color:'white',
+                  fontWeight:700,fontSize:'1.05rem',cursor:'pointer',
+                  boxShadow:'0 4px 18px rgba(91,140,90,0.25)'}}>
+                {loading ? '...' : (lang==='ru'?'Войти как гость 🌸':'Try as Guest 🌸')}
+              </button>
+            </>
           )}
           <button onClick={()=>document.getElementById('research')?.scrollIntoView({behavior:'smooth'})}
             style={{padding:'14px 32px',borderRadius:16,border:`2px solid ${C.rose}`,background:'transparent',
@@ -196,13 +219,22 @@ export default function HomePage() {
             {lang==='ru'?'Личный кабинет 🌸':'Dashboard 🌸'}
           </button>
         ) : (
-          <button onClick={()=>router.push('/register')}
-            style={{marginTop:28,padding:'16px 40px',borderRadius:16,border:'none',
-              background:`linear-gradient(135deg,${C.sage},#388e3c)`,color:'white',
-              fontWeight:700,fontSize:'1.1rem',cursor:'pointer',
-              boxShadow:'0 4px 18px rgba(91,140,90,0.3)'}}>
-            {lang==='ru'?'Начать бесплатно 🌸':'Start free 🌸'}
-          </button>
+          <div style={{display:'flex',gap:12,justifyContent:'center',marginTop:28,flexWrap:'wrap'}}>
+            <button onClick={()=>router.push('/register')}
+              style={{padding:'16px 40px',borderRadius:16,border:'none',
+                background:`linear-gradient(135deg,${C.sage},#388e3c)`,color:'white',
+                fontWeight:700,fontSize:'1.1rem',cursor:'pointer',
+                boxShadow:'0 4px 18px rgba(91,140,90,0.3)'}}>
+              {lang==='ru'?'Начать бесплатно 🌸':'Start free 🌸'}
+            </button>
+            <button onClick={handleGuestLogin} disabled={loading}
+              style={{padding:'16px 40px',borderRadius:16,border:'none',
+                background:`linear-gradient(135deg,${C.rose},#c2185b)`,color:'white',
+                fontWeight:700,fontSize:'1.1rem',cursor:'pointer',
+                boxShadow:'0 4px 18px rgba(233,30,99,0.3)'}}>
+              {loading ? '...' : (lang==='ru'?'Войти как гость 🌸':'Try as Guest 🌸')}
+            </button>
+          </div>
         )}
       </div>
 

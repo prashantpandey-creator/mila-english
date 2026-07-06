@@ -6,7 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 
 export default function RegisterPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const router = useRouter();
   const [form, setForm] = useState({name:'',email:'',password:'',nativeLanguage:'Русский',learnerCategory:'absolute_beginner'});
   const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
@@ -19,8 +19,23 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
       if (!res.ok) throw new Error('');
       router.push('/dashboard');
+      router.refresh();
     } catch { setError(t('error_try_again')); }
     finally { setLoading(false); }
+  };
+
+  const handleGuestLogin = async () => {
+    setLoading(true); setError('');
+    try {
+      const res = await fetch('/api/auth/guest', { method: 'POST' });
+      if (!res.ok) throw new Error('');
+      router.push('/dashboard');
+      router.refresh();
+    } catch {
+      setError(t('error_try_again'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,6 +69,13 @@ export default function RegisterPage() {
             <button type="submit" disabled={loading} style={{width:'100%',padding:'0.85rem',borderRadius:10,border:'none',
               background:'linear-gradient(135deg,#a8d5ba,#5b8c5a)',color:'white',fontWeight:600,fontSize:'1rem',cursor:'pointer',
               boxShadow:'0 4px 14px rgba(91,140,90,0.25)',marginTop:'0.5rem'}}>{loading ? '...' : t('register_btn')}</button>
+            <div style={{textAlign:'center',color:'#78716c',fontSize:'0.85rem',margin:'0.25rem 0'}}>{lang==='ru'?'или':'or'}</div>
+            <button type="button" onClick={handleGuestLogin} disabled={loading}
+              style={{width:'100%',padding:'0.85rem',borderRadius:10,border:'none',
+                background:'linear-gradient(135deg,#f9a8b8,#e91e63)',color:'white',fontWeight:600,fontSize:'1rem',cursor:'pointer',
+                boxShadow:'0 4px 14px rgba(233,30,99,0.25)'}}>
+              {lang==='ru'?'Войти как гость 🌸':'Try as Guest 🌸'}
+            </button>
           </form>
           <p style={{textAlign:'center',marginTop:'1.5rem',color:'#78716c',fontSize:'0.9rem'}}>
             {t('register_has_account')} <a href="/login" style={{color:'#5b8c5a',fontWeight:600,textDecoration:'none'}}>{t('register_login')}</a></p>
