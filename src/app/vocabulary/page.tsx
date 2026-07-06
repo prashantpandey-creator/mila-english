@@ -9,6 +9,7 @@ import WordReviewWidget from '@/components/WordReviewWidget';
 import SpacedRepetitionTimer from '@/components/SpacedRepetitionTimer';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
+import { ttsSpeak } from '@/lib/tts';
 
 const WORDS = [
   {en:'hello',ru:'привет',phonetic:'/həˈloʊ/'},{en:'goodbye',ru:'пока',phonetic:'/ɡʊdˈbaɪ/'},
@@ -23,8 +24,18 @@ export default function VocabPage() {
   const { t, lang } = useI18n(); const router = useRouter();
   const [idx, setIdx] = useState(0); const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<number[]>([]);
+  const [playing, setPlaying] = useState(false);
   const w = WORDS[idx];
-  const speak = (text: string) => { const u = new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=0.7; speechSynthesis.speak(u); };
+
+  const speak = async (text: string) => {
+    if (playing) return;
+    setPlaying(true);
+    try {
+      await ttsSpeak(text, 'en-US', 0.7);
+    } finally {
+      setPlaying(false);
+    }
+  };
 
   const next = (knew: boolean) => {
     if(knew) setKnown([...known, idx]);
@@ -46,9 +57,11 @@ export default function VocabPage() {
         </div>
 
         {/* Listen button */}
-        <button onClick={()=>speak(w.en)}
-          style={{padding:'12px 28px',borderRadius:14,border:'none',background:C.roseL,color:C.rose,fontWeight:600,cursor:'pointer',fontSize:'1rem',marginBottom:20}}>
-          🔊 {lang==='ru'?'Прослушать':'Listen'}
+        <button onClick={()=>speak(w.en)} disabled={playing}
+          style={{padding:'12px 28px',borderRadius:14,border:'none',background:playing?C.rose:C.roseL,
+            color:playing?'white':C.rose,fontWeight:600,cursor:playing?'default':'pointer',fontSize:'1rem',marginBottom:20,
+            transition:'all 0.2s',opacity:playing?0.7:1}}>
+          🔊 {playing ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Прослушать':'Listen')}
         </button>
 
         <WordReviewWidget known={known.length} total={WORDS.length} lang={lang} onForgot={()=>next(false)} onKnow={()=>next(true)}/>

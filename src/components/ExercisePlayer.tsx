@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { C } from '@/lib/theme';
 import { ACCENTS, startListening } from '@/lib/speech';
+import { ttsSpeak } from '@/lib/tts';
 
 const VERDICT = {
   good:  { fg: '#3f7a3e', bg: '#e8f5e9' },
@@ -33,10 +34,11 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
 
   const onListen = async () => {
     setPhase('speaking');
-    onSpeak(phrase.en);
-    setTimeout(() => {
-      setPhase('idle');
-    }, 1200);
+    try {
+      await ttsSpeak(phrase.en, 'en-US', 0.82);
+    } finally {
+      setPhase((p) => (p === 'speaking' ? 'idle' : p));
+    }
   };
 
   const settle = (r: any) => {
@@ -46,9 +48,14 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
   };
 
   const fail = (e: any) => {
-    setErrMsg(lang === 'ru'
-      ? 'Не расслышала. Попробуй ещё раз.'
-      : "Didn't catch that. Try again.");
+    const msg = e?.message;
+    setErrMsg(
+      msg === 'unsupported'
+        ? (lang === 'ru' ? 'Микрофон не поддерживается — открой в Chrome.' : 'Speech input needs Chrome — open there to practice.')
+        : msg === 'no-speech'
+        ? (lang === 'ru' ? 'Не слышу тебя. Проверь микрофон и попробуй снова.' : 'No speech detected. Check your mic and try again.')
+        : (lang === 'ru' ? 'Не расслышала. Попробуй ещё раз.' : "Didn't catch that. Try again.")
+    );
     setPhase('error');
     setSession(null);
   };

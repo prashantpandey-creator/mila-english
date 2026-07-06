@@ -16,7 +16,19 @@ export default function DashboardPage() {
   const { t, lang } = useI18n();
   const router = useRouter();
   const [m, setM] = useState(false);
-  useEffect(()=>{setM(true)},[]);
+  const [user, setUser] = useState<any>(null);
+  useEffect(()=>{
+    setM(true);
+    fetch('/api/users/me').then(r=>r.ok?r.json():null).then(d=>{if(d)setUser(d);}).catch(()=>{});
+  },[]);
+
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return lang==='ru' ? 'Доброе утро ☀️' : 'Good morning ☀️';
+    if (h < 17) return lang==='ru' ? 'Добрый день 🌤️' : 'Good afternoon 🌤️';
+    if (h < 21) return lang==='ru' ? 'Добрый вечер 🌙' : 'Good evening 🌙';
+    return lang==='ru' ? 'Добрый вечер 🌙' : 'Good evening 🌙';
+  };
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
@@ -47,7 +59,7 @@ export default function DashboardPage() {
           </button>
           <div style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.rose},#c2185b)`,
             display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:700,fontSize:'0.8rem'}}>
-            {lang==='ru'?'А':'A'}
+            {user?.name ? user.name[0].toUpperCase() : (lang==='ru'?'Г':'G')}
           </div>
         </div>
       </div>
@@ -56,7 +68,7 @@ export default function DashboardPage() {
         {/* Greeting */}
         <div style={{marginBottom:24}}>
           <h1 style={{fontSize:'1.6rem',fontWeight:800,margin:0,color:C.dark}}>
-            {lang==='ru'?'Доброе утро ☀️':'Good morning ☀️'}
+            {getGreeting()}
           </h1>
           <div style={{display:'flex',alignItems:'center',gap:10,marginTop:6}}>
             <p style={{color:C.warm,margin:0}}>

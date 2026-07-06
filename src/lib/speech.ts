@@ -5,6 +5,8 @@
 //   playPhrase()     — hear the phrase (baked accent audio, else browser TTS).
 //   startListening() — record with VAD auto-stop OR manual stop, score server-side.
 
+import { ttsSpeak } from './tts';
+
 export type Accent = { id: string; label: string; flag: string; locale: string; azureVoice: string };
 
 export const ACCENTS: Accent[] = [
@@ -22,11 +24,11 @@ export function playPhrase(idx: number, accent: Accent, text: string): Promise<v
     return new Promise<void>((resolve) => {
       const a = new Audio(`/audio/${accent.id}/${idx}.mp3`);
       a.onended = () => resolve();
-      a.onerror = () => { speak(text, accent).then(resolve); };
-      a.play().catch(() => { speak(text, accent).then(resolve); });
+      a.onerror = () => { ttsSpeak(text, accent.locale).then(resolve); };
+      a.play().catch(() => { ttsSpeak(text, accent.locale).then(resolve); });
     });
   }
-  return speak(text, accent);
+  return ttsSpeak(text, accent.locale);
 }
 
 export type Verdict = 'good' | 'close' | 'miss';
@@ -37,19 +39,7 @@ export type Session = { stop: () => Promise<Assessment> };
 
 // ── speak() — browser TTS (fallback voice for not-yet-baked accents) ──────────
 export function speak(text: string, accent: Accent): Promise<void> {
-  return new Promise((resolve) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return resolve();
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = accent.locale;
-    u.rate = 0.9;
-    const voices = window.speechSynthesis.getVoices();
-    const picked = voices.find((v) => v.lang === accent.locale) || voices.find((v) => v.lang?.toLowerCase().startsWith('en'));
-    if (picked) u.voice = picked;
-    u.onend = () => resolve();
-    u.onerror = () => resolve();
-    window.speechSynthesis.speak(u);
-  });
+  return ttsSpeak(text, accent.locale);
 }
 
 // Given a phrase and a scored result, return the drilled sound to tally as a
@@ -88,7 +78,7 @@ export async function startListening(
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   const rec = new MediaRecorder(stream);
   const chunks: Blob[] = [];
-  rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+  rec.ondataavailable = (e) => { if (e.data.size) { chunks.push(e.data); chunkCount++; } };
   const recStopped = new Promise<void>((res) => { rec.onstop = () => res(); });
   rec.start();
 
@@ -101,7 +91,9 @@ export async function startListening(
 
   const THRESH = 0.015, SILENCE_MS = 900, MIN_MS = 700, MAX_MS = 7000;
   const t0 = performance.now();
+  // If mic stays silent for the entire MAX_MS, we skip scoring and treat as empty
   let spoke = false, lastVoice = t0, raf = 0;
+  let chunkCount = 0; // count of non-empty chunks received
 
   let finalized = false;
   let resolveResult!: (a: Assessment) => void;
@@ -118,6 +110,11 @@ export async function startListening(
     (async () => {
       try {
         await recStopped;
+        // Guard: if no voice was detected, skip network round-trip
+        if (!spoke || chunks.length === 0) {
+          rejectResult(new Error('no-speech'));
+          return;
+        }
         resolveResult(await scoreBlob(new Blob(chunks, { type: rec.mimeType || 'audio/webm' }), reference));
       } catch (e: any) { rejectResult(e instanceof Error ? e : new Error(String(e))); }
     })();
