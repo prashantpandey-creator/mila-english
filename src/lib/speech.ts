@@ -72,6 +72,7 @@ export async function startListening(
   _accent: Accent,
   onAutoStop?: (a: Assessment) => void,
   onSilenceDetected?: () => void,
+  onAutoError?: (e: Error) => void,
 ): Promise<Session> {
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
 
@@ -130,7 +131,7 @@ export async function startListening(
     const elapsed = now - t0;
     if (elapsed > MAX_MS || (spoke && elapsed > MIN_MS && now - lastVoice > SILENCE_MS)) {
       onSilenceDetected?.();
-      finalize().then((a) => onAutoStop?.(a)).catch(() => {});
+      finalize().then((a) => onAutoStop?.(a)).catch((e) => onAutoError?.(e));
       return;
     }
     raf = requestAnimationFrame(tick);

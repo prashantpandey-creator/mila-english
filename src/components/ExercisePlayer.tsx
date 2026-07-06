@@ -84,7 +84,8 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
         () => {
           setPhase('scoring');
           setSession(null);
-        }
+        },
+        (e) => fail(e)
       );
       setSession(s);
     } catch (e) {

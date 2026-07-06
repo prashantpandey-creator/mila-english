@@ -76,7 +76,8 @@ export default function ListenPage() {
         phrase.text,
         accent,
         (a) => { setSession(null); settle(a); },
-        () => { setPhase('scoring'); setSession(null); }
+        () => { setPhase('scoring'); setSession(null); },
+        (e) => fail(e)
       );
       setSession(s);
     } catch (e) { fail(e); }
