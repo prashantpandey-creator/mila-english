@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { C } from '@/lib/theme';
 import { ACCENTS, startListening } from '@/lib/speech';
 import { ttsSpeak } from '@/lib/tts';
@@ -12,30 +12,82 @@ const VERDICT = {
   miss:  { fg: '#e91e63', bg: '#fce4ec' },
 };
 
+/** A friendly onboarding card shown only on the first phrase */
+function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => void }) {
+  return (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:0,textAlign:'center'}}>
+      <div style={{fontSize:'3.5rem',marginBottom:12}}>🎙️</div>
+      <h2 style={{fontSize:'1.4rem',fontWeight:800,color:C.dark,margin:'0 0 8px'}}>
+        {lang==='ru' ? 'Задание: произноси вслух!' : 'Speaking Exercise!'}
+      </h2>
+      <p style={{color:C.warm,fontSize:'0.95rem',lineHeight:1.6,margin:'0 0 24px',maxWidth:340}}>
+        {lang==='ru'
+          ? 'Сейчас ты будешь слушать фразы и повторять их вслух. ИИ оценит твоё произношение по фонемам — каждый звук отдельно.'
+          : 'You\'ll listen to each phrase, then repeat it aloud. Our AI scores every phoneme individually — so you know exactly which sounds to work on.'}
+      </p>
+
+      {/* How it works steps */}
+      {[
+        { icon: '🔊', en: 'Tap Listen to hear the phrase', ru: 'Нажми «Послушать», чтобы услышать фразу' },
+        { icon: '🎙️', en: 'Tap the mic and say it clearly', ru: 'Нажми микрофон и произнеси чётко' },
+        { icon: '📊', en: 'Get an instant phoneme score', ru: 'Получи оценку за каждый звук' },
+        { icon: '✅', en: 'Score 55+ to pass and move on', ru: 'Набери 55+ очков, чтобы перейти дальше' },
+      ].map(s => (
+        <div key={s.en} style={{display:'flex',alignItems:'center',gap:12,width:'100%',maxWidth:340,
+          background:'white',borderRadius:14,padding:'12px 16px',marginBottom:8,boxShadow:'0 1px 8px rgba(0,0,0,0.04)',textAlign:'left'}}>
+          <span style={{fontSize:'1.4rem',flex:'0 0 auto'}}>{s.icon}</span>
+          <span style={{fontSize:'0.88rem',color:C.dark,fontWeight:500}}>{lang==='ru' ? s.ru : s.en}</span>
+        </div>
+      ))}
+
+      <div style={{marginTop:8,background:'#ede9fe',borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20}}>
+        <span style={{fontSize:'0.82rem',color:'#7c3aed',fontWeight:600}}>
+          💡 {lang==='ru' ? 'Говори ровно и чётко — модель слышит каждую фонему' : 'Speak clearly and steadily — the model hears every phoneme'}
+        </span>
+      </div>
+
+      <button onClick={onStart}
+        style={{width:'100%',maxWidth:340,padding:'16px',borderRadius:16,border:'none',
+          background:`linear-gradient(135deg,${C.rose},#e91e63)`,color:'white',fontWeight:800,fontSize:'1.1rem',
+          cursor:'pointer',boxShadow:'0 6px 20px rgba(233,30,99,0.3)',letterSpacing:'0.01em'}}>
+        {lang==='ru' ? '🚀 Начать упражнение' : '🚀 Start Exercise'}
+      </button>
+    </div>
+  );
+}
+
 export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
   phrases: { en: string; ru: string }[]; lang: 'ru'|'en';
   onSpeak: (t: string) => void; onComplete: () => void;
 }) {
+  const [showGate, setShowGate] = useState(true);  // onboarding gate
   const [pos, setPos] = useState(0);
   const [phase, setPhase] = useState<'idle'|'speaking'|'recording'|'scoring'|'scored'|'error'>('idle');
   const [result, setResult] = useState<any>(null);
   const [errMsg, setErrMsg] = useState('');
   const [session, setSession] = useState<any>(null);
+  const [attempts, setAttempts] = useState(0);
 
   const phrase = phrases[pos] || phrases[0];
 
   useEffect(() => {
     return () => {
-      if (session) {
-        session.stop().catch(() => {});
-      }
+      if (session) { session.stop().catch(() => {}); }
     };
   }, [session]);
+
+  // Auto-listen when moving to a new phrase (after gate closed)
+  useEffect(() => {
+    if (showGate) return;
+    setPhase('idle');
+    setResult(null);
+    setErrMsg('');
+  }, [pos]);
 
   const onListen = async () => {
     setPhase('speaking');
     try {
-      await ttsSpeak(phrase.en, 'en-US', 0.82);
+      await ttsSpeak(phrase.en, 'en-US', 0.80);
     } finally {
       setPhase((p) => (p === 'speaking' ? 'idle' : p));
     }
@@ -45,16 +97,20 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
     setResult(r);
     setPhase('scored');
     setSession(null);
+    setAttempts(0);
   };
 
   const fail = (e: any) => {
     const msg = e?.message;
+    setAttempts(a => a + 1);
     setErrMsg(
       msg === 'unsupported'
         ? (lang === 'ru' ? 'Микрофон не поддерживается — открой в Chrome.' : 'Speech input needs Chrome — open there to practice.')
         : msg === 'no-speech'
-        ? (lang === 'ru' ? 'Не слышу тебя. Проверь микрофон и попробуй снова.' : 'No speech detected. Check your mic and try again.')
-        : (lang === 'ru' ? 'Не расслышала. Попробуй ещё раз.' : "Didn't catch that. Try again.")
+        ? (lang === 'ru' ? 'Ничего не слышу 🤫 Нажми 🎙️ и говори сразу после нажатия.' : "Nothing detected 🤫 Tap 🎙️ and speak right away, clearly into your mic.")
+        : msg === 'score-failed' || msg === 'score-empty'
+        ? (lang === 'ru' ? 'Сервер оценки недоступен. Попробуй снова.' : 'Scoring server unavailable. Please try again.')
+        : (lang === 'ru' ? 'Не расслышала. Попробуй ещё раз.' : "Didn't catch that — try again.")
     );
     setPhase('error');
     setSession(null);
@@ -77,14 +133,8 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
       const s = await startListening(
         phrase.en,
         ACCENTS[1],
-        (a) => {
-          setSession(null);
-          settle(a);
-        },
-        () => {
-          setPhase('scoring');
-          setSession(null);
-        },
+        (a) => { setSession(null); settle(a); },
+        () => { setPhase('scoring'); setSession(null); },
         (e) => fail(e)
       );
       setSession(s);
@@ -110,7 +160,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
 
   const ring = (score: number) => {
     const r = 24, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
-    const col = score >= 55 ? C.sage : C.rose;
+    const col = score >= 80 ? C.sage : score >= 55 ? C.gold : C.rose;
     return (
       <svg width="58" height="58" viewBox="0 0 58 58" style={{flex:'0 0 auto'}}>
         <circle cx="29" cy="29" r={r} fill="none" stroke="#f0ece7" strokeWidth="6"/>
@@ -121,54 +171,67 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
     );
   };
 
+  // ── Onboarding gate (first time only) ──────────────────────────────────────
+  if (showGate) {
+    return <OnboardingGate lang={lang} onStart={() => setShowGate(false)} />;
+  }
+
+  // ── Mic tip after 2+ failed attempts ──────────────────────────────────────
+  const showMicTip = attempts >= 2;
+
   return (
     <div style={{textAlign:'center'}}>
-      <div style={{fontSize:'3rem',marginBottom:12}}>🎙️</div>
-      <p style={{color:C.warm,marginBottom:20}}>
-        {lang==='ru'
-          ? 'Прослушай фразу, а затем произнеси её в микрофон.'
-          : 'Listen to the phrase, then say it into the mic.'}
-      </p>
-
-      {/* Progress label */}
-      <div style={{fontSize:'0.75rem',color:'#a8a29e',fontWeight:600,marginBottom:10}}>
-        {lang==='ru'?'Фраза':'Phrase'} {pos + 1} / {phrases.length}
+      {/* Progress label + phrase counter */}
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+        <span style={{fontSize:'0.72rem',color:'#a8a29e',fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>
+          {lang==='ru' ? 'Произношение' : 'Speaking Exercise'}
+        </span>
+        <span style={{fontSize:'0.72rem',color:'#a8a29e',fontWeight:700,background:'#f3f0ed',borderRadius:20,padding:'2px 10px'}}>
+          {pos + 1} / {phrases.length}
+        </span>
       </div>
 
-      {/* Active Phrase Card */}
-      <div style={{background:'white',borderRadius:20,padding:'24px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:16}}>
-        <div style={{fontSize:'1.3rem',fontWeight:700,color:C.dark,lineHeight:1.3,marginBottom:6}}>{phrase.en}</div>
+      {/* ── Phrase Card ────────────────────────────────────────────────────── */}
+      <div style={{background:'white',borderRadius:20,padding:'24px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:12}}>
+        <div style={{fontSize:'0.72rem',fontWeight:700,color:C.purple,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>
+          🎯 {lang==='ru' ? 'Повтори эту фразу:' : 'Repeat this phrase:'}
+        </div>
+        <div style={{fontSize:'1.35rem',fontWeight:700,color:C.dark,lineHeight:1.35,marginBottom:6}}>{phrase.en}</div>
         <div style={{fontSize:'0.9rem',color:C.warm}}>{phrase.ru}</div>
-
         <button onClick={onListen} disabled={phase==='speaking' || phase==='recording'}
-          style={{marginTop:16,padding:'8px 18px',borderRadius:20,border:'none',background:C.roseL,color:C.rose,fontWeight:600,cursor:'pointer',fontSize:'0.85rem'}}>
-          🔊 {phase==='speaking' ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Послушать':'Listen')}
+          style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,
+            width:'100%',marginTop:16,padding:'10px 18px',borderRadius:12,border:'none',
+            background: phase==='speaking' ? C.roseL : '#fce4ec',
+            color:C.rose,fontWeight:700,cursor:(phase==='speaking'||phase==='recording')?'default':'pointer',fontSize:'0.9rem',opacity:(phase==='recording')?0.5:1}}>
+          🔊 {phase==='speaking' ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Послушать':'Hear it first')}
         </button>
       </div>
 
-      {/* Scored Result Card */}
+      {/* ── Scored Result Card ─────────────────────────────────────────────── */}
       {phase==='scored' && result && (
-        <div style={{background:'white',borderRadius:20,padding:'16px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:16,textAlign:'left'}}>
+        <div style={{background:'white',borderRadius:20,padding:'16px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:12,textAlign:'left'}}>
           <div style={{display:'flex',alignItems:'center',gap:14}}>
             {ring(result.score)}
             <div style={{flex:1}}>
               <div style={{fontSize:'0.9rem',fontWeight:700,color:C.dark,marginBottom:6}}>
-                {isPassed
-                  ? (lang==='ru'?'Отлично! Проходной балл набран.':'Excellent! Passing score achieved.')
-                  : (lang==='ru'?'Слабовато. Попробуй произнести чётче!':'Needs work. Try speaking more clearly!')}
+                {result.score >= 80
+                  ? (lang==='ru' ? '🌟 Почти как носитель!' : '🌟 Nearly native!')
+                  : isPassed
+                  ? (lang==='ru' ? '✅ Хорошо! Проходной балл!' : '✅ Good — passing score!')
+                  : (lang==='ru' ? '⚠️ Чуть-чуть не хватает. Попробуй ещё раз.' : '⚠️ Close, but not quite. Try again!')}
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
-                {result.words.map((w:any,i:number)=>(
-                  <span key={i} style={{fontSize:'0.75rem',fontWeight:600,color:VERDICT[w.verdict]?.fg || C.dark,background:VERDICT[w.verdict]?.bg || '#f3f4f6',padding:'2px 7px',borderRadius:6}}>
+                {result.words.map((w:any,i:number) => (
+                  <span key={i} style={{fontSize:'0.78rem',fontWeight:600,color:VERDICT[w.verdict]?.fg || C.dark,background:VERDICT[w.verdict]?.bg || '#f3f4f6',padding:'2px 8px',borderRadius:6}}>
                     {w.word}
                   </span>
                 ))}
               </div>
             </div>
           </div>
-          {result.words.some((w:any)=>w.phonemes?.length) && (
+          {result.words.some((w:any) => w.phonemes?.length) && (
             <div style={{display:'flex',flexWrap:'wrap',gap:3,marginTop:12}}>
-              {result.words.flatMap((w:any)=>w.phonemes||[]).map((p:any,i:number)=>(
+              {result.words.flatMap((w:any) => w.phonemes||[]).map((p:any,i:number) => (
                 <span key={i} title={p.acc+'%'} style={{fontSize:'0.72rem',fontWeight:700,fontFamily:'ui-monospace,monospace',
                   color:VERDICT[p.verdict]?.fg || C.dark,background:VERDICT[p.verdict]?.bg || '#f3f4f6',padding:'2px 6px',borderRadius:5}}>
                   {p.ph}
@@ -176,49 +239,62 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
               ))}
             </div>
           )}
-          <div style={{marginTop:10,fontSize:'0.8rem',color:C.warm,lineHeight:1.45,background:C.pageBg,borderRadius:10,padding:'8px 10px'}}>
+          <div style={{marginTop:10,fontSize:'0.82rem',color:C.warm,lineHeight:1.5,background:C.pageBg,borderRadius:10,padding:'8px 12px'}}>
             💡 {result.tip}
           </div>
         </div>
       )}
 
-      {/* Error Card */}
+      {/* ── Error Card ─────────────────────────────────────────────────────── */}
       {phase==='error' && (
-        <div style={{background:C.roseL,color:C.rose,borderRadius:14,padding:'12px 16px',fontSize:'0.85rem',marginBottom:16}}>
-          {errMsg}
+        <div style={{background:C.roseL,borderRadius:14,padding:'12px 16px',fontSize:'0.88rem',marginBottom:12,textAlign:'left'}}>
+          <div style={{color:C.rose,fontWeight:700,marginBottom:showMicTip?6:0}}>{errMsg}</div>
+          {showMicTip && (
+            <div style={{fontSize:'0.8rem',color:'#c0392b',lineHeight:1.5}}>
+              {lang==='ru'
+                ? '📌 Убедись, что микрофон включён и браузер имеет к нему доступ. Говори сразу после нажатия — не делай паузу.'
+                : '📌 Make sure your mic is allowed in the browser. Speak immediately after tapping — don\'t pause.'}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Interaction Bar */}
-      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:16,flexDirection:'column'}}>
-        {/* Recording Mic Button */}
+      {/* ── Mic / Action Bar ───────────────────────────────────────────────── */}
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
         {!isPassed && (
-          <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8}}>
+          <>
             <button onClick={onMic} disabled={micBusy}
-              style={{width:64,height:64,borderRadius:'50%',border:'none',
+              style={{width:72,height:72,borderRadius:'50%',border:'none',
                 cursor:micBusy?'default':'pointer',
-                background:phase==='recording'?C.gold:phase==='scoring'?C.purple:C.rose,color:'white',fontSize:'1.5rem',
-                boxShadow:`0 6px 20px ${phase==='recording'?'rgba(245,158,11,.4)':'rgba(233,30,99,.35)'}`,
-                animation:phase==='recording'?'pulse 1.2s ease-in-out infinite':'none'}}>
+                background: phase==='recording' ? C.gold : phase==='scoring' ? '#7c3aed' : C.rose,
+                color:'white',fontSize:'1.6rem',
+                boxShadow:`0 8px 24px ${phase==='recording'?'rgba(245,158,11,.45)':phase==='scoring'?'rgba(124,58,237,.35)':'rgba(233,30,99,.35)'}`,
+                animation: phase==='recording' ? 'pulse 1.2s ease-in-out infinite' : 'none',
+                transition:'background 0.2s'}}>
               {phase==='recording' ? '⏹' : phase==='scoring' ? '⏳' : '🎙️'}
             </button>
-            <div style={{fontSize:'0.8rem',fontWeight:500,color:phase==='recording'?C.gold:phase==='scoring'?C.purple:C.warm}}>
+            <div style={{fontSize:'0.82rem',fontWeight:600,color:
+              phase==='recording' ? C.gold : phase==='scoring' ? '#7c3aed' : C.warm,
+              lineHeight:1.5,maxWidth:300}}>
               {phase==='recording'
-                ? (lang==='ru'?'Слушаю... скажи фразу и нажми ⏹':'Listening... say the phrase and tap ⏹')
+                ? (lang==='ru' ? '🔴 Слушаю... Скажи фразу, потом нажми ⏹' : '🔴 Listening… say the phrase, then tap ⏹ to stop')
                 : phase==='scoring'
-                ? (lang==='ru'?'Оцениваю...':'Analyzing pronunciation...')
-                : (lang==='ru'?'Нажми и начни говорить':'Tap to start speaking')}
+                ? (lang==='ru' ? '⏳ Оцениваю произношение...' : '⏳ Analyzing your pronunciation...')
+                : phase==='error'
+                ? (lang==='ru' ? 'Попробуй снова 👇' : 'Try again 👇')
+                : (lang==='ru' ? 'Нажми и произнеси фразу вслух' : 'Tap to start speaking')}
             </div>
-          </div>
+          </>
         )}
 
-        {/* Next/Complete Button (Only unlocked if passed >= 55) */}
         {isPassed && (
           <button onClick={next}
-            style={{width:'100%',padding:'14px',borderRadius:14,border:'none',background:C.sage,color:'white',fontWeight:700,fontSize:'1.1rem',cursor:'pointer',boxShadow:'0 4px 14px rgba(91,140,90,0.3)'}}>
+            style={{width:'100%',padding:'16px',borderRadius:16,border:'none',
+              background:`linear-gradient(135deg,${C.sage},#3f7a3e)`,color:'white',fontWeight:800,fontSize:'1.05rem',
+              cursor:'pointer',boxShadow:'0 6px 18px rgba(91,140,90,0.3)'}}>
             {pos >= phrases.length - 1
-              ? (lang==='ru'?'✅ Завершить урок':'✅ Complete lesson')
-              : (lang==='ru'?'Следующая фраза →':'Next phrase →')}
+              ? (lang==='ru' ? '✅ Завершить урок' : '✅ Complete lesson')
+              : (lang==='ru' ? 'Следующая фраза →' : 'Next phrase →')}
           </button>
         )}
       </div>

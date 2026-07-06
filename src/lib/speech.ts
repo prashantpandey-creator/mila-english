@@ -90,7 +90,7 @@ export async function startListening(
   actx.createMediaStreamSource(stream).connect(analyser);
   const buf = new Float32Array(analyser.fftSize);
 
-  const THRESH = 0.015, SILENCE_MS = 900, MIN_MS = 700, MAX_MS = 7000;
+  const THRESH = 0.008, SILENCE_MS = 1100, MIN_MS = 500, MAX_MS = 9000;
   const t0 = performance.now();
   // If mic stays silent for the entire MAX_MS, we skip scoring and treat as empty
   let spoke = false, lastVoice = t0, raf = 0;
