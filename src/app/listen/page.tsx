@@ -72,7 +72,12 @@ export default function ListenPage() {
     }
     setErrMsg(''); setResult(null); setPhase('recording');
     try {
-      const s = await startListening(phrase.text, accent, (a) => { setSession(null); setPhase('scoring'); settle(a); });
+      const s = await startListening(
+        phrase.text,
+        accent,
+        (a) => { setSession(null); settle(a); },
+        () => { setPhase('scoring'); setSession(null); }
+      );
       setSession(s);
     } catch (e) { fail(e); }
   };

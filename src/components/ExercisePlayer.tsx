@@ -67,12 +67,18 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
     setResult(null);
     setPhase('recording');
     try {
-      // Default to US English accent profile for assessment scoring
-      const s = await startListening(phrase.en, ACCENTS[1], (a) => {
-        setSession(null);
-        setPhase('scoring');
-        settle(a);
-      });
+      const s = await startListening(
+        phrase.en,
+        ACCENTS[1],
+        (a) => {
+          setSession(null);
+          settle(a);
+        },
+        () => {
+          setPhase('scoring');
+          setSession(null);
+        }
+      );
       setSession(s);
     } catch (e) {
       fail(e);

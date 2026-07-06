@@ -81,6 +81,7 @@ export async function startListening(
   reference: string,
   _accent: Accent,
   onAutoStop?: (a: Assessment) => void,
+  onSilenceDetected?: () => void,
 ): Promise<Session> {
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
 
@@ -131,6 +132,7 @@ export async function startListening(
     if (rms > THRESH) { spoke = true; lastVoice = now; }
     const elapsed = now - t0;
     if (elapsed > MAX_MS || (spoke && elapsed > MIN_MS && now - lastVoice > SILENCE_MS)) {
+      onSilenceDetected?.();
       finalize().then((a) => onAutoStop?.(a)).catch(() => {});
       return;
     }
