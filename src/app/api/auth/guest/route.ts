@@ -15,11 +15,16 @@ export async function POST() {
           email,
           name: 'Гость / Guest',
           password: hashPassword('guest-password-123-xyz'),
-          learnerCategory: 'adult_beginner',
+          learnerCategory: 'pending',
           nativeLanguage: 'Русский',
-          level: 'beginner',
+          level: 'pending',
           joinDate: new Date(),
         }
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { email },
+        data: { level: 'pending', learnerCategory: 'pending', learnerProfile: null }
       });
     }
 

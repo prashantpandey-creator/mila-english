@@ -59,13 +59,6 @@ export default function RegisterPage() {
               <div key={f.k}><label style={{fontSize:'0.9rem',fontWeight:500,color:'#44403c'}}>{t(f.l as any)}</label>
                 <input type={f.k==='email'?'email':f.k==='password'?'password':'text'} value={(form as any)[f.k]} onChange={up(f.k)} placeholder={f.ph} style={inp} required /></div>
             ))}
-            <div><label style={{fontSize:'0.9rem',fontWeight:500,color:'#44403c'}}>{t('register_level')}</label>
-              <select value={form.learnerCategory} onChange={up('learnerCategory')} style={inp}>
-                <option value="absolute_beginner">{t('register_level_beginner')}</option>
-                <option value="young_learner">{t('register_level_young')}</option>
-                <option value="adult_beginner">{t('register_level_adult')}</option>
-                <option value="intermediate">{t('register_level_intermediate')}</option>
-              </select></div>
             <button type="submit" disabled={loading} style={{width:'100%',padding:'0.85rem',borderRadius:10,border:'none',
               background:'linear-gradient(135deg,#a8d5ba,#5b8c5a)',color:'white',fontWeight:600,fontSize:'1rem',cursor:'pointer',
               boxShadow:'0 4px 14px rgba(91,140,90,0.25)',marginTop:'0.5rem'}}>{loading ? '...' : t('register_btn')}</button>

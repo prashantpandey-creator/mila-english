@@ -74,9 +74,42 @@ export default function DashboardPage() {
             <p style={{color:C.warm,margin:0}}>
               {lang==='ru'?'Готова позаниматься?':'Ready to practice?'}
             </p>
-            <StreakCounter days={5} lang={lang} />
+            <StreakCounter days={user?.streakDays || 0} lang={lang} />
           </div>
         </div>
+
+        {/* AI Assessment Banner (If pending) */}
+        {user?.level === 'pending' && (
+          <div style={{background:'linear-gradient(135deg,#c4b5fd,#a855f7)',borderRadius:20,padding:'24px',boxShadow:'0 8px 32px rgba(168,85,247,0.2)',marginBottom:24,color:'white'}}>
+            <div style={{fontSize:'1.8rem',marginBottom:8}}>🤖✨</div>
+            <h2 style={{fontSize:'1.3rem',fontWeight:800,margin:'0 0 6px'}}>{lang==='ru'?'Твой личный план обучения':'Your Custom Learning Plan'}</h2>
+            <p style={{fontSize:'0.9rem',opacity:0.9,lineHeight:1.5,margin:'0 0 16px'}}>{lang==='ru'?'Пройди короткое собеседование с ИИ, чтобы мы определили твой уровень и составили персональную программу.':'Take a quick conversational test with our AI to determine your level and generate a personalized curriculum.'}</p>
+            <button onClick={()=>router.push('/assessment')}
+              style={{width:'100%',padding:'12px',borderRadius:12,border:'none',background:'white',color:'#a855f7',fontWeight:700,fontSize:'1rem',cursor:'pointer',boxShadow:'0 4px 14px rgba(0,0,0,0.1)'}}>
+              {lang==='ru'?'Начать собеседование →':'Start Assessment →'}
+            </button>
+          </div>
+        )}
+
+        {/* Custom Plan Display (If generated) */}
+        {user?.level !== 'pending' && user?.learnerProfile && (
+          <div style={{background:'white',borderRadius:20,padding:'20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:24,border:'1px solid rgba(168,85,247,0.15)'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
+              <div>
+                <div style={{fontSize:'0.75rem',fontWeight:700,color:'#a855f7',textTransform:'uppercase',letterSpacing:1,marginBottom:4}}>
+                  {lang==='ru'?'Персональный план':'Custom Plan'}
+                </div>
+                <div style={{fontWeight:700,fontSize:'1.1rem',color:C.dark}}>Level: {user.level.toUpperCase()}</div>
+              </div>
+              <div style={{width:40,height:40,borderRadius:12,background:'#ede9fe',color:'#a855f7',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',fontWeight:800}}>
+                {user.level.slice(0,2).toUpperCase()}
+              </div>
+            </div>
+            <p style={{fontSize:'0.85rem',color:C.warm,lineHeight:1.5,margin:0}}>
+              {JSON.parse(user.learnerProfile)?.weak_summary || (lang==='ru'?'Мы составили план на основе твоего собеседования.':'We built this plan based on your assessment.')}
+            </p>
+          </div>
+        )}
 
         {/* Voice Darshan hero — antigravity's WebGL orb experience */}
         <div onClick={()=>router.push('/darshan')}

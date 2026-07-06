@@ -44,10 +44,16 @@ export async function ttsSpeak(text: string, lang = 'en-US', rate = 0.85): Promi
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
     u.rate = rate;
-    const best =
-      voices.find((v) => v.lang === lang) ||
-      voices.find((v) => v.lang?.toLowerCase().startsWith(lang.slice(0, 5))) ||
-      voices.find((v) => v.lang?.toLowerCase().startsWith('en'));
+    // Try to find a female voice first
+    let best = voices.find(v => v.lang === lang && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('zira')));
+    if (!best) {
+      best = voices.find(v => v.lang?.toLowerCase().startsWith(lang.slice(0, 5)) && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('zira')));
+    }
+    if (!best) {
+      best = voices.find((v) => v.lang === lang) ||
+             voices.find((v) => v.lang?.toLowerCase().startsWith(lang.slice(0, 5))) ||
+             voices.find((v) => v.lang?.toLowerCase().startsWith('en'));
+    }
     if (best) u.voice = best;
     u.onend = () => resolve();
     u.onerror = () => resolve();

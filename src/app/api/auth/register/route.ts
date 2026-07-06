@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
         email: body.email,
         name: body.name,
         password: hashPassword(body.password),
-        learnerCategory: body.learnerCategory || 'adult',
+        learnerCategory: body.learnerCategory || 'pending',
         nativeLanguage: body.nativeLanguage || 'ru',
-        level: body.level || 'beginner',
+        level: body.level || 'pending',
         joinDate: new Date(),
       }
     })
