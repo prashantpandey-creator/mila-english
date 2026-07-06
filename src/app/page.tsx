@@ -12,7 +12,15 @@ export default function HomePage() {
   const { t, lang } = useI18n();
   const router = useRouter();
   const [m, setM] = useState(false);
-  useEffect(()=>{setM(true)},[]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setM(true);
+    if (typeof document !== 'undefined') {
+      setIsLoggedIn(document.cookie.includes('token='));
+    }
+  }, []);
+
   if (!m) return null;
 
   const CATEGORIES = [
@@ -52,11 +60,19 @@ export default function HomePage() {
         <div style={{fontWeight:800,fontSize:'1.2rem',color:C.dark}}>🌸 Мила</div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <LangToggle />
-          <button onClick={()=>router.push('/login')}
-            style={{padding:'8px 20px',borderRadius:20,border:'none',background:C.rose,color:'white',
-              fontWeight:600,fontSize:'0.9rem',cursor:'pointer'}}>
-            {lang==='ru'?'Войти':'Sign In'}
-          </button>
+          {isLoggedIn ? (
+            <button onClick={()=>router.push('/dashboard')}
+              style={{padding:'8px 20px',borderRadius:20,border:'none',background:C.rose,color:'white',
+                fontWeight:600,fontSize:'0.9rem',cursor:'pointer'}}>
+              {lang==='ru'?'Кабинет':'Dashboard'}
+            </button>
+          ) : (
+            <button onClick={()=>router.push('/login')}
+              style={{padding:'8px 20px',borderRadius:20,border:'none',background:C.rose,color:'white',
+                fontWeight:600,fontSize:'0.9rem',cursor:'pointer'}}>
+              {lang==='ru'?'Войти':'Sign In'}
+            </button>
+          )}
         </div>
       </div>
 
@@ -78,13 +94,23 @@ export default function HomePage() {
 
         {/* CTA Buttons */}
         <div style={{display:'flex',gap:12,justifyContent:'center',marginTop:24,flexWrap:'wrap'}}>
-          <button onClick={()=>router.push('/register')}
-            style={{padding:'14px 32px',borderRadius:16,border:'none',
-              background:`linear-gradient(135deg,${C.rose},#c2185b)`,color:'white',
-              fontWeight:700,fontSize:'1.05rem',cursor:'pointer',
-              boxShadow:'0 4px 18px rgba(233,30,99,0.3)'}}>
-            {lang==='ru'?'Начать учиться →':'Start learning →'}
-          </button>
+          {isLoggedIn ? (
+            <button onClick={()=>router.push('/dashboard')}
+              style={{padding:'14px 32px',borderRadius:16,border:'none',
+                background:`linear-gradient(135deg,${C.rose},#c2185b)`,color:'white',
+                fontWeight:700,fontSize:'1.05rem',cursor:'pointer',
+                boxShadow:'0 4px 18px rgba(233,30,99,0.3)'}}>
+              {lang==='ru'?'Личный кабинет →':'Dashboard →'}
+            </button>
+          ) : (
+            <button onClick={()=>router.push('/register')}
+              style={{padding:'14px 32px',borderRadius:16,border:'none',
+                background:`linear-gradient(135deg,${C.rose},#c2185b)`,color:'white',
+                fontWeight:700,fontSize:'1.05rem',cursor:'pointer',
+                boxShadow:'0 4px 18px rgba(233,30,99,0.3)'}}>
+              {lang==='ru'?'Начать учиться →':'Start learning →'}
+            </button>
+          )}
           <button onClick={()=>document.getElementById('research')?.scrollIntoView({behavior:'smooth'})}
             style={{padding:'14px 32px',borderRadius:16,border:`2px solid ${C.rose}`,background:'transparent',
               color:C.rose,fontWeight:600,fontSize:'1.05rem',cursor:'pointer'}}>
@@ -161,13 +187,23 @@ export default function HomePage() {
           ))}
         </div>
 
-        <button onClick={()=>router.push('/register')}
-          style={{marginTop:28,padding:'16px 40px',borderRadius:16,border:'none',
-            background:`linear-gradient(135deg,${C.sage},#388e3c)`,color:'white',
-            fontWeight:700,fontSize:'1.1rem',cursor:'pointer',
-            boxShadow:'0 4px 18px rgba(91,140,90,0.3)'}}>
-          {lang==='ru'?'Начать бесплатно 🌸':'Start free 🌸'}
-        </button>
+        {isLoggedIn ? (
+          <button onClick={()=>router.push('/dashboard')}
+            style={{marginTop:28,padding:'16px 40px',borderRadius:16,border:'none',
+              background:`linear-gradient(135deg,${C.sage},#388e3c)`,color:'white',
+              fontWeight:700,fontSize:'1.1rem',cursor:'pointer',
+              boxShadow:'0 4px 18px rgba(91,140,90,0.3)'}}>
+            {lang==='ru'?'Личный кабинет 🌸':'Dashboard 🌸'}
+          </button>
+        ) : (
+          <button onClick={()=>router.push('/register')}
+            style={{marginTop:28,padding:'16px 40px',borderRadius:16,border:'none',
+              background:`linear-gradient(135deg,${C.sage},#388e3c)`,color:'white',
+              fontWeight:700,fontSize:'1.1rem',cursor:'pointer',
+              boxShadow:'0 4px 18px rgba(91,140,90,0.3)'}}>
+            {lang==='ru'?'Начать бесплатно 🌸':'Start free 🌸'}
+          </button>
+        )}
       </div>
 
       {/* ── FOOTER ── */}
