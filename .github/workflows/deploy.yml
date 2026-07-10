@@ -1,4 +1,4 @@
-name: Deploy Mila to Hetzner
+name: Deploy Mila to Mumbai
 on:
   push:
     branches: [main]
@@ -10,17 +10,18 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: 204.168.176.229
+          host: 209.182.233.163
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
             cd /root/mila 2>/dev/null || git clone https://github.com/prashantpandey-creator/mila-english.git /root/mila
-            cd /root/mila && git pull
-            echo "JWT_SECRET=${{ secrets.MILA_JWT_SECRET }}" > .env
-            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-            docker compose down --remove-orphans 2>/dev/null || true
-            docker compose build && docker compose up -d
-            sleep 3
+            cd /root/mila && git fetch --all && git reset --hard origin/main
+            # .env (JWT_SECRET, OPENAI_API_KEY) and pron-service/model.onnx live on
+            # the box and are not in git — the reset above never touches them.
+            test -f pron-service/model.onnx || { echo "model.onnx missing — see pron-service/README.md"; exit 1; }
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d
+            sleep 5
             docker exec mila node -e "require('http').get('http://localhost:3000/',r=>{console.log('status',r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"
-            echo "✅ Mila deployed — routed via Traefik at mila.purangpt.com"
+            echo "✅ Mila deployed — routed via Caddy at mila.purangpt.com"

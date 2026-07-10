@@ -1,0 +1,34 @@
+# Mila — Mumbai (SSDNodes) origin. Mirrors the purangpt frontend wiring:
+# both containers join the existing root_default network so Caddy (also on
+# root_default) resolves mila:3000 and mila resolves mila-pron:8000. No Traefik,
+# no published host ports — only Caddy is web-facing, same as the rest of prod.
+services:
+  mila:
+    build: .
+    container_name: mila
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=file:/data/mila.db
+      - PRON_URL=http://mila-pron:8000
+      - NODE_ENV=production
+    volumes:
+      - mila_data:/data
+    networks:
+      - root_default
+
+  mila-pron:
+    build: ./pron-service
+    container_name: mila-pron
+    restart: unless-stopped
+    networks:
+      - root_default
+
+volumes:
+  mila_data:
+    driver: local
+
+networks:
+  root_default:
+    external: true
