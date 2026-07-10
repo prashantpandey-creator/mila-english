@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import { ACCENTS, playPhrase, hasRealVoice, startListening, missedSound } from '@/lib/speech';
 import { PHRASES, PACKS, SOUND_INFO } from '@/lib/phrases';
+import { useScene } from '@/lib/scene';
 
 const VERDICT = {
   good:  { fg: '#8fce84', bg: 'rgba(143,206,132,0.16)' },
@@ -18,6 +19,7 @@ const VERDICT = {
 export default function ListenPage() {
   const { lang } = useI18n();
   const router = useRouter();
+  const { setScene } = useScene();
   const [m, setM] = useState(false);
   const [accent, setAccent] = useState(ACCENTS[0]);
   const [pack, setPack] = useState(PACKS[0].id);
@@ -33,6 +35,10 @@ export default function ListenPage() {
 
   useEffect(() => { setM(true); }, []);
   useEffect(() => { if (typeof window !== 'undefined') window.speechSynthesis?.getVoices(); }, [m]);
+  // The backdrop follows the room: pick UK → London, US → New York, IN → Mumbai;
+  // the situation pack (airport/hotel…) is the softer fallback signal.
+  useEffect(() => { setScene({ country: accent.id as any, topic: pack as any }); }, [accent.id, pack]);
+  useEffect(() => () => setScene({ country: null, topic: null }), []); // clear on leave
   if (!m) return null;
 
   // Phrases of the current pack, carrying their global index (= audio file index).
