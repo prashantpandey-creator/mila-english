@@ -27,6 +27,9 @@ export default function ListenPage() {
   const [errMsg, setErrMsg] = useState('');
   const [session, setSession] = useState<any>(null);
   const [soundMisses, setSoundMisses] = useState<Record<string,{count:number;example:string}>>({});
+  const [drills, setDrills] = useState<any[]>([]);        // personal AI drills from /api/drill
+  const [drillIdx, setDrillIdx] = useState<number|null>(null); // null = pack mode
+  const [drillLoading, setDrillLoading] = useState(false);
 
   useEffect(() => { setM(true); }, []);
   useEffect(() => { if (typeof window !== 'undefined') window.speechSynthesis?.getVoices(); }, [m]);
@@ -34,16 +37,32 @@ export default function ListenPage() {
 
   // Phrases of the current pack, carrying their global index (= audio file index).
   const items = PHRASES.map((p, i) => ({ ...p, gi: i })).filter((p) => p.pack === pack);
-  const phrase = items[pos] || items[0];
+  const inDrill = drillIdx !== null && drills[drillIdx];
+  const phrase = inDrill
+    ? { text: drills[drillIdx!].text, ipa: drills[drillIdx!].contrast, ru: drills[drillIdx!].tip || '', gi: -1, hard: '', sound: drills[drillIdx!].phoneme }
+    : (items[pos] || items[0]);
 
   const onPack = (id: string) => {
-    setPack(id); setPos(0); setResult(null); setPhase('idle'); setErrMsg(''); setSession(null);
+    setPack(id); setPos(0); setResult(null); setPhase('idle'); setErrMsg(''); setSession(null); setDrillIdx(null);
   };
 
   const onListen = async () => {
     setPhase('speaking');
     await playPhrase(phrase.gi, accent, phrase.text);
     setPhase(p => (p === 'speaking' ? 'idle' : p));
+  };
+
+  // Fetch personal drills built from the learner model (weakest phonemes).
+  const loadDrills = async () => {
+    setDrillLoading(true);
+    try {
+      const r = await fetch('/api/drill');
+      const d = r.ok ? await r.json() : null;
+      if (Array.isArray(d?.drills) && d.drills.length) {
+        setDrills(d.drills); setDrillIdx(0);
+        setResult(null); setPhase('idle'); setErrMsg(''); setSession(null);
+      }
+    } finally { setDrillLoading(false); }
   };
 
   // Tally the drilled sound whenever its carrier word wasn't nailed.
@@ -83,7 +102,14 @@ export default function ListenPage() {
     } catch (e) { fail(e); }
   };
 
-  const next = () => { setPos(i => (i + 1) % items.length); setResult(null); setPhase('idle'); setErrMsg(''); setSession(null); };
+  const next = () => {
+    if (inDrill) {
+      setDrillIdx(i => (i! + 1 < drills.length ? i! + 1 : null)); // last drill → back to pack
+    } else {
+      setPos(i => (i + 1) % items.length);
+    }
+    setResult(null); setPhase('idle'); setErrMsg(''); setSession(null);
+  };
   const micBusy = phase === 'scoring' || (phase === 'recording' && !session);
   const misses = Object.entries(soundMisses).sort((a, b) => b[1].count - a[1].count).slice(0, 4);
 
@@ -144,9 +170,12 @@ export default function ListenPage() {
         </div>
 
         {/* phrase card */}
-        <div style={{background:'white',borderRadius:20,padding:'22px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.05)',marginBottom:14}}>
-          <div style={{fontSize:'0.72rem',color:'#a8a29e',fontWeight:600,marginBottom:8}}>
-            {lang==='ru'?'Слушай и повтори':'Listen & repeat'} · {pos+1}/{items.length}
+        <div style={{background:'white',borderRadius:20,padding:'22px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.05)',marginBottom:14,
+          border: inDrill ? '1.5px solid #e9d5ff' : 'none'}}>
+          <div style={{fontSize:'0.72rem',color:inDrill?C.purple:'#a8a29e',fontWeight:inDrill?700:600,marginBottom:8}}>
+            {inDrill
+              ? `🎯 ${lang==='ru'?'Персональная тренировка':'Personal drill'} · ${drillIdx!+1}/${drills.length} · /${phrase.sound}/`
+              : `${lang==='ru'?'Слушай и повтори':'Listen & repeat'} · ${pos+1}/${items.length}`}
           </div>
           <div style={{fontSize:'1.4rem',fontWeight:700,color:C.dark,lineHeight:1.3}}>{phrase.text}</div>
           <div style={{fontSize:'0.85rem',color:'#9a8fb0',marginTop:6,fontFamily:'ui-monospace,monospace'}}>{phrase.ipa}</div>
@@ -249,6 +278,14 @@ export default function ListenPage() {
                 </div>
               );
             })}
+            <button onClick={loadDrills} disabled={drillLoading}
+              style={{width:'100%',marginTop:6,padding:'12px',borderRadius:12,border:'none',
+                background:'linear-gradient(135deg,#c4b5fd,#a855f7)',color:'white',fontWeight:800,fontSize:'0.9rem',
+                cursor:drillLoading?'default':'pointer',opacity:drillLoading?0.7:1}}>
+              {drillLoading
+                ? (lang==='ru'?'✨ Мила готовит упражнения…':'✨ Mila is building your drills…')
+                : (lang==='ru'?'✨ Тренировка от ИИ на мои слабые звуки':'✨ AI drills for my weak sounds')}
+            </button>
           </div>
         )}
 

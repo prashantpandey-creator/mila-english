@@ -59,3 +59,33 @@ export async function GET(request: NextRequest) {
     weakPhonemes,
   })
 }
+
+// Record a lesson attempt: one Progress row per (user, lesson), best score kept.
+export async function POST(request: NextRequest) {
+  const user = await authenticate(request)
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const body = await request.json().catch(() => null)
+  const lessonId = Number(body?.lessonId || 0)
+  if (!lessonId) return NextResponse.json({ error: 'missing lessonId' }, { status: 400 })
+  const userId = Number(user.sub)
+  const score = body?.score != null ? Number(body.score) : null
+  const completed = Boolean(body?.completed)
+
+  const existing = await prisma.progress.findFirst({ where: { userId, lessonId } })
+  const row = existing
+    ? await prisma.progress.update({
+        where: { id: existing.id },
+        data: {
+          completed: completed || existing.completed,
+          score: score != null ? Math.max(score, existing.score ?? 0) : existing.score,
+          lastAttemptDate: new Date(),
+        },
+      })
+    : await prisma.progress.create({
+        data: { userId, lessonId, completed, score, lastAttemptDate: new Date() },
+      })
+  return NextResponse.json(row, { status: existing ? 200 : 201 })
+}

@@ -47,7 +47,8 @@ model PhonemeStat {
   lastAcc Int?               // last GOP accuracy 0-100
   topSubstitution String?    // what they say instead, e.g. "s"
   mastery Float @default(0)  // BKT P(known) 0-1
-  difficulty Float @default(0) // FSRS Difficulty (also serves item difficulty b)
+  eloB Float @default(0)     // ELO/IRT item difficulty b (logit scale, per user-phoneme)
+  difficulty Float @default(5) // FSRS Difficulty 1-10 (memory axis, NOT the same thing as eloB)
   stability Float @default(0)  // FSRS Stability, days until recall = 90%
   due DateTime?              // FSRS next-review time
   User User @relation(fields: [userId], references: [id])

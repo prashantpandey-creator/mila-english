@@ -60,7 +60,7 @@ export default function LessonsPage() {
     fetch('/api/lessons')
       .then(r => r.ok ? r.json() : [])
       .then((rows: any[]) => setDbLessons(Array.isArray(rows) ? rows.map(l => ({
-        id: l.id,
+        id: `ai-${l.id}`,   // prefixed — static lessons own the bare 1..8 ids
         cat: '✨',
         title: l.title,
         sub: l.category || (lang==='ru' ? 'Урок от ИИ' : 'AI-generated lesson'),

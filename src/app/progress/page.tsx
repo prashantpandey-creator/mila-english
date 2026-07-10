@@ -1,24 +1,35 @@
 // @ts-nocheck
 'use client';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import ProgressSummary from '@/components/ProgressSummary';
 import ProgressRing from '@/components/ProgressRing';
-import ProgressChart from '@/components/ProgressChart';
-import SkillBreakdown from '@/components/SkillBreakdown';
-import WeakAreasAlert from '@/components/WeakAreasAlert';
-import StudyStreakCalendar from '@/components/StudyStreakCalendar';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
+import { SOUND_INFO } from '@/lib/phrases';
 
 export default function ProgressPage() {
   const {t,lang}=useI18n(); const router=useRouter();
+  const [data,setData]=useState<any>(null);
+  const [me,setMe]=useState<any>(null);
+
+  useEffect(()=>{
+    fetch('/api/progress').then(r=>r.ok?r.json():null).then(d=>{if(d)setData(d);}).catch(()=>{});
+    fetch('/api/users/me').then(r=>r.ok?r.json():null).then(d=>{if(d)setMe(d);}).catch(()=>{});
+  },[]);
+
+  const minutes = data ? Math.round(data.totalTimeSeconds/60) : null;
   const stats=[
-    {emoji:'⭐',l:lang==='ru'?'Уроков':'Lessons',v:12,c:C.sage},
-    {emoji:'📝',l:lang==='ru'?'Слов':'Words',v:34,c:C.rose},
-    {emoji:'⏱',l:lang==='ru'?'Часов':'Hours',v:2.5,c:C.gold},
-    {emoji:'🔥',l:lang==='ru'?'Дней подряд':'Day streak',v:5,c:C.purple},
+    {emoji:'⭐',l:lang==='ru'?'Уроков':'Lessons',v:data?.completedLessons ?? '…',c:C.sage},
+    {emoji:'🎯',l:lang==='ru'?'Ср. балл':'Avg score',v:data?(data.avgScore||0):'…',c:C.rose},
+    {emoji:'⏱',l:lang==='ru'?'Минут':'Minutes',v:minutes ?? '…',c:C.gold},
+    {emoji:'🔥',l:lang==='ru'?'Дней подряд':'Day streak',v:me?.streakDays ?? '…',c:C.purple},
   ];
+
+  const weak = Array.isArray(data?.weakPhonemes) ? data.weakPhonemes.filter((p:any)=>p.attempts>0) : [];
+  const recent = Array.isArray(data?.recentLessons) ? data.recentLessons : [];
+
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
       <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',justifyContent:'space-between'}}>
@@ -29,15 +40,80 @@ export default function ProgressPage() {
 
         <ProgressSummary items={stats.map(s=>({emoji:s.emoji,val:s.v,label:s.l,color:s.c}))}/>
 
-        <div style={{display:'flex',justifyContent:'center',gap:24,marginTop:20}}>
-          <ProgressRing percent={68} label={lang==='ru'?'До след. уровня':'To next level'} color={C.rose}/>
-          <ProgressRing percent={45} label={lang==='ru'?'Недельная цель':'Weekly goal'} color={C.sage}/>
-        </div>
+        {data && (
+          <div style={{display:'flex',justifyContent:'center',gap:24,marginTop:20}}>
+            <ProgressRing percent={Math.min(data.avgScore||0,100)} label={lang==='ru'?'Средний балл':'Average score'} color={C.rose}/>
+            <ProgressRing percent={Math.min((data.completedLessons||0)*10,100)} label={lang==='ru'?'До след. уровня':'To next level'} color={C.sage}/>
+          </div>
+        )}
 
-        <ProgressChart lang={lang}/>
-        <SkillBreakdown lang={lang}/>
-        <WeakAreasAlert lang={lang}/>
-        <StudyStreakCalendar lang={lang}/>
+        {/* Weak phonemes — real data from the scoring model */}
+        {weak.length > 0 && (
+          <div style={{background:'white',borderRadius:16,padding:'18px 20px',boxShadow:'0 2px 12px rgba(0,0,0,0.04)',marginTop:16}}>
+            <div style={{fontWeight:700,fontSize:'0.9rem',color:C.dark,marginBottom:2}}>
+              {lang==='ru'?'Звуки для тренировки':'Sounds to drill'}
+            </div>
+            <div style={{fontSize:'0.72rem',color:'#a8a29e',marginBottom:12}}>
+              {lang==='ru'?'По оценкам модели произношения':'From your pronunciation scores'}
+            </div>
+            {weak.map((p:any)=>{
+              const meta = SOUND_INFO[p.phoneme] || {};
+              return (
+                <div key={p.phoneme} style={{display:'flex',alignItems:'center',gap:11,marginBottom:10}}>
+                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:'#fce4ec',color:C.rose,
+                    fontWeight:800,fontFamily:'ui-monospace,monospace',display:'flex',alignItems:'center',justifyContent:'center'}}>{p.phoneme}</span>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:'0.82rem',fontWeight:700,color:C.dark}}>
+                      {meta.ex ? (lang==='ru'?`как в «${meta.ex}»`:`as in “${meta.ex}”`) : (lang==='ru'?'тренируй этот звук':'drill this sound')}
+                      <span style={{fontWeight:600,color:'#b0a89f'}}> · {p.attempts}× · {lang==='ru'?'освоено':'mastery'} {Math.round((p.mastery||0)*100)}%</span>
+                    </div>
+                    <div style={{height:5,borderRadius:3,background:'#f0ece7',marginTop:5}}>
+                      <div style={{height:'100%',width:`${Math.round((p.mastery||0)*100)}%`,borderRadius:3,background:C.sage,transition:'width .4s'}}/>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            <button onClick={()=>router.push('/listen')}
+              style={{width:'100%',marginTop:8,padding:'11px',borderRadius:12,border:'none',background:C.roseL,color:C.rose,fontWeight:700,cursor:'pointer',fontSize:'0.88rem'}}>
+              🎙️ {lang==='ru'?'Тренировать сейчас':'Drill them now'}
+            </button>
+          </div>
+        )}
+
+        {/* Recent lessons — real Progress rows */}
+        {recent.length > 0 && (
+          <div style={{background:'white',borderRadius:16,padding:'18px 20px',boxShadow:'0 2px 12px rgba(0,0,0,0.04)',marginTop:16}}>
+            <div style={{fontWeight:700,fontSize:'0.9rem',color:C.dark,marginBottom:12}}>
+              {lang==='ru'?'Недавние уроки':'Recent lessons'}
+            </div>
+            {recent.map((r:any,i:number)=>(
+              <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 0',borderBottom:i<recent.length-1?'1px solid #f3f0ed':'none'}}>
+                <div>
+                  <div style={{fontSize:'0.88rem',fontWeight:600,color:C.dark}}>{r.lessonTitle || (lang==='ru'?'Урок':'Lesson')}</div>
+                  <div style={{fontSize:'0.72rem',color:C.warm}}>{r.category || ''}</div>
+                </div>
+                <span style={{fontSize:'0.85rem',fontWeight:800,color:r.score>=80?C.sage:r.score>=55?C.gold:C.rose}}>
+                  {r.score != null ? r.score : (r.completed ? '✓' : '—')}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty state — honest, points at the two learning loops */}
+        {data && weak.length===0 && recent.length===0 && (
+          <div style={{textAlign:'center',padding:'36px 12px',color:C.warm}}>
+            <div style={{fontSize:'2.6rem',marginBottom:10}}>🌱</div>
+            <p style={{margin:'0 0 18px',lineHeight:1.6}}>
+              {lang==='ru'?'Пока нет данных. Пройди урок или потренируй произношение — статистика появится здесь.':'No data yet. Complete a lesson or practice pronunciation — your stats will grow here.'}
+            </p>
+            <div style={{display:'flex',gap:10,justifyContent:'center'}}>
+              <button onClick={()=>router.push('/listen')} style={{padding:'11px 18px',borderRadius:12,border:'none',background:C.rose,color:'white',fontWeight:700,cursor:'pointer'}}>🎙️ {lang==='ru'?'Произношение':'Pronunciation'}</button>
+              <button onClick={()=>router.push('/lessons')} style={{padding:'11px 18px',borderRadius:12,border:'none',background:C.sage,color:'white',fontWeight:700,cursor:'pointer'}}>📚 {lang==='ru'?'Уроки':'Lessons'}</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

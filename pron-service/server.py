@@ -9,6 +9,7 @@ from phonemizer.separator import Separator
 HERE = os.path.dirname(os.path.abspath(__file__))
 _d = json.load(open(os.path.join(HERE, "vocab.json"), encoding="utf-8"))
 VOCAB, BLANK = _d["vocab"], _d["blank"]
+IVOCAB = {v: k for k, v in VOCAB.items()}  # id -> phoneme, for substitution decode
 _sess = ort.InferenceSession(os.path.join(HERE, "model.onnx"), providers=["CPUExecutionProvider"])
 _INP = _sess.get_inputs()[0].name
 
@@ -55,6 +56,17 @@ def forced_align(logp, targets, blank):
     return frames
 
 
+def heard_phoneme(logp, fr, expected_pid):
+    """What the model actually heard in this phoneme's frame window: argmax over
+    summed frame log-probs (blank excluded). Zero extra inference — reuses logp."""
+    if not fr:
+        return None
+    mass = logp[fr].sum(0)
+    mass[BLANK] = -1e30
+    heard = int(mass.argmax())
+    return IVOCAB.get(heard) if heard != expected_pid else None
+
+
 def score(audio, reference):
     logp = log_softmax(_sess.run(None, {_INP: audio[None, :].astype("float32")})[0][0])
     words = g2p_words(reference)
@@ -63,15 +75,22 @@ def score(audio, reference):
         for p in phs:
             flat.append(VOCAB[p]); owner.append((wi, p))
     frames = forced_align(logp, flat, BLANK)
-    accs = []
+    accs, subs = [], []
     for i, pid in enumerate(flat):
         fr = frames.get(i) or []
         accs.append(int(round(100 * float(np.exp(np.mean([logp[t, pid] for t in fr]))))) if fr else 0)
+        # substitution only meaningful when the phoneme was off (below GOOD)
+        subs.append(heard_phoneme(logp, fr, pid) if accs[-1] < GOOD else None)
     out_words = []
     for wi, (wtxt, _) in enumerate(words):
         idxs = [i for i in range(len(flat)) if owner[i][0] == wi]
         wa = int(round(np.mean([accs[i] for i in idxs]))) if idxs else 0
-        phonemes = [{"ph": owner[i][1], "acc": accs[i], "verdict": verdict(accs[i])} for i in idxs]
+        phonemes = []
+        for i in idxs:
+            entry = {"ph": owner[i][1], "acc": accs[i], "verdict": verdict(accs[i])}
+            if subs[i]:
+                entry["sub"] = subs[i]  # what they said instead
+            phonemes.append(entry)
         out_words.append({"word": wtxt, "score": wa, "verdict": verdict(wa), "phonemes": phonemes})
     overall = int(round(np.mean(accs))) if accs else 0
     worst = min(out_words, key=lambda w: w["score"]) if out_words else None

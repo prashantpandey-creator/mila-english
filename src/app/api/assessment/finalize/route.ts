@@ -67,6 +67,7 @@ export async function POST(req: Request) {
           durationMinutes: 5,
           content: l.content,
           difficulty: l.difficulty,
+          createdByUserId: Number(user.sub),
           Exercises: {
             create: l.exercises.map((ex: any) => ({
               type: 'multiple-choice',
