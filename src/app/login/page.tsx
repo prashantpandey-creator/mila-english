@@ -38,14 +38,14 @@ export default function LoginPage() {
     }
   };
 
-  const inputStyle = {width:'100%',padding:'0.75rem 1rem',borderRadius:10,border:'1.5px solid rgba(255,255,255,0.14)',fontSize:'0.95rem',outline:'none'};
+  const inputStyle = {width:'100%',padding:'0.75rem 1rem',borderRadius:10,border:'1.5px solid rgba(255,255,255,0.14)',fontSize:'0.95rem',outline:'none',background:'rgba(255,255,255,0.07)',color:'#f2ede3'};
   const btnStyle = {width:'100%',padding:'0.85rem',borderRadius:10,border:'none',background:'linear-gradient(135deg,#e8869a,#e8556d)',color:'white',fontWeight:600,fontSize:'1rem',cursor:'pointer',boxShadow:'0 4px 14px rgba(233,30,99,0.25)'};
 
   return (
     <div style={{minHeight:'100vh',background:'transparent'}}>
-      <nav style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'0.75rem 1.5rem',borderBottom:'1px solid rgba(249,168,184,0.12)'}}>
+      <nav style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'0.75rem 1.5rem',borderBottom:'1px solid rgba(212,175,55,0.18)'}}>
         <div style={{maxWidth:1200,margin:'0 auto',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <span style={{fontWeight:800,fontSize:'1.15rem',color:'#f2ede3'}}>🌸 Eng<span style={{color:'#e8556d'}}>Fluent</span></span>
+          <span style={{display:'flex',alignItems:'center',gap:9}}><span style={{width:30,height:30,borderRadius:'50%',border:'1px solid rgba(212,175,55,0.6)',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:"'Cormorant Garamond',serif",fontWeight:700,fontSize:'1.05rem',color:'#e8cd7a'}}>M</span><span style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:'#f2ede3'}}>Mila</span></span>
           <LangToggle />
         </div>
       </nav>
