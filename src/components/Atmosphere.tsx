@@ -15,25 +15,32 @@ import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useScene } from '@/lib/scene';
 
+// All clips are cinematically graded (austere, cool, contrasty, vignetted),
+// sourced hi-res (mostly 4K) then supersampled to 1080p. Aesthetic: gothic,
+// European, awe-inspiring — not tourist snapshots.
 const COUNTRY_POOLS: Record<string, string[]> = {
-  uk: ['/ambience/uk-london-bus.mp4', '/ambience/uk-bigben.mp4', '/ambience/uk-tower.mp4'],
-  us: ['/ambience/us-times-sq.mp4', '/ambience/us-manhattan.mp4'],
-  in: ['/ambience/in-mumbai.mp4', '/ambience/in-street.mp4'],
+  uk: ['/ambience/uk-bigben-night.mp4', '/ambience/uk-tower.mp4'],
+  us: ['/ambience/us-manhattan.mp4', '/ambience/us-empire.mp4'],
+  in: ['/ambience/in-taj-aerial.mp4'],
 };
 
 const TOPIC_POOLS: Record<string, string[]> = {
-  airport:     ['/ambience/topic-airport.mp4'],
-  hotel:       ['/ambience/topic-hotel.mp4'],
-  cafe:        ['/ambience/conversation.mp4'],
-  directions:  ['/ambience/campus.mp4'],
-  emergencies: ['/ambience/city-night.mp4'],
+  airport:     ['/ambience/us-empire.mp4'],
+  hotel:       ['/ambience/venice-night.mp4'],
+  cafe:        ['/ambience/person-cafe.mp4'],
+  directions:  ['/ambience/venice-night.mp4'],
+  emergencies: ['/ambience/uk-bigben-night.mp4'],
 };
 
 const ROUTE_POOLS: Record<string, string[]> = {
-  nature: ['/ambience/nature-forest.mp4', '/ambience/nature-lake.mp4', '/ambience/nature-field.mp4'],
-  learn:  ['/ambience/classroom.mp4', '/ambience/kids-writing.mp4', '/ambience/study-group.mp4', '/ambience/library.mp4'],
-  social: ['/ambience/friends.mp4', '/ambience/conversation.mp4', '/ambience/study-group.mp4', '/ambience/campus.mp4'],
-  club:   ['/ambience/conversation.mp4', '/ambience/library.mp4', '/ambience/campus.mp4', '/ambience/city-night.mp4', '/ambience/nature-lake.mp4'],
+  // progress/achievements — awe of nature: peaks, aurora, cliffs, volcano
+  nature: ['/ambience/nature-peaks.mp4', '/ambience/nature-aurora.mp4', '/ambience/nature-cliff.mp4', '/ambience/nature-volcano.mp4'],
+  // lessons/study — gothic learning: cathedral naves, columns, candlelight
+  learn:  ['/ambience/cathedral-light.mp4', '/ambience/cathedral-columns.mp4', '/ambience/candle-dark.mp4'],
+  // the talk/practice rooms — elegant European people
+  social: ['/ambience/person-suit.mp4', '/ambience/person-model.mp4', '/ambience/person-couple.mp4', '/ambience/person-cafe.mp4'],
+  // front door / auth — the full cinematic sweep, hero-first
+  club:   ['/ambience/cathedral-light.mp4', '/ambience/us-manhattan.mp4', '/ambience/nature-peaks.mp4', '/ambience/person-suit.mp4', '/ambience/venice-night.mp4', '/ambience/nature-aurora.mp4'],
 };
 
 function routePool(path: string): string[] {
