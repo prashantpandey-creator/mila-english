@@ -11,8 +11,8 @@ export default function LessonList({ lessons, onSelect }: {
     <div style={{display:'flex',flexDirection:'column',gap:12}}>
       {lessons.map(l=>(
         <div key={l.id} onClick={()=>onSelect(l.id)}
-          style={{cursor:'pointer',background:'white',borderRadius:16,padding:'16px 20px',
-            boxShadow:'0 1px 8px rgba(0,0,0,0.04)',display:'flex',alignItems:'center',gap:14,
+          style={{cursor:'pointer',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'16px 20px',
+            boxShadow:'0 1px 8px rgba(0,0,0,0.45)',display:'flex',alignItems:'center',gap:14,
             border:'2px solid transparent',transition:'all 0.2s'}}
           onMouseEnter={e=>{e.currentTarget.style.borderColor=C.rose;e.currentTarget.style.transform='translateY(-2px)'}}
           onMouseLeave={e=>{e.currentTarget.style.borderColor='transparent';e.currentTarget.style.transform='none'}}>

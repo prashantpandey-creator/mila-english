@@ -2,42 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Mila Atelier — noir ground, glass surfaces, champagne gold ── */
 :root {
-  --rose: #f9a8b8; --rose-light: #fce4ec; --rose-dark: #e91e63;
-  --cream: #fff8f0; --cream-dark: #f5e6d3;
-  --sage: #a8d5ba; --sage-light: #e8f5e9; --sage-dark: #5b8c5a;
-  --lavender: #c4b5fd; --lavender-light: #ede9fe;
-  --gold: #f59e0b; --gold-light: #fef3c7;
-  --warm-gray: #78716c; --warm-dark: #44403c;
+  --noir: #0b0e14; --noir-2: #0d1017; --noir-3: #131722;
+  --ivory: #f2ede3; --stone: #a89f8d;
+  --gold: #d4af37; --gold-soft: rgba(212,175,55,0.16);
+  --rose: #e8556d; --rose-soft: rgba(232,85,109,0.16);
+  --sage: #8fce84; --sage-soft: rgba(143,206,132,0.16);
+  --glass: rgba(255,255,255,0.05); --line: rgba(255,255,255,0.12);
 }
 
+html { background: var(--noir); }
+
 body {
-  background: var(--cream);
-  color: var(--warm-dark);
-  font-family: 'Inter', -apple-system, sans-serif;
+  background:
+    radial-gradient(1200px 800px at 85% -10%, rgba(212,175,55,0.10), transparent 60%),
+    radial-gradient(1000px 700px at -10% 25%, rgba(232,85,109,0.07), transparent 55%),
+    radial-gradient(900px 900px at 50% 115%, rgba(167,139,250,0.08), transparent 60%),
+    var(--noir);
+  background-attachment: fixed;
+  color: var(--ivory);
+  font-family: 'Manrope', 'Inter', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Display type — headlines wear the serif, regardless of inherited inline sans */
+h1, h2 {
+  font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+
+/* ── Living footage backdrop (Atmosphere component) ── */
+.atmosphere {
+  position: fixed; inset: 0; z-index: -2; overflow: hidden;
+  background: var(--noir);
+}
+.atmosphere video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: opacity 2.4s ease;
+  filter: saturate(0.85) contrast(1.05);
+}
+.atmosphere video.is-on { opacity: 1; }
+.atmosphere::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(1200px 800px at 85% -10%, rgba(212,175,55,0.08), transparent 60%),
+    linear-gradient(180deg, rgba(11,14,20,0.82) 0%, rgba(11,14,20,0.88) 45%, rgba(11,14,20,0.96) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.atmosphere--bright::after {
+  background:
+    radial-gradient(1200px 800px at 85% -10%, rgba(212,175,55,0.10), transparent 60%),
+    linear-gradient(180deg, rgba(11,14,20,0.62) 0%, rgba(11,14,20,0.78) 55%, rgba(11,14,20,0.94) 100%);
 }
 
 .card {
-  background: white; border-radius: 16px; padding: 1.5rem;
-  box-shadow: 0 4px 24px rgba(120,113,108,0.10);
-  border: 1px solid rgba(249,168,184,0.10);
+  background: var(--glass); border-radius: 16px; padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   transition: all 0.3s;
 }
-.card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(249,168,184,0.15); }
+.card:hover { transform: translateY(-2px); border-color: rgba(212,175,55,0.35); }
 
 .btn-primary {
-  background: linear-gradient(135deg, #f9a8b8, #e91e63); color: white;
-  padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600;
+  background: linear-gradient(135deg, #e8b96a, #d4af37); color: #17130a;
+  padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 700;
   border: none; cursor: pointer; transition: all 0.2s;
-  box-shadow: 0 4px 14px rgba(233,30,99,0.25);
+  box-shadow: 0 4px 18px rgba(212,175,55,0.28);
 }
-.btn-primary:hover { box-shadow: 0 6px 20px rgba(233,30,99,0.35); transform: translateY(-1px); }
+.btn-primary:hover { box-shadow: 0 6px 26px rgba(212,175,55,0.4); transform: translateY(-1px); }
 
 /* Speech pulse */
 .speech-pulse {
   width: 80px; height: 80px; border-radius: 50%;
-  background: var(--rose-light); cursor: pointer;
+  background: var(--rose-soft); cursor: pointer;
+  border: 1px solid rgba(232,85,109,0.35);
   display: flex; align-items: center; justify-content: center;
   font-size: 2rem;
 }
@@ -46,39 +90,54 @@ body {
   animation: pulse 1.5s ease-in-out infinite;
 }
 @keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(249,168,184,0.5); }
-  50% { box-shadow: 0 0 0 24px rgba(249,168,184,0); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(232,85,109,0.5); }
+  50% { box-shadow: 0 0 0 24px rgba(232,85,109,0); }
 }
 
 .lang-toggle {
-  display: flex; gap: 2px; background: #f5e6d3; border-radius: 999px; padding: 3px;
+  display: flex; gap: 2px; background: rgba(255,255,255,0.07); border-radius: 999px; padding: 3px;
+  border: 1px solid var(--line);
 }
 .lang-toggle button {
   background: none; border: none; padding: 6px 14px; border-radius: 999px;
-  font-size: 0.8rem; font-weight: 600; cursor: pointer; color: #78716c; transition: all 0.2s;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--stone); transition: all 0.2s;
 }
-.lang-toggle button.active { background: white; color: #e91e63; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.lang-toggle button.active { background: var(--gold); color: #17130a; box-shadow: 0 1px 8px rgba(212,175,55,0.4); }
 
-.streak-card { background: linear-gradient(135deg,#fff8f0,#fef3c7); border: 1.5px solid rgba(245,158,11,0.2); }
+.streak-card { background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.05)); border: 1px solid rgba(212,175,55,0.3); }
 
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 .animate-in { animation: fadeIn 0.4s ease; }
 
-/* Glassmorphism utilities (from the darshan/AI overhaul) */
+/* Glassmorphism utilities — dark atelier glass */
 @layer utilities {
   .glass {
-    @apply bg-white/50 backdrop-blur-xl border border-white/60 shadow-xl shadow-pink-500/5;
+    @apply backdrop-blur-xl border shadow-xl;
+    background: rgba(255,255,255,0.055);
+    border-color: rgba(255,255,255,0.12);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.5);
   }
   .glass-card {
-    @apply bg-white/70 backdrop-blur-md border border-white/50 shadow-lg shadow-purple-500/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 rounded-3xl;
+    @apply backdrop-blur-md border transition-all duration-300 rounded-3xl;
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.10);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
   }
+  .glass-card:hover { transform: translateY(-4px); border-color: rgba(212,175,55,0.4); }
   .gradient-text {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600;
+    @apply text-transparent bg-clip-text;
+    background-image: linear-gradient(120deg, #f0d98c, #d4af37 40%, #e8556d);
   }
 }
 
 @keyframes spin-slow { to { transform: rotate(360deg); } }
 .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+/* gold hairline divider */
+.hairline {
+  height: 1px; border: none;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.55), transparent);
+}
 
 /* ── Mila Voice Darshan Styles ── */
 .darshan-orb { display: block; }

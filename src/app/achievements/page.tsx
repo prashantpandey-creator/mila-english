@@ -14,8 +14,8 @@ export default function AchievementsPage() {
   const {t,lang}=useI18n(); const router=useRouter();
   const badges=lang==='ru'?BADGES_RU:BADGES_EN;
   return (
-    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
-      <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',justifyContent:'space-between'}}>
+    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
+      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>🌸 Мила</span><LangToggle/>
       </div>
       <div style={{maxWidth:500,margin:'0 auto',padding:'24px 20px'}}>

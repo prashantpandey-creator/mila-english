@@ -17,10 +17,10 @@ export default function SkillRadar() {
     return `${x},${y}`;
   }).join(' ');
   return (
-    <div style={{background:'white',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.04)',marginTop:16,textAlign:'center'}}>
+    <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)',marginTop:16,textAlign:'center'}}>
       <svg width="220" height="220" viewBox="0 0 220 220">
         {[0.33,0.66,1].map(f=>(
-          <circle key={f} cx={cx} cy={cy} r={r*f} fill="none" stroke="#e5e0dc" strokeWidth="1"/>
+          <circle key={f} cx={cx} cy={cy} r={r*f} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1"/>
         ))}
         <polygon points={pts} fill={C.roseL} stroke={C.rose} strokeWidth="2" opacity="0.85"/>
         {SKILLS.map((s,i)=>{

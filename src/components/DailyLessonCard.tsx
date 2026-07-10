@@ -8,7 +8,7 @@ export default function DailyLessonCard({ title, subtitle, onStart }: {
 }) {
   return (
     <div onClick={onStart}
-      style={{cursor:'pointer',borderRadius:20,overflow:'hidden',background:'white',
+      style={{cursor:'pointer',borderRadius:20,overflow:'hidden',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',
         boxShadow:'0 2px 20px rgba(0,0,0,0.06)',marginBottom:20,transition:'all 0.2s',border:'2px solid transparent'}}
       onMouseEnter={e=>{e.currentTarget.style.borderColor=C.rose;e.currentTarget.style.transform='translateY(-2px)'}}
       onMouseLeave={e=>{e.currentTarget.style.borderColor='transparent';e.currentTarget.style.transform='none'}}>

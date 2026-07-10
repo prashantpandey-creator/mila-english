@@ -46,12 +46,12 @@ export default function AssessmentChat() {
   if (!m) return null;
 
   return (
-    <div style={{display:'flex',flexDirection:'column',height:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
+    <div style={{display:'flex',flexDirection:'column',height:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
       {/* Header */}
-      <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+        borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>🌸 Мила</span>
-        <h1 style={{margin:0,fontWeight:800,fontSize:'1rem',color:'#a855f7'}}>
+        <h1 style={{margin:0,fontWeight:800,fontSize:'1rem',color:'#a78bfa'}}>
           {lang==='ru' ? '🤖 Собеседование' : '🤖 Level Assessment'}
         </h1>
         <LangToggle/>
@@ -78,8 +78,8 @@ export default function AssessmentChat() {
             <div style={{
               maxWidth:'80%',borderRadius:18,padding:'12px 16px',fontSize:'0.95rem',lineHeight:1.5,
               ...(m.role === 'user'
-                ? {background:'#a855f7',color:'white',borderBottomRightRadius:4}
-                : {background:'white',color:C.dark,borderBottomLeftRadius:4,boxShadow:'0 2px 8px rgba(0,0,0,0.06)',border:'1px solid rgba(0,0,0,0.04)'})
+                ? {background:'#a78bfa',color:'white',borderBottomRightRadius:4}
+                : {background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.dark,borderBottomLeftRadius:4,boxShadow:'0 2px 8px rgba(0,0,0,0.06)',border:'1px solid rgba(255,255,255,0.08)'})
             }}>
               {m.content || (m.toolInvocations ? (lang==='ru'?'Анализирую результаты...':'Analyzing results...') : '')}
             </div>
@@ -88,7 +88,7 @@ export default function AssessmentChat() {
 
         {(isLoading || finalizing) && (
           <div style={{display:'flex',justifyContent:'flex-start'}}>
-            <div style={{background:'white',borderRadius:18,borderBottomLeftRadius:4,padding:'12px 16px',
+            <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:18,borderBottomLeftRadius:4,padding:'12px 16px',
               boxShadow:'0 2px 8px rgba(0,0,0,0.06)',color:C.warm,fontSize:'0.9rem',fontStyle:'italic'}}>
               {finalizing ? (lang==='ru'?'Составляю твой личный план... 🚀':'Building your custom plan... 🚀') : (lang==='ru' ? 'Мила печатает...' : 'Mila is typing...')}
             </div>
@@ -106,13 +106,13 @@ export default function AssessmentChat() {
             onChange={handleInputChange}
             placeholder={lang==='ru' ? 'Ответь по-английски...' : 'Reply in English...'}
             disabled={isLoading || finalizing}
-            style={{flex:1,padding:'12px 16px',borderRadius:14,border:`1.5px solid ${(isLoading||finalizing)?'#e5e0dc':'#a855f760'}`,
-              fontSize:'0.95rem',outline:'none',background:'white',color:C.dark,
-              fontFamily:"'Nunito','Inter',sans-serif"}}
+            style={{flex:1,padding:'12px 16px',borderRadius:14,border:`1.5px solid ${(isLoading||finalizing)?'rgba(255,255,255,0.14)':'#a78bfa60'}`,
+              fontSize:'0.95rem',outline:'none',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.dark,
+              fontFamily:"'Manrope','Inter',sans-serif"}}
           />
           <button type="submit" disabled={isLoading || finalizing || !input.trim()}
             style={{padding:'12px 22px',borderRadius:14,border:'none',
-              background:(isLoading||finalizing||!input.trim())?'#e5e0dc':`linear-gradient(135deg,#c4b5fd,#a855f7)`,
+              background:(isLoading||finalizing||!input.trim())?'rgba(255,255,255,0.14)':`linear-gradient(135deg,#c4b5fd,#a78bfa)`,
               color:'white',fontWeight:700,cursor:(isLoading||finalizing||!input.trim())?'default':'pointer',
               fontSize:'0.95rem',transition:'all 0.2s'}}>
             {lang==='ru' ? 'Отправить' : 'Send'}

@@ -12,7 +12,7 @@ export default function SkillBreakdown({ lang }: { lang: 'ru'|'en' }) {
     { label: lang==='ru'?'Грамматика':'Grammar', val: 40, color: C.purple },
   ];
   return (
-    <div style={{background:'white',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.04)',marginTop:16,display:'flex',flexDirection:'column',gap:12}}>
+    <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)',marginTop:16,display:'flex',flexDirection:'column',gap:12}}>
       <div style={{fontWeight:700,fontSize:'0.9rem',color:C.dark}}>
         {lang==='ru'?'По навыкам':'Skill breakdown'}
       </div>

@@ -9,7 +9,7 @@ export default function ProgressRing({ percent, label, color = C.rose }: { perce
   return (
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8}}>
       <svg width="100" height="100" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r={r} fill="none" stroke="#e5e0dc" strokeWidth="10" />
+        <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="10" />
         <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="10"
           strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
           transform="rotate(-90 50 50)" style={{transition:'stroke-dashoffset 0.4s'}} />

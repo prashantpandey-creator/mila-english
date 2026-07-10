@@ -64,11 +64,11 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
     <>
       <div style={{display:'inline-block',background:C.goldL,color:C.gold,fontWeight:700,fontSize:'0.75rem',padding:'4px 12px',borderRadius:20,marginBottom:12}}>✨ {lang==='ru'?'Урок от ИИ':'AI-generated'}</div>
       <h1 style={{fontSize:'1.5rem',fontWeight:800,color:C.dark,margin:'0 0 12px'}}>{lesson.title}</h1>
-      <div style={{background:'white',borderRadius:16,padding:'20px 24px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',color:C.dark,lineHeight:1.7,marginBottom:16,whiteSpace:'pre-wrap'}}>
+      <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'20px 24px',boxShadow:'0 1px 8px rgba(0,0,0,0.45)',color:C.dark,lineHeight:1.7,marginBottom:16,whiteSpace:'pre-wrap'}}>
         {lesson.content}
       </div>
       <button onClick={()=>onSpeak(lesson.content)}
-        style={{width:'100%',padding:'12px',borderRadius:12,border:'none',background:'#fce4ec',color:C.rose,fontWeight:700,cursor:'pointer',marginBottom:10}}>
+        style={{width:'100%',padding:'12px',borderRadius:12,border:'none',background:'rgba(232,85,109,0.16)',color:C.rose,fontWeight:700,cursor:'pointer',marginBottom:10}}>
         🔊 {lang==='ru'?'Прослушать урок':'Hear it read aloud'}
       </button>
       <button onClick={()=>exercises.length ? setStage('quiz') : setStage('done')}
@@ -86,15 +86,15 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
           <span style={{fontSize:'0.75rem',fontWeight:700,color:C.purple,textTransform:'uppercase',letterSpacing:1}}>{lang==='ru'?'Вопрос':'Question'} {qi+1}/{exercises.length}</span>
           <span style={{fontSize:'0.75rem',fontWeight:700,color:C.gold}}>⭐ {points}</span>
         </div>
-        <div style={{background:'white',borderRadius:16,padding:'18px 20px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',marginBottom:14}}>
+        <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'18px 20px',boxShadow:'0 1px 8px rgba(0,0,0,0.45)',marginBottom:14}}>
           <div style={{fontWeight:700,color:C.dark,fontSize:'1.05rem'}}>{ex.question}</div>
         </div>
         <div style={{display:'grid',gridTemplateColumns:'1fr',gap:8}}>
           {opts.map((o: string, i: number) => {
             const isPick = picked === o;
             const isRight = verdict && o.trim().toLowerCase() === String(verdict.correctAnswer).trim().toLowerCase();
-            const bg = !verdict ? 'white' : isRight ? '#e8f5e9' : isPick ? '#fce4ec' : 'white';
-            const border = !verdict ? '#e5e0dc' : isRight ? '#3f7a3e' : isPick ? '#e91e63' : '#e5e0dc';
+            const bg = !verdict ? 'rgba(255,255,255,0.06)' : isRight ? 'rgba(143,206,132,0.16)' : isPick ? 'rgba(232,85,109,0.16)' : 'rgba(255,255,255,0.06)';
+            const border = !verdict ? 'rgba(255,255,255,0.14)' : isRight ? '#8fce84' : isPick ? '#e8556d' : 'rgba(255,255,255,0.14)';
             return (
               <button key={i} onClick={()=>pick(o)} disabled={!!picked}
                 style={{padding:'13px 16px',borderRadius:12,border:`1.5px solid ${border}`,background:bg,
@@ -107,7 +107,7 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
         {verdict && (
           <>
             {!verdict.correct && verdict.hint && (
-              <div style={{marginTop:10,fontSize:'0.85rem',color:C.warm,background:'#fef3c7',borderRadius:10,padding:'10px 14px'}}>💡 {verdict.hint}</div>
+              <div style={{marginTop:10,fontSize:'0.85rem',color:C.warm,background:'rgba(212,175,55,0.18)',borderRadius:10,padding:'10px 14px'}}>💡 {verdict.hint}</div>
             )}
             <button onClick={nextQ}
               style={{width:'100%',marginTop:14,padding:'15px',borderRadius:14,border:'none',background:C.sage,color:'white',fontWeight:800,fontSize:'1rem',cursor:'pointer'}}>
@@ -177,9 +177,9 @@ export default function LessonPage() {
   // each tap checks against /api/exercises/<id>/check, completion records Progress.
   if (!staticLesson) {
     return (
-      <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
-        <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
-          borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+      <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
+        <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+          borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
           <span onClick={()=>router.push('/lessons')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>← 🌸 Мила</span>
           <LangToggle />
         </div>
@@ -204,9 +204,9 @@ export default function LessonPage() {
   }
 
   return (
-    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
-      <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
+      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+        borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/lessons')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>← 🌸 Мила</span>
         <LangToggle />
       </div>
@@ -215,7 +215,7 @@ export default function LessonPage() {
         {/* Progress bar */}
         <div style={{display:'flex',gap:4,marginBottom:20}}>
           {['words','phrases','practice'].map((s,i)=>(
-            <div key={s} style={{flex:1,height:4,borderRadius:2,background:step===s?C.rose:i<['words','phrases','practice'].indexOf(step)?C.sage:'#e5e0dc',transition:'all 0.3s'}}/>
+            <div key={s} style={{flex:1,height:4,borderRadius:2,background:step===s?C.rose:i<['words','phrases','practice'].indexOf(step)?C.sage:'rgba(255,255,255,0.14)',transition:'all 0.3s'}}/>
           ))}
         </div>
 
@@ -248,7 +248,7 @@ export default function LessonPage() {
         {step === 'phrases' && (
           <div>
             {lesson.phrases.map((p,i)=>(
-              <div key={i} style={{background:'white',borderRadius:16,padding:'16px 20px',marginBottom:10,boxShadow:'0 1px 8px rgba(0,0,0,0.04)',cursor:'pointer'}}
+              <div key={i} style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'16px 20px',marginBottom:10,boxShadow:'0 1px 8px rgba(0,0,0,0.45)',cursor:'pointer'}}
                    onClick={()=>{setShowTranslation(showTranslation===p.en?!showTranslation:p.en);speak(p.en)}}>
                 <div style={{fontWeight:600,fontSize:'1.05rem',color:C.dark}}>{p.en}</div>
                 {showTranslation===p.en && <div style={{color:C.warm,marginTop:4,fontSize:'0.9rem'}}>{p.ru}</div>}

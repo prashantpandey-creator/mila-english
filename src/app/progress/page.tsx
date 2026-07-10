@@ -31,8 +31,8 @@ export default function ProgressPage() {
   const recent = Array.isArray(data?.recentLessons) ? data.recentLessons : [];
 
   return (
-    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
-      <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',justifyContent:'space-between'}}>
+    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
+      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>🌸 Мила</span><LangToggle/>
       </div>
       <div style={{maxWidth:500,margin:'0 auto',padding:'24px 20px'}}>
@@ -49,25 +49,25 @@ export default function ProgressPage() {
 
         {/* Weak phonemes — real data from the scoring model */}
         {weak.length > 0 && (
-          <div style={{background:'white',borderRadius:16,padding:'18px 20px',boxShadow:'0 2px 12px rgba(0,0,0,0.04)',marginTop:16}}>
+          <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'18px 20px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)',marginTop:16}}>
             <div style={{fontWeight:700,fontSize:'0.9rem',color:C.dark,marginBottom:2}}>
               {lang==='ru'?'Звуки для тренировки':'Sounds to drill'}
             </div>
-            <div style={{fontSize:'0.72rem',color:'#a8a29e',marginBottom:12}}>
+            <div style={{fontSize:'0.72rem',color:'#9d9483',marginBottom:12}}>
               {lang==='ru'?'По оценкам модели произношения':'From your pronunciation scores'}
             </div>
             {weak.map((p:any)=>{
               const meta = SOUND_INFO[p.phoneme] || {};
               return (
                 <div key={p.phoneme} style={{display:'flex',alignItems:'center',gap:11,marginBottom:10}}>
-                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:'#fce4ec',color:C.rose,
+                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:'rgba(232,85,109,0.16)',color:C.rose,
                     fontWeight:800,fontFamily:'ui-monospace,monospace',display:'flex',alignItems:'center',justifyContent:'center'}}>{p.phoneme}</span>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'0.82rem',fontWeight:700,color:C.dark}}>
                       {meta.ex ? (lang==='ru'?`как в «${meta.ex}»`:`as in “${meta.ex}”`) : (lang==='ru'?'тренируй этот звук':'drill this sound')}
-                      <span style={{fontWeight:600,color:'#b0a89f'}}> · {p.attempts}× · {lang==='ru'?'освоено':'mastery'} {Math.round((p.mastery||0)*100)}%</span>
+                      <span style={{fontWeight:600,color:'#948b7c'}}> · {p.attempts}× · {lang==='ru'?'освоено':'mastery'} {Math.round((p.mastery||0)*100)}%</span>
                     </div>
-                    <div style={{height:5,borderRadius:3,background:'#f0ece7',marginTop:5}}>
+                    <div style={{height:5,borderRadius:3,background:'rgba(255,255,255,0.10)',marginTop:5}}>
                       <div style={{height:'100%',width:`${Math.round((p.mastery||0)*100)}%`,borderRadius:3,background:C.sage,transition:'width .4s'}}/>
                     </div>
                   </div>
@@ -83,12 +83,12 @@ export default function ProgressPage() {
 
         {/* Recent lessons — real Progress rows */}
         {recent.length > 0 && (
-          <div style={{background:'white',borderRadius:16,padding:'18px 20px',boxShadow:'0 2px 12px rgba(0,0,0,0.04)',marginTop:16}}>
+          <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'18px 20px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)',marginTop:16}}>
             <div style={{fontWeight:700,fontSize:'0.9rem',color:C.dark,marginBottom:12}}>
               {lang==='ru'?'Недавние уроки':'Recent lessons'}
             </div>
             {recent.map((r:any,i:number)=>(
-              <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 0',borderBottom:i<recent.length-1?'1px solid #f3f0ed':'none'}}>
+              <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 0',borderBottom:i<recent.length-1?'1px solid rgba(255,255,255,0.08)':'none'}}>
                 <div>
                   <div style={{fontSize:'0.88rem',fontWeight:600,color:C.dark}}>{r.lessonTitle || (lang==='ru'?'Урок':'Lesson')}</div>
                   <div style={{fontSize:'0.72rem',color:C.warm}}>{r.category || ''}</div>

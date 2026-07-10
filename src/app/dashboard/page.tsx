@@ -44,10 +44,10 @@ export default function DashboardPage() {
   if (!m) return null;
 
   return (
-    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
+    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
       {/* Top Bar */}
-      <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(0,0,0,0.04)',position:'sticky',top:0,zIndex:50,
+      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+        borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div onClick={()=>router.push('/')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>
           🌸 Мила
@@ -59,7 +59,7 @@ export default function DashboardPage() {
               fontWeight:600,fontSize:'0.8rem',cursor:'pointer'}}>
             {lang==='ru'?'Выйти':'Sign Out'}
           </button>
-          <div style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.rose},#c2185b)`,
+          <div style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.rose},#c13e58)`,
             display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:700,fontSize:'0.8rem'}}>
             {user?.name ? user.name[0].toUpperCase() : (lang==='ru'?'Г':'G')}
           </div>
@@ -82,12 +82,12 @@ export default function DashboardPage() {
 
         {/* AI Assessment Banner (If pending) */}
         {user?.level === 'pending' && (
-          <div style={{background:'linear-gradient(135deg,#c4b5fd,#a855f7)',borderRadius:20,padding:'24px',boxShadow:'0 8px 32px rgba(168,85,247,0.2)',marginBottom:24,color:'white'}}>
+          <div style={{background:'linear-gradient(135deg,#c4b5fd,#a78bfa)',borderRadius:20,padding:'24px',boxShadow:'0 8px 32px rgba(168,85,247,0.2)',marginBottom:24,color:'white'}}>
             <div style={{fontSize:'1.8rem',marginBottom:8}}>🤖✨</div>
             <h2 style={{fontSize:'1.3rem',fontWeight:800,margin:'0 0 6px'}}>{lang==='ru'?'Твой личный план обучения':'Your Custom Learning Plan'}</h2>
             <p style={{fontSize:'0.9rem',opacity:0.9,lineHeight:1.5,margin:'0 0 16px'}}>{lang==='ru'?'Пройди короткое собеседование с ИИ, чтобы мы определили твой уровень и составили персональную программу.':'Take a quick conversational test with our AI to determine your level and generate a personalized curriculum.'}</p>
             <button onClick={()=>router.push('/assessment')}
-              style={{width:'100%',padding:'12px',borderRadius:12,border:'none',background:'white',color:'#a855f7',fontWeight:700,fontSize:'1rem',cursor:'pointer',boxShadow:'0 4px 14px rgba(0,0,0,0.1)'}}>
+              style={{width:'100%',padding:'12px',borderRadius:12,border:'none',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:'#a78bfa',fontWeight:700,fontSize:'1rem',cursor:'pointer',boxShadow:'0 4px 14px rgba(0,0,0,0.1)'}}>
               {lang==='ru'?'Начать собеседование →':'Start Assessment →'}
             </button>
           </div>
@@ -98,15 +98,15 @@ export default function DashboardPage() {
           let plan: any = null;
           try { plan = JSON.parse(user.learnerProfile); } catch { plan = null; }
           return (
-          <div style={{background:'white',borderRadius:20,padding:'20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:24,border:'1px solid rgba(168,85,247,0.15)'}}>
+          <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:24,border:'1px solid rgba(168,85,247,0.15)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
               <div>
-                <div style={{fontSize:'0.75rem',fontWeight:700,color:'#a855f7',textTransform:'uppercase',letterSpacing:1,marginBottom:4}}>
+                <div style={{fontSize:'0.75rem',fontWeight:700,color:'#a78bfa',textTransform:'uppercase',letterSpacing:1,marginBottom:4}}>
                   {lang==='ru'?'Персональный план':'Custom Plan'}
                 </div>
                 <div style={{fontWeight:700,fontSize:'1.1rem',color:C.dark}}>Level: {user.level.toUpperCase()}</div>
               </div>
-              <div style={{width:40,height:40,borderRadius:12,background:'#ede9fe',color:'#a855f7',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',fontWeight:800}}>
+              <div style={{width:40,height:40,borderRadius:12,background:'rgba(167,139,250,0.16)',color:'#a78bfa',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',fontWeight:800}}>
                 {user.level.slice(0,2).toUpperCase()}
               </div>
             </div>
@@ -128,7 +128,7 @@ export default function DashboardPage() {
           {/* CSS glow orb */}
           <div style={{position:'absolute',top:'30%',left:'50%',transform:'translate(-50%,-50%)',width:150,height:150}}>
             <div className="animate-spin-slow" style={{position:'absolute',inset:0,borderRadius:'50%',
-              background:'conic-gradient(from 0deg,#ec4899,#a855f7,#3b82f6,#ec4899)',filter:'blur(20px)',opacity:0.6}}/>
+              background:'conic-gradient(from 0deg,#ec4899,#a78bfa,#3b82f6,#ec4899)',filter:'blur(20px)',opacity:0.6}}/>
             <div style={{position:'absolute',inset:16,borderRadius:'50%',background:'rgba(255,255,255,0.1)',backdropFilter:'blur(4px)',border:'1px solid rgba(255,255,255,0.2)'}}/>
           </div>
           <div style={{position:'relative',zIndex:1}}>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Pronunciation */}
-        <div style={{background:'white',borderRadius:20,padding:'20px 24px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',marginBottom:16,textAlign:'center'}}>
+        <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'20px 24px',boxShadow:'0 1px 8px rgba(0,0,0,0.45)',marginBottom:16,textAlign:'center'}}>
           <div style={{fontWeight:700,fontSize:'1rem',color:C.dark,marginBottom:4}}>🎤 {lang==='ru'?'Произношение':'Pronunciation'}</div>
           <p style={{fontSize:'0.85rem',color:C.warm,margin:'0 0 14px'}}>{lang==='ru'?'Нажми и послушай':'Tap to listen'}</p>
           <div style={{display:'flex',justifyContent:'center',gap:20}}>
@@ -179,10 +179,10 @@ export default function DashboardPage() {
             {emoji:'🤖',label:lang==='ru'?'ИИ Чат':'AI Chat',sub:lang==='ru'?'Общение':'Converse',href:'/chat',color:C.rose},
           ].map((l,i)=>(
             <div key={i} onClick={()=>router.push(l.href)}
-              style={{cursor:'pointer',background:'white',borderRadius:16,padding:'16px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',
+              style={{cursor:'pointer',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'16px',boxShadow:'0 1px 8px rgba(0,0,0,0.45)',
                 display:'flex',alignItems:'center',gap:12,transition:'all 0.2s'}}
-              onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)'}}
-              onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 1px 8px rgba(0,0,0,0.04)'}}>
+              onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.55)'}}
+              onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 1px 8px rgba(0,0,0,0.45)'}}>
               <div style={{width:40,height:40,borderRadius:12,background:l.color+'20',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem'}}>{l.emoji}</div>
               <div><div style={{fontWeight:600,fontSize:'0.95rem',color:C.dark}}>{l.label}</div><div style={{fontSize:'0.8rem',color:C.warm}}>{l.sub}</div></div>
             </div>

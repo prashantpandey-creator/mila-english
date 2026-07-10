@@ -19,7 +19,7 @@ export default function SpeechButton({ text = 'Hello! Welcome to Mila.', label }
   return (
     <button onClick={speak} disabled={playing}
       style={{display:'inline-flex',alignItems:'center',gap:8,padding:'10px 20px',
-        borderRadius:20,border:`1.5px solid ${C.rose}`,background:'white',color:C.rose,
+        borderRadius:20,border:`1.5px solid ${C.rose}`,background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.rose,
         fontWeight:600,fontSize:'0.9rem',cursor:playing?'default':'pointer',opacity:playing?0.7:1}}>
       🔊 {playing ? 'Playing…' : (label || 'Hear it')}
     </button>

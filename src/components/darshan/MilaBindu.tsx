@@ -76,7 +76,7 @@ void main() {
   // Mila Colors
   vec3 cWhite  = vec3(1.0, 0.98, 0.98);
   vec3 cPink   = vec3(0.925, 0.282, 0.6); // #ec4899
-  vec3 cPurple = vec3(0.654, 0.345, 0.968); // #a855f7
+  vec3 cPurple = vec3(0.654, 0.345, 0.968); // #a78bfa
   vec3 cBlue   = vec3(0.231, 0.51, 0.964); // #3b82f6
   vec3 cViolet = vec3(0.545, 0.361, 0.965);
 
@@ -469,7 +469,7 @@ export function MilaBindu({
             <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
           </radialGradient>
           <radialGradient id={core}>
-            <stop offset="0%" stopColor="#fdf2f8" />
+            <stop offset="0%" stopColor="#0d1017" />
             <stop offset="40%" stopColor="#f472b6" />
             <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
           </radialGradient>
@@ -486,7 +486,7 @@ export function MilaBindu({
           <circle cx="160" cy="160" r="90" fill="none" stroke="#db2777" strokeWidth={1} opacity="0.4" />
           <circle cx="160" cy="160" r="58" fill="none" stroke="#7e92b8" strokeWidth={0.8} opacity="0.32" />
           <circle cx="160" cy="160" r="46" fill={`url(#${core})`} opacity="0.7" />
-          <circle cx="160" cy="160" r="13" fill="#fdf2f8" />
+          <circle cx="160" cy="160" r="13" fill="#0d1017" />
         </g>
       </svg>
     );

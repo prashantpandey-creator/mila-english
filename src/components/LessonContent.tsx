@@ -10,7 +10,7 @@ export default function LessonContent({ words, currentWord, lang, onPrev, onNext
   const isLast = currentWord >= words.length - 1;
   return (
     <div style={{textAlign:'center'}}>
-      <div style={{background:'white',borderRadius:20,padding:'32px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:16}}>
+      <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'32px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:16}}>
         <div style={{fontSize:'2rem',fontWeight:700,color:C.dark,marginBottom:8,cursor:'pointer'}}
              onClick={()=>onSpeak(words[currentWord])}>
           {words[currentWord]} 🔊
@@ -19,13 +19,13 @@ export default function LessonContent({ words, currentWord, lang, onPrev, onNext
       </div>
       <div style={{display:'flex',gap:10,justifyContent:'center'}}>
         <button onClick={onPrev}
-          style={{padding:'12px 24px',borderRadius:12,border:'1.5px solid #e5e0dc',background:'white',cursor:'pointer',fontSize:'1.2rem'}}>←</button>
+          style={{padding:'12px 24px',borderRadius:12,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',cursor:'pointer',fontSize:'1.2rem'}}>←</button>
         <button onClick={()=>onSpeak(words[currentWord])}
           style={{padding:'12px 24px',borderRadius:12,border:'none',background:C.rose,color:'white',cursor:'pointer',fontWeight:600}}>
           🔊 {lang==='ru'?'Слушать':'Listen'}
         </button>
         <button onClick={onNext}
-          style={{padding:'12px 24px',borderRadius:12,border:'1.5px solid #e5e0dc',background:'white',cursor:'pointer',fontSize:'1.2rem'}}>
+          style={{padding:'12px 24px',borderRadius:12,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',cursor:'pointer',fontSize:'1.2rem'}}>
           {isLast ? '✅' : '→'}
         </button>
       </div>

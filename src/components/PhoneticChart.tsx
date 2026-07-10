@@ -11,7 +11,7 @@ const SOUNDS = [
 
 export default function PhoneticChart() {
   return (
-    <div style={{background:'white',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.04)',marginTop:16}}>
+    <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)',marginTop:16}}>
       <div style={{fontWeight:700,fontSize:'0.9rem',color:C.dark,marginBottom:14}}>Sounds Russian doesn't have</div>
       <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
         {SOUNDS.map((s,i)=>(

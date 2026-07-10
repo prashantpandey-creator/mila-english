@@ -22,10 +22,10 @@ export default function Chat() {
   if (!m) return null;
 
   return (
-    <div style={{display:'flex',flexDirection:'column',height:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
+    <div style={{display:'flex',flexDirection:'column',height:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
       {/* Header */}
-      <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(0,0,0,0.04)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+        borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>🌸 Мила</span>
         <h1 style={{margin:0,fontWeight:800,fontSize:'1rem',color:C.dark}}>
           {lang==='ru' ? '🤖 ИИ-репетитор' : '🤖 AI Tutor'}
@@ -55,7 +55,7 @@ export default function Chat() {
               maxWidth:'80%',borderRadius:18,padding:'12px 16px',fontSize:'0.95rem',lineHeight:1.5,
               ...(m.role === 'user'
                 ? {background:C.rose,color:'white',borderBottomRightRadius:4}
-                : {background:'white',color:C.dark,borderBottomLeftRadius:4,boxShadow:'0 2px 8px rgba(0,0,0,0.06)',border:'1px solid rgba(0,0,0,0.04)'})
+                : {background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.dark,borderBottomLeftRadius:4,boxShadow:'0 2px 8px rgba(0,0,0,0.06)',border:'1px solid rgba(255,255,255,0.08)'})
             }}>
               {m.content}
             </div>
@@ -64,7 +64,7 @@ export default function Chat() {
 
         {isLoading && (
           <div style={{display:'flex',justifyContent:'flex-start'}}>
-            <div style={{background:'white',borderRadius:18,borderBottomLeftRadius:4,padding:'12px 16px',
+            <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:18,borderBottomLeftRadius:4,padding:'12px 16px',
               boxShadow:'0 2px 8px rgba(0,0,0,0.06)',color:C.warm,fontSize:'0.9rem',fontStyle:'italic'}}>
               {lang==='ru' ? 'Мила печатает...' : 'Mila is typing...'}
             </div>
@@ -82,19 +82,19 @@ export default function Chat() {
             onChange={handleInputChange}
             placeholder={lang==='ru' ? 'Напиши что-нибудь по-английски...' : 'Say something in English...'}
             disabled={isLoading}
-            style={{flex:1,padding:'12px 16px',borderRadius:14,border:`1.5px solid ${isLoading?'#e5e0dc':C.rose+'60'}`,
-              fontSize:'0.95rem',outline:'none',background:'white',color:C.dark,
-              fontFamily:"'Nunito','Inter',sans-serif"}}
+            style={{flex:1,padding:'12px 16px',borderRadius:14,border:`1.5px solid ${isLoading?'rgba(255,255,255,0.14)':C.rose+'60'}`,
+              fontSize:'0.95rem',outline:'none',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.dark,
+              fontFamily:"'Manrope','Inter',sans-serif"}}
           />
           <button type="submit" disabled={isLoading || !input.trim()}
             style={{padding:'12px 22px',borderRadius:14,border:'none',
-              background:isLoading||!input.trim()?'#e5e0dc':`linear-gradient(135deg,${C.rose},#c2185b)`,
+              background:isLoading||!input.trim()?'rgba(255,255,255,0.14)':`linear-gradient(135deg,${C.rose},#c13e58)`,
               color:'white',fontWeight:700,cursor:isLoading||!input.trim()?'default':'pointer',
               fontSize:'0.95rem',transition:'all 0.2s'}}>
             {lang==='ru' ? 'Отправить' : 'Send'}
           </button>
         </form>
-        <div style={{textAlign:'center',fontSize:'0.72rem',color:'#c0b8af',marginTop:8}}>
+        <div style={{textAlign:'center',fontSize:'0.72rem',color:'#8b8373',marginTop:8}}>
           {lang==='ru' ? '🎯 ИИ мягко исправит твои ошибки и ответит на английском' : '🎯 AI gently corrects your mistakes and replies in English'}
         </div>
       </div>

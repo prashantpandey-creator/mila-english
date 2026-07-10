@@ -7,9 +7,9 @@ import { ACCENTS, startListening } from '@/lib/speech';
 import { ttsSpeak } from '@/lib/tts';
 
 const VERDICT = {
-  good:  { fg: '#3f7a3e', bg: '#e8f5e9' },
-  close: { fg: '#b45309', bg: '#fef3c7' },
-  miss:  { fg: '#e91e63', bg: '#fce4ec' },
+  good:  { fg: '#8fce84', bg: 'rgba(143,206,132,0.16)' },
+  close: { fg: '#e0b64e', bg: 'rgba(212,175,55,0.18)' },
+  miss:  { fg: '#e8556d', bg: 'rgba(232,85,109,0.16)' },
 };
 
 /** A friendly onboarding card shown only on the first phrase */
@@ -34,21 +34,21 @@ function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => voi
         { icon: '✅', en: 'Score 55+ to pass and move on', ru: 'Набери 55+ очков, чтобы перейти дальше' },
       ].map(s => (
         <div key={s.en} style={{display:'flex',alignItems:'center',gap:12,width:'100%',maxWidth:340,
-          background:'white',borderRadius:14,padding:'12px 16px',marginBottom:8,boxShadow:'0 1px 8px rgba(0,0,0,0.04)',textAlign:'left'}}>
+          background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:14,padding:'12px 16px',marginBottom:8,boxShadow:'0 1px 8px rgba(0,0,0,0.45)',textAlign:'left'}}>
           <span style={{fontSize:'1.4rem',flex:'0 0 auto'}}>{s.icon}</span>
           <span style={{fontSize:'0.88rem',color:C.dark,fontWeight:500}}>{lang==='ru' ? s.ru : s.en}</span>
         </div>
       ))}
 
-      <div style={{marginTop:8,background:'#ede9fe',borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20}}>
-        <span style={{fontSize:'0.82rem',color:'#7c3aed',fontWeight:600}}>
+      <div style={{marginTop:8,background:'rgba(167,139,250,0.16)',borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20}}>
+        <span style={{fontSize:'0.82rem',color:'#a78bfa',fontWeight:600}}>
           💡 {lang==='ru' ? 'Говори ровно и чётко — модель слышит каждую фонему' : 'Speak clearly and steadily — the model hears every phoneme'}
         </span>
       </div>
 
       <button onClick={onStart}
         style={{width:'100%',maxWidth:340,padding:'16px',borderRadius:16,border:'none',
-          background:`linear-gradient(135deg,${C.rose},#e91e63)`,color:'white',fontWeight:800,fontSize:'1.1rem',
+          background:`linear-gradient(135deg,${C.rose},#e8556d)`,color:'white',fontWeight:800,fontSize:'1.1rem',
           cursor:'pointer',boxShadow:'0 6px 20px rgba(233,30,99,0.3)',letterSpacing:'0.01em'}}>
         {lang==='ru' ? '🚀 Начать упражнение' : '🚀 Start Exercise'}
       </button>
@@ -163,7 +163,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
     const col = score >= 80 ? C.sage : score >= 55 ? C.gold : C.rose;
     return (
       <svg width="58" height="58" viewBox="0 0 58 58" style={{flex:'0 0 auto'}}>
-        <circle cx="29" cy="29" r={r} fill="none" stroke="#f0ece7" strokeWidth="6"/>
+        <circle cx="29" cy="29" r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="6"/>
         <circle cx="29" cy="29" r={r} fill="none" stroke={col} strokeWidth="6" strokeLinecap="round"
           strokeDasharray={circ} strokeDashoffset={off} transform="rotate(-90 29 29)" style={{transition:'stroke-dashoffset .5s'}}/>
         <text x="29" y="35" textAnchor="middle" fontSize="16" fontWeight="800" fill={C.dark}>{score}</text>
@@ -183,16 +183,16 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
     <div style={{textAlign:'center'}}>
       {/* Progress label + phrase counter */}
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-        <span style={{fontSize:'0.72rem',color:'#a8a29e',fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>
+        <span style={{fontSize:'0.72rem',color:'#9d9483',fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>
           {lang==='ru' ? 'Произношение' : 'Speaking Exercise'}
         </span>
-        <span style={{fontSize:'0.72rem',color:'#a8a29e',fontWeight:700,background:'#f3f0ed',borderRadius:20,padding:'2px 10px'}}>
+        <span style={{fontSize:'0.72rem',color:'#9d9483',fontWeight:700,background:'rgba(255,255,255,0.08)',borderRadius:20,padding:'2px 10px'}}>
           {pos + 1} / {phrases.length}
         </span>
       </div>
 
       {/* ── Phrase Card ────────────────────────────────────────────────────── */}
-      <div style={{background:'white',borderRadius:20,padding:'24px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:12}}>
+      <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'24px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:12}}>
         <div style={{fontSize:'0.72rem',fontWeight:700,color:C.purple,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>
           🎯 {lang==='ru' ? 'Повтори эту фразу:' : 'Repeat this phrase:'}
         </div>
@@ -201,7 +201,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
         <button onClick={onListen} disabled={phase==='speaking' || phase==='recording'}
           style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,
             width:'100%',marginTop:16,padding:'10px 18px',borderRadius:12,border:'none',
-            background: phase==='speaking' ? C.roseL : '#fce4ec',
+            background: phase==='speaking' ? C.roseL : 'rgba(232,85,109,0.16)',
             color:C.rose,fontWeight:700,cursor:(phase==='speaking'||phase==='recording')?'default':'pointer',fontSize:'0.9rem',opacity:(phase==='recording')?0.5:1}}>
           🔊 {phase==='speaking' ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Послушать':'Hear it first')}
         </button>
@@ -209,7 +209,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
 
       {/* ── Scored Result Card ─────────────────────────────────────────────── */}
       {phase==='scored' && result && (
-        <div style={{background:'white',borderRadius:20,padding:'16px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:12,textAlign:'left'}}>
+        <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'16px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:12,textAlign:'left'}}>
           <div style={{display:'flex',alignItems:'center',gap:14}}>
             {ring(result.score)}
             <div style={{flex:1}}>
@@ -222,7 +222,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
                 {result.words.map((w:any,i:number) => (
-                  <span key={i} style={{fontSize:'0.78rem',fontWeight:600,color:VERDICT[w.verdict]?.fg || C.dark,background:VERDICT[w.verdict]?.bg || '#f3f4f6',padding:'2px 8px',borderRadius:6}}>
+                  <span key={i} style={{fontSize:'0.78rem',fontWeight:600,color:VERDICT[w.verdict]?.fg || C.dark,background:VERDICT[w.verdict]?.bg || 'rgba(255,255,255,0.08)',padding:'2px 8px',borderRadius:6}}>
                     {w.word}
                   </span>
                 ))}
@@ -233,7 +233,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
             <div style={{display:'flex',flexWrap:'wrap',gap:3,marginTop:12}}>
               {result.words.flatMap((w:any) => w.phonemes||[]).map((p:any,i:number) => (
                 <span key={i} title={p.acc+'%'} style={{fontSize:'0.72rem',fontWeight:700,fontFamily:'ui-monospace,monospace',
-                  color:VERDICT[p.verdict]?.fg || C.dark,background:VERDICT[p.verdict]?.bg || '#f3f4f6',padding:'2px 6px',borderRadius:5}}>
+                  color:VERDICT[p.verdict]?.fg || C.dark,background:VERDICT[p.verdict]?.bg || 'rgba(255,255,255,0.08)',padding:'2px 6px',borderRadius:5}}>
                   {p.ph}
                 </span>
               ))}
@@ -266,15 +266,15 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
             <button onClick={onMic} disabled={micBusy}
               style={{width:72,height:72,borderRadius:'50%',border:'none',
                 cursor:micBusy?'default':'pointer',
-                background: phase==='recording' ? C.gold : phase==='scoring' ? '#7c3aed' : C.rose,
+                background: phase==='recording' ? C.gold : phase==='scoring' ? '#a78bfa' : C.rose,
                 color:'white',fontSize:'1.6rem',
-                boxShadow:`0 8px 24px ${phase==='recording'?'rgba(245,158,11,.45)':phase==='scoring'?'rgba(124,58,237,.35)':'rgba(233,30,99,.35)'}`,
+                boxShadow:`0 8px 24px ${phase==='recording'?'rgba(212,175,55,.45)':phase==='scoring'?'rgba(124,58,237,.35)':'rgba(233,30,99,.35)'}`,
                 animation: phase==='recording' ? 'pulse 1.2s ease-in-out infinite' : 'none',
                 transition:'background 0.2s'}}>
               {phase==='recording' ? '⏹' : phase==='scoring' ? '⏳' : '🎙️'}
             </button>
             <div style={{fontSize:'0.82rem',fontWeight:600,color:
-              phase==='recording' ? C.gold : phase==='scoring' ? '#7c3aed' : C.warm,
+              phase==='recording' ? C.gold : phase==='scoring' ? '#a78bfa' : C.warm,
               lineHeight:1.5,maxWidth:300}}>
               {phase==='recording'
                 ? (lang==='ru' ? '🔴 Слушаю... Скажи фразу, потом нажми ⏹' : '🔴 Listening… say the phrase, then tap ⏹ to stop')
@@ -290,7 +290,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
         {isPassed && (
           <button onClick={next}
             style={{width:'100%',padding:'16px',borderRadius:16,border:'none',
-              background:`linear-gradient(135deg,${C.sage},#3f7a3e)`,color:'white',fontWeight:800,fontSize:'1.05rem',
+              background:`linear-gradient(135deg,${C.sage},#8fce84)`,color:'white',fontWeight:800,fontSize:'1.05rem',
               cursor:'pointer',boxShadow:'0 6px 18px rgba(91,140,90,0.3)'}}>
             {pos >= phrases.length - 1
               ? (lang==='ru' ? '✅ Завершить урок' : '✅ Complete lesson')

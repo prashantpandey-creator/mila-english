@@ -8,7 +8,7 @@ export default function WordCard({ word, flipped, onFlip, lang }: {
 }) {
   return (
     <div onClick={onFlip}
-      style={{cursor:'pointer',background:'white',borderRadius:24,minHeight:220,display:'flex',flexDirection:'column',
+      style={{cursor:'pointer',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:24,minHeight:220,display:'flex',flexDirection:'column',
         alignItems:'center',justifyContent:'center',padding:32,boxShadow:'0 4px 24px rgba(0,0,0,0.06)',
         marginBottom:20,transition:'all 0.3s',userSelect:'none'}}>
       <div style={{fontSize:flipped?'1.1rem':'2rem',fontWeight:flipped?500:700,color:flipped?C.warm:C.dark,marginBottom:8}}>

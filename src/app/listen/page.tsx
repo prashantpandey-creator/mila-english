@@ -10,9 +10,9 @@ import { ACCENTS, playPhrase, hasRealVoice, startListening, missedSound } from '
 import { PHRASES, PACKS, SOUND_INFO } from '@/lib/phrases';
 
 const VERDICT = {
-  good:  { fg: '#3f7a3e', bg: '#e8f5e9' },
-  close: { fg: '#b45309', bg: '#fef3c7' },
-  miss:  { fg: '#e91e63', bg: '#fce4ec' },
+  good:  { fg: '#8fce84', bg: 'rgba(143,206,132,0.16)' },
+  close: { fg: '#e0b64e', bg: 'rgba(212,175,55,0.18)' },
+  miss:  { fg: '#e8556d', bg: 'rgba(232,85,109,0.16)' },
 };
 
 export default function ListenPage() {
@@ -118,7 +118,7 @@ export default function ListenPage() {
     const col = score >= 80 ? C.sage : score >= 55 ? C.gold : C.rose;
     return (
       <svg width="62" height="62" viewBox="0 0 62 62" style={{flex:'0 0 auto'}}>
-        <circle cx="31" cy="31" r={r} fill="none" stroke="#f0ece7" strokeWidth="7"/>
+        <circle cx="31" cy="31" r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="7"/>
         <circle cx="31" cy="31" r={r} fill="none" stroke={col} strokeWidth="7" strokeLinecap="round"
           strokeDasharray={circ} strokeDashoffset={off} transform="rotate(-90 31 31)" style={{transition:'stroke-dashoffset .5s'}}/>
         <text x="31" y="37" textAnchor="middle" fontSize="19" fontWeight="800" fill={C.dark}>{score}</text>
@@ -127,20 +127,20 @@ export default function ListenPage() {
   };
 
   return (
-    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Nunito','Inter',sans-serif"}}>
-      <div style={{background:'rgba(255,255,255,0.9)',backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(0,0,0,0.04)',position:'sticky',top:0,zIndex:50,
+    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
+      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+        borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>🌸 Мила</span>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <span style={{fontSize:'0.7rem',fontWeight:700,color:C.purple,background:'#ede9fe',padding:'3px 9px',borderRadius:20}}>Level B1</span>
+          <span style={{fontSize:'0.7rem',fontWeight:700,color:C.purple,background:'rgba(167,139,250,0.16)',padding:'3px 9px',borderRadius:20}}>Level B1</span>
           <LangToggle/>
         </div>
       </div>
 
       <div style={{maxWidth:460,margin:'0 auto',padding:'22px 20px'}}>
         {/* pack picker */}
-        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#b08968',marginBottom:8}}>
+        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#c9a961',marginBottom:8}}>
           {lang==='ru'?'Ситуация':'Situation'}
         </div>
         <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:16}}>
@@ -148,14 +148,14 @@ export default function ListenPage() {
             <button key={p.id} onClick={()=>onPack(p.id)}
               style={{flex:'0 0 auto',fontSize:'0.82rem',fontWeight:pack===p.id?700:600,cursor:'pointer',
                 color:pack===p.id?'white':C.warm,background:pack===p.id?C.sage:'white',
-                border:pack===p.id?'none':'1px solid #e0e6da',padding:'7px 13px',borderRadius:20}}>
+                border:pack===p.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 13px',borderRadius:20}}>
               {p.emoji} {lang==='ru'?p.ru:p.en}
             </button>
           ))}
         </div>
 
         {/* accent picker */}
-        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#b08968',marginBottom:8}}>
+        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#c9a961',marginBottom:8}}>
           {lang==='ru'?'Акцент':'Accent'}
         </div>
         <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:18}}>
@@ -163,16 +163,16 @@ export default function ListenPage() {
             <button key={a.id} onClick={()=>setAccent(a)}
               style={{flex:'0 0 auto',fontSize:'0.85rem',fontWeight:accent.id===a.id?700:600,cursor:'pointer',
                 color:accent.id===a.id?'white':C.warm,background:accent.id===a.id?C.rose:'white',
-                border:accent.id===a.id?'none':'1px solid #efe0d4',padding:'7px 14px',borderRadius:20}}>
+                border:accent.id===a.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 14px',borderRadius:20}}>
               {a.flag} {a.label}
             </button>
           ))}
         </div>
 
         {/* phrase card */}
-        <div style={{background:'white',borderRadius:20,padding:'22px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.05)',marginBottom:14,
+        <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'22px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:14,
           border: inDrill ? '1.5px solid #e9d5ff' : 'none'}}>
-          <div style={{fontSize:'0.72rem',color:inDrill?C.purple:'#a8a29e',fontWeight:inDrill?700:600,marginBottom:8}}>
+          <div style={{fontSize:'0.72rem',color:inDrill?C.purple:'#9d9483',fontWeight:inDrill?700:600,marginBottom:8}}>
             {inDrill
               ? `🎯 ${lang==='ru'?'Персональная тренировка':'Personal drill'} · ${drillIdx!+1}/${drills.length} · /${phrase.sound}/`
               : `${lang==='ru'?'Слушай и повтори':'Listen & repeat'} · ${pos+1}/${items.length}`}
@@ -185,7 +185,7 @@ export default function ListenPage() {
               cursor:phase==='speaking'?'default':'pointer',opacity:phase==='speaking'?0.7:1}}>
             🔊 {phase==='speaking' ? (lang==='ru'?'Звучит…':'Playing…') : `${lang==='ru'?'Прослушать':'Hear it'} — ${accent.flag} ${accent.label}`}
           </button>
-          <div style={{textAlign:'center',fontSize:'0.68rem',color:'#c0b8af',marginTop:8}}>
+          <div style={{textAlign:'center',fontSize:'0.68rem',color:'#8b8373',marginTop:8}}>
             {hasRealVoice(accent)
               ? (lang==='ru'?'✨ Настоящий голос носителя':'✨ Real native voice')
               : (lang==='ru'?'Синтетический голос — настоящий акцент скоро':'Synthetic for now — real accent coming')}
@@ -194,7 +194,7 @@ export default function ListenPage() {
 
         {/* score / result */}
         {phase==='scored' && result && (
-          <div style={{background:'white',borderRadius:20,padding:'18px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.05)',marginBottom:14}}>
+          <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'18px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:14}}>
             <div style={{display:'flex',alignItems:'center',gap:14}}>
               {ring(result.score)}
               <div style={{flex:1}}>
@@ -219,7 +219,7 @@ export default function ListenPage() {
             <div style={{marginTop:11,fontSize:'0.82rem',color:C.warm,lineHeight:1.45,background:C.pageBg,borderRadius:10,padding:'9px 11px'}}>
               💡 {result.tip}
             </div>
-            <div style={{marginTop:8,fontSize:'0.8rem',color:'#a8a29e'}}>{phrase.ru}</div>
+            <div style={{marginTop:8,fontSize:'0.8rem',color:'#9d9483'}}>{phrase.ru}</div>
           </div>
         )}
 
@@ -230,7 +230,7 @@ export default function ListenPage() {
         {/* mic + next */}
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <button onClick={next}
-            style={{flex:1,height:52,borderRadius:16,border:'1.5px solid #efe0d4',background:'white',color:C.warm,fontWeight:600,fontSize:'0.95rem',cursor:'pointer'}}>
+            style={{flex:1,height:52,borderRadius:16,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.warm,fontWeight:600,fontSize:'0.95rem',cursor:'pointer'}}>
             {lang==='ru'?'Следующая →':'Next phrase →'}
           </button>
           <button onClick={onMic} disabled={micBusy}
@@ -238,13 +238,13 @@ export default function ListenPage() {
             style={{width:64,height:64,borderRadius:'50%',border:'none',
               cursor:micBusy?'default':'pointer',opacity:1,
               background:phase==='recording'?C.gold:phase==='scoring'?C.purple:C.rose,color:'white',fontSize:'1.5rem',
-              boxShadow:`0 6px 20px ${phase==='recording'?'rgba(245,158,11,.4)':'rgba(233,30,99,.35)'}`,
+              boxShadow:`0 6px 20px ${phase==='recording'?'rgba(212,175,55,.4)':'rgba(233,30,99,.35)'}`,
               animation:phase==='recording'?'pulse 1.2s ease-in-out infinite':'none'}}>
             {phase==='recording' ? '⏹' : phase==='scoring' ? '⏳' : '🎙️'}
           </button>
         </div>
         <div style={{textAlign:'center',fontSize:'0.78rem',marginTop:10,
-          color:phase==='recording'?C.gold:phase==='scoring'?C.purple:'#b0a89f',
+          color:phase==='recording'?C.gold:phase==='scoring'?C.purple:'#948b7c',
           fontWeight:(phase==='recording'||phase==='scoring')?700:400}}>
           {phase==='recording'
             ? (lang==='ru'?'Слушаю… говори, потом нажми ⏹ (или просто закончи)':'Listening… speak, then tap ⏹ (or just finish)')
@@ -255,23 +255,23 @@ export default function ListenPage() {
 
         {/* weak-sound recap — grows as the session goes */}
         {misses.length > 0 && (
-          <div style={{marginTop:18,background:'white',borderRadius:16,padding:'16px 18px',boxShadow:'0 2px 12px rgba(0,0,0,0.05)'}}>
+          <div style={{marginTop:18,background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'16px 18px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)'}}>
             <div style={{fontSize:'0.8rem',fontWeight:800,color:C.dark,marginBottom:2}}>
               {lang==='ru'?'Звуки для тренировки':'Sounds to drill'}
             </div>
-            <div style={{fontSize:'0.72rem',color:'#a8a29e',marginBottom:12}}>
+            <div style={{fontSize:'0.72rem',color:'#9d9483',marginBottom:12}}>
               {lang==='ru'?'Где ты чаще спотыкаешься':'Where you keep stumbling'}
             </div>
             {misses.map(([snd, info]) => {
               const meta = SOUND_INFO[snd] || { ex: info.example, en: '', ru: '' };
               return (
                 <div key={snd} style={{display:'flex',alignItems:'flex-start',gap:11,marginBottom:11}}>
-                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:'#fce4ec',color:C.rose,
+                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:'rgba(232,85,109,0.16)',color:C.rose,
                     fontWeight:800,fontSize:'0.95rem',fontFamily:'ui-monospace,monospace',display:'flex',alignItems:'center',justifyContent:'center'}}>{snd}</span>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'0.82rem',fontWeight:700,color:C.dark}}>
                       {lang==='ru'?`как в «${meta.ex}»`:`as in “${meta.ex}”`}
-                      <span style={{fontWeight:600,color:'#b0a89f'}}> · {info.count}×</span>
+                      <span style={{fontWeight:600,color:'#948b7c'}}> · {info.count}×</span>
                     </div>
                     <div style={{fontSize:'0.76rem',color:C.warm,lineHeight:1.4,marginTop:1}}>{lang==='ru'?meta.ru:meta.en}</div>
                   </div>
@@ -280,7 +280,7 @@ export default function ListenPage() {
             })}
             <button onClick={loadDrills} disabled={drillLoading}
               style={{width:'100%',marginTop:6,padding:'12px',borderRadius:12,border:'none',
-                background:'linear-gradient(135deg,#c4b5fd,#a855f7)',color:'white',fontWeight:800,fontSize:'0.9rem',
+                background:'linear-gradient(135deg,#c4b5fd,#a78bfa)',color:'white',fontWeight:800,fontSize:'0.9rem',
                 cursor:drillLoading?'default':'pointer',opacity:drillLoading?0.7:1}}>
               {drillLoading
                 ? (lang==='ru'?'✨ Мила готовит упражнения…':'✨ Mila is building your drills…')
@@ -289,7 +289,7 @@ export default function ListenPage() {
           </div>
         )}
 
-        <div style={{textAlign:'center',fontSize:'0.72rem',color:'#c0b8af',marginTop:18,lineHeight:1.5}}>
+        <div style={{textAlign:'center',fontSize:'0.72rem',color:'#8b8373',marginTop:18,lineHeight:1.5}}>
           {lang==='ru'
             ? '🎯 Оценка по фонемам — модель на нашем сервере, мгновенно.'
             : '🎯 Phoneme-level scoring by our model — instant.'}
