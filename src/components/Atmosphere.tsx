@@ -1,35 +1,75 @@
 'use client';
 
-// Living backdrop — slow crossfading footage of people studying, talking,
-// city light. Sits behind every page under a dark-glass scrim (globals.css
-// .atmosphere). Clips live in public/ambience (720p, ~7MB total, committed);
-// if one fails to load the component quietly falls back to pure noir.
+// Living backdrop — slow crossfading footage behind every page, under a
+// dark-glass scrim (globals.css .atmosphere). Route-aware: each area of the app
+// draws from its own themed pool, so the mood fits the room —
+//   progress/growth  → nature       lessons/library → classrooms + kids
+//   conversation rooms → cool young people    landing/auth → the club set
+// Clips live in public/ambience (720p, committed). If one fails to load the
+// component quietly falls back to pure noir.
 import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
-const CLIPS = [
-  '/ambience/conversation.mp4',   // colleagues talking over coffee
-  '/ambience/library.mp4',        // student reading, writing
-  '/ambience/campus.mp4',         // university walk, Greenwich
-  '/ambience/meeting.mp4',        // office conversation
-  '/ambience/city-night.mp4',     // London skyline after dark
-];
+const POOLS: Record<string, string[]> = {
+  // calm nature — the growth story
+  nature: [
+    '/ambience/nature-forest.mp4',   // sunbeams through trees
+    '/ambience/nature-lake.mp4',     // mountain lake at dawn
+    '/ambience/nature-field.mp4',    // golden-hour meadow
+  ],
+  // classrooms + children — the learning story
+  learn: [
+    '/ambience/classroom.mp4',       // children in a classroom
+    '/ambience/kids-writing.mp4',    // child learning the alphabet
+    '/ambience/study-group.mp4',     // university students together
+    '/ambience/library.mp4',         // reading, writing
+  ],
+  // cool young people — the social story
+  social: [
+    '/ambience/friends.mp4',         // friends together, laughing
+    '/ambience/conversation.mp4',    // talking over coffee
+    '/ambience/study-group.mp4',     // students collaborating
+    '/ambience/campus.mp4',          // campus walk
+  ],
+  // the club set — cinematic, for the front door
+  club: [
+    '/ambience/conversation.mp4',
+    '/ambience/library.mp4',
+    '/ambience/campus.mp4',
+    '/ambience/city-night.mp4',
+    '/ambience/nature-lake.mp4',
+  ],
+};
+
+// Which pool a route draws from (first prefix match wins).
+function poolFor(path: string): string[] {
+  if (path.startsWith('/progress') || path.startsWith('/achievements')) return POOLS.nature;
+  if (path.startsWith('/lessons') || path.startsWith('/vocabulary') || path.startsWith('/phonetics')) return POOLS.learn;
+  if (path.startsWith('/listen') || path.startsWith('/chat') || path.startsWith('/darshan') || path.startsWith('/dashboard') || path.startsWith('/assessment')) return POOLS.social;
+  return POOLS.club; // '/', '/login', '/register'
+}
 
 const HOLD_MS = 22000; // how long each scene breathes before the next
 
 export default function Atmosphere() {
+  const pathname = usePathname();
+  const clips = poolFor(pathname || '/');
   const [idx, setIdx] = useState(0);
   const [on, setOn] = useState(false);      // current layer visible?
   const [dead, setDead] = useState(false);  // clips unreachable → stay noir
   const vidRef = useRef<HTMLVideoElement>(null);
 
+  // New room → restart the rotation from the top of its pool.
+  useEffect(() => { setIdx(0); setOn(false); }, [pathname]);
+
   useEffect(() => {
     if (dead) return;
     const t = setTimeout(() => {
       setOn(false);
-      setTimeout(() => setIdx(i => (i + 1) % CLIPS.length), 2500); // after fade-out
+      setTimeout(() => setIdx(i => (i + 1) % clips.length), 2500); // after fade-out
     }, HOLD_MS);
     return () => clearTimeout(t);
-  }, [idx, dead]);
+  }, [idx, dead, clips.length]);
 
   useEffect(() => {
     const v = vidRef.current;
@@ -55,7 +95,7 @@ export default function Atmosphere() {
     <div className='atmosphere' aria-hidden>
       <video
         ref={vidRef}
-        key={idx}
+        key={`${pathname}:${idx}`}
         className={on ? 'is-on' : ''}
         muted
         loop
@@ -63,7 +103,7 @@ export default function Atmosphere() {
         preload="auto"
         onCanPlay={(e) => { setOn(true); const v = e.currentTarget; v.muted = true; v.play().catch(() => {}); }}
         onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
-        src={CLIPS[idx]}
+        src={clips[idx]}
       />
     </div>
   );
