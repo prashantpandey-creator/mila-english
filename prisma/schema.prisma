@@ -31,6 +31,7 @@ model User {
   Achievements Achievement[]
   StudySessions StudySession[]
   PhonemeStats PhonemeStat[]
+  GeneratedLessons Lesson[] @relation("LessonCreator")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -65,6 +66,8 @@ model Lesson {
   visualAidUrl String?
   audioUrl String?
   difficulty Int
+  createdByUserId Int?           // null = global/curated; set = user-specific AI lesson
+  CreatedBy User? @relation("LessonCreator", fields: [createdByUserId], references: [id])
   Exercises Exercise[]
   Progresses Progress[]
   createdAt DateTime @default(now())

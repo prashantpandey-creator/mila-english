@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const profile = await prisma.user.findUnique({
-    where: { id: Number(user.id) },
-    select: { id: true, name: true, email: true, learnerCategory: true, nativeLanguage: true, level: true, streakDays: true }
+    where: { id: Number(user.sub) },
+    select: { id: true, name: true, email: true, learnerCategory: true, nativeLanguage: true, level: true, streakDays: true, learnerProfile: true, learnerProfileAt: true }
   })
   if (!profile) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(profile)

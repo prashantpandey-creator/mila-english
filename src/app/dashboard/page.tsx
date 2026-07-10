@@ -17,9 +17,11 @@ export default function DashboardPage() {
   const router = useRouter();
   const [m, setM] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [stats, setStats] = useState<{completedLessons:number;totalTimeSeconds:number;avgScore:number}|null>(null);
   useEffect(()=>{
     setM(true);
     fetch('/api/users/me').then(r=>r.ok?r.json():null).then(d=>{if(d)setUser(d);}).catch(()=>{});
+    fetch('/api/progress').then(r=>r.ok?r.json():null).then(d=>{if(d)setStats(d);}).catch(()=>{});
   },[]);
 
   const getGreeting = () => {
@@ -92,7 +94,10 @@ export default function DashboardPage() {
         )}
 
         {/* Custom Plan Display (If generated) */}
-        {user?.level !== 'pending' && user?.learnerProfile && (
+        {user?.level !== 'pending' && user?.learnerProfile && (()=>{
+          let plan: any = null;
+          try { plan = JSON.parse(user.learnerProfile); } catch { plan = null; }
+          return (
           <div style={{background:'white',borderRadius:20,padding:'20px',boxShadow:'0 2px 16px rgba(0,0,0,0.04)',marginBottom:24,border:'1px solid rgba(168,85,247,0.15)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
               <div>
@@ -106,10 +111,11 @@ export default function DashboardPage() {
               </div>
             </div>
             <p style={{fontSize:'0.85rem',color:C.warm,lineHeight:1.5,margin:0}}>
-              {JSON.parse(user.learnerProfile)?.weak_summary || (lang==='ru'?'Мы составили план на основе твоего собеседования.':'We built this plan based on your assessment.')}
+              {plan?.weak_summary || (lang==='ru'?'Мы составили план на основе твоего собеседования.':'We built this plan based on your assessment.')}
             </p>
           </div>
-        )}
+          );
+        })()}
 
         {/* Voice Darshan hero — antigravity's WebGL orb experience */}
         <div onClick={()=>router.push('/darshan')}
@@ -145,8 +151,8 @@ export default function DashboardPage() {
         {/* Stats */}
         <div style={{marginBottom:20}}>
           <ProgressSummary items={[
-            {emoji:'📝',val:8,label:lang==='ru'?'Слов':'Words',color:C.rose},
-            {emoji:'⭐',val:12,label:lang==='ru'?'Уроков':'Lessons',color:C.sage},
+            {emoji:'📝',val:stats?.completedLessons ?? '…',label:lang==='ru'?'Уроков пройдено':'Lessons done',color:C.sage},
+            {emoji:'⭐',val:stats ? Math.round(stats.totalTimeSeconds/60) : '…',label:lang==='ru'?'Минут':'Minutes',color:C.rose},
           ]}/>
         </div>
 
@@ -175,7 +181,8 @@ export default function DashboardPage() {
             <div key={i} onClick={()=>router.push(l.href)}
               style={{cursor:'pointer',background:'white',borderRadius:16,padding:'16px',boxShadow:'0 1px 8px rgba(0,0,0,0.04)',
                 display:'flex',alignItems:'center',gap:12,transition:'all 0.2s'}}
-              onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)'}}>
+              onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)'}}
+              onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 1px 8px rgba(0,0,0,0.04)'}}>
               <div style={{width:40,height:40,borderRadius:12,background:l.color+'20',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem'}}>{l.emoji}</div>
               <div><div style={{fontWeight:600,fontSize:'0.95rem',color:C.dark}}>{l.label}</div><div style={{fontSize:'0.8rem',color:C.warm}}>{l.sub}</div></div>
             </div>

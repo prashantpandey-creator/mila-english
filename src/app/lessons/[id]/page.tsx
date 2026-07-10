@@ -7,6 +7,7 @@ import LangToggle from '@/components/LangToggle';
 import LessonContent from '@/components/LessonContent';
 import ExercisePlayer from '@/components/ExercisePlayer';
 import VisualAidViewer from '@/components/VisualAidViewer';
+import { ttsSpeak } from '@/lib/tts';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 
@@ -29,20 +30,20 @@ export default function LessonPage() {
   const [showTranslation, setShowTranslation] = useState(false);
   const [step, setStep] = useState<'words'|'phrases'|'practice'>('words');
   const [dbLesson, setDbLesson] = useState<any>(null);
+  const [dbError, setDbError] = useState(false);
 
   // Lessons not in the built-in set are AI-generated ones living in the DB.
   useEffect(() => {
     if (staticLesson) return;
+    const timer = setTimeout(() => setDbError(true), 8000); // 8s timeout
     fetch(`/api/lessons/${params?.id}`)
       .then(r => r.ok ? r.json() : null)
-      .then(setDbLesson)
-      .catch(() => setDbLesson(null));
+      .then(d => { clearTimeout(timer); if (d) setDbLesson(d); else setDbError(true); })
+      .catch(() => { clearTimeout(timer); setDbError(true); });
   }, [params?.id, staticLesson]);
 
   const speak = (text: string) => {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US'; u.rate = 0.75;
-    speechSynthesis.speak(u);
+    ttsSpeak(text, 'en-US', 0.75);
   };
 
   // AI-generated lesson: render its content + exercises directly.

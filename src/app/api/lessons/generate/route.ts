@@ -2,13 +2,23 @@ import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authenticate } from '@/lib/auth';
 
 export const maxDuration = 60;
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const user = await authenticate(req as any);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   try {
     const { topic } = await req.json();
+    const userId = Number(user.sub);
+
+    // Fetch user's real level to tailor the lesson
+    const profile = await prisma.user.findUnique({ where: { id: userId }, select: { level: true } });
+    const level = profile?.level && profile.level !== 'pending' ? profile.level : 'intermediate';
 
     const { object } = await generateObject({
       model: openai('gpt-4o-mini'),
@@ -32,10 +42,11 @@ export async function POST(req: Request) {
       data: {
         title: object.title,
         category: object.category,
-        learnerLevel: 'intermediate',
+        learnerLevel: level,
         durationMinutes: 5,
         content: object.content,
         difficulty: object.difficulty,
+        createdByUserId: userId,
         Exercises: {
           create: object.exercises.map((ex: any) => ({
             type: 'multiple-choice',

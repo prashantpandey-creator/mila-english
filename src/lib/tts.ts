@@ -55,11 +55,10 @@ export async function ttsSpeak(text: string, lang = 'en-US', rate = 0.85): Promi
              voices.find((v) => v.lang?.toLowerCase().startsWith('en'));
     }
     if (best) u.voice = best;
-    u.onend = () => resolve();
-    u.onerror = () => resolve();
     // Chrome bug: synthesis stalls if tab is in background; this nudges it
-    const safetyTimer = setTimeout(() => resolve(), 8000);
+    const safetyTimer = setTimeout(() => { resolve(); }, 8000);
     u.onend = () => { clearTimeout(safetyTimer); resolve(); };
+    u.onerror = () => { clearTimeout(safetyTimer); resolve(); };
     window.speechSynthesis.speak(u);
   });
 }
