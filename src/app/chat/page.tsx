@@ -26,7 +26,7 @@ export default function Chat() {
       {/* Header */}
       <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>🌸 Мила</span>
+        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
         <h1 style={{margin:0,fontWeight:800,fontSize:'1rem',color:C.dark}}>
           {lang==='ru' ? '🤖 ИИ-репетитор' : '🤖 AI Tutor'}
         </h1>

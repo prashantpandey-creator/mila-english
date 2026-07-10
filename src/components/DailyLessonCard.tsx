@@ -12,7 +12,7 @@ export default function DailyLessonCard({ title, subtitle, onStart }: {
         boxShadow:'0 2px 20px rgba(0,0,0,0.06)',marginBottom:20,transition:'all 0.2s',border:'2px solid transparent'}}
       onMouseEnter={e=>{e.currentTarget.style.borderColor=C.rose;e.currentTarget.style.transform='translateY(-2px)'}}
       onMouseLeave={e=>{e.currentTarget.style.borderColor='transparent';e.currentTarget.style.transform='none'}}>
-      <div style={{height:6,background:`linear-gradient(90deg,${C.rose},${C.gold},${C.sage})`}}/>
+      <div style={{height:2,background:'linear-gradient(90deg,transparent,rgba(212,175,55,0.8),transparent)'}}/>
       <div style={{display:'flex',alignItems:'center',padding:'20px 24px',gap:16}}>
         <div style={{width:56,height:56,borderRadius:16,background:C.roseL,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.8rem'}}>📖</div>
         <div style={{flex:1}}>

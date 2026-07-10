@@ -16,7 +16,7 @@ const CLIPS = [
 
 const HOLD_MS = 22000; // how long each scene breathes before the next
 
-export default function Atmosphere({ bright = false }: { bright?: boolean }) {
+export default function Atmosphere() {
   const [idx, setIdx] = useState(0);
   const [on, setOn] = useState(false);      // current layer visible?
   const [dead, setDead] = useState(false);  // clips unreachable → stay noir
@@ -34,15 +34,25 @@ export default function Atmosphere({ bright = false }: { bright?: boolean }) {
   useEffect(() => {
     const v = vidRef.current;
     if (!v || dead) return;
+    // React doesn't reliably reflect the JSX `muted` attr onto the DOM before
+    // play() — set it imperatively or autoplay policy blocks the video.
+    v.muted = true;
     v.load();
     const play = v.play();
-    if (play) play.catch(() => {}); // autoplay policies — muted, should pass
+    if (play) play.catch(() => {});
+    // Keepalive: browsers opportunistically pause background/covered videos;
+    // nudge it back. Cheap (no-op while playing), removes a whole failure class.
+    const alive = setInterval(() => {
+      const cur = vidRef.current;
+      if (cur && cur.paused) { cur.muted = true; cur.play().catch(() => {}); }
+    }, 3000);
+    return () => clearInterval(alive);
   }, [idx, dead]);
 
   if (dead) return <div className="atmosphere" aria-hidden />;
 
   return (
-    <div className={`atmosphere${bright ? ' atmosphere--bright' : ''}`} aria-hidden>
+    <div className='atmosphere' aria-hidden>
       <video
         ref={vidRef}
         key={idx}
@@ -51,7 +61,7 @@ export default function Atmosphere({ bright = false }: { bright?: boolean }) {
         loop
         playsInline
         preload="auto"
-        onCanPlay={() => setOn(true)}
+        onCanPlay={(e) => { setOn(true); const v = e.currentTarget; v.muted = true; v.play().catch(() => {}); }}
         onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
         src={CLIPS[idx]}
       />

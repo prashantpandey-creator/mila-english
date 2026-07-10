@@ -49,8 +49,11 @@ export default function DashboardPage() {
       <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-        <div onClick={()=>router.push('/')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>
-          🌸 Мила
+        <div onClick={()=>router.push('/')} style={{cursor:'pointer',display:'flex',alignItems:'center',gap:9}}>
+          <div style={{width:30,height:30,borderRadius:'50%',border:'1px solid rgba(212,175,55,0.6)',
+            display:'flex',alignItems:'center',justifyContent:'center',
+            fontFamily:"'Cormorant Garamond',serif",fontWeight:700,fontSize:'1.05rem',color:'#e8cd7a'}}>M</div>
+          <span style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.25rem',color:C.dark}}>Mila</span>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <LangToggle />
@@ -82,12 +85,16 @@ export default function DashboardPage() {
 
         {/* AI Assessment Banner (If pending) */}
         {user?.level === 'pending' && (
-          <div style={{background:'linear-gradient(135deg,#c4b5fd,#a78bfa)',borderRadius:20,padding:'24px',boxShadow:'0 8px 32px rgba(168,85,247,0.2)',marginBottom:24,color:'white'}}>
+          <div style={{background:'rgba(167,139,250,0.10)',backdropFilter:'blur(16px)',WebkitBackdropFilter:'blur(16px)',
+            border:'1px solid rgba(167,139,250,0.35)',borderRadius:20,padding:'24px',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.5)',marginBottom:24,color:'#f2ede3'}}>
             <div style={{fontSize:'1.8rem',marginBottom:8}}>🤖✨</div>
-            <h2 style={{fontSize:'1.3rem',fontWeight:800,margin:'0 0 6px'}}>{lang==='ru'?'Твой личный план обучения':'Your Custom Learning Plan'}</h2>
-            <p style={{fontSize:'0.9rem',opacity:0.9,lineHeight:1.5,margin:'0 0 16px'}}>{lang==='ru'?'Пройди короткое собеседование с ИИ, чтобы мы определили твой уровень и составили персональную программу.':'Take a quick conversational test with our AI to determine your level and generate a personalized curriculum.'}</p>
+            <h2 style={{fontSize:'1.4rem',margin:'0 0 6px',color:'#f2ede3'}}>{lang==='ru'?'Твой личный план обучения':'Your Custom Learning Plan'}</h2>
+            <p style={{fontSize:'0.9rem',opacity:0.85,lineHeight:1.5,margin:'0 0 16px',color:'#cfc8ba'}}>{lang==='ru'?'Пройди короткое собеседование с ИИ, чтобы мы определили твой уровень и составили персональную программу.':'Take a quick conversational test with our AI to determine your level and generate a personalized curriculum.'}</p>
             <button onClick={()=>router.push('/assessment')}
-              style={{width:'100%',padding:'12px',borderRadius:12,border:'none',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:'#a78bfa',fontWeight:700,fontSize:'1rem',cursor:'pointer',boxShadow:'0 4px 14px rgba(0,0,0,0.1)'}}>
+              style={{width:'100%',padding:'13px',borderRadius:12,border:'none',
+                background:'linear-gradient(135deg,#e8b96a,#d4af37)',color:'#17130a',fontWeight:800,fontSize:'1rem',
+                cursor:'pointer',boxShadow:'0 6px 22px rgba(212,175,55,0.35)'}}>
               {lang==='ru'?'Начать собеседование →':'Start Assessment →'}
             </button>
           </div>

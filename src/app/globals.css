@@ -15,12 +15,10 @@
 html { background: var(--noir); }
 
 body {
-  background:
-    radial-gradient(1200px 800px at 85% -10%, rgba(212,175,55,0.10), transparent 60%),
-    radial-gradient(1000px 700px at -10% 25%, rgba(232,85,109,0.07), transparent 55%),
-    radial-gradient(900px 900px at 50% 115%, rgba(167,139,250,0.08), transparent 60%),
-    var(--noir);
-  background-attachment: fixed;
+  /* MUST stay transparent: the .atmosphere footage is fixed at z-index -2,
+     and any opaque body background paints over it. Noir base lives on html;
+     the gold/rose glows live on the .atmosphere scrim below. */
+  background: transparent;
   color: var(--ivory);
   font-family: 'Manrope', 'Inter', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -42,21 +40,17 @@ h1, h2 {
 .atmosphere video {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; opacity: 0; transition: opacity 2.4s ease;
-  filter: saturate(0.85) contrast(1.05);
+  filter: saturate(0.95) contrast(1.05) brightness(1.25);
 }
 .atmosphere video.is-on { opacity: 1; }
 .atmosphere::after {
   content: ''; position: absolute; inset: 0;
   background:
-    radial-gradient(1200px 800px at 85% -10%, rgba(212,175,55,0.08), transparent 60%),
-    linear-gradient(180deg, rgba(11,14,20,0.82) 0%, rgba(11,14,20,0.88) 45%, rgba(11,14,20,0.96) 100%);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-}
-.atmosphere--bright::after {
-  background:
     radial-gradient(1200px 800px at 85% -10%, rgba(212,175,55,0.10), transparent 60%),
-    linear-gradient(180deg, rgba(11,14,20,0.62) 0%, rgba(11,14,20,0.78) 55%, rgba(11,14,20,0.94) 100%);
+    radial-gradient(1000px 700px at -10% 25%, rgba(232,85,109,0.06), transparent 55%),
+    linear-gradient(180deg, rgba(11,14,20,0.42) 0%, rgba(11,14,20,0.62) 55%, rgba(11,14,20,0.88) 100%);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 .card {

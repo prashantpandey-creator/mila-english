@@ -131,7 +131,7 @@ export default function ListenPage() {
       <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontWeight:800,fontSize:'1.1rem',color:C.dark}}>🌸 Мила</span>
+        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <span style={{fontSize:'0.7rem',fontWeight:700,color:C.purple,background:'rgba(167,139,250,0.16)',padding:'3px 9px',borderRadius:20}}>Level B1</span>
           <LangToggle/>
@@ -147,7 +147,7 @@ export default function ListenPage() {
           {PACKS.map(p=>(
             <button key={p.id} onClick={()=>onPack(p.id)}
               style={{flex:'0 0 auto',fontSize:'0.82rem',fontWeight:pack===p.id?700:600,cursor:'pointer',
-                color:pack===p.id?'white':C.warm,background:pack===p.id?C.sage:'white',
+                color:pack===p.id?'white':C.warm,background:pack===p.id?C.sage:'rgba(255,255,255,0.07)',
                 border:pack===p.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 13px',borderRadius:20}}>
               {p.emoji} {lang==='ru'?p.ru:p.en}
             </button>
@@ -162,7 +162,7 @@ export default function ListenPage() {
           {ACCENTS.map(a=>(
             <button key={a.id} onClick={()=>setAccent(a)}
               style={{flex:'0 0 auto',fontSize:'0.85rem',fontWeight:accent.id===a.id?700:600,cursor:'pointer',
-                color:accent.id===a.id?'white':C.warm,background:accent.id===a.id?C.rose:'white',
+                color:accent.id===a.id?'white':C.warm,background:accent.id===a.id?C.rose:'rgba(255,255,255,0.07)',
                 border:accent.id===a.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 14px',borderRadius:20}}>
               {a.flag} {a.label}
             </button>
