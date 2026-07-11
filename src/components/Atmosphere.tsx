@@ -15,9 +15,9 @@ import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useScene } from '@/lib/scene';
 
-// All clips are cinematically graded (austere, cool, contrasty, vignetted),
-// sourced hi-res (mostly 4K) then supersampled to 1080p. Aesthetic: gothic,
-// European, awe-inspiring — not tourist snapshots.
+// All clips share ONE warm luminous grade — golden highlights, lifted shadows,
+// full saturation, soft vignette. Sourced hi-res (mostly 4K), supersampled to
+// 1080p. Aesthetic: beautiful, warm, cinematic — women lead the people pool.
 const COUNTRY_POOLS: Record<string, string[]> = {
   uk: ['/ambience/uk-bigben-night.mp4', '/ambience/uk-tower.mp4'],
   us: ['/ambience/us-manhattan.mp4', '/ambience/us-empire.mp4'],
@@ -27,20 +27,20 @@ const COUNTRY_POOLS: Record<string, string[]> = {
 const TOPIC_POOLS: Record<string, string[]> = {
   airport:     ['/ambience/us-empire.mp4'],
   hotel:       ['/ambience/venice-night.mp4'],
-  cafe:        ['/ambience/person-cafe.mp4'],
+  cafe:        ['/ambience/woman-coffee.mp4'],
   directions:  ['/ambience/venice-night.mp4'],
   emergencies: ['/ambience/uk-bigben-night.mp4'],
 };
 
 const ROUTE_POOLS: Record<string, string[]> = {
-  // progress/achievements — awe of nature: peaks, aurora, cliffs, volcano
+  // progress/achievements — awe of nature, warm: golden peaks, aurora, cliffs
   nature: ['/ambience/nature-peaks.mp4', '/ambience/nature-aurora.mp4', '/ambience/nature-cliff.mp4', '/ambience/nature-volcano.mp4'],
-  // lessons/study — gothic learning: cathedral naves, columns, candlelight
-  learn:  ['/ambience/cathedral-light.mp4', '/ambience/cathedral-columns.mp4', '/ambience/candle-dark.mp4'],
-  // the talk/practice rooms — elegant European people
-  social: ['/ambience/person-suit.mp4', '/ambience/person-model.mp4', '/ambience/person-couple.mp4', '/ambience/person-cafe.mp4'],
-  // front door / auth — the full cinematic sweep, hero-first
-  club:   ['/ambience/cathedral-light.mp4', '/ambience/us-manhattan.mp4', '/ambience/nature-peaks.mp4', '/ambience/person-suit.mp4', '/ambience/venice-night.mp4', '/ambience/nature-aurora.mp4'],
+  // lessons/study — gothic learning halls, warmly lit: cathedral naves + columns
+  learn:  ['/ambience/cathedral-light.mp4', '/ambience/cathedral-columns.mp4', '/ambience/woman-reading.mp4'],
+  // the talk/practice rooms — beautiful women: golden field, silk, coffee, flowers
+  social: ['/ambience/woman-golden.mp4', '/ambience/woman-silk.mp4', '/ambience/woman-hair.mp4', '/ambience/woman-flowers.mp4', '/ambience/woman-coffee.mp4'],
+  // front door / auth — the full sweep, beauty-first
+  club:   ['/ambience/woman-golden.mp4', '/ambience/woman-silk.mp4', '/ambience/us-manhattan.mp4', '/ambience/nature-peaks.mp4', '/ambience/venice-night.mp4', '/ambience/cathedral-light.mp4'],
 };
 
 function routePool(path: string): string[] {
