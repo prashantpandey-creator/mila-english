@@ -18,10 +18,12 @@ import { useScene } from '@/lib/scene';
 // All clips share ONE warm luminous grade — golden highlights, lifted shadows,
 // full saturation, soft vignette. Sourced hi-res (mostly 4K), supersampled to
 // 1080p. Aesthetic: beautiful, warm, cinematic — women lead the people pool.
+// Each country carries its own tradition, not just a landmark — the backdrop
+// gives a "dhyāna" (meditative) sense of the place you're training to enter.
 const COUNTRY_POOLS: Record<string, string[]> = {
   uk: ['/ambience/uk-bigben-night.mp4', '/ambience/uk-tower.mp4'],
   us: ['/ambience/us-manhattan.mp4', '/ambience/us-empire.mp4'],
-  in: ['/ambience/in-taj-aerial.mp4'],
+  in: ['/ambience/in-taj-aerial.mp4', '/ambience/in-saree-wedding.mp4', '/ambience/in-saree-dance.mp4', '/ambience/in-diwali.mp4', '/ambience/in-palace.mp4', '/ambience/in-holi.mp4'],
 };
 
 const TOPIC_POOLS: Record<string, string[]> = {
