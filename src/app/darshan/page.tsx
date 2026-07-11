@@ -124,7 +124,7 @@ export default function DarshanPage() {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      const sdpResponse = await fetch(`https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17`, {
+      const sdpResponse = await fetch(`https://api.openai.com/v1/realtime?model=gpt-realtime`, {
         method: "POST",
         body: offer.sdp,
         headers: {

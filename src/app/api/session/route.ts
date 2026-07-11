@@ -51,11 +51,14 @@ export async function GET(req: Request) {
 
     const isAssessment = new URL(req.url).searchParams.get('mode') === 'assessment';
 
+    // OpenAI Realtime API (2025 shape): model = "gpt-realtime", and `voice` now
+    // lives under session.audio.output.voice — NOT top-level (the old
+    // session.voice shape now 400s). Verified against the live API.
     const session: any = {
       type: "realtime",
-      model: "gpt-4o-realtime-preview-2024-12-17",
-      voice: "shimmer",
+      model: "gpt-realtime",
       instructions: isAssessment ? EXAMINER : TUTOR,
+      audio: { output: { voice: "shimmer" } },
     };
     if (isAssessment) {
       session.tools = ASSESSMENT_TOOLS;
