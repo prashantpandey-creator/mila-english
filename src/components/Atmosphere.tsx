@@ -52,11 +52,19 @@ function routePool(path: string): string[] {
   return ROUTE_POOLS.club;
 }
 
-const HOLD_MS = 20000; // how long each scene breathes before the next
+const HOLD_MS = 28000; // how long each scene breathes before the next (calm cadence)
+
+// A clip path → its extracted still. Motion belongs only at the front door;
+// every inner room shows a frozen graded frame instead.
+const stillOf = (clip: string) => clip.replace('/ambience/', '/ambience/stills/').replace('.mp4', '.jpg');
 
 export default function Atmosphere() {
   const pathname = usePathname() || '/';
   const { country, topic } = useScene();
+
+  // Motion ONLY on the front door ('/'). Everywhere else: stills — video is
+  // distracting once you're working; a still holds the mood without pulling the eye.
+  const motion = pathname === '/';
 
   // Resolve the active pool, most specific signal wins. A key string lets us
   // reset the rotation whenever the resolved scene changes (tap a new flag →
@@ -75,48 +83,59 @@ export default function Atmosphere() {
   // New scene → restart rotation from the top of its pool.
   useEffect(() => { setIdx(0); setOn(false); }, [sceneKey]);
 
+  // Gentle rotation through the pool (both stills and the front-door video).
   useEffect(() => {
-    if (dead) return;
+    if (dead || clips.length < 2) return;
     const t = setTimeout(() => {
       setOn(false);
-      setTimeout(() => setIdx(i => (i + 1) % clips.length), 2500);
+      setTimeout(() => setIdx(i => (i + 1) % clips.length), 2800);
     }, HOLD_MS);
     return () => clearTimeout(t);
   }, [idx, dead, clips.length]);
 
+  // Front-door video playback (only when motion is on).
   useEffect(() => {
+    if (!motion) return;
     const v = vidRef.current;
     if (!v || dead) return;
-    // React doesn't reliably reflect the JSX `muted` attr onto the DOM before
-    // play() — set it imperatively or autoplay policy blocks the video.
     v.muted = true;
     v.load();
     const play = v.play();
     if (play) play.catch(() => {});
-    // Keepalive: browsers opportunistically pause background/covered videos.
     const alive = setInterval(() => {
       const cur = vidRef.current;
       if (cur && cur.paused) { cur.muted = true; cur.play().catch(() => {}); }
     }, 3000);
     return () => clearInterval(alive);
-  }, [idx, dead, sceneKey]);
+  }, [idx, dead, sceneKey, motion]);
 
   if (dead) return <div className="atmosphere" aria-hidden />;
 
   return (
     <div className='atmosphere' aria-hidden>
-      <video
-        ref={vidRef}
-        key={`${sceneKey}:${idx}`}
-        className={on ? 'is-on' : ''}
-        muted
-        loop
-        playsInline
-        preload="auto"
-        onCanPlay={(e) => { setOn(true); const v = e.currentTarget; v.muted = true; v.play().catch(() => {}); }}
-        onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
-        src={clips[idx]}
-      />
+      {motion ? (
+        <video
+          ref={vidRef}
+          key={`${sceneKey}:${idx}`}
+          className={`atmosphere-slow ${on ? 'is-on' : ''}`}
+          muted
+          loop
+          playsInline
+          preload="auto"
+          onCanPlay={(e) => { setOn(true); const v = e.currentTarget; v.muted = true; v.play().catch(() => {}); }}
+          onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
+          src={clips[idx]}
+        />
+      ) : (
+        <img
+          key={`${sceneKey}:${idx}`}
+          className={on ? 'is-on' : ''}
+          onLoad={() => setOn(true)}
+          onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
+          src={stillOf(clips[idx])}
+          alt=""
+        />
+      )}
     </div>
   );
 }

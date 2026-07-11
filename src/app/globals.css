@@ -40,13 +40,24 @@ h1, h2 {
 /* The footage is a WHISPER, not a picture — heavily dimmed, blurred, and
    near-monochrome so it reads as moving texture deep behind the glass. Never a
    recognizable figure competing with the words. Subtlety is the whole point. */
-.atmosphere video {
+/* Video (front door) AND stills (inner rooms) share the same subtle dimming. */
+.atmosphere video,
+.atmosphere img {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; opacity: 0; transition: opacity 3s ease;
   filter: saturate(0.55) contrast(0.96) brightness(0.62) blur(6px);
   transform: scale(1.06); /* hide the blur's soft edges */
 }
-.atmosphere video.is-on { opacity: 0.3; }
+.atmosphere video.is-on,
+.atmosphere img.is-on { opacity: 0.3; }
+
+/* Front-door video only: a very slow drift so it reads as a gentle pan, not
+   fast motion. 40s ease over a 3% zoom — barely perceptible, beautiful. */
+.atmosphere-slow { animation: atmosDrift 40s ease-in-out infinite alternate; }
+@keyframes atmosDrift {
+  from { transform: scale(1.06) translate3d(0, 0, 0); }
+  to   { transform: scale(1.12) translate3d(-1.5%, -1%, 0); }
+}
 .atmosphere::after {
   content: ''; position: absolute; inset: 0;
   background:
