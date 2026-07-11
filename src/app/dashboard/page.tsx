@@ -9,6 +9,7 @@ import StreakCounter from '@/components/StreakCounter';
 import ProgressSummary from '@/components/ProgressSummary';
 import PronunciationButton from '@/components/PronunciationButton';
 import LeaderboardCard from '@/components/LeaderboardCard';
+import { Card, IconTile } from '@/components/ui/Card';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 
@@ -85,19 +86,17 @@ export default function DashboardPage() {
 
         {/* AI Assessment Banner (If pending) */}
         {user?.level === 'pending' && (
-          <div style={{background:'rgba(167,139,250,0.10)',backdropFilter:'blur(16px)',WebkitBackdropFilter:'blur(16px)',
-            border:'1px solid rgba(167,139,250,0.35)',borderRadius:20,padding:'24px',
-            boxShadow:'0 8px 32px rgba(0,0,0,0.5)',marginBottom:24,color:'#f2ede3'}}>
-            <div style={{fontSize:'1.8rem',marginBottom:8}}>🤖✨</div>
-            <h2 style={{fontSize:'1.4rem',margin:'0 0 6px',color:'#f2ede3'}}>{lang==='ru'?'Твой личный план обучения':'Your Custom Learning Plan'}</h2>
-            <p style={{fontSize:'0.9rem',opacity:0.85,lineHeight:1.5,margin:'0 0 16px',color:'#cfc8ba'}}>{lang==='ru'?'Пройди короткое собеседование с ИИ, чтобы мы определили твой уровень и составили персональную программу.':'Take a quick conversational test with our AI to determine your level and generate a personalized curriculum.'}</p>
+          <Card hover={false} padding="24px" style={{ marginBottom: 24 }}>
+            <div style={{fontSize:'1.8rem',marginBottom:8}}>✨</div>
+            <h2 style={{fontSize:'1.5rem',margin:'0 0 6px',color:C.dark}}>{lang==='ru'?'Твой личный план обучения':'Your custom learning plan'}</h2>
+            <p style={{fontSize:'0.9rem',lineHeight:1.55,margin:'0 0 16px',color:C.warm}}>{lang==='ru'?'Пройди короткое собеседование с ИИ, чтобы мы определили твой уровень и составили персональную программу.':'Take a short conversation with our AI to place your level and tailor a personal curriculum.'}</p>
             <button onClick={()=>router.push('/assessment')}
               style={{width:'100%',padding:'13px',borderRadius:12,border:'none',
                 background:'linear-gradient(135deg,#e8b96a,#d4af37)',color:'#17130a',fontWeight:800,fontSize:'1rem',
-                cursor:'pointer',boxShadow:'0 6px 22px rgba(212,175,55,0.35)'}}>
-              {lang==='ru'?'Начать собеседование →':'Start Assessment →'}
+                cursor:'pointer',boxShadow:'0 6px 22px rgba(212,175,55,0.3)'}}>
+              {lang==='ru'?'Начать собеседование →':'Start assessment →'}
             </button>
-          </div>
+          </Card>
         )}
 
         {/* Custom Plan Display (If generated) */}
@@ -105,48 +104,42 @@ export default function DashboardPage() {
           let plan: any = null;
           try { plan = JSON.parse(user.learnerProfile); } catch { plan = null; }
           return (
-          <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:24,border:'1px solid rgba(168,85,247,0.15)'}}>
+          <Card hover={false} padding="20px" style={{ marginBottom: 24 }}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
               <div>
-                <div style={{fontSize:'0.75rem',fontWeight:700,color:'#a78bfa',textTransform:'uppercase',letterSpacing:1,marginBottom:4}}>
-                  {lang==='ru'?'Персональный план':'Custom Plan'}
+                <div style={{fontSize:'0.72rem',fontWeight:700,color:C.gold,textTransform:'uppercase',letterSpacing:1.5,marginBottom:4}}>
+                  {lang==='ru'?'Персональный план':'Custom plan'}
                 </div>
-                <div style={{fontWeight:700,fontSize:'1.1rem',color:C.dark}}>Level: {user.level.toUpperCase()}</div>
+                <div style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.35rem',color:C.dark}}>Level {user.level.toUpperCase()}</div>
               </div>
-              <div style={{width:40,height:40,borderRadius:12,background:'rgba(167,139,250,0.16)',color:'#a78bfa',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',fontWeight:800}}>
-                {user.level.slice(0,2).toUpperCase()}
-              </div>
+              <IconTile size={44}>{user.level.slice(0,2).toUpperCase()}</IconTile>
             </div>
-            <p style={{fontSize:'0.85rem',color:C.warm,lineHeight:1.5,margin:0}}>
-              {plan?.weak_summary || (lang==='ru'?'Мы составили план на основе твоего собеседования.':'We built this plan based on your assessment.')}
+            <p style={{fontSize:'0.85rem',color:C.warm,lineHeight:1.55,margin:0}}>
+              {plan?.weak_summary || (lang==='ru'?'Мы составили план на основе твоего собеседования.':'We built this plan from your assessment.')}
             </p>
-          </div>
+          </Card>
           );
         })()}
 
-        {/* Voice Darshan hero — antigravity's WebGL orb experience */}
-        <div onClick={()=>router.push('/darshan')}
-          style={{cursor:'pointer',position:'relative',height:200,borderRadius:24,overflow:'hidden',
-            background:'linear-gradient(135deg,#1a0b2e,#3a1c4a,#4a1d3d)',marginBottom:16,
-            boxShadow:'0 8px 32px rgba(124,58,237,0.25)',display:'flex',flexDirection:'column',justifyContent:'flex-end',padding:24,
-            transition:'transform 0.2s'}}
-          onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)'}}
-          onMouseLeave={e=>{e.currentTarget.style.transform='none'}}>
-          {/* CSS glow orb */}
-          <div style={{position:'absolute',top:'30%',left:'50%',transform:'translate(-50%,-50%)',width:150,height:150}}>
-            <div className="animate-spin-slow" style={{position:'absolute',inset:0,borderRadius:'50%',
-              background:'conic-gradient(from 0deg,#ec4899,#a78bfa,#3b82f6,#ec4899)',filter:'blur(20px)',opacity:0.6}}/>
-            <div style={{position:'absolute',inset:16,borderRadius:'50%',background:'rgba(255,255,255,0.1)',backdropFilter:'blur(4px)',border:'1px solid rgba(255,255,255,0.2)'}}/>
-          </div>
-          <div style={{position:'relative',zIndex:1}}>
-            <div style={{fontWeight:800,fontSize:'1.5rem',color:'white',lineHeight:1.1}}>
-              {lang==='ru'?'Голосовой Даршан':'Voice Darshan'}
+        {/* Voice Lounge — the hero, in the house language: gold ember on glass */}
+        <Card onClick={()=>router.push('/darshan')} padding={0} style={{ position:'relative', height:184, overflow:'hidden', marginBottom:16 }}>
+          {/* single warm ember — one gold glow, no rainbow orb */}
+          <div style={{position:'absolute',top:'-10%',right:'-6%',width:280,height:280,borderRadius:'50%',
+            background:'radial-gradient(circle, rgba(212,175,55,0.30), rgba(232,85,109,0.12) 45%, transparent 70%)',
+            filter:'blur(24px)'}}/>
+          <div className="animate-spin-slow" style={{position:'absolute',top:'26%',left:'50%',transform:'translate(-50%,-50%)',
+            width:120,height:120,borderRadius:'50%',
+            background:'conic-gradient(from 0deg, rgba(212,175,55,0.55), rgba(232,85,109,0.35), rgba(212,175,55,0.55))',
+            filter:'blur(18px)',opacity:0.7}}/>
+          <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',justifyContent:'flex-end',padding:'22px 24px'}}>
+            <div style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.6rem',color:C.dark,lineHeight:1.05}}>
+              {lang==='ru'?'Голосовая гостиная':'The Voice Lounge'}
             </div>
-            <div style={{fontSize:'0.9rem',color:'#e9d5ff',marginTop:4}}>
-              {lang==='ru'?'Говори с Милой вслух — ИИ ответит':'Speak with Mila aloud — the AI answers'}
+            <div style={{fontSize:'0.88rem',color:C.warm,marginTop:5}}>
+              {lang==='ru'?'Говори с Милой вслух — она ответит':'Speak with Mila aloud — she answers'}
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Main CTA — the listen-and-repeat core loop */}
         <DailyLessonCard
@@ -164,7 +157,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Pronunciation */}
-        <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'20px 24px',boxShadow:'0 1px 8px rgba(0,0,0,0.45)',marginBottom:16,textAlign:'center'}}>
+        <Card hover={false} padding="20px 24px" style={{ marginBottom: 16, textAlign: 'center' }}>
           <div style={{fontWeight:700,fontSize:'1rem',color:C.dark,marginBottom:4}}>🎤 {lang==='ru'?'Произношение':'Pronunciation'}</div>
           <p style={{fontSize:'0.85rem',color:C.warm,margin:'0 0 14px'}}>{lang==='ru'?'Нажми и послушай':'Tap to listen'}</p>
           <div style={{display:'flex',justifyContent:'center',gap:20}}>
@@ -172,27 +165,23 @@ export default function DashboardPage() {
               <PronunciationButton key={w} word={w}/>
             ))}
           </div>
-        </div>
+        </Card>
 
-        {/* Quick links */}
+        {/* Quick links — one uniform gold icon tile, no per-card rainbow */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
           {[
-            {emoji:'📚',label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons',color:C.sage},
-            {emoji:'📊',label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',color:C.purple},
-            {emoji:'📖',label:lang==='ru'?'Словарь':'Vocabulary',sub:lang==='ru'?'Повторение':'Review',href:'/vocabulary',color:C.gold},
-            {emoji:'🏆',label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements',color:C.rose},
-            {emoji:'🔤',label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics',color:C.sage},
-            {emoji:'🎯',label:lang==='ru'?'Тест':'Assessment',sub:lang==='ru'?'Твой уровень':'Your level',href:'/assessment',color:C.purple},
-            {emoji:'🤖',label:lang==='ru'?'ИИ Чат':'AI Chat',sub:lang==='ru'?'Общение':'Converse',href:'/chat',color:C.rose},
+            {emoji:'📚',label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons'},
+            {emoji:'📊',label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress'},
+            {emoji:'📖',label:lang==='ru'?'Словарь':'Vocabulary',sub:lang==='ru'?'Повторение':'Review',href:'/vocabulary'},
+            {emoji:'🏆',label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements'},
+            {emoji:'🔤',label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics'},
+            {emoji:'🎯',label:lang==='ru'?'Тест':'Assessment',sub:lang==='ru'?'Твой уровень':'Your level',href:'/assessment'},
+            {emoji:'🤖',label:lang==='ru'?'ИИ Чат':'AI Chat',sub:lang==='ru'?'Общение':'Converse',href:'/chat'},
           ].map((l,i)=>(
-            <div key={i} onClick={()=>router.push(l.href)}
-              style={{cursor:'pointer',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'16px',boxShadow:'0 1px 8px rgba(0,0,0,0.45)',
-                display:'flex',alignItems:'center',gap:12,transition:'all 0.2s'}}
-              onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.55)'}}
-              onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 1px 8px rgba(0,0,0,0.45)'}}>
-              <div style={{width:40,height:40,borderRadius:12,background:l.color+'20',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem'}}>{l.emoji}</div>
+            <Card key={i} onClick={()=>router.push(l.href)} padding="14px" style={{ display:'flex', alignItems:'center', gap:12 }}>
+              <IconTile size={40}>{l.emoji}</IconTile>
               <div><div style={{fontWeight:600,fontSize:'0.95rem',color:C.dark}}>{l.label}</div><div style={{fontSize:'0.8rem',color:C.warm}}>{l.sub}</div></div>
-            </div>
+            </Card>
           ))}
         </div>
 
