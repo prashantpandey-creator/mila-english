@@ -85,6 +85,9 @@ const ROUTE_SCENES: Record<'nature' | 'study' | 'social' | 'club', VisualScene[]
   // heading toward. The garden scene stays defined above for future rooms.
   social: [MILA_STUDIO],
   club: [
+    legacyScene('woman-cafe-laptop', 'brand'),
+    legacyScene('city-night-bokeh', 'place'),
+    legacyScene('woman-city-phone', 'brand'),
     legacyScene('woman-coffee', 'brand', '55% center'),
     legacyScene('us-manhattan', 'place'),
     legacyScene('uk-bigben-night', 'place'),
