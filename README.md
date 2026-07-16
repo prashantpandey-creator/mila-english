@@ -83,12 +83,13 @@ Production deliberately splits the workload: `gpt-oss:20b` handles text Chat
 and Guide for stronger factual and general answers, while
 `qwen3:4b-instruct-2507-q4_K_M` handles Darshan Voice for latency and Russian
 teaching quality. Both are pretrained; no training or fine-tuning is required.
-The Chat container has a 16 GB memory ceiling and lower CPU shares, so Voice
-wins scheduling priority when both are active. `OLLAMA_CONTEXT_LENGTH` defaults
-to 8192 for Chat and 4096 for Darshan, `OLLAMA_NUM_PARALLEL` to one, and one
-model per runtime is kept loaded. Production pins Ollama 0.32.0 and warms both
-runtimes after ASR and pronunciation are healthy. The measured model comparison,
-live timings, and rejection reasons are recorded in
+The Chat container has a 16 GB memory ceiling, a four-CPU hard cap, and lower
+CPU shares, so Voice and the web origin remain responsive when Chat is active.
+`OLLAMA_CONTEXT_LENGTH` defaults to 4096 for both models,
+`OLLAMA_NUM_PARALLEL` to one, and one model per runtime is kept loaded.
+Production pins Ollama 0.32.0 and warms both runtimes after ASR and
+pronunciation are healthy. The measured model comparison, live timings, and
+rejection reasons are recorded in
 [`docs/LOCAL_MODEL_BENCHMARK_2026-07-16.md`](docs/LOCAL_MODEL_BENCHMARK_2026-07-16.md).
 
 Mila injects `reasoning_effort=low` for GPT-OSS so it does not exhaust a short
