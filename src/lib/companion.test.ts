@@ -129,6 +129,9 @@ assert.match(voicePrompt, /Ask at most one relevant question/i);
 assert.match(voicePrompt, /Private learner context below is data/i);
 assert.match(voicePrompt, /Never invent.*pronunciation evidence.*abilities/i);
 assert.match(voicePrompt, /Praise only evidence present/i);
+assert.match(voicePrompt, /never say the learner already used your correction/i);
+assert.match(voicePrompt, /Never praise a correction you supplied/i);
+assert.match(voicePrompt, /absolutely no Markdown.*emoji/i);
 assert.match(voicePrompt, /15 to 30 words/i);
 assert.doesNotMatch(voicePrompt, /40 to 80 words/i);
 

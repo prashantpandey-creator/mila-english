@@ -290,7 +290,7 @@ export async function POST(request: NextRequest) {
     messages,
     system,
     maxTokens: surfaceKind === 'voice' ? 50 : 320,
-    temperature: surfaceKind === 'voice' ? 0.45 : 0.35,
+    temperature: surfaceKind === 'voice' ? 0.25 : 0.35,
     maxRetries: choice.provider === 'ollama' ? 0 : 1,
     onFinish: async ({ text }) => {
       if (!text.trim()) return;
