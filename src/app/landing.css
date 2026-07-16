@@ -361,38 +361,44 @@
 
 /* ── Two rooms, one page: the welcome overrides below re-theme the ENTIRE
    page, islands included. Noir remains the base skin for dark rooms. */
+.mila-surface--welcome .lp { isolation: isolate; }
+.mila-surface--welcome .lp::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(62, 40, 32, 0.14), rgba(58, 38, 34, 0.24) 55%, rgba(54, 36, 34, 0.32));
+}
 .mila-surface--welcome .lp {
+  position: relative;
   --lp-ink: #2f2530;
   --lp-muted: #6f6269;
   --lp-faint: #90828a;
   --lp-strong: #241c26;
   --lp-gold: #a87e1e;
   --lp-gold-bright: #906600;
-  --lp-glass: rgba(255, 255, 255, 0.66);
-  --lp-panel: rgba(255, 255, 255, 0.93);
-  --lp-band: rgba(255, 255, 255, 0.52);
-  --lp-inset: rgba(93, 46, 66, 0.045);
-  --lp-inset-strong: rgba(255, 250, 252, 0.85);
+  --lp-glass: rgba(252, 245, 238, 0.58);
+  --lp-panel: rgba(250, 242, 234, 0.88);
+  --lp-band: rgba(248, 240, 232, 0.42);
+  --lp-inset: rgba(93, 46, 66, 0.05);
+  --lp-inset-strong: rgba(247, 239, 231, 0.78);
   --lp-line: rgba(93, 46, 66, 0.12);
   --lp-line-gold: rgba(144, 102, 0, 0.4);
   --lp-venus: #a83d64;
   --lp-voice: #0c7895;
   --lp-emerald: #08785b;
 }
-.mila-surface--welcome .lp-nav { background: rgba(255, 250, 252, 0.82); border-bottom-color: rgba(93, 46, 66, 0.1); }
+.mila-surface--welcome .lp-nav { background: rgba(246, 238, 230, 0.78); border-bottom-color: rgba(93, 46, 66, 0.1); }
 .mila-surface--welcome .lp-nav .lang-toggle { background: rgba(93, 46, 66, 0.07); }
 .mila-surface--welcome .lp-brand__mark { background: linear-gradient(150deg, rgba(144, 102, 0, 0.12), rgba(255, 255, 255, 0.6)); }
 .mila-surface--welcome .lp-signin { background: rgba(144, 102, 0, 0.06); }
 .mila-surface--welcome .lp-signin:hover { background: rgba(144, 102, 0, 0.12); border-color: rgba(144, 102, 0, 0.55); }
-.mila-surface--welcome .lp-btn--ghost { border-color: rgba(93, 46, 66, 0.22); background: rgba(255, 255, 255, 0.55); }
-.mila-surface--welcome .lp-btn--ghost:hover:not(:disabled) { border-color: rgba(93, 46, 66, 0.4); background: rgba(255, 255, 255, 0.8); }
+.mila-surface--welcome .lp-btn--ghost { border-color: rgba(93, 46, 66, 0.24); background: rgba(250, 243, 235, 0.5); }
+.mila-surface--welcome .lp-btn--ghost:hover:not(:disabled) { border-color: rgba(93, 46, 66, 0.4); background: rgba(250, 243, 235, 0.75); }
 .mila-surface--welcome .lp-step, .mila-surface--welcome .lp-door { box-shadow: 0 1px 2px rgba(63, 32, 45, 0.035), 0 10px 28px rgba(93, 46, 66, 0.065); }
 .mila-surface--welcome .lp-door:hover { border-color: rgba(168, 61, 100, 0.3); box-shadow: 0 2px 4px rgba(63, 32, 45, 0.04), 0 16px 38px rgba(93, 46, 66, 0.09); }
-.mila-surface--welcome .lp-door--lead { background: linear-gradient(160deg, rgba(224, 186, 99, 0.2), rgba(255, 255, 255, 0.62) 55%); border-color: rgba(144, 102, 0, 0.32); }
+.mila-surface--welcome .lp-door--lead { background: linear-gradient(160deg, rgba(224, 186, 99, 0.22), rgba(250, 242, 234, 0.6) 55%); border-color: rgba(144, 102, 0, 0.32); }
 .mila-surface--welcome .lp-door__start { background: rgba(144, 102, 0, 0.1); }
 .mila-surface--welcome .lp-door__icon, .mila-surface--welcome .lp-step__top i { background: rgba(144, 102, 0, 0.07); }
 .mila-surface--welcome .lp-proof, .mila-surface--welcome .lp-home { border-top-color: rgba(93, 46, 66, 0.08); border-bottom-color: rgba(93, 46, 66, 0.08); }
-.mila-surface--welcome .lp-dock { background: rgba(255, 250, 252, 0.95); border-color: rgba(144, 102, 0, 0.35); box-shadow: 0 18px 48px rgba(93, 46, 66, 0.18); }
+.mila-surface--welcome .lp-dock { background: rgba(247, 239, 231, 0.95); border-color: rgba(144, 102, 0, 0.35); box-shadow: 0 18px 48px rgba(93, 46, 66, 0.18); }
 
 .mila-surface--welcome .lp-demo { box-shadow: 0 18px 48px rgba(93, 46, 66, 0.14); }
 .mila-surface--welcome .lp-demo__badge { border-color: rgba(12, 120, 149, 0.35); color: var(--lp-voice); }
