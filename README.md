@@ -10,6 +10,106 @@ npx prisma db push
 npm run dev
 ```
 
+The primary voice assessment is self-hosted. One read-aloud phrase is scored by
+`pron-service`, and four spontaneous answers are transcribed by the offline
+faster-whisper model in `asr-service`. The browser only contacts the Mila
+origin; recordings are processed on Mila's private Docker network and deleted
+after each request. CEFR placement is derived from spontaneous language
+evidence, with pronunciation used only as a small supporting signal. This is
+the intended Russia path and still requires an acceptance test from a Russian
+mobile network without a VPN before it is called verified.
+
+The no-microphone assessment and bundled starter lessons are also provider-free.
+OpenAI Realtime remains an optional live-interview enhancement for supported
+regions. Copy `.env.local.example` to `.env.local` and set `OPENAI_API_KEY` only
+when that optional path is needed; the standard key is never exposed to the
+browser.
+
+For eligible regions, custom lesson generation uses OpenAI first and can fall
+back to OpenRouter when both `OPENROUTER_API_KEY` and an explicitly reviewed
+`OPENROUTER_ASSESSMENT_MODEL` are configured. OpenRouter cannot replace the
+direct OpenAI Realtime connection used by the optional live AI interview. Do not use a
+proxy to bypass a provider's country restrictions; confirm the selected model's
+terms for the learner's region.
+
+For the self-hosted stack, `docker compose -f docker-compose.prod.yml build`
+bakes the multilingual faster-whisper `small` ASR model into the image. Assessment
+requests force English, while Darshan can auto-detect English or Russian. Runtime
+transcription makes no request to OpenAI, Hugging Face, or OpenRouter. The pronunciation ONNX file is
+intentionally not committed; place `pron-service/model.onnx` as described in
+[`pron-service/README.md`](pron-service/README.md) before building production.
+
+## Self-hosted companion model
+
+Mila can use an already-trained [Qwen3](https://github.com/QwenLM/Qwen3) model
+through Ollama; no fine-tuning or training job is required. The default is
+`qwen3:4b-instruct-2507-q4_K_M`, a compact multilingual instruction model. Its
+weights are downloaded once, stored in the `mila_llm` Docker volume, and kept
+out of Git and application images.
+
+The same companion endpoint, prompt, learner context, conversation history, and
+explicit memories power full text Chat, the floating guide, and Darshan. Darshan
+adds local speech recognition before the chat request and browser speech output
+after it; it does not use a second conversational personality. OpenAI Realtime
+remains an optional supported-region enhancement, not a dependency of the local
+voice conversation.
+
+For native development, install Ollama and run:
+
+```bash
+ollama pull qwen3:4b-instruct-2507-q4_K_M
+ollama serve
+```
+
+Then copy `.env.local.example` to `.env.local`; its
+`LOCAL_LLM_URL=http://127.0.0.1:11434` value is correct when Next.js and Ollama
+both run on the host. For the Docker stack, Ollama is available only to Mila on
+the private Docker network and is intentionally not published on a host port:
+
+```bash
+docker compose up -d mila-llm
+docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm \
+  ollama pull qwen3:4b-instruct-2507-q4_K_M
+docker compose up -d
+```
+
+The 4B quantization needs materially more memory than its 2.5 GB weights alone;
+use a host with at least 8 GB RAM for the full stack. On a smaller host, set
+`LOCAL_LLM_MODEL=qwen3:1.7b-q4_K_M` in `.env`, pull that exact tag instead, and
+restart the app. The 1.7B model reduces memory and latency at the cost of weaker
+reasoning and less consistent teaching. `OLLAMA_CONTEXT_LENGTH` defaults to
+8192, `OLLAMA_NUM_PARALLEL` to one, and only one model is kept loaded to keep
+CPU deployment predictable.
+
+`gpt-oss:20b` is also supported without training. When selected, Mila injects
+`reasoning_effort=low` so the model does not exhaust a short conversational
+response budget on hidden reasoning. It needs substantially more memory and is
+best treated as a slower, deliberate-answer option on a CPU-only host rather
+than as the default live-voice model. Set `LOCAL_LLM_MODEL=gpt-oss:20b`, pull
+that exact tag, and keep `LOCAL_LLM_REASONING_EFFORT=low` unless latency is not
+interactive.
+
+The production deployment pulls and runs a short smoke prompt against the
+configured model before restarting Mila, then verifies app-to-Ollama
+connectivity. Chat prompts stay inside the private runtime network; the initial
+model download still
+requires outbound access to Ollama's registry. Russian-network availability of
+the Mila web origin must still be acceptance-tested from Russia without a VPN.
+
+External chat fallback is opt-in. It remains disabled unless
+`ALLOW_EXTERNAL_CHAT_FALLBACK=true` is set. The fallback cascade tries
+OpenRouter only when its key and an explicitly reviewed
+`OPENROUTER_CHAT_MODEL` are both present, then tries OpenAI when its key is
+present. Leave the flag `false` for the self-hosted, provider-independent path;
+never use the fallback to bypass a provider's regional terms.
+
+## Telegram translator
+
+The Russian↔English Telegram translator lives at `/api/telegram/webhook` and is
+operationally separate from the PuranGPT announcement bot. See
+[`docs/TELEGRAM_TRANSLATOR.md`](docs/TELEGRAM_TRANSLATOR.md) for BotFather,
+environment, webhook, privacy, and quality-benchmark setup.
+
 ## Architecture
 
 - **Stack:** nextjs

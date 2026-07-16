@@ -469,7 +469,7 @@ export function MilaBindu({
             <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
           </radialGradient>
           <radialGradient id={core}>
-            <stop offset="0%" stopColor="#0d1017" />
+            <stop offset="0%" stopColor="#000000" />
             <stop offset="40%" stopColor="#f472b6" />
             <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
           </radialGradient>
@@ -486,7 +486,7 @@ export function MilaBindu({
           <circle cx="160" cy="160" r="90" fill="none" stroke="#db2777" strokeWidth={1} opacity="0.4" />
           <circle cx="160" cy="160" r="58" fill="none" stroke="#7e92b8" strokeWidth={0.8} opacity="0.32" />
           <circle cx="160" cy="160" r="46" fill={`url(#${core})`} opacity="0.7" />
-          <circle cx="160" cy="160" r="13" fill="#0d1017" />
+          <circle cx="160" cy="160" r="13" fill="#000000" />
         </g>
       </svg>
     );

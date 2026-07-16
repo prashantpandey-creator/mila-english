@@ -10,7 +10,7 @@ export default function StreakBadge({ days, lang }: { days: number; lang: 'ru'|'
       <div style={{fontSize:'2.5rem'}}>🔥</div>
       <div>
         <div style={{fontWeight:800,fontSize:'1.3rem',color:'white'}}>{days} {lang==='ru'?'дней подряд':'day streak'}</div>
-        <div style={{fontSize:'0.85rem',color:'rgba(13,16,23,0.72)'}}>
+        <div style={{fontSize:'0.85rem',color:'rgba(0,0,0,0.84)'}}>
           {lang==='ru'?'Не останавливайся!':"Don't break the chain!"}
         </div>
       </div>

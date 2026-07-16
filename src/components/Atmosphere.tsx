@@ -41,8 +41,9 @@ const ROUTE_POOLS: Record<string, string[]> = {
   learn:  ['/ambience/cathedral-light.mp4', '/ambience/cathedral-columns.mp4', '/ambience/woman-reading.mp4'],
   // the talk/practice rooms — beautiful women: golden field, silk, coffee, flowers
   social: ['/ambience/woman-golden.mp4', '/ambience/woman-silk.mp4', '/ambience/woman-hair.mp4', '/ambience/woman-flowers.mp4', '/ambience/woman-coffee.mp4'],
-  // front door / auth — the full sweep, beauty-first
-  club:   ['/ambience/woman-golden.mp4', '/ambience/woman-silk.mp4', '/ambience/us-manhattan.mp4', '/ambience/nature-peaks.mp4', '/ambience/venice-night.mp4', '/ambience/cathedral-light.mp4'],
+  // Front door / auth — one coherent learning scene. A single light clip avoids
+  // downloading a rotating gallery on mobile and keeps the brand story focused.
+  club:   ['/ambience/woman-reading.mp4'],
 };
 
 function routePool(path: string): string[] {
@@ -61,10 +62,30 @@ const stillOf = (clip: string) => clip.replace('/ambience/', '/ambience/stills/'
 export default function Atmosphere() {
   const pathname = usePathname() || '/';
   const { country, topic } = useScene();
+  const [allowMotion, setAllowMotion] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const connection = (navigator as Navigator & {
+      connection?: {
+        saveData?: boolean;
+        addEventListener?: (type: string, callback: () => void) => void;
+        removeEventListener?: (type: string, callback: () => void) => void;
+      };
+    }).connection;
+    const sync = () => setAllowMotion(!query.matches && !connection?.saveData);
+    sync();
+    query.addEventListener?.('change', sync);
+    connection?.addEventListener?.('change', sync);
+    return () => {
+      query.removeEventListener?.('change', sync);
+      connection?.removeEventListener?.('change', sync);
+    };
+  }, []);
 
   // Motion ONLY on the front door ('/'). Everywhere else: stills — video is
   // distracting once you're working; a still holds the mood without pulling the eye.
-  const motion = pathname === '/';
+  const motion = pathname === '/' && allowMotion;
 
   // Resolve the active pool, most specific signal wins. A key string lets us
   // reset the rotation whenever the resolved scene changes (tap a new flag →
@@ -79,18 +100,22 @@ export default function Atmosphere() {
   const [on, setOn] = useState(false);
   const [dead, setDead] = useState(false);
   const vidRef = useRef<HTMLVideoElement>(null);
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // New scene → restart rotation from the top of its pool.
-  useEffect(() => { setIdx(0); setOn(false); }, [sceneKey]);
+  useEffect(() => { setIdx(0); setOn(false); setDead(false); }, [sceneKey]);
 
   // Gentle rotation through the pool (both stills and the front-door video).
   useEffect(() => {
     if (dead || clips.length < 2) return;
     const t = setTimeout(() => {
       setOn(false);
-      setTimeout(() => setIdx(i => (i + 1) % clips.length), 2800);
+      fadeTimerRef.current = setTimeout(() => setIdx(i => (i + 1) % clips.length), 2800);
     }, HOLD_MS);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+    };
   }, [idx, dead, clips.length]);
 
   // Front-door video playback (only when motion is on).
@@ -100,19 +125,24 @@ export default function Atmosphere() {
     if (!v || dead) return;
     v.muted = true;
     v.load();
-    const play = v.play();
-    if (play) play.catch(() => {});
-    const alive = setInterval(() => {
-      const cur = vidRef.current;
-      if (cur && cur.paused) { cur.muted = true; cur.play().catch(() => {}); }
-    }, 3000);
-    return () => clearInterval(alive);
+    const syncPlayback = () => {
+      const current = vidRef.current;
+      if (!current) return;
+      if (document.hidden) current.pause();
+      else current.play().catch(() => {});
+    };
+    syncPlayback();
+    document.addEventListener('visibilitychange', syncPlayback);
+    return () => {
+      document.removeEventListener('visibilitychange', syncPlayback);
+      v.pause();
+    };
   }, [idx, dead, sceneKey, motion]);
 
   if (dead) return <div className="atmosphere" aria-hidden />;
 
   return (
-    <div className='atmosphere' aria-hidden>
+    <div className={`atmosphere ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
       {motion ? (
         <video
           ref={vidRef}
@@ -121,8 +151,9 @@ export default function Atmosphere() {
           muted
           loop
           playsInline
-          preload="auto"
-          onCanPlay={(e) => { setOn(true); const v = e.currentTarget; v.muted = true; v.play().catch(() => {}); }}
+          preload="metadata"
+          poster={stillOf(clips[idx])}
+          onCanPlay={(e) => { setOn(true); const v = e.currentTarget; v.muted = true; if (!document.hidden) v.play().catch(() => {}); }}
           onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
           src={clips[idx]}
         />

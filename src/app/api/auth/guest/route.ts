@@ -1,32 +1,24 @@
 import { NextResponse } from 'next/server';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, createSession } from '@/lib/auth';
 
 export async function POST() {
   try {
-    const email = 'guest@purangpt.com';
-    let user = await prisma.user.findUnique({
-      where: { email }
+    // Each browser gets an isolated guest learner. Sharing a single database row
+    // leaked progress and assessment state between unrelated pilot students.
+    const guestId = randomUUID();
+    const user = await prisma.user.create({
+      data: {
+        email: `guest-${guestId}@mila.local`,
+        name: 'Гость / Guest',
+        password: hashPassword(randomBytes(32).toString('hex')),
+        learnerCategory: 'pending',
+        nativeLanguage: 'Русский',
+        level: 'pending',
+        joinDate: new Date(),
+      }
     });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email,
-          name: 'Гость / Guest',
-          password: hashPassword('guest-password-123-xyz'),
-          learnerCategory: 'pending',
-          nativeLanguage: 'Русский',
-          level: 'pending',
-          joinDate: new Date(),
-        }
-      });
-    } else {
-      user = await prisma.user.update({
-        where: { email },
-        data: { level: 'pending', learnerCategory: 'pending', learnerProfile: null }
-      });
-    }
 
     // Set the session token cookie
     await createSession({ sub: user.id.toString(), email: user.email });

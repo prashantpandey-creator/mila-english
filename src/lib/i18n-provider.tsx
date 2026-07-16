@@ -19,12 +19,15 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<Lang>('ru');
 
   useEffect(() => {
-    setLang(getLangFromStorage());
+    const storedLang = getLangFromStorage();
+    setLang(storedLang);
+    document.documentElement.lang = storedLang;
   }, []);
 
   const switchLang = (l: Lang) => {
     setLang(l);
     setLangStorage(l);
+    document.documentElement.lang = l;
   };
 
   return (

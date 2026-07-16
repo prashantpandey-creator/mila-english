@@ -83,9 +83,17 @@ export default function ListenPage() {
 
   const settle = (r: any) => { setResult(r); setPhase('scored'); setSession(null); recordMiss(phrase, r); };
   const fail = (e: any) => {
-    setErrMsg(e?.message === 'unsupported'
-      ? (lang==='ru' ? 'Микрофон не поддерживается — открой в Chrome.' : 'Speech input needs Chrome — open there to practice.')
-      : (lang==='ru' ? 'Не расслышала. Попробуй ещё раз.' : "Didn't catch that. Try again."));
+    const message = e?.message;
+    const permissionDenied = e?.name === 'NotAllowedError' || message === 'permission-denied';
+    setErrMsg(message === 'unsupported'
+      ? (lang==='ru' ? 'Этот браузер не поддерживает запись. Открой Mila в Chrome или Safari.' : 'This browser cannot record audio. Open Mila in Chrome or Safari.')
+      : permissionDenied
+      ? (lang==='ru' ? 'Нужен доступ к микрофону. Разреши его в настройках браузера — речь пока не оценивалась.' : 'Microphone permission is needed. Allow it in browser settings — your speech was not graded.')
+      : message === 'no-speech'
+      ? (lang==='ru' ? 'Микрофон не уловил речь — это не оценка произношения. Нажми и начни говорить сразу.' : 'The mic did not capture speech — your pronunciation was not graded. Tap and speak right away.')
+      : message === 'score-failed' || message === 'score-empty'
+      ? (lang==='ru' ? 'Сервис оценки временно недоступен — запись не оценивалась. Попробуй ещё раз.' : 'Scoring is temporarily unavailable — your recording was not graded. Please try again.')
+      : (lang==='ru' ? 'Техническая ошибка микрофона — это не оценка твоей речи. Попробуй снова.' : 'There was a microphone issue — this is not a judgment of your speech. Please try again.'));
     setPhase('error'); setSession(null);
   };
 
@@ -134,7 +142,7 @@ export default function ListenPage() {
 
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+      <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
@@ -205,7 +213,7 @@ export default function ListenPage() {
               {ring(result.score)}
               <div style={{flex:1}}>
                 <div style={{fontSize:'0.9rem',fontWeight:700,color:C.dark,marginBottom:6}}>
-                  {result.score>=80?(lang==='ru'?'Почти как носитель':'Nearly native'):result.score>=55?(lang==='ru'?'Хорошо, шлифуем':'Good — polish it'):(lang==='ru'?'Ещё разок':'One more pass')}
+                  {result.score>=80?(lang==='ru'?'Ясно и уверенно':'Clear and confident'):result.score>=55?(lang==='ru'?'Хорошая работа — одна небольшая доработка':'Good work — one small adjustment'):(lang==='ru'?'Полезная отправная точка — попробуй подсказку':'A useful starting point — try the tip')}
                 </div>
                 <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
                   {result.words.map((w:any,i:number)=>(

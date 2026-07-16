@@ -12,9 +12,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
-  // Record word review result, update spaced repetition interval and next review date
+  const userId = Number(user.sub)
+  const wordId = Number(request.nextUrl.pathname.split('/').at(-2))
+  const body = await request.json().catch(() => null)
+  if (!Number.isSafeInteger(wordId) || wordId <= 0 || typeof body?.remembered !== 'boolean') {
+    return NextResponse.json({ error: 'invalid review' }, { status: 400 })
+  }
+  const word = await prisma.word.findUnique({ where: { id: wordId }, select: { id: true } })
+  if (!word) return NextResponse.json({ error: 'word not found' }, { status: 404 })
 
-  const item = await prisma.word.create({ data: body })
-  return NextResponse.json(item, { status: 201 })
+  const existing = await prisma.wordReview.findUnique({ where: { userId_wordId: { userId, wordId } } })
+  const repetitionCount = body.remembered ? Math.min((existing?.repetitionCount ?? 0) + 1, 6) : 0
+  const intervals = [1, 2, 4, 7, 15, 30, 60]
+  const nextReviewDate = new Date(Date.now() + intervals[repetitionCount] * 86400000)
+  const review = await prisma.wordReview.upsert({
+    where: { userId_wordId: { userId, wordId } },
+    create: { userId, wordId, repetitionCount, lastReviewedAt: new Date(), nextReviewDate },
+    update: { repetitionCount, lastReviewedAt: new Date(), nextReviewDate },
+  })
+  return NextResponse.json(review)
 }

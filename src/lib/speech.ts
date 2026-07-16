@@ -35,7 +35,7 @@ export type Verdict = 'good' | 'close' | 'miss';
 export type Phoneme = { ph: string; acc: number; verdict: Verdict };
 export type WordScore = { word: string; score?: number; verdict: Verdict; phonemes?: Phoneme[] };
 export type Assessment = { score: number; words: WordScore[]; tip: string };
-export type Session = { stop: () => Promise<Assessment> };
+export type Session = { stop: () => Promise<Assessment>; cancel: () => void };
 
 // ── speak() — browser TTS (fallback voice for not-yet-baked accents) ──────────
 export function speak(text: string, accent: Accent): Promise<void> {
@@ -97,6 +97,7 @@ export async function startListening(
   let chunkCount = 0; // count of non-empty chunks received
 
   let finalized = false;
+  let cancelled = false;
   let resolveResult!: (a: Assessment) => void;
   let rejectResult!: (e: Error) => void;
   const resultP = new Promise<Assessment>((res, rej) => { resolveResult = res; rejectResult = rej; });
@@ -111,6 +112,7 @@ export async function startListening(
     (async () => {
       try {
         await recStopped;
+        if (cancelled) return;
         // Guard: if no voice was detected, skip network round-trip
         if (!spoke || chunks.length === 0) {
           rejectResult(new Error('no-speech'));
@@ -138,5 +140,18 @@ export async function startListening(
   };
   raf = requestAnimationFrame(tick);
 
-  return { stop: () => finalize() };
+  return {
+    stop: () => finalize(),
+    cancel: () => {
+      if (finalized) return;
+      cancelled = true;
+      finalized = true;
+      cancelAnimationFrame(raf);
+      try { if (rec.state !== 'inactive') rec.stop(); } catch { /* no-op */ }
+      stream.getTracks().forEach((track) => track.stop());
+      actx.close().catch(() => {});
+      resultP.catch(() => {});
+      rejectResult(new Error('cancelled'));
+    },
+  };
 }

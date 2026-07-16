@@ -31,7 +31,7 @@ function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => voi
         { icon: '🔊', en: 'Tap Listen to hear the phrase', ru: 'Нажми «Послушать», чтобы услышать фразу' },
         { icon: '🎙️', en: 'Tap the mic and say it clearly', ru: 'Нажми микрофон и произнеси чётко' },
         { icon: '📊', en: 'Get an instant phoneme score', ru: 'Получи оценку за каждый звук' },
-        { icon: '✅', en: 'Score 55+ to pass and move on', ru: 'Набери 55+ очков, чтобы перейти дальше' },
+        { icon: '🌱', en: 'Use the feedback, then continue when ready', ru: 'Используй подсказку и продолжай, когда готова' },
       ].map(s => (
         <div key={s.en} style={{display:'flex',alignItems:'center',gap:12,width:'100%',maxWidth:340,
           background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:14,padding:'12px 16px',marginBottom:8,boxShadow:'0 1px 8px rgba(0,0,0,0.45)',textAlign:'left'}}>
@@ -58,7 +58,7 @@ function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => voi
 
 export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
   phrases: { en: string; ru: string }[]; lang: 'ru'|'en';
-  onSpeak: (t: string) => void; onComplete: () => void;
+  onSpeak: (t: string) => void; onComplete: (score: number) => void;
 }) {
   const [showGate, setShowGate] = useState(true);  // onboarding gate
   const [pos, setPos] = useState(0);
@@ -67,6 +67,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
   const [errMsg, setErrMsg] = useState('');
   const [session, setSession] = useState<any>(null);
   const [attempts, setAttempts] = useState(0);
+  const [scores, setScores] = useState<number[]>([]);
 
   const phrase = phrases[pos] || phrases[0];
 
@@ -94,6 +95,11 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
   };
 
   const settle = (r: any) => {
+    setScores(previous => {
+      const nextScores = [...previous];
+      nextScores[pos] = Number(r?.score) || 0;
+      return nextScores;
+    });
     setResult(r);
     setPhase('scored');
     setSession(null);
@@ -107,10 +113,10 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
       msg === 'unsupported'
         ? (lang === 'ru' ? 'Микрофон не поддерживается — открой в Chrome.' : 'Speech input needs Chrome — open there to practice.')
         : msg === 'no-speech'
-        ? (lang === 'ru' ? 'Ничего не слышу 🤫 Нажми 🎙️ и говори сразу после нажатия.' : "Nothing detected 🤫 Tap 🎙️ and speak right away, clearly into your mic.")
+        ? (lang === 'ru' ? 'Микрофон не уловил речь — это не оценка произношения. Нажми 🎙️ и начни говорить сразу.' : 'The mic did not capture speech — your pronunciation was not graded. Tap 🎙️ and speak right away.')
         : msg === 'score-failed' || msg === 'score-empty'
-        ? (lang === 'ru' ? 'Сервер оценки недоступен. Попробуй снова.' : 'Scoring server unavailable. Please try again.')
-        : (lang === 'ru' ? 'Не расслышала. Попробуй ещё раз.' : "Didn't catch that — try again.")
+        ? (lang === 'ru' ? 'Сервис оценки временно недоступен — запись не оценивалась. Попробуй снова.' : 'Scoring is temporarily unavailable — your recording was not graded. Please try again.')
+        : (lang === 'ru' ? 'Техническая ошибка микрофона — это не оценка твоей речи. Попробуй снова.' : 'There was a microphone issue — this is not a judgment of your speech. Please try again.')
     );
     setPhase('error');
     setSession(null);
@@ -145,7 +151,10 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
 
   const next = () => {
     if (pos >= phrases.length - 1) {
-      onComplete();
+      const finalScores = [...scores];
+      if (result?.score != null) finalScores[pos] = Number(result.score);
+      const average = finalScores.length ? Math.round(finalScores.reduce((sum, score) => sum + score, 0) / finalScores.length) : 0;
+      onComplete(average);
     } else {
       setPos(pos + 1);
       setResult(null);
@@ -156,7 +165,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
   };
 
   const micBusy = phase === 'scoring' || (phase === 'recording' && !session);
-  const isPassed = result && result.score >= 55;
+  const hasResult = Boolean(result);
 
   const ring = (score: number) => {
     const r = 24, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
@@ -215,10 +224,10 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
             <div style={{flex:1}}>
               <div style={{fontSize:'0.9rem',fontWeight:700,color:C.dark,marginBottom:6}}>
                 {result.score >= 80
-                  ? (lang==='ru' ? '🌟 Почти как носитель!' : '🌟 Nearly native!')
-                  : isPassed
-                  ? (lang==='ru' ? '✅ Хорошо! Проходной балл!' : '✅ Good — passing score!')
-                  : (lang==='ru' ? '⚠️ Чуть-чуть не хватает. Попробуй ещё раз.' : '⚠️ Close, but not quite. Try again!')}
+                  ? (lang==='ru' ? '🌟 Ясно и уверенно!' : '🌟 Clear and confident!')
+                  : result.score >= 55
+                  ? (lang==='ru' ? '✨ Хорошая работа — осталась небольшая доработка.' : '✨ Good work — one small adjustment.')
+                  : (lang==='ru' ? '🌱 Полезная отправная точка — попробуй подсказку или продолжай.' : '🌱 A useful starting point — try the tip or continue.')}
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
                 {result.words.map((w:any,i:number) => (
@@ -261,7 +270,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
 
       {/* ── Mic / Action Bar ───────────────────────────────────────────────── */}
       <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
-        {!isPassed && (
+        {!hasResult && (
           <>
             <button onClick={onMic} disabled={micBusy}
               style={{width:72,height:72,borderRadius:'50%',border:'none',
@@ -287,15 +296,17 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
           </>
         )}
 
-        {isPassed && (
-          <button onClick={next}
-            style={{width:'100%',padding:'16px',borderRadius:16,border:'none',
-              background:`linear-gradient(135deg,${C.sage},#8fce84)`,color:'white',fontWeight:800,fontSize:'1.05rem',
-              cursor:'pointer',boxShadow:'0 6px 18px rgba(91,140,90,0.3)'}}>
-            {pos >= phrases.length - 1
-              ? (lang==='ru' ? '✅ Завершить урок' : '✅ Complete lesson')
-              : (lang==='ru' ? 'Следующая фраза →' : 'Next phrase →')}
-          </button>
+        {hasResult && (
+          <div style={{display:'flex',gap:10,width:'100%'}}>
+            <button onClick={onMic} disabled={micBusy}
+              style={{flex:1,padding:'14px',borderRadius:16,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',color:C.warm,fontWeight:700,cursor:'pointer'}}>
+              🎙️ {lang==='ru' ? 'Ещё раз' : 'Try again'}
+            </button>
+            <button onClick={next}
+              style={{flex:2,padding:'16px',borderRadius:16,border:'none',background:`linear-gradient(135deg,${C.sage},#8fce84)`,color:'white',fontWeight:800,fontSize:'1.05rem',cursor:'pointer',boxShadow:'0 6px 18px rgba(91,140,90,0.3)'}}>
+              {pos >= phrases.length - 1 ? (lang==='ru' ? 'Завершить урок' : 'Complete lesson') : (lang==='ru' ? 'Продолжить →' : 'Continue →')}
+            </button>
+          </div>
         )}
       </div>
     </div>

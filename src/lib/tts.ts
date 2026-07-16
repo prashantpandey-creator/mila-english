@@ -44,16 +44,20 @@ export async function ttsSpeak(text: string, lang = 'en-US', rate = 0.85): Promi
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
     u.rate = rate;
-    // Try to find a female voice first
-    let best = voices.find(v => v.lang === lang && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('zira')));
-    if (!best) {
-      best = voices.find(v => v.lang?.toLowerCase().startsWith(lang.slice(0, 5)) && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('zira')));
-    }
-    if (!best) {
-      best = voices.find((v) => v.lang === lang) ||
-             voices.find((v) => v.lang?.toLowerCase().startsWith(lang.slice(0, 5))) ||
-             voices.find((v) => v.lang?.toLowerCase().startsWith('en'));
-    }
+    const chooseVoice = (pool: SpeechSynthesisVoice[]) => {
+      const isPreferred = (voice: SpeechSynthesisVoice) => {
+        const name = voice.name.toLowerCase();
+        return name.includes('female') || name.includes('samantha') || name.includes('zira');
+      };
+      return pool.find((voice) => voice.lang === lang && isPreferred(voice))
+        || pool.find((voice) => voice.lang?.toLowerCase().startsWith(lang.slice(0, 5).toLowerCase()) && isPreferred(voice))
+        || pool.find((voice) => voice.lang === lang)
+        || pool.find((voice) => voice.lang?.toLowerCase().startsWith(lang.slice(0, 5).toLowerCase()))
+        || pool.find((voice) => voice.lang?.toLowerCase().startsWith('en'));
+    };
+    // Installed voices are the provider-independent path. Only fall back to a
+    // browser-managed voice when the device has no suitable local voice.
+    const best = chooseVoice(voices.filter((voice) => voice.localService)) || chooseVoice(voices);
     if (best) u.voice = best;
     // Chrome bug: synthesis stalls if tab is in background; this nudges it
     const safetyTimer = setTimeout(() => { resolve(); }, 8000);

@@ -9,19 +9,78 @@ jobs:
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         with:
           host: 209.182.233.163
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
+          envs: OPENAI_API_KEY,OPENROUTER_API_KEY
+          command_timeout: 30m
           script: |
             set -e
             cd /root/mila 2>/dev/null || git clone https://github.com/prashantpandey-creator/mila-english.git /root/mila
             cd /root/mila && git fetch --all && git reset --hard origin/main
-            # .env (JWT_SECRET, OPENAI_API_KEY) and pron-service/model.onnx live on
-            # the box and are not in git — the reset above never touches them.
+            # Keep secrets out of Git while ensuring repository secrets refresh
+            # the server-side environment on every deploy.
+            touch .env
+            upsert_secret() {
+              key="$1"
+              value="$2"
+              [ -n "$value" ] || return 0
+              temp_file="$(mktemp)"
+              awk -F= -v key="$key" '$1 != key { print }' .env > "$temp_file"
+              printf '%s=%s\n' "$key" "$value" >> "$temp_file"
+              chmod 600 "$temp_file"
+              mv "$temp_file" .env
+            }
+            upsert_secret OPENAI_API_KEY "$OPENAI_API_KEY"
+            upsert_secret OPENROUTER_API_KEY "$OPENROUTER_API_KEY"
             test -f pron-service/model.onnx || { echo "model.onnx missing — see pron-service/README.md"; exit 1; }
             docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d mila-llm
+            for attempt in $(seq 1 60); do
+              if docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama list >/dev/null 2>&1; then
+                break
+              fi
+              if [ "$attempt" -eq 60 ]; then
+                docker logs --tail 100 mila-llm
+                exit 1
+              fi
+              sleep 2
+            done
+            local_llm_model="$(awk -F= '$1 == "LOCAL_LLM_MODEL" { sub(/^[^=]*=/, ""); print }' .env | tail -n 1 | tr -d '\r\"' | tr -d "'")"
+            local_llm_model="${local_llm_model:-qwen3:4b-instruct-2507-q4_K_M}"
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama pull "$local_llm_model"
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama show "$local_llm_model" >/dev/null
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama run "$local_llm_model" "Reply with OK only." >/dev/null
             docker compose -f docker-compose.prod.yml up -d
-            sleep 5
+            wait_for_health() {
+              container="$1"
+              port="$2"
+              for attempt in $(seq 1 30); do
+                if docker exec "$container" python -c "import urllib.request; urllib.request.urlopen('http://localhost:$port/health', timeout=3)"; then
+                  return 0
+                fi
+                sleep 2
+              done
+              docker logs --tail 100 "$container"
+              return 1
+            }
+            wait_for_health mila-pron 8000
+            wait_for_health mila-asr 8001
+            docker exec mila node -e "Promise.all([fetch('http://mila-pron:8000/health'),fetch('http://mila-asr:8001/health')]).then(rs=>{console.log('local speech services',rs.map(r=>r.status));process.exit(rs.every(r=>r.ok)?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
+            docker exec mila node -e "fetch('http://mila-llm:11434/api/tags').then(async r=>{if(!r.ok)throw new Error('Ollama status '+r.status);const d=await r.json();const wanted=process.env.LOCAL_LLM_MODEL||'qwen3:4b-instruct-2507-q4_K_M';const names=(d.models||[]).map(m=>m.name);console.log('local companion model',wanted,names.includes(wanted)?'ready':'missing');process.exit(names.includes(wanted)?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
+            if docker exec mila sh -lc 'test -n "$OPENAI_API_KEY"'; then
+              docker exec mila node -e "fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+process.env.OPENAI_API_KEY}}).then(r=>console.log('Optional OpenAI credential status',r.status)).catch(e=>console.warn(e.message))" || true
+            else
+              echo "OpenAI voice enhancement not configured; provider-free assessment remains available"
+            fi
+            if docker exec mila sh -lc 'test -n "$OPENROUTER_API_KEY"'; then
+              docker exec mila node -e "fetch('https://openrouter.ai/api/v1/key',{headers:{Authorization:'Bearer '+process.env.OPENROUTER_API_KEY}}).then(r=>console.log('Optional OpenRouter credential status',r.status)).catch(e=>console.warn(e.message))" || true
+            else
+              echo "OpenRouter enhancement not configured; provider-free assessment remains available"
+            fi
             docker exec mila node -e "require('http').get('http://localhost:3000/',r=>{console.log('status',r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"
             echo "✅ Mila deployed — routed via Caddy at mila.purangpt.com"

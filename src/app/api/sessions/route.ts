@@ -12,9 +12,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
-  // Start a new study session, calculate current streak
-
-  const item = await prisma.studySession.create({ data: body })
+  const body = await request.json().catch(() => ({}))
+  const userId = Number(user.sub)
+  const current = await prisma.studySession.findFirst({ where: { userId, endTime: null }, orderBy: { startTime: 'desc' } })
+  if (current) return NextResponse.json(current)
+  const focusArea = typeof body?.focusArea === 'string' ? body.focusArea.slice(0, 80) : null
+  const item = await prisma.studySession.create({ data: { userId, startTime: new Date(), focusArea } })
   return NextResponse.json(item, { status: 201 })
 }

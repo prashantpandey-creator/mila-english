@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import LessonContent from '@/components/LessonContent';
@@ -10,6 +10,7 @@ import VisualAidViewer from '@/components/VisualAidViewer';
 import { ttsSpeak } from '@/lib/tts';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
+import { getBuiltinLesson } from '@/lib/builtinLessons';
 
 // Interactive player for a DB (AI-generated) lesson: content → quiz → recorded result.
 function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
@@ -137,26 +138,18 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
   );
 }
 
-const LESSONS = {
-  '1':{cat:'🗣️',title:'Знакомство',titleEn:'Introductions',words:['Hello','My name is...','Nice to meet you','Where are you from?','I am from Russia'],
-    phrases:[{en:'Hello, how are you?',ru:'Привет, как дела?'},{en:'My name is Anna',ru:'Меня зовут Анна'},
-      {en:'Nice to meet you!',ru:'Приятно познакомиться!'},{en:'I am from Moscow',ru:'Я из Москвы'}]},
-  '2':{cat:'☕',title:'В кафе',titleEn:'At a Café',words:['I would like...','A coffee please','How much is it?','The menu please','Thank you'],
-    phrases:[{en:'I would like a coffee, please',ru:'Я бы хотела кофе, пожалуйста'},
-      {en:'How much is it?',ru:'Сколько это стоит?'},{en:'Can I see the menu?',ru:'Можно меню?'}]},
-};
-
 export default function LessonPage() {
   const { t, lang } = useI18n();
   const router = useRouter();
   const params = useParams();
-  const staticLesson = LESSONS[params?.id as string];
-  const lesson = staticLesson || LESSONS['1'];
+  const staticLesson = getBuiltinLesson(params?.id as string);
+  const lesson = staticLesson ? { ...staticLesson, cat: staticLesson.icon, title: staticLesson.titleRu } : null;
   const [currentWord, setCurrentWord] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
   const [step, setStep] = useState<'words'|'phrases'|'practice'>('words');
   const [dbLesson, setDbLesson] = useState<any>(null);
   const [dbError, setDbError] = useState(false);
+  const startedAt = useRef(Date.now());
 
   // Lessons not in the built-in set are AI-generated ones living in the DB,
   // routed as /lessons/ai-<dbId> so they never collide with static ids 1..8.
@@ -178,7 +171,7 @@ export default function LessonPage() {
   if (!staticLesson) {
     return (
       <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-        <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+        <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',
           borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
           <span onClick={()=>router.push('/lessons')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>← Mila</span>
           <LangToggle />
@@ -205,7 +198,7 @@ export default function LessonPage() {
 
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+      <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/lessons')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>← Mila</span>
         <LangToggle />
@@ -266,7 +259,12 @@ export default function LessonPage() {
             phrases={lesson.phrases}
             lang={lang}
             onSpeak={speak}
-            onComplete={()=>router.push('/lessons')}
+            onComplete={(score)=>{
+              fetch('/api/progress', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ builtinId: staticLesson.id, score, completed: true, timeSpentSeconds: Math.round((Date.now() - startedAt.current) / 1000) }),
+              }).finally(()=>router.push('/lessons'));
+            }}
           />
         )}
       </div>

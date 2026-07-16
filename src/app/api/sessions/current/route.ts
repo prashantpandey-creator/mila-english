@@ -6,16 +6,53 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticate } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
+export async function GET(request: NextRequest) {
+  const user = await authenticate(request)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const item = await prisma.studySession.findFirst({
+    where: { userId: Number(user.sub), endTime: null },
+    orderBy: { startTime: 'desc' },
+  })
+  return item ? NextResponse.json(item) : NextResponse.json({ error: 'No active session' }, { status: 404 })
+}
+
 export async function PUT(request: NextRequest) {
   const user = await authenticate(request)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
-  // End current session, update stats and streak
+  const body = await request.json().catch(() => ({}))
+  const userId = Number(user.sub)
+  const current = await prisma.studySession.findFirst({ where: { userId, endTime: null }, orderBy: { startTime: 'desc' } })
+  if (!current) return NextResponse.json({ error: 'No active session' }, { status: 404 })
 
-  const id = Number(request.nextUrl.pathname.split('/').pop() || '0')
-  const item = await prisma.studySession.update({ where: { id: Number(id) }, data: body })
+  const previous = await prisma.studySession.findFirst({
+    where: { userId, endTime: { not: null }, id: { not: current.id } },
+    orderBy: { endTime: 'desc' },
+  })
+  const today = new Date(); today.setUTCHours(0, 0, 0, 0)
+  const yesterday = new Date(today.getTime() - 86400000)
+  const previousDay = previous?.endTime ? new Date(previous.endTime) : null
+  previousDay?.setUTCHours(0, 0, 0, 0)
+  const profile = await prisma.user.findUnique({ where: { id: userId }, select: { streakDays: true } })
+  const streakDays = previousDay?.getTime() === today.getTime()
+    ? (profile?.streakDays ?? 1)
+    : previousDay?.getTime() === yesterday.getTime() ? (profile?.streakDays ?? 0) + 1 : 1
+
+  const safeCount = (value: unknown) => Number.isSafeInteger(Number(value)) ? Math.max(0, Math.min(Number(value), 1000)) : null
+  const item = await prisma.$transaction(async (tx) => {
+    const session = await tx.studySession.update({
+      where: { id: current.id },
+      data: {
+        endTime: new Date(), streakDay: streakDays,
+        lessonsCompleted: safeCount(body?.lessonsCompleted),
+        wordsReviewed: safeCount(body?.wordsReviewed),
+        focusArea: typeof body?.focusArea === 'string' ? body.focusArea.slice(0, 80) : current.focusArea,
+      },
+    })
+    await tx.user.update({ where: { id: userId }, data: { streakDays } })
+    return session
+  })
   return NextResponse.json(item)
 }

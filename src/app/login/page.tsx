@@ -43,7 +43,7 @@ export default function LoginPage() {
 
   return (
     <div style={{minHeight:'100vh',background:'transparent'}}>
-      <nav style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'0.75rem 1.5rem',borderBottom:'1px solid rgba(212,175,55,0.18)'}}>
+      <nav style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'0.75rem 1.5rem',borderBottom:'1px solid rgba(212,175,55,0.18)'}}>
         <div style={{maxWidth:1200,margin:'0 auto',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
           <span style={{display:'flex',alignItems:'center',gap:9}}><span style={{width:30,height:30,borderRadius:'50%',border:'1px solid rgba(212,175,55,0.6)',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:"'Cormorant Garamond',serif",fontWeight:700,fontSize:'1.05rem',color:'#e8cd7a'}}>M</span><span style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:'#f2ede3'}}>Mila</span></span>
           <LangToggle />

@@ -12,8 +12,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Get user achievements and badges earned
-
-  const items = await prisma.achievement.findMany()
-  return NextResponse.json(items)
+  const userId = Number(user.sub)
+  const [profile, completedLessons, learnedWords, phonemeAttempts, perfectScores] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: { streakDays: true } }),
+    prisma.progress.count({ where: { userId, completed: true } }),
+    prisma.wordReview.count({ where: { userId, repetitionCount: { gt: 0 } } }),
+    prisma.phonemeStat.aggregate({ where: { userId }, _sum: { attempts: true } }),
+    prisma.progress.count({ where: { userId, score: 100 } }),
+  ])
+  return NextResponse.json({
+    streakDays: profile?.streakDays ?? 0,
+    badges: [
+      { id: 'first-lesson', unlocked: completedLessons >= 1 },
+      { id: 'three-day-streak', unlocked: (profile?.streakDays ?? 0) >= 3 },
+      { id: 'ten-words', unlocked: learnedWords >= 10 },
+      { id: 'voice', unlocked: (phonemeAttempts._sum.attempts ?? 0) >= 1 },
+      { id: 'five-lessons', unlocked: completedLessons >= 5 },
+      { id: 'perfect-score', unlocked: perfectScores >= 1 },
+    ],
+  })
 }

@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import WordCard from '@/components/WordCard';
@@ -11,60 +11,74 @@ import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import { ttsSpeak } from '@/lib/tts';
 
-const WORDS = [
-  {en:'hello',ru:'привет',phonetic:'/həˈloʊ/'},{en:'goodbye',ru:'пока',phonetic:'/ɡʊdˈbaɪ/'},
-  {en:'please',ru:'пожалуйста',phonetic:'/pliːz/'},{en:'thank you',ru:'спасибо',phonetic:'/θæŋk juː/'},
-  {en:'sorry',ru:'извините',phonetic:'/ˈsɒri/'},{en:'yes',ru:'да',phonetic:'/jes/'},
-  {en:'no',ru:'нет',phonetic:'/noʊ/'},{en:'maybe',ru:'может быть',phonetic:'/ˈmeɪbi/'},
-  {en:'beautiful',ru:'красивый',phonetic:'/ˈbjuːtɪfəl/'},{en:'delicious',ru:'вкусный',phonetic:'/dɪˈlɪʃəs/'},
-  {en:'important',ru:'важный',phonetic:'/ɪmˈpɔːrtənt/'},{en:'comfortable',ru:'удобный',phonetic:'/ˈkʌmftəbəl/'},
-];
-
 export default function VocabPage() {
-  const { t, lang } = useI18n(); const router = useRouter();
-  const [idx, setIdx] = useState(0); const [flipped, setFlipped] = useState(false);
-  const [known, setKnown] = useState<number[]>([]);
+  const { lang } = useI18n();
+  const router = useRouter();
+  const [words, setWords] = useState<any[]>([]);
+  const [idx, setIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const w = WORDS[idx];
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<'loading'|'ready'|'error'>('loading');
+
+  useEffect(() => {
+    fetch('/api/words').then(async response => {
+      if (!response.ok) throw new Error('load');
+      const data = await response.json();
+      setWords(Array.isArray(data) ? data : []);
+      setStatus('ready');
+    }).catch(() => setStatus('error'));
+  }, []);
+
+  const word = words[idx];
+  const known = words.filter(item => (item.review?.repetitionCount ?? 0) > 0).length;
 
   const speak = async (text: string) => {
     if (playing) return;
     setPlaying(true);
-    try {
-      await ttsSpeak(text, 'en-US', 0.7);
-    } finally {
-      setPlaying(false);
-    }
+    try { await ttsSpeak(text, 'en-US', 0.7); } finally { setPlaying(false); }
   };
 
-  const next = (knew: boolean) => {
-    if(knew) setKnown([...known, idx]);
-    if(idx < WORDS.length-1) { setIdx(idx+1); setFlipped(false); }
-    else setIdx(0);
+  const review = async (remembered: boolean) => {
+    if (!word || saving) return;
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/words/${word.id}/review`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ remembered }),
+      });
+      if (!response.ok) throw new Error('save');
+      const saved = await response.json();
+      setWords(current => current.map(item => item.id === word.id ? { ...item, review: saved } : item));
+      setIdx(current => (current + 1) % words.length);
+      setFlipped(false);
+    } catch {
+      setStatus('error');
+    } finally { setSaving(false); }
   };
 
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
+      <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark}}>← Mila</span>
         <LangToggle/>
       </div>
       <div style={{maxWidth:460,margin:'0 auto',padding:'32px 20px',textAlign:'center'}}>
-        <WordCard word={w} flipped={flipped} onFlip={()=>{setFlipped(!flipped);if(!flipped)speak(w.en);}} lang={lang}/>
-
-        <div style={{marginBottom:20}}>
-          <SpacedRepetitionTimer repetitionCount={known.includes(idx)?1:0} lang={lang}/>
-        </div>
-
-        {/* Listen button */}
-        <button onClick={()=>speak(w.en)} disabled={playing}
-          style={{padding:'12px 28px',borderRadius:14,border:'none',background:playing?C.rose:C.roseL,
-            color:playing?'white':C.rose,fontWeight:600,cursor:playing?'default':'pointer',fontSize:'1rem',marginBottom:20,
-            transition:'all 0.2s',opacity:playing?0.7:1}}>
-          🔊 {playing ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Прослушать':'Listen')}
-        </button>
-
-        <WordReviewWidget known={known.length} total={WORDS.length} lang={lang} onForgot={()=>next(false)} onKnow={()=>next(true)}/>
+        <h1 style={{color:C.dark,margin:'0 0 6px'}}>{lang==='ru' ? 'Новые слова' : 'New words'}</h1>
+        <p style={{color:C.warm,margin:'0 0 22px'}}>{lang==='ru' ? 'Повторения сохраняются для тебя' : 'Your reviews are saved to your profile'}</p>
+        {status === 'loading' && <p style={{color:C.warm}}>{lang==='ru' ? 'Загружаю слова…' : 'Loading words…'}</p>}
+        {status === 'error' && <div style={{color:C.rose,background:C.roseL,padding:14,borderRadius:12}}>{lang==='ru' ? 'Не удалось сохранить или загрузить слова. Обнови страницу.' : 'Words could not be loaded or saved. Please refresh.'}</div>}
+        {status === 'ready' && !word && <p style={{color:C.warm}}>{lang==='ru' ? 'Слова скоро появятся.' : 'Words are coming soon.'}</p>}
+        {status === 'ready' && word && <>
+          <WordCard word={{en:word.english,ru:word.translationNative,phonetic:word.phonetic}} flipped={flipped} onFlip={()=>{setFlipped(!flipped);if(!flipped)speak(word.english);}} lang={lang}/>
+          <div style={{marginBottom:20}}><SpacedRepetitionTimer repetitionCount={word.review?.repetitionCount ?? 0} lang={lang}/></div>
+          <button onClick={()=>speak(word.english)} disabled={playing} style={{padding:'12px 28px',borderRadius:14,border:'none',background:playing?C.rose:C.roseL,color:playing?'white':C.rose,fontWeight:600,cursor:'pointer',fontSize:'1rem',marginBottom:20}}>
+            🔊 {playing ? (lang==='ru'?'Воспроизведение…':'Playing…') : (lang==='ru'?'Прослушать':'Listen')}
+          </button>
+          <div style={{opacity:saving?0.55:1,pointerEvents:saving?'none':'auto'}}>
+            <WordReviewWidget known={known} total={words.length} lang={lang} onForgot={()=>review(false)} onKnow={()=>review(true)}/>
+          </div>
+        </>}
       </div>
     </div>
   );

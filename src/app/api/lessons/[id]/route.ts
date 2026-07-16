@@ -15,7 +15,16 @@ export async function GET(request: NextRequest) {
   // Get lesson detail with all exercises
 
   const id = Number(request.nextUrl.pathname.split('/').pop() || '0')
-  const item = await prisma.lesson.findUnique({ where: { id: Number(id) }, include: { Exercises: true } })
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return NextResponse.json({ error: 'Invalid lesson id' }, { status: 400 })
+  }
+  const item = await prisma.lesson.findFirst({
+    where: {
+      id,
+      OR: [{ createdByUserId: Number(user.sub) }, { createdByUserId: null }],
+    },
+    include: { Exercises: true },
+  })
   if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(item)
 }

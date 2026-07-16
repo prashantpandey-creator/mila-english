@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useChat } from "ai/react";
 import { useRouter } from "next/navigation";
 import { MilaVoid } from "@/components/darshan/MilaVoid";
 import { MilaBindu, type BinduState } from "@/components/darshan/MilaBindu";
+import { useI18n } from "@/lib/i18n-provider";
+import { startLocalTranscription, type LocalTranscript, type TranscriptionSession } from "@/lib/localTranscription";
+import { ttsSpeak } from "@/lib/tts";
+import { toSpokenText } from "@/lib/spokenText";
+import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
 
 const INVITES = [
   "What do you wish to know?",
@@ -15,19 +21,48 @@ const INVITES = [
 
 export default function DarshanPage() {
   const router = useRouter();
+  const { lang } = useI18n();
 
   const [phase, setPhase] = useState<BinduState>("resting");
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [voiceError, setVoiceError] = useState("");
 
   const [liveText, setLiveText] = useState("");
   const [answer, setAnswer] = useState("");
   const [invI, setInvI] = useState(0);
   const [orbSize, setOrbSize] = useState(320);
 
-  const pcRef = useRef<RTCPeerConnection | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const dcRef = useRef<RTCDataChannel | null>(null);
+  const transcriptionRef = useRef<TranscriptionSession | null>(null);
+  const activeRef = useRef(false);
+  const startListeningRef = useRef<() => Promise<void>>(async () => {});
+
+  const { append, isLoading } = useChat({
+    id: "mila-darshan-local",
+    api: "/api/chat",
+    body: { context: { pathname: "/darshan", lang, surface: "voice" } },
+    onError: () => {
+      setVoiceError(lang === "ru"
+        ? "Мила не смогла ответить. Коснись сферы, чтобы попробовать снова."
+        : "Mila could not answer. Touch the orb to try again.");
+      setPhase("resting");
+    },
+    onFinish: (message) => {
+      const reply = toSpokenText(message.content);
+      if (!reply) {
+        setPhase("resting");
+        return;
+      }
+      announceCompanionHistoryUpdated();
+      setAnswer(reply);
+      setPhase("manifesting");
+      void ttsSpeak(reply, lang === "ru" ? "ru-RU" : "en-US", 0.9).finally(() => {
+        if (!activeRef.current) return;
+        setPhase("resting");
+        window.setTimeout(() => void startListeningRef.current(), 350);
+      });
+    },
+  });
 
   // Responsive orb sizing
   useEffect(() => {
@@ -49,127 +84,110 @@ export default function DarshanPage() {
 
   useEffect(() => {
     return () => {
-      if (pcRef.current) pcRef.current.close();
+      activeRef.current = false;
+      transcriptionRef.current?.cancel();
+      transcriptionRef.current = null;
+      window.speechSynthesis?.cancel();
     };
   }, []);
 
+  const submitTranscript = useCallback(async (transcript: LocalTranscript) => {
+    const text = transcript.text.trim();
+    transcriptionRef.current = null;
+    if (!text || !activeRef.current) return;
+    setLiveText(text);
+    setAnswer("");
+    setVoiceError("");
+    setPhase("thinking");
+    await append({ role: "user", content: text });
+  }, [append]);
+
+  const startListening = useCallback(async () => {
+    if (!activeRef.current || transcriptionRef.current || isLoading) return;
+    setVoiceError("");
+    setLiveText("");
+    setAnswer("");
+    setPhase("listening");
+    try {
+      const session = await startLocalTranscription({
+        language: "auto",
+        onScoring: () => setPhase("thinking"),
+        onAutoStop: (transcript) => void submitTranscript(transcript),
+        onError: (error) => {
+          transcriptionRef.current = null;
+          if (!activeRef.current || error.message === "cancelled") return;
+          if (error.message === "no-speech" || error.message === "transcribe-empty") {
+            setPhase("resting");
+            window.setTimeout(() => void startListeningRef.current(), 500);
+            return;
+          }
+          setVoiceError(lang === "ru"
+            ? "Не удалось распознать речь. Проверь микрофон и попробуй снова."
+            : "I could not transcribe that. Check the microphone and try again.");
+          setPhase("resting");
+        },
+      });
+      if (!activeRef.current) {
+        session.cancel();
+        return;
+      }
+      transcriptionRef.current = session;
+    } catch (error) {
+      console.error("Could not start local Darshan transcription", error);
+      activeRef.current = false;
+      setIsConnected(false);
+      setVoiceError(lang === "ru"
+        ? "Нет доступа к микрофону или локальному распознаванию речи."
+        : "Microphone access or local speech recognition is unavailable.");
+      setPhase("resting");
+      throw error;
+    }
+  }, [isLoading, lang, submitTranscript]);
+
+  useEffect(() => {
+    startListeningRef.current = startListening;
+  }, [startListening]);
+
   const connectToDarshan = async () => {
-    if (isConnecting || isConnected) {
-      // If already connected, maybe it's a tap to interrupt
-      if (dcRef.current?.readyState === "open" && phase === "manifesting") {
-        dcRef.current.send(JSON.stringify({ type: "response.cancel" }));
-        setPhase("listening");
+    if (isConnecting || isLoading) return;
+
+    if (isConnected) {
+      if (phase === "manifesting") {
+        window.speechSynthesis?.cancel();
+        setPhase("resting");
+        await startListening();
+      } else if (phase === "listening" && transcriptionRef.current) {
+        const session = transcriptionRef.current;
+        transcriptionRef.current = null;
+        try {
+          await submitTranscript(await session.stop());
+        } catch (error) {
+          if (error instanceof Error && error.message !== "no-speech") console.error(error);
+          setPhase("resting");
+        }
+      } else if (phase === "resting") {
+        await startListening();
       }
       return;
     }
+
     setIsConnecting(true);
-
+    activeRef.current = true;
+    setIsConnected(true);
     try {
-      const sessionResponse = await fetch('/api/session');
-      const sessionData = await sessionResponse.json();
-
-      if (!sessionData.client_secret?.value) {
-        throw new Error("Failed to get ephemeral token");
-      }
-      const ephemeralKey = sessionData.client_secret.value;
-
-      const pc = new RTCPeerConnection();
-      pcRef.current = pc;
-
-      audioRef.current = new Audio();
-      audioRef.current.autoplay = true;
-
-      pc.ontrack = (e) => {
-        if (audioRef.current) {
-          audioRef.current.srcObject = e.streams[0];
-        }
-      };
-
-      const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
-      pc.addTrack(ms.getTracks()[0]);
-
-      const dc = pc.createDataChannel('oai-events');
-      dcRef.current = dc;
-
-      dc.addEventListener('message', (e) => {
-        try {
-          const event = JSON.parse(e.data);
-
-          if (event.type === 'input_audio_buffer.speech_started') {
-            setPhase("listening");
-            setLiveText("");
-            setAnswer("");
-          } else if (event.type === 'conversation.item.input_audio_transcription.completed') {
-            setLiveText(event.transcript || "");
-          } else if (event.type === 'response.created') {
-            setPhase("thinking");
-            setAnswer("");
-          } else if (event.type === 'response.audio.delta') {
-            setPhase("manifesting");
-          } else if (event.type === 'response.audio_transcript.delta') {
-            setAnswer(prev => prev + event.delta);
-          } else if (event.type === 'response.done') {
-            // Briefly keep it manifesting, then switch back to resting/listening
-            setTimeout(() => {
-              setPhase(prev => (prev === "manifesting" ? "resting" : prev));
-            }, 1000);
-          } else if (event.type === 'error') {
-            console.error("OpenAI WebRTC Error:", event);
-          }
-        } catch (err) {
-          console.error("Failed to parse event:", err);
-        }
-      });
-
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-
-      const sdpResponse = await fetch(`https://api.openai.com/v1/realtime?model=gpt-realtime`, {
-        method: "POST",
-        body: offer.sdp,
-        headers: {
-          Authorization: `Bearer ${ephemeralKey}`,
-          "Content-Type": "application/sdp"
-        }
-      });
-
-      if (!sdpResponse.ok) {
-        throw new Error("Failed to connect to OpenAI WebRTC");
-      }
-
-      const answerSdp = {
-        type: "answer" as RTCSdpType,
-        sdp: await sdpResponse.text()
-      };
-      await pc.setRemoteDescription(answerSdp);
-
-      setIsConnected(true);
-
-      // Update session to require audio transcription so we get text on screen
-      dc.addEventListener('open', () => {
-        dc.send(JSON.stringify({
-          type: "session.update",
-          session: {
-            input_audio_transcription: {
-              model: "whisper-1"
-            }
-          }
-        }));
-      });
-
-    } catch (err) {
-      console.error(err);
-      alert("Could not start Darshan. Check console for errors.");
+      await startListening();
+    } catch {
+      // startListening exposes a useful in-page error and resets the connection.
     } finally {
       setIsConnecting(false);
     }
   };
 
   const exit = useCallback(() => {
-    if (pcRef.current) {
-      pcRef.current.close();
-      pcRef.current = null;
-    }
+    activeRef.current = false;
+    transcriptionRef.current?.cancel();
+    transcriptionRef.current = null;
+    window.speechSynthesis?.cancel();
     setIsConnected(false);
     router.push('/chat');
   }, [router]);
@@ -199,7 +217,7 @@ export default function DarshanPage() {
       <button
         type="button"
         onClick={connectToDarshan}
-        aria-label={!isConnected ? "Touch to begin" : "Interrupt"}
+        aria-label={!isConnected ? "Touch to begin" : phase === "manifesting" ? "Interrupt" : "Speak or stop recording"}
         className="darshan-orb absolute left-1/2 z-10 outline-none"
         style={{ top: "42%", transform: "translate(-50%, -50%)", background: "transparent", border: "none", cursor: "pointer" }}
       >
@@ -263,6 +281,12 @@ export default function DarshanPage() {
             )}
           </p>
         </div>
+      )}
+
+      {voiceError && (
+        <p className="absolute bottom-[3%] left-1/2 z-20 w-[90%] max-w-md -translate-x-1/2 text-center text-xs text-rose-200" role="alert">
+          {voiceError}
+        </p>
       )}
     </div>
   );

@@ -11,152 +11,218 @@ generator client {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  password String
-  name String
-  learnerCategory String
-  nativeLanguage String
-  level String?
-  joinDate DateTime
+  id                Int               @id @default(autoincrement())
+  email             String            @unique
+  password          String
+  name              String
+  learnerCategory   String
+  nativeLanguage    String
+  level             String?
+  joinDate          DateTime
   // ── Learner model (the person axis) ──
-  ability Float?              // ELO / online-IRT ability estimate θ (speaking level)
-  goal String?               // "travel", "job interview", …
-  tonePreference String?     // companion persona pref: teacher | friend | guide
-  streakDays Int @default(0)
-  learnerProfile String?     // synthesized JSON blob (strengths, weak_summary, learner_arc, focus)
-  learnerProfileAt DateTime?
-  Progresses Progress[]
-  Assessments Assessment[]
-  Achievements Achievement[]
-  StudySessions StudySession[]
-  PhonemeStats PhonemeStat[]
-  GeneratedLessons Lesson[] @relation("LessonCreator")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  ability           Float? // ELO / online-IRT ability estimate θ (speaking level)
+  goal              String? // "travel", "job interview", …
+  tonePreference    String? // companion persona pref: teacher | friend | guide
+  streakDays        Int               @default(0)
+  learnerProfile    String? // synthesized JSON blob (strengths, weak_summary, learner_arc, focus)
+  learnerProfileAt  DateTime?
+  Progresses        Progress[]
+  Assessments       Assessment[]
+  Achievements      Achievement[]
+  StudySessions     StudySession[]
+  PhonemeStats      PhonemeStat[]
+  WordReviews       WordReview[]
+  GeneratedLessons  Lesson[]          @relation("LessonCreator")
+  CompanionThreads  CompanionThread[]
+  CompanionMemories CompanionMemory[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 // Quantified per-phoneme state — the math layer (ELO difficulty, FSRS scheduling,
 // BKT mastery) plus the substitution the learner actually produces. One row per
 // (user, phoneme); updated every scored attempt.
 model PhonemeStat {
-  id Int @id @default(autoincrement())
-  userId Int
-  phoneme String             // IPA symbol, e.g. "θ"
-  attempts Int @default(0)
-  lastAcc Int?               // last GOP accuracy 0-100
-  topSubstitution String?    // what they say instead, e.g. "s"
-  mastery Float @default(0)  // BKT P(known) 0-1
-  eloB Float @default(0)     // ELO/IRT item difficulty b (logit scale, per user-phoneme)
-  difficulty Float @default(5) // FSRS Difficulty 1-10 (memory axis, NOT the same thing as eloB)
-  stability Float @default(0)  // FSRS Stability, days until recall = 90%
-  due DateTime?              // FSRS next-review time
-  User User @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  phoneme         String // IPA symbol, e.g. "θ"
+  attempts        Int       @default(0)
+  lastAcc         Int? // last GOP accuracy 0-100
+  topSubstitution String? // what they say instead, e.g. "s"
+  mastery         Float     @default(0) // BKT P(known) 0-1
+  eloB            Float     @default(0) // ELO/IRT item difficulty b (logit scale, per user-phoneme)
+  difficulty      Float     @default(5) // FSRS Difficulty 1-10 (memory axis, NOT the same thing as eloB)
+  stability       Float     @default(0) // FSRS Stability, days until recall = 90%
+  due             DateTime? // FSRS next-review time
+  User            User      @relation(fields: [userId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
   @@unique([userId, phoneme])
 }
 
 model Lesson {
-  id Int @id @default(autoincrement())
-  title String
-  category String
-  learnerLevel String
+  id              Int        @id @default(autoincrement())
+  contentKey      String?    @unique
+  title           String
+  category        String
+  learnerLevel    String
   durationMinutes Int
-  content String
-  visualAidUrl String?
-  audioUrl String?
-  difficulty Int
-  createdByUserId Int?           // null = global/curated; set = user-specific AI lesson
-  CreatedBy User? @relation("LessonCreator", fields: [createdByUserId], references: [id])
-  Exercises Exercise[]
-  Progresses Progress[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  content         String
+  visualAidUrl    String?
+  audioUrl        String?
+  difficulty      Int
+  createdByUserId Int? // null = global/curated; set = user-specific AI lesson
+  CreatedBy       User?      @relation("LessonCreator", fields: [createdByUserId], references: [id])
+  Exercises       Exercise[]
+  Progresses      Progress[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 }
 
 model Exercise {
-  id Int @id @default(autoincrement())
-  lessonId Int
-  type String
-  question String
+  id            Int      @id @default(autoincrement())
+  lessonId      Int
+  type          String
+  question      String
   correctAnswer String
-  options String?
-  points Int
-  hintText String?
-  Lesson Lesson @relation(fields: [lessonId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  options       String?
+  points        Int
+  hintText      String?
+  Lesson        Lesson   @relation(fields: [lessonId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Progress {
-  id Int @id @default(autoincrement())
-  userId Int
-  lessonId Int
-  completed Boolean @default(false)
-  score Int?
+  id               Int       @id @default(autoincrement())
+  userId           Int
+  lessonId         Int
+  completed        Boolean   @default(false)
+  score            Int?
   timeSpentSeconds Int?
-  mistakes String?
-  lastAttemptDate DateTime?
-  User User @relation(fields: [userId], references: [id])
-  Lesson Lesson @relation(fields: [lessonId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  mistakes         String?
+  lastAttemptDate  DateTime?
+  User             User      @relation(fields: [userId], references: [id])
+  Lesson           Lesson    @relation(fields: [lessonId], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Word {
-  id Int @id @default(autoincrement())
-  english String
-  phonetic String
+  id                Int          @id @default(autoincrement())
+  english           String
+  phonetic          String
   translationNative String
-  partOfSpeech String
-  exampleSentence String?
-  audioUrl String?
-  difficultyLevel Int
-  learnerCategory String
-  nextReviewDate DateTime?
-  repetitionCount Int? @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  partOfSpeech      String
+  exampleSentence   String?
+  audioUrl          String?
+  difficultyLevel   Int
+  learnerCategory   String
+  nextReviewDate    DateTime?
+  repetitionCount   Int?         @default(0)
+  Reviews           WordReview[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model WordReview {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  wordId          Int
+  repetitionCount Int       @default(0)
+  lastReviewedAt  DateTime?
+  nextReviewDate  DateTime?
+  User            User      @relation(fields: [userId], references: [id])
+  Word            Word      @relation(fields: [wordId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([userId, wordId])
 }
 
 model Achievement {
-  id Int @id @default(autoincrement())
-  userId Int
-  badgeName String
-  badgeIcon String
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  badgeName   String
+  badgeIcon   String
   description String
-  earnedDate DateTime
-  category String
-  User User @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  earnedDate  DateTime
+  category    String
+  User        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Assessment {
-  id Int @id @default(autoincrement())
-  userId Int
-  type String
-  score Int
-  maxScore Int
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  type             String
+  score            Int
+  maxScore         Int
   recommendedLevel String?
-  weakAreas String?
-  takenDate DateTime
-  User User @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  weakAreas        String?
+  takenDate        DateTime
+  User             User     @relation(fields: [userId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model StudySession {
-  id Int @id @default(autoincrement())
-  userId Int
-  startTime DateTime
-  endTime DateTime?
+  id               Int       @id @default(autoincrement())
+  userId           Int
+  startTime        DateTime
+  endTime          DateTime?
   lessonsCompleted Int?
-  wordsReviewed Int?
-  focusArea String?
-  streakDay Int? @default(0)
-  User User @relation(fields: [userId], references: [id])
+  wordsReviewed    Int?
+  focusArea        String?
+  streakDay        Int?      @default(0)
+  User             User      @relation(fields: [userId], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+// Mila keeps one private companion thread per learner. The same thread is used by
+// the full Chat page and the floating guide so the relationship continues across
+// the app instead of resetting whenever the learner changes pages.
+model CompanionThread {
+  id        Int                @id @default(autoincrement())
+  userId    Int
+  key       String             @default("primary")
+  summary   String?
+  User      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Messages  CompanionMessage[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@unique([userId, key])
+  @@index([userId, updatedAt])
+}
+
+model CompanionMessage {
+  id        Int             @id @default(autoincrement())
+  threadId  Int
+  role      String
+  content   String
+  pathname  String?
+  locale    String?
+  surface   String?
+  Thread    CompanionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now())
+
+  @@index([threadId, createdAt])
+}
+
+// Only facts the learner explicitly asks Mila to remember are stored here.
+// Ordinary chat history is never silently promoted into long-term memory.
+model CompanionMemory {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  content   String
+  locale    String?
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt])
 }

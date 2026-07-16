@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticate } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { BUILTIN_WORDS } from '@/lib/builtinWords'
 
 export async function GET(request: NextRequest) {
   const user = await authenticate(request)
@@ -12,8 +13,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Get vocabulary words due for review based on spaced repetition algorithm and learner category
+  const userId = Number(user.sub)
+  await Promise.all(BUILTIN_WORDS.map(async (word) => {
+    const existing = await prisma.word.findFirst({ where: { english: word.english }, select: { id: true } })
+    if (!existing) {
+      await prisma.word.create({ data: { ...word, learnerCategory: 'all' } })
+    }
+  }))
 
-  const items = await prisma.word.findMany()
-  return NextResponse.json(items)
+  const items = await prisma.word.findMany({
+    include: { Reviews: { where: { userId }, take: 1 } },
+    orderBy: [{ difficultyLevel: 'asc' }, { id: 'asc' }],
+  })
+  return NextResponse.json(items.map(({ Reviews, ...word }) => ({
+    ...word,
+    review: Reviews[0] ?? null,
+  })))
 }

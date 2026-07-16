@@ -14,6 +14,9 @@ export async function GET(request: NextRequest) {
 
   // Get assessment history with scores and recommendations
 
-  const items = await prisma.assessment.findMany()
+  const items = await prisma.assessment.findMany({
+    where: { userId: Number(user.sub) },
+    orderBy: { takenDate: 'desc' },
+  })
   return NextResponse.json(items)
 }

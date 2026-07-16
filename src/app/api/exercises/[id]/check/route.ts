@@ -19,7 +19,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'missing exercise id or answer' }, { status: 400 })
   }
 
-  const ex = await prisma.exercise.findUnique({ where: { id: exerciseId } })
+  const ex = await prisma.exercise.findFirst({
+    where: {
+      id: exerciseId,
+      Lesson: {
+        OR: [{ createdByUserId: Number(user.sub) }, { createdByUserId: null }],
+      },
+    },
+  })
   if (!ex) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const correct = answer.trim().toLowerCase() === ex.correctAnswer.trim().toLowerCase()

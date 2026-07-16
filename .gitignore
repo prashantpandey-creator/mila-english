@@ -4,3 +4,9 @@ node_modules/
 .env.local
 *.db
 *.tsbuildinfo
+__pycache__/
+# Local business documents and generated review artifacts are not application deploy inputs.
+MILA_*AGREEMENT*.txt
+mary-*.txt
+output/
+tmp/

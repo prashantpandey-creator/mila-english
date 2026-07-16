@@ -9,40 +9,7 @@ import LessonList from '@/components/LessonList';
 import GenerateLessonButton from '@/components/GenerateLessonButton';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
-
-const LESSONS_RU = [
-  {id:1,cat:'🗣️',catName:'Разговор',title:'Знакомство',sub:'Представься и спроси имя',time:'3 мин',diff:'Лёгкий',diffNum:1,
-   words:['Hello','My name is...','Nice to meet you','Where are you from?','I am from Russia']},
-  {id:2,cat:'☕',catName:'Разговор',title:'В кафе',sub:'Закажи кофе и еду',time:'5 мин',diff:'Лёгкий',diffNum:1,
-   words:['I would like...','A coffee please','How much is it?','The menu please','Thank you']},
-  {id:3,cat:'✈️',catName:'Разговор',title:'В аэропорту',sub:'Пройди регистрацию и паспортный контроль',time:'7 мин',diff:'Средний',diffNum:2,
-   words:['Where is the gate?','My flight is at...','Boarding pass','Passport control','Carry-on luggage']},
-  {id:4,cat:'🔤',catName:'Фонетика',title:'Сложные звуки',sub:'th, w, r — звуки, которых нет в русском',time:'5 мин',diff:'Средний',diffNum:2,
-   words:['think','through','weather','world','river']},
-  {id:5,cat:'📝',catName:'Слова',title:'Базовые глаголы',sub:'Самые нужные глаголы для everyday',time:'4 мин',diff:'Лёгкий',diffNum:1,
-   words:['be','have','do','go','make','get','know','think','see','come']},
-  {id:6,cat:'📝',catName:'Слова',title:'Эмоции и чувства',sub:'Описывай свои чувства точно',time:'5 мин',diff:'Средний',diffNum:2,
-   words:['happy','excited','worried','confused','grateful','overwhelmed','proud']},
-  {id:7,cat:'🎧',catName:'Аудирование',title:'Медленная речь',sub:'Понимай медленную английскую речь',time:'5 мин',diff:'Лёгкий',diffNum:1},
-  {id:8,cat:'🎧',catName:'Аудирование',title:'Естественная скорость',sub:'Учись понимать носителей',time:'7 мин',diff:'Сложный',diffNum:3},
-];
-
-const LESSONS_EN = [
-  {id:1,cat:'🗣️',catName:'Speaking',title:'Introductions',sub:'Introduce yourself and ask names',time:'3 min',diff:'Easy',diffNum:1,
-   words:['Hello','My name is...','Nice to meet you','Where are you from?','I am from Russia']},
-  {id:2,cat:'☕',catName:'Speaking',title:'At a Café',sub:'Order coffee and food',time:'5 min',diff:'Easy',diffNum:1,
-   words:['I would like...','A coffee please','How much is it?','The menu please','Thank you']},
-  {id:3,cat:'✈️',catName:'Speaking',title:'At the Airport',sub:'Check in and go through passport control',time:'7 min',diff:'Medium',diffNum:2,
-   words:['Where is the gate?','My flight is at...','Boarding pass','Passport control','Carry-on luggage']},
-  {id:4,cat:'🔤',catName:'Phonetics',title:'Tricky Sounds',sub:'th, w, r — sounds Russian doesn\'t have',time:'5 min',diff:'Medium',diffNum:2,
-   words:['think','through','weather','world','river']},
-  {id:5,cat:'📝',catName:'Vocabulary',title:'Essential Verbs',sub:'The most important everyday verbs',time:'4 min',diff:'Easy',diffNum:1,
-   words:['be','have','do','go','make','get','know','think','see','come']},
-  {id:6,cat:'📝',catName:'Vocabulary',title:'Emotions',sub:'Express your feelings precisely',time:'5 min',diff:'Medium',diffNum:2,
-   words:['happy','excited','worried','confused','grateful','overwhelmed','proud']},
-  {id:7,cat:'🎧',catName:'Listening',title:'Slow Speech',sub:'Understand slow English speech',time:'5 min',diff:'Easy',diffNum:1},
-  {id:8,cat:'🎧',catName:'Listening',title:'Natural Speed',sub:'Learn to understand native speakers',time:'7 min',diff:'Hard',diffNum:3},
-];
+import { COURSE_LESSON_IDS, getBuiltinLesson } from '@/lib/builtinLessons';
 
 const CATS_RU = ['Все','Разговор','Фонетика','Слова','Аудирование'];
 const CATS_EN = ['All','Speaking','Phonetics','Vocabulary','Listening'];
@@ -52,7 +19,19 @@ export default function LessonsPage() {
   const router = useRouter();
   const [activeCat, setActiveCat] = useState(0);
   const [dbLessons, setDbLessons] = useState<any[]>([]);
-  const staticLessons = lang==='ru' ? LESSONS_RU : LESSONS_EN;
+  const staticLessons = COURSE_LESSON_IDS.map((id) => {
+    const lesson = getBuiltinLesson(id)!;
+    return {
+      id: Number(id), cat: lesson.icon,
+      catName: lang === 'ru' ? lesson.categoryRu : lesson.categoryEn,
+      title: lang === 'ru' ? lesson.titleRu : lesson.titleEn,
+      sub: lang === 'ru' ? lesson.subtitleRu : lesson.subtitleEn,
+      time: `${lesson.durationMinutes} ${lang === 'ru' ? 'мин' : 'min'}`,
+      diff: lang === 'ru' ? ['Лёгкий', 'Средний', 'Сложный'][lesson.difficulty - 1] : ['Easy', 'Medium', 'Hard'][lesson.difficulty - 1],
+      diffNum: lesson.difficulty,
+      words: lesson.words,
+    };
+  });
   const cats = lang==='ru' ? CATS_RU : CATS_EN;
 
   // AI-generated lessons live in the DB — fetch and show them alongside the built-in ones.
@@ -83,7 +62,7 @@ export default function LessonsPage() {
 
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      <div style={{background:'rgba(13,16,23,0.72)',backdropFilter:'blur(12px)',padding:'10px 20px',
+      <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
         <LangToggle />
