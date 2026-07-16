@@ -337,6 +337,13 @@ export default function DarshanPage() {
             scheduleListening(turnRef.current, 500);
             return;
           }
+          if (error.message === "auth-required") {
+            setVoiceError(lang === "ru"
+              ? "Войди в аккаунт, чтобы говорить с Милой голосом."
+              : "Log in to talk with Mila by voice.");
+            setPhase("resting");
+            return;
+          }
           setVoiceError(lang === "ru"
             ? "Не удалось распознать речь. Проверь микрофон и попробуй снова."
             : "I could not transcribe that. Check the microphone and try again.");
