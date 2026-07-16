@@ -187,7 +187,7 @@
 .lp-proof__inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; padding: 26px 0; }
 .lp-proof__item { display: flex; gap: 13px; align-items: flex-start; }
 .lp-proof__item > span { flex: none; color: rgba(232, 132, 94, 0.5); font: 400 26px/1 var(--lp-serif); }
-.lp-proof__item strong { display: block; color: var(--lp-strong); font-size: 14px; font-weight: 700; }
+.lp-proof__item strong { display: block; color: var(--lp-strong); font: 400 17px/1.25 var(--lp-serif); }
 .lp-proof__item p { margin: 3px 0 0; color: var(--lp-faint); font-size: 12.5px; line-height: 1.45; }
 
 /* ── Section scaffolding ── */
@@ -209,7 +209,7 @@
 }
 .lp-step:hover { transform: translateY(-4px); border-color: rgba(232, 132, 94, 0.3); }
 .lp-step__top { display: flex; align-items: center; justify-content: space-between; }
-.lp-step__top span { color: rgba(255, 255, 255, 0.22); font: 400 30px/1 var(--lp-serif); }
+.lp-step__top span { color: var(--lp-terra-bright); font: 600 34px/1 var(--lp-accent); opacity: 0.85; }
 .lp-step__top i { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--lp-line-terra); background: rgba(205, 95, 54, 0.08); color: var(--lp-terra-bright); }
 .lp-step h3 { margin: 0; font: 400 25px/1.15 var(--lp-serif); color: var(--lp-strong); }
 .lp-step > p { margin: -8px 0 0; color: var(--lp-muted); font-size: 14.5px; line-height: 1.6; flex: 1; }
@@ -244,18 +244,18 @@
   padding: 22px 22px 20px; display: flex; flex-direction: column; gap: 10px;
   color: inherit; transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
-.lp-door:hover { transform: translateY(-4px); border-color: rgba(232, 132, 94, 0.38); box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); }
+.lp-door:hover { transform: translateY(-4px); border-color: var(--door-line, rgba(232, 132, 94, 0.38)); box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); }
 .lp-door--lead { grid-column: span 3; background: linear-gradient(160deg, rgba(205, 95, 54, 0.11), rgba(255, 255, 255, 0.03) 55%); border-color: rgba(232, 132, 94, 0.3); }
 .lp-door--main { grid-column: span 3; }
 .lp-door--third { grid-column: span 2; }
-.lp-door__icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--lp-line-terra); background: rgba(205, 95, 54, 0.08); color: var(--lp-terra-bright); }
+.lp-door__icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--door-line, var(--lp-line-terra)); background: var(--door-soft, rgba(205, 95, 54, 0.08)); color: var(--door-accent, var(--lp-terra-bright)); }
 .lp-door__icon .mila-icon { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .lp-door__icon .mila-icon__accent { stroke: var(--lp-venus); }
 .lp-door__icon .mila-icon__accent-fill { fill: var(--lp-venus); stroke: none; }
-.lp-door__kicker { color: var(--lp-faint); font-size: 10.5px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; }
-.lp-door strong { font: 400 24px/1.15 var(--lp-serif); color: var(--lp-strong); }
+.lp-door__kicker { color: var(--door-accent, var(--lp-terra-bright)); font: 600 19px/1.2 var(--lp-accent); letter-spacing: 0.01em; }
+.lp-door strong { font: 400 25px/1.18 var(--lp-serif); color: var(--lp-strong); }
 .lp-door p { margin: 0; color: var(--lp-muted); font-size: 14px; line-height: 1.55; flex: 1; }
-.lp-door__go { display: inline-flex; align-items: center; gap: 7px; margin-top: 6px; color: var(--lp-terra-bright); font-size: 13px; font-weight: 700; }
+.lp-door__go { display: inline-flex; align-items: center; gap: 7px; margin-top: 6px; color: var(--door-accent, var(--lp-terra-bright)); font-size: 13px; font-weight: 700; }
 .lp-door__start { position: absolute; top: 16px; right: 16px; padding: 4px 13px; border-radius: 999px; border: 1px solid rgba(205, 95, 54, 0.45); background: rgba(205, 95, 54, 0.1); color: var(--lp-terra-bright); font: 600 17px/1.3 var(--lp-accent); letter-spacing: 0.01em; }
 
 /* ── Cities ── */
@@ -394,7 +394,7 @@
 .mila-surface--welcome .lp-btn--ghost { border-color: rgba(90, 62, 40, 0.24); background: rgba(250, 243, 235, 0.5); }
 .mila-surface--welcome .lp-btn--ghost:hover:not(:disabled) { border-color: rgba(90, 62, 40, 0.4); background: rgba(250, 243, 235, 0.75); }
 .mila-surface--welcome .lp-step, .mila-surface--welcome .lp-door { box-shadow: 0 1px 2px rgba(66, 44, 28, 0.035), 0 10px 28px rgba(90, 62, 40, 0.065); }
-.mila-surface--welcome .lp-door:hover { border-color: rgba(179, 80, 44, 0.32); box-shadow: 0 2px 4px rgba(66, 44, 28, 0.04), 0 16px 38px rgba(90, 62, 40, 0.09); }
+.mila-surface--welcome .lp-door:hover { box-shadow: 0 2px 4px rgba(66, 44, 28, 0.04), 0 16px 38px rgba(90, 62, 40, 0.09); }
 .mila-surface--welcome .lp-door--lead { background: linear-gradient(160deg, rgba(205, 95, 54, 0.22), rgba(250, 242, 234, 0.6) 55%); border-color: rgba(150, 66, 34, 0.32); }
 .mila-surface--welcome .lp-door__start { background: rgba(150, 66, 34, 0.1); }
 .mila-surface--welcome .lp-door__icon, .mila-surface--welcome .lp-step__top i { background: rgba(150, 66, 34, 0.07); }
