@@ -1,10 +1,18 @@
 // Shared planetary palette. Mercury emerald carries communication and action;
-// voice cyan remains reserved for listening/audio; Jupiter gold marks learning,
-// mastery, and earned progress. Legacy aliases keep older pages coherent.
+// Venus blush belongs to Mila's warm companion identity; voice cyan is reserved
+// for audio; Jupiter gold marks language, travel, mastery, and earned progress.
 export const C = {
   pageBg: 'transparent',
-  rose: '#ff758a',
-  roseL: 'rgba(255,117,138,0.14)',
+  venus: '#f28bad',
+  venusBright: '#ffbdd0',
+  venusDeep: '#5b1932',
+  venusInk: '#260c16',
+  venusL: 'rgba(242,139,173,0.14)',
+  danger: '#ff6b6b',
+  dangerL: 'rgba(255,107,107,0.14)',
+  // Legacy correction aliases. Venus must never mean an error or wrong answer.
+  rose: '#ff6b6b',
+  roseL: 'rgba(255,107,107,0.14)',
   mercury: '#24d39a',
   mercuryBright: '#9af2d3',
   mercuryDeep: '#0a5c45',

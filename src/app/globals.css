@@ -2,15 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Mila — obsidian, Mercury communication, Jupiter learning ── */
+/* ── Mila — obsidian, Mercury action, Venus identity, Jupiter expansion ── */
 :root {
   --noir: #000000; --noir-2: #050505; --noir-3: #0a0a0b;
   --ivory: #f7f8f5; --stone: #a7ada9;
   --mercury: #24d39a; --mercury-bright: #9af2d3; --mercury-soft: rgba(36,211,154,.14);
+  --venus: #f28bad; --venus-bright: #ffbdd0; --venus-deep: #5b1932; --venus-ink: #260c16; --venus-soft: rgba(242,139,173,.14);
   --voice: #6adcf5; --voice-bright: #b7f2ff; --voice-soft: rgba(106,220,245,.14);
   --jupiter: #f2c75c; --jupiter-bright: #ffe29a; --jupiter-soft: rgba(242,199,92,.14);
   --gold: var(--jupiter); --gold-soft: var(--jupiter-soft);
-  --rose: #ff758a; --rose-soft: rgba(255,117,138,0.14);
+  --danger: #ff6b6b; --danger-soft: rgba(255,107,107,.14);
+  --rose: var(--danger); --rose-soft: var(--danger-soft);
   --sage: #72e3b7; --sage-soft: rgba(114,227,183,0.14);
   --glass: rgba(5,11,8,.88); --line: rgba(154,242,211,.14);
 }
@@ -107,7 +109,7 @@ h1, h2 {
 .atmosphere--brand::after {
   background:
     radial-gradient(900px 640px at 78% 34%, rgba(36,211,154,.035), transparent 66%),
-    radial-gradient(600px 520px at 76% 52%, rgba(106,220,245,.025), transparent 62%),
+    radial-gradient(580px 500px at 82% 36%, rgba(242,139,173,.045), transparent 62%),
     linear-gradient(180deg,rgba(0,0,0,.24),rgba(0,0,0,.48) 60%,rgba(0,0,0,.84));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -1643,7 +1645,7 @@ body { color: #f7f7f8; }
 .darshan-aword.is-init { animation-duration: 2s; }
 @keyframes awordAppear { 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
 
-/* ── Planetary spectrum — Mercury speaks, Jupiter teaches ─────────────── */
+/* ── Planetary spectrum — Mercury acts, Venus welcomes, Jupiter expands ── */
 ::selection { color: #031b13; background: var(--mercury-bright); }
 
 .card,
@@ -1664,15 +1666,15 @@ body { color: #f7f7f8; }
 .btn-primary:hover { box-shadow: 0 12px 34px rgba(36,211,154,.3); }
 .lang-toggle button.active,
 .landing-nav .lang-toggle button.active {
-  color: #031b13;
-  background: linear-gradient(135deg,var(--mercury-bright),var(--mercury));
-  box-shadow: 0 5px 18px rgba(36,211,154,.2);
+  color: #211804;
+  background: linear-gradient(135deg,var(--jupiter-bright),var(--jupiter));
+  box-shadow: 0 5px 18px rgba(242,199,92,.2);
 }
 .streak-card {
   border-color: rgba(242,199,92,.28);
   background: linear-gradient(135deg,rgba(242,199,92,.12),rgba(242,199,92,.035));
 }
-.gradient-text { background-image: linear-gradient(120deg,var(--mercury-bright),var(--mercury) 42%,var(--voice) 72%,var(--jupiter)); }
+.gradient-text { background-image: linear-gradient(120deg,var(--mercury-bright),var(--mercury) 45%,var(--venus-bright)); }
 .hairline { background: linear-gradient(90deg,transparent,rgba(242,199,92,.58),transparent); }
 
 /* Authored glyph language: primary stroke carries function, the small second
@@ -1701,7 +1703,11 @@ body { color: #f7f7f8; }
   --journey-glow: rgba(242,199,92,.075);
   --icon-accent: var(--mercury);
 }
-.journey-card[data-kind="tutor"] { --icon-accent: var(--voice); }
+.journey-card[data-kind="tutor"] {
+  --journey-tone: var(--venus);
+  --journey-glow: rgba(242,139,173,.09);
+  --icon-accent: var(--mercury);
+}
 .journey-card__icon {
   border-color: color-mix(in srgb,var(--journey-tone) 24%,transparent);
   color: var(--journey-tone);
@@ -1721,40 +1727,40 @@ body { color: #f7f7f8; }
   .journey-card:hover .journey-card__action { color: var(--journey-tone); }
 }
 
-/* Front door: emerald owns action and intelligence; cyan stays audible; gold
-   appears only where the learner has understood or earned something. */
+/* Front door: emerald owns action, Venus identifies Mila, cyan stays audible,
+   and Jupiter appears only for language, travel, or earned understanding. */
 .landing-page {
   --landing-ink: #f7f8f5;
   --landing-muted: #a7ada9;
   --landing-gold: var(--mercury);
   --landing-gold-bright: var(--mercury-bright);
-  --landing-coral: var(--rose);
+  --landing-coral: var(--venus);
   --landing-mint: var(--mercury);
   --landing-bg: #000;
 }
 .landing-brand__mark {
-  border-color: rgba(36,211,154,.46);
+  border-color: rgba(242,139,173,.5);
   color: var(--mercury-bright);
-  background: linear-gradient(145deg,rgba(36,211,154,.14),rgba(106,220,245,.025));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.1),0 8px 28px rgba(36,211,154,.09);
+  background: linear-gradient(145deg,rgba(36,211,154,.14),rgba(242,139,173,.09));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1),0 8px 28px rgba(242,139,173,.09);
 }
 .landing-signin {
   border-color: rgba(36,211,154,.34);
   color: var(--mercury-bright);
   background: rgba(36,211,154,.05);
 }
-.landing-hero::after { background: linear-gradient(90deg,transparent,rgba(36,211,154,.34),rgba(106,220,245,.18),rgba(242,199,92,.14),transparent); }
+.landing-hero::after { background: linear-gradient(90deg,transparent,rgba(36,211,154,.34),rgba(242,139,173,.22),rgba(242,199,92,.12),transparent); }
 .landing-hero__glow {
   display: block;
   opacity: .82;
-  background: radial-gradient(circle at 35% 40%,rgba(36,211,154,.17),rgba(106,220,245,.08) 46%,rgba(242,199,92,.035) 64%,transparent 72%);
+  background: radial-gradient(circle at 35% 40%,rgba(36,211,154,.16),rgba(242,139,173,.075) 48%,rgba(242,199,92,.03) 66%,transparent 73%);
   filter: blur(118px);
 }
 .landing-eyebrow { color: var(--mercury-bright); }
 .landing-eyebrow__dot { background: var(--mercury); box-shadow: 0 0 0 6px rgba(36,211,154,.11),0 0 24px rgba(36,211,154,.42); }
 .landing-hero h1 em {
   color: transparent;
-  background: linear-gradient(105deg,#d9fff0 0%,var(--mercury-bright) 44%,var(--voice) 100%);
+  background: linear-gradient(105deg,#d9fff0 0%,var(--mercury-bright) 45%,var(--venus-bright) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1775,10 +1781,10 @@ body { color: #f7f7f8; }
   background: linear-gradient(155deg,rgba(7,15,11,.96),rgba(1,3,2,.99));
   box-shadow: 0 42px 110px rgba(0,0,0,.72),0 18px 60px rgba(36,211,154,.065),inset 0 1px 0 rgba(194,255,231,.075);
 }
-.coach-demo::before { background: linear-gradient(135deg,rgba(36,211,154,.26),transparent 40%,rgba(106,220,245,.08) 72%,rgba(242,199,92,.12)); }
+.coach-demo::before { background: linear-gradient(135deg,rgba(36,211,154,.24),transparent 42%,rgba(242,139,173,.07) 76%,rgba(242,199,92,.1)); }
 .coach-demo__sample { border-color: rgba(36,211,154,.24); color: var(--mercury-bright); background: rgba(36,211,154,.075); }
-.coach-demo__accents button.is-active { border-color: rgba(36,211,154,.3); color: #effff8; background: rgba(36,211,154,.1); }
-.coach-demo__accents button.is-active span { color: var(--mercury-bright); }
+.coach-demo__accents button.is-active { border-color: rgba(242,199,92,.34); color: #fff8df; background: rgba(242,199,92,.1); }
+.coach-demo__accents button.is-active span { color: var(--jupiter-bright); }
 .coach-demo__word small,
 .coach-demo__hear,
 .coach-demo__ready svg { color: var(--voice-bright); }
@@ -1788,7 +1794,7 @@ body { color: #f7f7f8; }
 .coach-demo__score strong { color: var(--jupiter-bright); }
 .coach-demo__score span { color: #b7a36d; }
 .coach-demo__phonemes .is-good { color: var(--jupiter-bright); background: rgba(242,199,92,.09); }
-.coach-demo__avatar { color: #031b13; background: linear-gradient(135deg,var(--mercury-bright),var(--mercury)); }
+.coach-demo__avatar { color: var(--venus-ink); background: linear-gradient(135deg,var(--venus-bright),var(--venus)); }
 .coach-demo__analysing i { border-color: rgba(36,211,154,.2); border-top-color: var(--mercury); }
 .coach-demo__run { border-color: rgba(36,211,154,.24); color: var(--mercury-bright); background: rgba(36,211,154,.065); }
 
@@ -1803,28 +1809,47 @@ body { color: #f7f7f8; }
 .story-phrase .is-clear { color: var(--jupiter-bright); background: rgba(242,199,92,.085); }
 .story-insight span { color: var(--mercury-bright); background: rgba(36,211,154,.09); }
 .story-plan-row svg { color: var(--mercury); }
-.room-card__label { color: var(--mercury-bright); }
-.room-mini-word small,
-.room-visual--course i { color: var(--voice-bright); }
+.room-card {
+  --room-tone: var(--mercury);
+  --room-glow: rgba(36,211,154,.08);
+}
+.room-card[data-room="pronunciation"] { --room-tone: var(--voice); --room-glow: rgba(106,220,245,.08); }
+.room-card[data-room="mentor"] { --room-tone: var(--venus); --room-glow: rgba(242,139,173,.085); }
+.room-card[data-room="course"],
+.room-card[data-room="progress"] { --room-tone: var(--jupiter); --room-glow: rgba(242,199,92,.075); }
+.room-card[data-room] .room-card__icon {
+  border-color: color-mix(in srgb,var(--room-tone) 28%,transparent);
+  color: color-mix(in srgb,var(--room-tone) 82%,white);
+  background: color-mix(in srgb,var(--room-tone) 8%,transparent);
+}
+.room-card[data-room] .room-card__label,
+.room-card[data-room] .room-card__link { color: color-mix(in srgb,var(--room-tone) 82%,white); }
+.room-mini-word small { color: var(--voice-bright); }
+.room-visual--course i { color: var(--jupiter-bright); }
 .room-mini-phonemes i { color: var(--jupiter-bright); background: rgba(242,199,92,.085); }
 .room-mini-meter span { background: linear-gradient(90deg,var(--voice),var(--mercury),var(--jupiter)); }
-.room-visual--course b { background: rgba(36,211,154,.32); }
+.room-visual--course b { background: rgba(242,199,92,.34); }
 .room-visual--mentor > i { border-color: rgba(36,211,154,.2); }
 .room-visual--mentor > i:nth-child(2) { border-color: rgba(106,220,245,.18); }
-.room-visual--mentor > i:nth-child(3) { border-color: rgba(242,199,92,.17); }
+.room-visual--mentor > i:nth-child(3) { border-color: rgba(242,139,173,.24); }
 .room-visual--mentor > span {
-  color: #031d14;
-  background: radial-gradient(circle at 35% 30%,#e0fff2,var(--mercury-bright) 45%,var(--voice));
-  box-shadow: 0 0 50px rgba(36,211,154,.17),0 0 74px rgba(106,220,245,.08);
+  color: var(--venus-ink);
+  background: radial-gradient(circle at 35% 30%,#ffe7ef,var(--venus-bright) 44%,var(--venus));
+  box-shadow: 0 0 50px rgba(242,139,173,.18),0 0 74px rgba(36,211,154,.07);
 }
 .progress-bars i { background: linear-gradient(var(--mercury-bright),var(--mercury) 52%,var(--jupiter)); }
 .room-visual--progress > span { color: var(--jupiter-bright); }
 .room-swipehint span:first-child { background: rgba(36,211,154,.68); }
-.landing-cta__orb { display: block; background: linear-gradient(110deg,rgba(36,211,154,.14),rgba(106,220,245,.075),rgba(242,199,92,.08)); }
+.landing-cta__orb { display: block; background: linear-gradient(110deg,rgba(36,211,154,.13),rgba(242,139,173,.085),rgba(242,199,92,.07)); }
 
-/* Mila herself uses the same grammar: emerald means available/thinking, cyan
-   means listening, gold is a tiny moment of insight, coral only flags emotion
-   or an actual correction. */
+.mila-guide[data-state="idle"] .mila-guide__launcher { border-color: rgba(242,139,173,.3); box-shadow: 0 20px 50px rgba(0,7,4,.52),0 0 28px rgba(242,139,173,.08),inset 0 1px 0 rgba(255,255,255,.1); }
+.mila-guide__portrait { border-color: rgba(242,139,173,.2); }
+.mila-guide__identity strong { color: var(--venus-bright); }
+.mila-guide__welcome { box-shadow: inset 3px 0 0 rgba(242,139,173,.72); }
+.mila-guide__message.is-assistant { box-shadow: inset 2px 0 0 rgba(242,139,173,.5); }
+
+/* Mila herself: Venus identifies the companion; dynamic status remains Mercury
+   or voice cyan. Jupiter is reserved for earned insight; danger stays red. */
 .mila-guide__launcher:hover { border-color: rgba(36,211,154,.52); box-shadow: 0 24px 58px rgba(0,7,4,.62),0 8px 36px rgba(36,211,154,.17),inset 0 1px 0 rgba(220,255,240,.12); }
 .mila-guide__launcher:focus-visible { outline-color: var(--mercury); }
 .mila-guide__launcher::before { background: radial-gradient(circle,rgba(36,211,154,.2),rgba(36,211,154,0) 68%); }
@@ -1857,14 +1882,15 @@ body { color: #f7f7f8; }
 .darshan-q { color: rgba(183,242,255,.7); }
 .darshan-a { color: var(--mercury-bright); text-shadow: 0 0 18px rgba(36,211,154,.32); }
 
-@media (hover:hover) {
+@media (hover:hover) and (pointer:fine) {
+  .mila-guide:not(.is-open) .mila-guide__launcher:hover { border-color: rgba(242,139,173,.52); box-shadow: 0 24px 58px rgba(0,7,4,.62),0 8px 36px rgba(36,211,154,.13),0 0 30px rgba(242,139,173,.1),inset 0 1px 0 rgba(255,230,239,.12); }
   .landing-signin:hover { border-color: rgba(36,211,154,.62); background: rgba(36,211,154,.1); }
   .landing-button--primary:hover { box-shadow: 0 20px 52px rgba(36,211,154,.32),inset 0 1px 0 rgba(255,255,255,.5); }
   .landing-button--secondary:hover,
-  .coach-demo__accents button:hover,
+  .coach-demo__accents button:hover:not(.is-active),
   .coach-demo__run:hover { border-color: rgba(36,211,154,.36); background: rgba(36,211,154,.075); }
   .coach-demo__hear:hover { border-color: rgba(106,220,245,.36); background: rgba(106,220,245,.075); }
-  .room-card:hover { border-color: rgba(36,211,154,.26); background: linear-gradient(145deg,rgba(7,27,19,.82),rgba(3,13,9,.9)); }
+  .room-card:hover { border-color: color-mix(in srgb,var(--room-tone,var(--mercury)) 36%,transparent); background: linear-gradient(145deg,rgba(9,13,11,.88),rgba(3,5,4,.94)); box-shadow: 0 18px 48px rgba(0,0,0,.5),0 0 28px var(--room-glow,rgba(36,211,154,.07)); }
 }
 
 /* The mobile source is art-directed, so it no longer needs the nearly opaque

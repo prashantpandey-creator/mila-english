@@ -161,7 +161,7 @@ export default function ListenPage() {
           {PACKS.map(p=>(
             <button key={p.id} onClick={()=>onPack(p.id)}
               style={{flex:'0 0 auto',fontSize:'0.82rem',fontWeight:pack===p.id?700:600,cursor:'pointer',
-                color:pack===p.id?'#02140f':C.warm,background:pack===p.id?C.mercury:'rgba(255,255,255,0.07)',
+                color:pack===p.id?'#211804':C.warm,background:pack===p.id?C.jupiter:'rgba(255,255,255,0.07)',
                 border:pack===p.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 13px',borderRadius:20}}>
               {p.emoji} {lang==='ru'?p.ru:p.en}
             </button>

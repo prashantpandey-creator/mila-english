@@ -51,16 +51,17 @@ export default function DashboardPage() {
         borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div onClick={()=>router.push('/')} style={{cursor:'pointer',display:'flex',alignItems:'center',gap:9}}>
-          <div style={{width:30,height:30,borderRadius:10,border:'1px solid rgba(36,211,154,0.48)',
+          <div style={{width:30,height:30,borderRadius:10,border:'1px solid rgba(242,139,173,0.48)',
             display:'flex',alignItems:'center',justifyContent:'center',
             fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:750,fontSize:'1rem',color:C.mercuryBright,
-            background:'linear-gradient(145deg,rgba(36,211,154,.1),rgba(106,220,245,.025))'}}>M</div>
+            background:'linear-gradient(145deg,rgba(36,211,154,.11),rgba(242,139,173,.08))',
+            boxShadow:'0 0 22px rgba(242,139,173,.08)'}}>M</div>
           <span style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.18rem',letterSpacing:'-0.03em',color:C.dark}}>Mila</span>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <LangToggle />
           <button onClick={handleLogout}
-            style={{padding:'6px 14px',borderRadius:12,border:`1.5px solid ${C.rose}`,background:'transparent',color:C.rose,
+            style={{padding:'6px 14px',borderRadius:12,border:'1.5px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.025)',color:'#c8c8cc',
               fontWeight:600,fontSize:'0.8rem',cursor:'pointer'}}>
             {lang==='ru'?'Выйти':'Sign Out'}
           </button>
@@ -76,7 +77,7 @@ export default function DashboardPage() {
         {/* Greeting */}
         <div style={{marginBottom:24}}>
           <h1 style={{display:'flex',alignItems:'center',gap:9,fontSize:'1.6rem',fontWeight:800,margin:0,color:C.dark}}>
-            {getGreeting()} <span style={{display:'grid',color:C.mercury}}><MilaIcon name="sparkle" size={22}/></span>
+            {getGreeting()} <span style={{display:'grid',color:C.venus}}><MilaIcon name="sparkle" size={22}/></span>
           </h1>
           <div style={{display:'flex',alignItems:'center',gap:10,marginTop:6}}>
             <p style={{color:C.warm,margin:0}}>

@@ -387,7 +387,7 @@ export default function HomePage() {
 
           <div className="room-grid">
             {rooms.map((room) => (
-              <button className={`room-card ${room.className}`} key={room.href} onClick={() => router.push(isLoggedIn ? room.href : '/register')}>
+              <button className={`room-card ${room.className}`} data-room={room.id} key={room.href} onClick={() => router.push(isLoggedIn ? room.href : '/register')}>
                 <span className="room-card__icon"><Icon name={room.icon} /></span>
                 <RoomVisual id={room.id}/>
                 <span className="room-card__label">{room.label}</span>
