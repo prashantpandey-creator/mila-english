@@ -2,19 +2,21 @@
 
 ## Decision
 
-Keep `qwen3:4b-instruct-2507-q4_K_M` as Mila's shared Chat, Guide, and Darshan
-model. None of the tested sub-2B models was accurate enough to teach English to
-Russian speakers, and NVIDIA Nemotron 3 Nano 4B was slower on bilingual turns
-without matching Qwen's quality.
+Keep `qwen3:4b-instruct-2507-q4_K_M` as Mila's Chat, Guide, and Darshan
+checkpoint. Darshan uses a separate 4K Ollama runtime with the same weights so
+Chat traffic cannot evict its prompt cache. None of the tested sub-2B models was
+accurate enough to teach English to Russian speakers, and NVIDIA Nemotron 3 Nano
+4B was slower on bilingual turns without matching Qwen's quality.
 
 The production latency fix is therefore operational rather than a model
 downgrade:
 
 - pin Ollama 0.32.0, which generated the same Qwen 4B answers roughly two to
   three times faster than the previous 0.15.1 runtime in this CPU test;
-- load and keep the model resident after ASR and pronunciation have booted;
-- send only the last three voice turns and cap spoken replies at 60 tokens;
-- target one or two sentences and 15–35 spoken words;
+- load and keep the Chat and dedicated voice runtimes resident after ASR and
+  pronunciation have booted;
+- send only the last two voice turns and cap spoken replies at 50 tokens;
+- target one or two sentences and 15–30 spoken words;
 - stop recording after 1.2 seconds of silence instead of 1.6 seconds.
 
 This preserves the same Mila persona, learner profile, explicit memories, and

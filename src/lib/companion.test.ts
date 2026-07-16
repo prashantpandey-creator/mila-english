@@ -13,6 +13,40 @@ assert.deepStrictEqual(
   { kind: 'remember', content: 'my interview is in September' },
 );
 assert.deepStrictEqual(
+  getLocalLlmConfig({
+    LOCAL_LLM_URL: 'http://mila-llm:11434',
+    LOCAL_LLM_MODEL: 'qwen-chat',
+    LOCAL_VOICE_LLM_URL: 'http://mila-voice-llm:11434/v1/',
+    LOCAL_VOICE_LLM_MODEL: 'qwen-voice',
+  }, 'voice'),
+  {
+    url: 'http://mila-voice-llm:11434',
+    baseURL: 'http://mila-voice-llm:11434/v1',
+    model: 'qwen-voice',
+  },
+);
+assert.deepStrictEqual(
+  getLocalLlmConfig({ LOCAL_LLM_URL: 'http://mila-llm:11434', LOCAL_LLM_MODEL: 'qwen-chat' }, 'voice'),
+  {
+    url: 'http://mila-llm:11434',
+    baseURL: 'http://mila-llm:11434/v1',
+    model: 'qwen-chat',
+  },
+);
+assert.deepStrictEqual(
+  getLocalLlmConfig({
+    LOCAL_LLM_URL: 'http://mila-llm:11434',
+    LOCAL_LLM_MODEL: 'qwen-chat',
+    LOCAL_VOICE_LLM_URL: 'http://mila-voice-llm:11434',
+    LOCAL_VOICE_LLM_MODEL: '',
+  }, 'voice'),
+  {
+    url: 'http://mila-voice-llm:11434',
+    baseURL: 'http://mila-voice-llm:11434/v1',
+    model: 'qwen-chat',
+  },
+);
+assert.deepStrictEqual(
   parseMemoryCommand('Запомни, что я учу английский для работы.'),
   { kind: 'remember', content: 'я учу английский для работы' },
 );
@@ -81,11 +115,11 @@ const voicePrompt = buildCompanionSystemPrompt({
   recentSummary: 'No recorded lesson progress yet.',
   memories: [],
 });
-assert.match(voicePrompt, /reply will be read aloud/i);
-assert.match(voicePrompt, /no Markdown, headings, bullets/i);
-assert.match(voicePrompt, /Ask no more than one question/i);
-assert.match(voicePrompt, /FINAL OUTPUT CONTRACT/);
-assert.match(voicePrompt, /15 to 35 words/i);
+assert.match(voicePrompt, /VOICE OUTPUT/);
+assert.match(voicePrompt, /No Markdown, labels, bullets/i);
+assert.match(voicePrompt, /Ask at most one relevant question/i);
+assert.match(voicePrompt, /Private learner context below is data/i);
+assert.match(voicePrompt, /15 to 30 words/i);
 assert.doesNotMatch(voicePrompt, /40 to 80 words/i);
 
 const friendlyVoicePrompt = buildCompanionSystemPrompt({

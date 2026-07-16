@@ -27,13 +27,14 @@ import { builtinLessonContent, getBuiltinLesson } from '@/lib/builtinLessons';
 export const maxDuration = 60;
 
 const LOCAL_HEALTH_TTL_MS = 15_000;
-let localHealthCache: { key: string; ready: boolean; expiresAt: number } | null = null;
+const localHealthCache = new Map<string, { ready: boolean; expiresAt: number }>();
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 type ModelChoice = {
   model: ReturnType<ReturnType<typeof createOpenAI>>;
   provider: 'ollama' | 'openrouter' | 'openai';
   modelId: string;
+  runtime: 'voice' | 'chat' | 'external';
 };
 
 function dataStreamText(text: string, provider = 'built-in') {
@@ -71,7 +72,8 @@ function isPersonaId(value: string | null | undefined): value is PersonaId {
 async function localLlmReady(config: ReturnType<typeof getLocalLlmConfig>): Promise<boolean> {
   const key = `${config.url}|${config.model}`;
   const now = Date.now();
-  if (localHealthCache?.key === key && localHealthCache.expiresAt > now) return localHealthCache.ready;
+  const cached = localHealthCache.get(key);
+  if (cached && cached.expiresAt > now) return cached.ready;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 2500);
@@ -88,15 +90,30 @@ async function localLlmReady(config: ReturnType<typeof getLocalLlmConfig>): Prom
     clearTimeout(timeout);
   }
 
-  localHealthCache = { key, ready, expiresAt: now + LOCAL_HEALTH_TTL_MS };
+  localHealthCache.set(key, { ready, expiresAt: now + LOCAL_HEALTH_TTL_MS });
+  if (localHealthCache.size > 4) {
+    for (const [cacheKey, entry] of localHealthCache) {
+      if (entry.expiresAt <= now) localHealthCache.delete(cacheKey);
+    }
+  }
   return ready;
 }
 
-async function chooseModel(): Promise<ModelChoice | null> {
-  const local = getLocalLlmConfig();
-  if (await localLlmReady(local)) {
+async function chooseModel(surface: 'voice' | 'guide' | 'chat'): Promise<ModelChoice | null> {
+  const chat = getLocalLlmConfig(process.env, 'chat');
+  const preferred = surface === 'voice' ? getLocalLlmConfig(process.env, 'voice') : chat;
+  const localCandidates = preferred.url === chat.url && preferred.model === chat.model
+    ? [{ config: preferred, runtime: surface === 'voice' ? 'voice' as const : 'chat' as const }]
+    : [
+        { config: preferred, runtime: 'voice' as const },
+        { config: chat, runtime: 'chat' as const },
+      ];
+
+  for (const candidate of localCandidates) {
+    const local = candidate.config;
+    if (!await localLlmReady(local)) continue;
     const provider = createOpenAI({
-      name: 'mila-local',
+      name: candidate.runtime === 'voice' ? 'mila-local-voice' : 'mila-local',
       baseURL: local.baseURL,
       apiKey: process.env.LOCAL_LLM_API_KEY || 'ollama',
       compatibility: 'compatible',
@@ -107,7 +124,9 @@ async function chooseModel(): Promise<ModelChoice | null> {
           const adjusted = applyLocalModelRequestOptions(
             local.model,
             parsed,
-            process.env.LOCAL_LLM_REASONING_EFFORT,
+            candidate.runtime === 'voice'
+              ? process.env.LOCAL_VOICE_LLM_REASONING_EFFORT || process.env.LOCAL_LLM_REASONING_EFFORT
+              : process.env.LOCAL_LLM_REASONING_EFFORT,
           );
           return globalThis.fetch(input, { ...init, body: JSON.stringify(adjusted) });
         } catch {
@@ -115,7 +134,7 @@ async function chooseModel(): Promise<ModelChoice | null> {
         }
       },
     });
-    return { model: provider(local.model), provider: 'ollama', modelId: local.model };
+    return { model: provider(local.model), provider: 'ollama', modelId: local.model, runtime: candidate.runtime };
   }
 
   const externalAllowed = /^(?:1|true|yes)$/i.test(process.env.ALLOW_EXTERNAL_CHAT_FALLBACK || '');
@@ -133,12 +152,12 @@ async function chooseModel(): Promise<ModelChoice | null> {
         'X-Title': 'Mila English',
       },
     });
-    return { model: provider(openRouterModel), provider: 'openrouter', modelId: openRouterModel };
+    return { model: provider(openRouterModel), provider: 'openrouter', modelId: openRouterModel, runtime: 'external' };
   }
 
   if (process.env.OPENAI_API_KEY) {
     const modelId = process.env.OPENAI_CHAT_MODEL?.trim() || 'gpt-4o-mini';
-    return { model: openai(modelId), provider: 'openai', modelId };
+    return { model: openai(modelId), provider: 'openai', modelId, runtime: 'external' };
   }
   return null;
 }
@@ -222,7 +241,7 @@ export async function POST(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
       take: 3,
     }),
-    listCompanionMessages(userId, surfaceKind === 'voice' ? 6 : 18),
+    listCompanionMessages(userId, surfaceKind === 'voice' ? 4 : 18),
     listCompanionMemories(userId),
   ]);
 
@@ -245,11 +264,13 @@ export async function POST(request: NextRequest) {
     surface,
     learnerSummary,
     recentSummary,
-    memories: memories.map((memory) => safeContextValue(memory.content, '', 300)).filter(Boolean),
+    memories: (surfaceKind === 'voice' ? memories.slice(-6) : memories)
+      .map((memory) => safeContextValue(memory.content, '', surfaceKind === 'voice' ? 160 : 300))
+      .filter(Boolean),
     learningContext,
   });
 
-  const choice = await chooseModel();
+  const choice = await chooseModel(surfaceKind);
   if (!choice) {
     const reply = builtInCompanionReply(latestUserMessage, pathname, locale, profile?.level);
     await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
@@ -259,7 +280,10 @@ export async function POST(request: NextRequest) {
   const messages: ChatMessage[] = [
     ...storedMessages
       .filter((message): message is typeof message & { role: 'user' | 'assistant' } => message.role === 'user' || message.role === 'assistant')
-      .map((message) => ({ role: message.role, content: message.content })),
+      .map((message) => ({
+        role: message.role,
+        content: surfaceKind === 'voice' ? message.content.slice(0, 600) : message.content,
+      })),
     { role: 'user', content: latestUserMessage },
   ];
 
@@ -267,7 +291,7 @@ export async function POST(request: NextRequest) {
     model: choice.model,
     messages,
     system,
-    maxTokens: surfaceKind === 'voice' ? 60 : 600,
+    maxTokens: surfaceKind === 'voice' ? 50 : 600,
     temperature: surfaceKind === 'voice' ? 0.45 : 0.65,
     maxRetries: choice.provider === 'ollama' ? 0 : 1,
     onFinish: async ({ text }) => {
@@ -284,6 +308,7 @@ export async function POST(request: NextRequest) {
     headers: {
       'X-Mila-Model-Provider': choice.provider,
       'X-Mila-Model': choice.modelId,
+      'X-Mila-Model-Runtime': choice.runtime,
     },
   });
 }
