@@ -201,7 +201,7 @@ export default function HomePage() {
 
   const doors: { icon: MilaIconName; kicker: string; title: string; copy: string; href: string; cls: string; start?: boolean; accent: [string, string, string] }[] = [
     {
-      accent: ['#b3502c', 'rgba(179, 80, 44, 0.09)', 'rgba(179, 80, 44, 0.35)'], icon: 'level', cls: 'lp-door--lead', href: '/assessment', start: true,
+      accent: ['#d63d72', 'rgba(214, 61, 114, 0.09)', 'rgba(214, 61, 114, 0.35)'], icon: 'level', cls: 'lp-door--lead', href: '/assessment', start: true,
       kicker: T('Проверка уровня', 'Level check'),
       title: T('Пять минут голосом — и Mila знает, с чего начать', 'Five minutes of your voice — Mila knows where to begin'),
       copy: T('Прочитай фразу, ответь на четыре вопроса. Мила определит уровень и соберёт личный план. Есть режим без микрофона.', 'Read one phrase, answer four questions. Mila places your level and builds a personal plan. A no-microphone mode is included.'),
@@ -219,13 +219,13 @@ export default function HomePage() {
       copy: T('Живые фразы, три акцента, разбор каждой фонемы.', 'Real phrases, three accents, every phoneme mapped.'),
     },
     {
-      accent: ['#a9720f', 'rgba(169, 114, 15, 0.09)', 'rgba(169, 114, 15, 0.34)'], icon: 'vocabulary', cls: 'lp-door--third', href: '/vocabulary',
+      accent: ['#7c5cbf', 'rgba(124, 92, 191, 0.09)', 'rgba(124, 92, 191, 0.34)'], icon: 'vocabulary', cls: 'lp-door--third', href: '/vocabulary',
       kicker: T('Новые слова', 'New words'),
       title: T('Словарь, который не забывается', 'Vocabulary that stays'),
       copy: T('Интервальные повторения возвращают слово точно в срок.', 'Spaced repetition brings each word back right on time.'),
     },
     {
-      accent: ['#5f7052', 'rgba(95, 112, 82, 0.09)', 'rgba(95, 112, 82, 0.32)'], icon: 'grammar', cls: 'lp-door--third', href: '/grammar',
+      accent: ['#2f855a', 'rgba(47, 133, 90, 0.09)', 'rgba(47, 133, 90, 0.32)'], icon: 'grammar', cls: 'lp-door--third', href: '/grammar',
       kicker: T('Грамматика', 'Grammar'),
       title: T('Правила через твои фразы', 'Rules through your own phrases'),
       copy: T('Грамматика объясняется на языке, которым ты уже говоришь.', 'Grammar explained through language you already use.'),
