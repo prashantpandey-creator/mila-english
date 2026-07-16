@@ -33,10 +33,16 @@ export const viewport: Viewport = {
   width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#fff9fb',
 }
 
+// Runs before first paint so a night visitor never sees a blush flash: the
+// welcome room's light CSS is gated on html[data-mila-theme]. Preference key
+// mirrors mila_lang; absent/invalid means follow the device.
+const themeInitScript = `(function(){try{var p=localStorage.getItem('mila_theme');var d=p==='dark'||(p!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.milaTheme=d?'dark':'light';}catch(e){document.documentElement.dataset.milaTheme='light';}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${displayFont.variable} ${sansFont.variable}`}>
+    <html lang="ru" className={`${displayFont.variable} ${sansFont.variable}`} suppressHydrationWarning>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <PwaRegister />
         <SceneProvider>
           <Atmosphere />
