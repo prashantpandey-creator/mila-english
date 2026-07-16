@@ -66,7 +66,7 @@ jobs:
               fi
               sleep 2
             done
-            docker compose -f docker-compose.prod.yml up -d --no-deps mila-pron mila-asr
+            docker compose -f docker-compose.prod.yml up -d --no-deps mila-pron mila-asr mila-tts
             wait_for_health() {
               container="$1"
               port="$2"
@@ -81,12 +81,19 @@ jobs:
             }
             pron_ready=false
             asr_ready=false
+            tts_ready=false
             if wait_for_health mila-pron 8000; then pron_ready=true; fi
             if wait_for_health mila-asr 8001; then asr_ready=true; fi
+            if wait_for_health mila-tts 8002; then tts_ready=true; fi
             if [ "$pron_ready" = true ] && [ "$asr_ready" = true ]; then
               docker exec mila node -e "Promise.all([fetch('http://mila-pron:8000/health'),fetch('http://mila-asr:8001/health')]).then(rs=>{console.log('local speech services',rs.map(r=>r.status));process.exit(rs.every(r=>r.ok)?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
             else
               echo "Speech service warning: pronunciation=$pron_ready asr=$asr_ready"
+            fi
+            if [ "$tts_ready" = true ]; then
+              docker exec mila node -e "fetch('http://mila-tts:8002/health').then(r=>{console.log('piper tts',r.status);process.exit(r.ok?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
+            else
+              echo "TTS warning: Piper unavailable — browser speech fallback stays active"
             fi
             # Runtime measurements show that both resident runtimes fit safely
             # after ASR and pronunciation are loaded and avoid the cold-start
