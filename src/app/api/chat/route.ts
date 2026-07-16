@@ -11,8 +11,11 @@ import {
   ollamaHasModel,
   parseMemoryCommand,
   sanitizeVoiceReply,
+  voiceEvidenceFallbackLine,
+  voiceReplyHasUnsupportedEvidence,
   type CompanionLocale,
 } from '@/lib/companion';
+import { splitCompleteSentences } from '@/lib/voiceTurn';
 import {
   forgetAllCompanionMemories,
   listCompanionMemories,
@@ -196,8 +199,14 @@ export async function POST(request: NextRequest) {
       ? 'Darshan voice conversation'
       : 'full tutor chat';
   const turnContext = { pathname, locale, surface };
+  // Speculative voice drafts run against partial transcripts: they must never
+  // persist a turn or execute a memory command heard mid-sentence.
+  const speculative = surfaceKind === 'voice' && payload?.context?.speculative === true;
 
   const command = parseMemoryCommand(latestUserMessage);
+  if (command && speculative) {
+    return dataStreamText('', 'speculative-skip');
+  }
   if (command?.kind === 'remember') {
     if (isSensitiveMemory(command.content)) {
       return dataStreamText(locale === 'ru'
@@ -293,6 +302,7 @@ export async function POST(request: NextRequest) {
     maxTokens: surfaceKind === 'voice' ? 50 : 320,
     temperature: surfaceKind === 'voice' ? 0.25 : 0.35,
     maxRetries: choice.provider === 'ollama' ? 0 : 1,
+    abortSignal: request.signal,
     onFinish: surfaceKind === 'voice' ? undefined : async ({ text }) => {
       if (!text.trim()) return;
       try {
@@ -304,13 +314,63 @@ export async function POST(request: NextRequest) {
   });
 
   if (surfaceKind === 'voice') {
-    let rawReply = '';
-    for await (const delta of result.textStream) rawReply += delta;
-    const reply = sanitizeVoiceReply(rawReply) || (locale === 'ru'
+    // Sentence-streamed fail-closed guard. Every evidence pattern in
+    // voiceReplyHasUnsupportedEvidence is sentence-local ([^.!?] windows), so
+    // checking sentence-by-sentence detects exactly what the whole-reply check
+    // did — while letting TTS start after the first clean sentence instead of
+    // after the full generation.
+    const emptyFallback = locale === 'ru'
       ? 'Я могу ответить по тексту, но не буду выдумывать то, чего не слышала или не видела.'
-      : 'I can respond to the text, but I will not invent anything I did not hear or see.');
-    await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
-    return new Response(`0:${JSON.stringify(reply)}\n`, {
+      : 'I can respond to the text, but I will not invent anything I did not hear or see.';
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        let emitted = '';
+        const emit = (piece: string) => {
+          const clean = piece.trim();
+          if (!clean) return;
+          const chunk = emitted ? ` ${clean}` : clean;
+          emitted += chunk;
+          controller.enqueue(encoder.encode(`0:${JSON.stringify(chunk)}\n`));
+        };
+        let buffer = '';
+        let failedClosed = false;
+        try {
+          for await (const delta of result.textStream) {
+            buffer += delta;
+            const { complete, rest } = splitCompleteSentences(buffer);
+            buffer = rest;
+            for (const sentence of complete) {
+              if (voiceReplyHasUnsupportedEvidence(sentence)) {
+                failedClosed = true;
+                break;
+              }
+              emit(sanitizeVoiceReply(sentence));
+            }
+            if (failedClosed) break;
+          }
+          if (!failedClosed && buffer.trim()) {
+            if (voiceReplyHasUnsupportedEvidence(buffer)) failedClosed = true;
+            else emit(sanitizeVoiceReply(buffer));
+          }
+        } catch (error) {
+          if (!request.signal.aborted) console.error('Voice reply stream failed', error);
+        }
+        // An unsupported claim with nothing spoken yet → speak the safe line.
+        // With clean sentences already spoken → stop silently at the claim.
+        if (failedClosed && !emitted) emit(voiceEvidenceFallbackLine(buffer));
+        if (!emitted && !request.signal.aborted) emit(emptyFallback);
+        if (!speculative && !request.signal.aborted && emitted.trim()) {
+          try {
+            await saveCompanionTurn(userId, latestUserMessage, emitted.trim(), turnContext);
+          } catch (error) {
+            console.error('Failed to persist Mila voice turn', error);
+          }
+        }
+        controller.close();
+      },
+    });
+    return new Response(stream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'X-Vercel-AI-Data-Stream': 'v1',

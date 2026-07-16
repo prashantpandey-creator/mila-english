@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useChat } from "ai/react";
 import { useRouter } from "next/navigation";
 import { MilaVoid } from "@/components/darshan/MilaVoid";
 import { MilaBindu, type BinduState } from "@/components/darshan/MilaBindu";
@@ -10,6 +9,8 @@ import { startLocalTranscription, type LocalTranscript, type TranscriptionSessio
 import { createStreamingTtsSession, spokenLocaleForText, ttsSpeak, type StreamingTtsSession } from "@/lib/tts";
 import { toSpokenText } from "@/lib/spokenText";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
+import { streamVoiceReply } from "@/lib/voiceChatStream";
+import { draftMatches, endpointSilenceMs, pickBackchannel } from "@/lib/voiceTurn";
 
 const INVITES = [
   "What do you wish to know?",
@@ -19,11 +20,21 @@ const INVITES = [
   "What do you seek?",
 ];
 
-function completeSpokenPrefix(value: string): string {
-  const endings = [...value.matchAll(/[.!?…]+["')\]]*(?=\s|$)/gu)];
-  const last = endings[endings.length - 1];
-  return last ? value.slice(0, (last.index ?? 0) + last[0].length).trim() : "";
-}
+// While the learner speaks, each mid-speech pause fires a speculative reply
+// draft against the partial transcript. A draft is committed only when the
+// final transcript matches it; otherwise it is aborted and a normal request
+// runs. Flip to false to fall back to strictly sequential turns.
+const SPECULATIVE_DRAFTS = true;
+
+type Draft = {
+  transcript: string;
+  text: string;
+  done: boolean;
+  failed: boolean;
+  controller: AbortController;
+  promise: Promise<string>;
+  onUpdate: ((full: string) => void) | null;
+};
 
 export default function DarshanPage() {
   const router = useRouter();
@@ -32,6 +43,7 @@ export default function DarshanPage() {
   const [phase, setPhase] = useState<BinduState>("resting");
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isBusy, setIsBusy] = useState(false);
   const [voiceError, setVoiceError] = useState("");
 
   const [liveText, setLiveText] = useState("");
@@ -44,12 +56,13 @@ export default function DarshanPage() {
   const listeningStartRef = useRef(false);
   const loadingRef = useRef(false);
   const turnRef = useRef(0);
-  const requestTurnRef = useRef<number | null>(null);
-  const requestUserMessageIdRef = useRef<string | null>(null);
-  const assistantMessageIdRef = useRef<string | null>(null);
   const restartTimerRef = useRef<number | null>(null);
   const activeRef = useRef(false);
   const startListeningRef = useRef<() => Promise<void>>(async () => {});
+  const latestPartialRef = useRef<string | null>(null);
+  const draftRef = useRef<Draft | null>(null);
+  const requestControllerRef = useRef<AbortController | null>(null);
+  const backchannelIndexRef = useRef<number | null>(null);
 
   const clearRestartTimer = useCallback(() => {
     if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
@@ -77,86 +90,66 @@ export default function DarshanPage() {
     window.speechSynthesis?.cancel();
   }, []);
 
-  const { append, isLoading, messages, stop } = useChat({
-    id: "mila-darshan-local",
-    api: "/api/chat",
-    body: { context: { pathname: "/darshan", lang, surface: "voice" } },
-    keepLastMessageOnError: true,
-    onError: () => {
-      const failedTurn = requestTurnRef.current;
-      requestTurnRef.current = null;
-      requestUserMessageIdRef.current = null;
-      assistantMessageIdRef.current = null;
-      cancelSpeechSession();
-      if (failedTurn === null || failedTurn !== turnRef.current) return;
-      setVoiceError(lang === "ru"
-        ? "Мила не смогла ответить. Коснись сферы, чтобы попробовать снова."
-        : "Mila could not answer. Touch the orb to try again.");
-      setPhase("resting");
-    },
-    onFinish: (message, { finishReason }) => {
-      const completedTurn = requestTurnRef.current;
-      if (completedTurn === null || completedTurn !== turnRef.current) return;
-      if (assistantMessageIdRef.current && assistantMessageIdRef.current !== message.id) return;
-      assistantMessageIdRef.current = message.id;
-      const reply = toSpokenText(message.content);
-      if (!reply) {
-        requestTurnRef.current = null;
-        requestUserMessageIdRef.current = null;
-        assistantMessageIdRef.current = null;
-        cancelSpeechSession();
-        setPhase("resting");
-        scheduleListening(completedTurn);
-        return;
-      }
-      announceCompanionHistoryUpdated();
-      setAnswer(reply);
-      setPhase("manifesting");
-      const pending = speechSessionRef.current;
-      const speaking = pending
-        ? pending.then((session) => session.finish(reply, finishReason !== "length"))
-        : ttsSpeak(
-            finishReason === "length" ? completeSpokenPrefix(reply) : reply,
-            spokenLocaleForText(reply, lang === "ru" ? "ru-RU" : "en-US"),
-            0.9,
-          );
-      void speaking.finally(() => {
-        if (requestTurnRef.current !== completedTurn || turnRef.current !== completedTurn) return;
-        if (speechSessionRef.current === pending) speechSessionRef.current = null;
-        requestTurnRef.current = null;
-        requestUserMessageIdRef.current = null;
-        assistantMessageIdRef.current = null;
-        if (!activeRef.current) return;
-        setPhase("resting");
-        scheduleListening(completedTurn);
-      });
-    },
-  });
-  loadingRef.current = isLoading;
+  const abortDraft = useCallback(() => {
+    const draft = draftRef.current;
+    draftRef.current = null;
+    draft?.controller.abort();
+  }, []);
+
+  const fireDraft = useCallback((partialText: string) => {
+    if (!SPECULATIVE_DRAFTS || !activeRef.current || loadingRef.current) return;
+    const transcript = partialText.trim();
+    if (!transcript) return;
+    const current = draftRef.current;
+    if (current && current.transcript === transcript) return;
+    current?.controller.abort();
+    const controller = new AbortController();
+    const draft: Draft = {
+      transcript,
+      text: "",
+      done: false,
+      failed: false,
+      controller,
+      promise: Promise.resolve(""),
+      onUpdate: null,
+    };
+    draft.promise = streamVoiceReply({
+      text: transcript,
+      lang: lang === "ru" ? "ru" : "en",
+      speculative: true,
+      signal: controller.signal,
+      onDelta: (full) => {
+        draft.text = full;
+        draft.onUpdate?.(full);
+      },
+    }).then((response) => {
+      draft.text = response.reply;
+      draft.done = true;
+      draft.onUpdate?.(response.reply);
+      return response.reply;
+    }).catch(() => {
+      draft.failed = true;
+      draft.done = true;
+      return "";
+    });
+    draftRef.current = draft;
+  }, [lang]);
 
   useEffect(() => {
-    const currentTurn = requestTurnRef.current;
-    const userMessageId = requestUserMessageIdRef.current;
-    if (!isLoading || currentTurn === null || currentTurn !== turnRef.current || !userMessageId || !speechSessionRef.current) return;
-    const userIndex = messages.findIndex((message) => message.id === userMessageId);
-    if (userIndex < 0) return;
-    const assistant = messages.slice(userIndex + 1).find((message) => message.role === "assistant");
-    if (!assistant || typeof assistant.content !== "string") return;
-    if (assistantMessageIdRef.current && assistantMessageIdRef.current !== assistant.id) return;
-    assistantMessageIdRef.current = assistant.id;
-    const partial = toSpokenText(assistant.content);
-    if (!partial) return;
-    setAnswer(partial);
-    const pending = speechSessionRef.current;
-    void pending.then((session) => {
-      if (
-        speechSessionRef.current === pending
-        && requestTurnRef.current === currentTurn
-        && turnRef.current === currentTurn
-        && assistantMessageIdRef.current === assistant.id
-      ) session.push(partial);
-    });
-  }, [isLoading, messages]);
+    return () => {
+      activeRef.current = false;
+      turnRef.current += 1;
+      clearRestartTimer();
+      requestControllerRef.current?.abort();
+      requestControllerRef.current = null;
+      const draft = draftRef.current;
+      draftRef.current = null;
+      draft?.controller.abort();
+      transcriptionRef.current?.cancel();
+      transcriptionRef.current = null;
+      cancelSpeechSession();
+    };
+  }, [cancelSpeechSession, clearRestartTimer]);
 
   // Responsive orb sizing
   useEffect(() => {
@@ -176,24 +169,10 @@ export default function DarshanPage() {
     return () => clearInterval(id);
   }, [phase]);
 
-  useEffect(() => {
-    return () => {
-      activeRef.current = false;
-      turnRef.current += 1;
-      requestTurnRef.current = null;
-      requestUserMessageIdRef.current = null;
-      assistantMessageIdRef.current = null;
-      clearRestartTimer();
-      stop();
-      transcriptionRef.current?.cancel();
-      transcriptionRef.current = null;
-      cancelSpeechSession();
-    };
-  }, [cancelSpeechSession, clearRestartTimer, stop]);
-
   const submitTranscript = useCallback(async (transcript: LocalTranscript) => {
     const text = transcript.text.trim();
     transcriptionRef.current = null;
+    latestPartialRef.current = null;
     if (!text || !activeRef.current) return;
     setLiveText(text);
     setAnswer("");
@@ -203,31 +182,127 @@ export default function DarshanPage() {
     cancelSpeechSession();
     const turnId = turnRef.current + 1;
     turnRef.current = turnId;
-    requestTurnRef.current = turnId;
-    const userMessageId = `darshan-user-${turnId}-${Date.now()}`;
-    requestUserMessageIdRef.current = userMessageId;
-    assistantMessageIdRef.current = null;
-    speechSessionRef.current = createStreamingTtsSession(
-      lang === "ru" ? "ru-RU" : "en-US",
-      0.9,
-      () => {
-        if (!activeRef.current || requestTurnRef.current !== turnId || turnRef.current !== turnId) return;
-        setPhase("manifesting");
-      },
-    );
-    try {
-      await append({ id: userMessageId, role: "user", content: text });
-    } catch (error) {
-      if (requestTurnRef.current !== turnId || turnRef.current !== turnId) return;
-      console.error("Could not request a Darshan reply", error);
-      requestTurnRef.current = null;
-      requestUserMessageIdRef.current = null;
-      assistantMessageIdRef.current = null;
-      cancelSpeechSession();
+    loadingRef.current = true;
+    setIsBusy(true);
+
+    const draft = draftRef.current;
+    draftRef.current = null;
+    const draftHit = !!draft && !draft.failed && draftMatches(draft.transcript, text);
+    if (draft && !draftHit) draft.controller.abort();
+
+    const requestLang = lang === "ru" ? "ru" : "en";
+    const spokenLocale = spokenLocaleForText(text, lang === "ru" ? "ru-RU" : "en-US");
+    const sessionPromise = createStreamingTtsSession(spokenLocale, 0.9, () => {
+      if (!activeRef.current || turnRef.current !== turnId) return;
+      setPhase("manifesting");
+    });
+    speechSessionRef.current = sessionPromise;
+
+    const endTurn = (restAndListen: boolean) => {
+      if (turnRef.current !== turnId) return;
+      if (speechSessionRef.current === sessionPromise) speechSessionRef.current = null;
+      requestControllerRef.current = null;
+      loadingRef.current = false;
+      setIsBusy(false);
+      if (!activeRef.current || !restAndListen) return;
       setPhase("resting");
-      setVoiceError(lang === "ru" ? "Мила не смогла ответить." : "Mila could not answer.");
+      scheduleListening(turnId);
+    };
+
+    try {
+      const sessionBox = { current: await sessionPromise, pushedAny: false };
+      if (turnRef.current !== turnId || !activeRef.current) return;
+
+      const handleDelta = (full: string) => {
+        if (turnRef.current !== turnId || !activeRef.current) return;
+        const spoken = toSpokenText(full);
+        if (!spoken) return;
+        sessionBox.pushedAny = true;
+        setAnswer(spoken);
+        sessionBox.current.push(spoken);
+      };
+
+      const runRealRequest = async (): Promise<string> => {
+        // A partially spoken failed draft cannot be extended by a fresh reply
+        // (the TTS session is append-only) — restart the session first.
+        if (sessionBox.pushedAny) {
+          sessionBox.current.cancel();
+          const fresh = createStreamingTtsSession(spokenLocale, 0.9, () => {
+            if (!activeRef.current || turnRef.current !== turnId) return;
+            setPhase("manifesting");
+          });
+          speechSessionRef.current = fresh;
+          sessionBox.current = await fresh;
+          sessionBox.pushedAny = false;
+        }
+        const controller = new AbortController();
+        requestControllerRef.current = controller;
+        const response = await streamVoiceReply({
+          text,
+          lang: requestLang,
+          signal: controller.signal,
+          onDelta: handleDelta,
+        });
+        return response.reply;
+      };
+
+      // First sound: a finished matching draft speaks immediately with no
+      // filler; anything slower gets a spoken backchannel while it thinks.
+      const draftReady = draftHit && draft!.done && !!toSpokenText(draft!.text);
+      if (!draftReady) {
+        const pick = pickBackchannel(
+          spokenLocale === "ru-RU" ? "ru" : "en",
+          turnId,
+          backchannelIndexRef.current,
+        );
+        backchannelIndexRef.current = pick.index;
+        void ttsSpeak(pick.text, spokenLocale, 1);
+      }
+
+      let reply = "";
+      if (draftHit) {
+        requestControllerRef.current = draft!.controller;
+        draft!.onUpdate = handleDelta;
+        if (draft!.text) handleDelta(draft!.text);
+        reply = await draft!.promise;
+        if (turnRef.current !== turnId) return;
+        if (draft!.failed || !toSpokenText(reply)) {
+          reply = await runRealRequest();
+        } else {
+          void fetch("/api/chat/commit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user: text, assistant: reply, lang: requestLang }),
+          }).catch((error) => console.error("Could not persist a committed Darshan draft", error));
+        }
+      } else {
+        reply = await runRealRequest();
+      }
+      if (turnRef.current !== turnId) return;
+
+      const spokenReply = toSpokenText(reply);
+      if (!spokenReply) {
+        cancelSpeechSession();
+        endTurn(true);
+        return;
+      }
+      announceCompanionHistoryUpdated();
+      setAnswer(spokenReply);
+      await sessionBox.current.finish(spokenReply, true);
+      endTurn(true);
+    } catch (error) {
+      if ((error as Error)?.name === "AbortError") return;
+      if (turnRef.current !== turnId) return;
+      console.error("Could not complete a Darshan turn", error);
+      cancelSpeechSession();
+      endTurn(false);
+      if (!activeRef.current) return;
+      setVoiceError(lang === "ru"
+        ? "Мила не смогла ответить. Коснись сферы, чтобы попробовать снова."
+        : "Mila could not answer. Touch the orb to try again.");
+      setPhase("resting");
     }
-  }, [append, cancelSpeechSession, clearRestartTimer, lang]);
+  }, [cancelSpeechSession, clearRestartTimer, lang, scheduleListening]);
 
   const startListening = useCallback(async () => {
     if (!activeRef.current || transcriptionRef.current || listeningStartRef.current || loadingRef.current) return;
@@ -236,9 +311,22 @@ export default function DarshanPage() {
     setLiveText("");
     setAnswer("");
     setPhase("listening");
+    latestPartialRef.current = null;
     try {
       const session = await startLocalTranscription({
         language: "auto",
+        partialAfterMs: 450,
+        getSilenceMs: () => endpointSilenceMs(latestPartialRef.current),
+        onPartial: (partial) => {
+          if (!activeRef.current) return;
+          latestPartialRef.current = partial.text;
+          setLiveText(partial.text);
+          fireDraft(partial.text);
+        },
+        onVoiceResume: () => {
+          latestPartialRef.current = null;
+          abortDraft();
+        },
         onScoring: () => setPhase("thinking"),
         onAutoStop: (transcript) => void submitTranscript(transcript),
         onError: (error) => {
@@ -272,7 +360,7 @@ export default function DarshanPage() {
     } finally {
       listeningStartRef.current = false;
     }
-  }, [lang, scheduleListening, submitTranscript]);
+  }, [abortDraft, fireDraft, lang, scheduleListening, submitTranscript]);
 
   useEffect(() => {
     startListeningRef.current = startListening;
@@ -280,17 +368,18 @@ export default function DarshanPage() {
 
   const connectToDarshan = async () => {
     if (isConnecting) return;
-    const canInterruptGeneration = phase === "manifesting" || (phase === "thinking" && requestTurnRef.current !== null);
-    if (isLoading && !canInterruptGeneration) return;
+    const canInterruptGeneration = phase === "manifesting" || (phase === "thinking" && isBusy);
+    if (isBusy && !canInterruptGeneration) return;
 
     if (isConnected) {
       if (canInterruptGeneration) {
         const nextTurn = turnRef.current + 1;
         turnRef.current = nextTurn;
-        requestTurnRef.current = null;
-        requestUserMessageIdRef.current = null;
-        assistantMessageIdRef.current = null;
-        stop();
+        requestControllerRef.current?.abort();
+        requestControllerRef.current = null;
+        abortDraft();
+        loadingRef.current = false;
+        setIsBusy(false);
         cancelSpeechSession();
         setPhase("resting");
         scheduleListening(nextTurn);
@@ -324,17 +413,16 @@ export default function DarshanPage() {
   const exit = useCallback(() => {
     activeRef.current = false;
     turnRef.current += 1;
-    requestTurnRef.current = null;
-    requestUserMessageIdRef.current = null;
-    assistantMessageIdRef.current = null;
     clearRestartTimer();
-    stop();
+    requestControllerRef.current?.abort();
+    requestControllerRef.current = null;
+    abortDraft();
     transcriptionRef.current?.cancel();
     transcriptionRef.current = null;
     cancelSpeechSession();
     setIsConnected(false);
     router.push('/chat');
-  }, [cancelSpeechSession, clearRestartTimer, router, stop]);
+  }, [abortDraft, cancelSpeechSession, clearRestartTimer, router]);
 
   const showInvocation = phase === "resting";
   const showQuestion = (phase === "listening" || phase === "thinking") && !!liveText;
