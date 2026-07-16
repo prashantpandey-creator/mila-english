@@ -11,6 +11,7 @@ import { MASCOT_PITCH, createStreamingTtsSession, spokenLocaleForText, ttsSpeakB
 import { startLocalTranscription } from '@/lib/localTranscription'
 import { streamVoiceReply } from '@/lib/voiceChatStream'
 import { parseVoiceCommand } from '@/lib/voiceCommands'
+import { endpointSilenceMs, pickBackchannel } from '@/lib/voiceTurn'
 import { toSpokenText } from '@/lib/spokenText'
 
 type GuideContext = {
@@ -58,7 +59,11 @@ export default function MilaGuide() {
   const [context, setContext] = useState<GuideContext | null>(null)
   const [guideError, setGuideError] = useState('')
   const [voiceMode, setVoiceMode] = useState(false)
+  const [voiceCaption, setVoiceCaption] = useState('')
   const pendingSpeakRef = useRef<{ text: string; locale: string } | null>(null)
+  const guidePartialRef = useRef<string | null>(null)
+  const backchannelIdxRef = useRef<number | null>(null)
+  const turnSeedRef = useRef(0)
 
   const {
     messages,
@@ -162,6 +167,9 @@ export default function MilaGuide() {
     const onVoiceMode = (event: Event) => {
       const detail = (event as CustomEvent).detail
       if (detail?.speak) pendingSpeakRef.current = { text: detail.speak, locale: detail.locale || 'en-US' }
+      // Consume the reload-safety flag so a later full page load does not
+      // re-arm voice mode unexpectedly.
+      try { sessionStorage.removeItem('mila-voice-mode') } catch { /* storage unavailable */ }
       setOpen(false)
       setVoiceMode(true)
     }
@@ -180,6 +188,7 @@ export default function MilaGuide() {
     let alive = true
     let session: { stop: () => Promise<unknown>; cancel: () => void } | null = null
     let restartTimer: number | null = null
+    let fillerPlayedThisTurn = false
 
     const schedule = (ms: number) => {
       if (!alive) return
@@ -191,6 +200,7 @@ export default function MilaGuide() {
       session = null
       setListening(false)
       if (!text || !alive) return schedule(500)
+      setVoiceCaption(text)
       const command = parseVoiceCommand(text)
       const locale = spokenLocaleForText(text, lang === 'ru' ? 'ru-RU' : 'en-US')
       if (command) {
@@ -198,25 +208,33 @@ export default function MilaGuide() {
           ? (lang === 'ru' ? 'Возвращаюсь.' : 'Going back.')
           : (lang === 'ru' ? `Открываю: ${command.labelRu}.` : `Opening ${command.labelEn}.`)
         pendingSpeakRef.current = { text: confirmation, locale }
+        setVoiceCaption(confirmation)
         if (command.kind === 'back') router.back()
         else router.push(command.route)
         return // pathname change re-runs this effect and resumes listening
       }
       setGuideError('')
       try {
-        const tts = await createStreamingTtsSession(locale, 0.98, () => setSpeaking(true), true, MASCOT_PITCH)
+        // The endpoint filler may still be humming — never cancel over it.
+        const tts = await createStreamingTtsSession(
+          locale, 0.98, () => setSpeaking(true), !fillerPlayedThisTurn, MASCOT_PITCH,
+        )
         const { reply } = await streamVoiceReply({
           text,
           lang: lang === 'ru' ? 'ru' : 'en',
           pathname,
           onDelta: (full) => {
             const spoken = toSpokenText(full)
-            if (spoken && alive) tts.push(spoken)
+            if (spoken && alive) {
+              setVoiceCaption(spoken)
+              tts.push(spoken)
+            }
           },
         })
         const spoken = toSpokenText(reply)
         if (spoken) {
           announceCompanionHistoryUpdated()
+          setVoiceCaption(spoken)
           await tts.finish(spoken, true)
         } else {
           tts.cancel()
@@ -233,11 +251,40 @@ export default function MilaGuide() {
       if (!alive) return
       const pending = pendingSpeakRef.current
       pendingSpeakRef.current = null
-      if (pending) await ttsSpeakBrowser(pending.text, pending.locale, 1, MASCOT_PITCH).catch(() => {})
+      if (pending) {
+        setVoiceCaption(pending.text)
+        await ttsSpeakBrowser(pending.text, pending.locale, 1, MASCOT_PITCH).catch(() => {})
+      }
       if (!alive) return
+      guidePartialRef.current = null
+      fillerPlayedThisTurn = false
       try {
         const started = await startLocalTranscription({
           language: 'auto',
+          partialAfterMs: 450,
+          getSilenceMs: () => endpointSilenceMs(guidePartialRef.current),
+          onPartial: (partial) => {
+            guidePartialRef.current = partial.text
+            if (alive) setVoiceCaption(partial.text)
+          },
+          onScoring: () => {
+            // End of turn — first sound before transcription finishes, same
+            // craft the old voice room had.
+            if (!alive || fillerPlayedThisTurn) return
+            fillerPlayedThisTurn = true
+            turnSeedRef.current += 1
+            const fillerLocale = spokenLocaleForText(
+              guidePartialRef.current || '',
+              lang === 'ru' ? 'ru-RU' : 'en-US',
+            )
+            const pick = pickBackchannel(
+              fillerLocale === 'ru-RU' ? 'ru' : 'en',
+              turnSeedRef.current,
+              backchannelIdxRef.current,
+            )
+            backchannelIdxRef.current = pick.index
+            void ttsSpeakBrowser(pick.text, fillerLocale, 1, MASCOT_PITCH)
+          },
           onAutoStop: (transcript) => void handleVoiceTurn(transcript.text),
           onError: (error) => {
             session = null
@@ -262,6 +309,7 @@ export default function MilaGuide() {
       session?.cancel()
       setListening(false)
       setSpeaking(false)
+      setVoiceCaption('')
       window.speechSynthesis?.cancel()
     }
   }, [voiceMode, isVoiceRoom, context?.authenticated, pathname, lang, router])
@@ -382,7 +430,7 @@ export default function MilaGuide() {
                     )}
                     <button type="button" disabled={isHistoryHydrating} onClick={() => ask(lang === 'ru' ? 'С чего мне лучше начать сегодня?' : 'What should I start with today?')}>{lang === 'ru' ? 'С чего начать?' : 'Where do I start?'}</button>
                     <button type="button" onClick={() => router.push('/assessment')}>{lang === 'ru' ? 'Проверить уровень' : 'Check my level'}</button>
-                    <button type="button" onClick={() => router.push('/darshan')}>{lang === 'ru' ? 'Поговорить голосом' : 'Voice practice'}</button>
+                    <button type="button" onClick={() => { setOpen(false); setVoiceMode(true) }}>{lang === 'ru' ? 'Поговорить голосом' : 'Voice practice'}</button>
                   </div>
                 )}
               </div>
@@ -415,8 +463,7 @@ export default function MilaGuide() {
             {context?.authenticated ? (
               <>
                 <button type="button" disabled={isHistoryHydrating} onClick={() => ask(lang === 'ru' ? 'Объясни, что я могу делать на этой странице.' : 'Explain what I can do on this page.')}><span>?</span>{lang === 'ru' ? 'Объясни страницу' : 'Explain this page'}</button>
-                <button type="button" onClick={() => router.push('/darshan')}><span>◉</span>{lang === 'ru' ? 'Поговорить голосом' : 'Voice practice'}</button>
-                <button type="button" onClick={() => { setOpen(false); setVoiceMode(true) }}><span>∿</span>{lang === 'ru' ? 'Свободный диалог' : 'Hands-free'}</button>
+                <button type="button" onClick={() => { setOpen(false); setVoiceMode(true) }}><span>◉</span>{lang === 'ru' ? 'Поговорить голосом' : 'Voice practice'}</button>
               </>
             ) : context && (
               // Guest FAQ — always visible so answers don't consume the options.
@@ -461,6 +508,22 @@ export default function MilaGuide() {
           <strong>{lang === 'ru' ? 'Мила рядом' : 'Mila is here'}</strong>
           <span>{lang === 'ru' ? 'Спросить или продолжить урок' : 'Ask anything or continue learning'}</span>
         </button>
+      )}
+
+      {/* Voice-mode caption — what she heard and what she is saying, floating
+          above the mascot while the panel stays closed. */}
+      {voiceMode && !open && voiceCaption && (
+        <div
+          aria-live="polite"
+          style={{
+            position: 'fixed', right: 18, bottom: 96, maxWidth: 300, zIndex: 60,
+            background: 'rgba(22, 17, 30, 0.92)', color: '#fff', borderRadius: 14,
+            padding: '10px 14px', fontSize: 13, lineHeight: 1.45, pointerEvents: 'none',
+            maxHeight: 130, overflow: 'hidden',
+          }}
+        >
+          {voiceCaption}
+        </div>
       )}
 
       <button
