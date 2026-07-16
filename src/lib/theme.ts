@@ -1,20 +1,18 @@
-// Shared palette — every page and component draws from this single source.
-// Design language: private atelier — deep noir ground, glass surfaces,
-// champagne gold, warm ivory type. Keys are SEMANTIC (dark = primary text,
-// white = card surface) so the 40+ existing call sites restyle without edits.
+// Shared palette — true obsidian, neutral glass, human coral and mint.
+// Keys are semantic legacy aliases so existing pages inherit the new system.
 export const C = {
-  pageBg: 'transparent',                // body paints noir+glows; pages stay clear so the Atmosphere footage shows through
-  rose: '#e8556d',                      // rich rose — secondary accent, mic energy
-  roseL: 'rgba(232,85,109,0.16)',
-  sage: '#8fce84',                      // success on dark
-  sageL: 'rgba(143,206,132,0.16)',
-  gold: '#d4af37',                      // champagne — the money color
-  goldL: 'rgba(212,175,55,0.16)',
-  purple: '#a78bfa',
-  warm: '#a89f8d',                      // secondary text — warm stone
-  dark: '#f2ede3',                      // PRIMARY TEXT (ivory on noir)
-  white: 'rgba(255,255,255,0.05)',      // legacy alias — glass surface
-  card: 'rgba(255,255,255,0.05)',       // glass card fill
-  line: 'rgba(255,255,255,0.12)',       // hairline borders on glass
-  navBg: 'rgba(11,14,20,0.72)',         // dark glass bars
+  pageBg: 'transparent',
+  rose: '#ff758a',
+  roseL: 'rgba(255,117,138,0.14)',
+  sage: '#75dfb4',
+  sageL: 'rgba(117,223,180,0.14)',
+  gold: '#6adcf5',
+  goldL: 'rgba(106,220,245,0.14)',
+  purple: '#9caaff',
+  warm: '#a7a7ad',
+  dark: '#f7f7f8',
+  white: 'rgba(8,8,9,0.86)',
+  card: 'rgba(8,8,9,0.86)',
+  line: 'rgba(255,255,255,0.13)',
+  navBg: 'rgba(0,0,0,0.84)',
 };
