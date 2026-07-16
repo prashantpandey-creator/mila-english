@@ -213,12 +213,26 @@ export function builtInCompanionReply(
 
 /** Remove claims and markup that a spoken model must never pass to TTS. */
 export function sanitizeVoiceReply(value: string): string {
+  const unsupportedEvidence = [
+    /\b(?:I heard|I did hear|I could hear|I can hear|I listened to)\b/iu,
+    /\byour\b[^.!?]{0,64}\b(?:sound|pronunciation)\b[^.!?]{0,64}\b(?:clear|perfect|strong|correct|good)\b/iu,
+    /\byou(?:'ve| have)\b[^.!?]{0,48}\b(?:improved|made progress|mastered)\b/iu,
+    /(?:Я (?:действительно )?слышала|Я услышала|Я слышу|Я могу слышать)/iu,
+    /(?:Твоё|Ваше) произношение[^.!?]{0,64}(?:идеаль|отлич|правиль|чётк|хорош)/iu,
+  ].some((pattern) => pattern.test(value));
+  if (unsupportedEvidence) {
+    const cyrillic = value.match(/[А-Яа-яЁё]/gu)?.length ?? 0;
+    const latin = value.match(/[A-Za-z]/gu)?.length ?? 0;
+    return cyrillic > latin
+      ? 'В этом сообщении не было аудио, поэтому я не могу оценить произношение или прогресс по напечатанному тексту.'
+      : 'I did not receive audio in this turn, so I cannot judge pronunciation or progress from the typed text.';
+  }
   return value
     .replace(/[\p{Extended_Pictographic}\uFE0E\uFE0F\u200D]/gu, '')
     .replace(/\s*[–—-]\s*(?:great|excellent|amazing|well done|nice work|good job)\b[!.]?/giu, ' ')
     .replace(/^(?:great|excellent|amazing|well done|nice work|good job)\b[!.]?\s*/iu, '')
     .replace(/\bYou\s+(?:used|said|pronounced|read)\b[^.!?]{0,96}\b(?:correctly|perfectly|clearly|well)\b[.!?]?/giu, ' ')
-    .replace(/\b(?:I (?:did )?hear|I could hear|I can hear|I listened to)\b[^.!?]*[.!?]?/giu, ' ')
+    .replace(/\b(?:I heard|I did hear|I could hear|I can hear|I listened to)\b[^.!?]*[.!?]?/giu, ' ')
     .replace(/\bYour pronunciation (?:was|is|sounds?)\b[^.!?]*[.!?]?/giu, ' ')
     .replace(/(?:Я (?:действительно )?слышала|Я услышала|Я слышу|Я могу слышать)[^.!?]*[.!?]?/giu, ' ')
     .replace(/(?:Твоё|Ваше) произношение[^.!?]*[.!?]?/giu, ' ')

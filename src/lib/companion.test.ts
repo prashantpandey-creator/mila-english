@@ -153,7 +153,11 @@ assert.strictEqual(
 );
 assert.strictEqual(
   sanitizeVoiceReply('Отлично! Я слышала идеальный звук th. По тексту лучше: I think it is good. 🎉'),
-  'По тексту лучше: I think it is good.',
+  'В этом сообщении не было аудио, поэтому я не могу оценить произношение или прогресс по напечатанному тексту.',
+);
+assert.strictEqual(
+  sanitizeVoiceReply('Mila here! I heard you — your “th” sound was clear and strong! Great job on that! Keep going!'),
+  'I did not receive audio in this turn, so I cannot judge pronunciation or progress from the typed text.',
 );
 assert.strictEqual(sanitizeVoiceReply('**Use “went,” not “go.”**'), 'Use “went,” not “go.”');
 
