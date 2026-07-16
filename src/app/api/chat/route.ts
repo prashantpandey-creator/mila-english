@@ -102,12 +102,10 @@ async function localLlmReady(config: ReturnType<typeof getLocalLlmConfig>): Prom
 async function chooseModel(surface: 'voice' | 'guide' | 'chat'): Promise<ModelChoice | null> {
   const chat = getLocalLlmConfig(process.env, 'chat');
   const preferred = surface === 'voice' ? getLocalLlmConfig(process.env, 'voice') : chat;
-  const localCandidates = preferred.url === chat.url && preferred.model === chat.model
-    ? [{ config: preferred, runtime: surface === 'voice' ? 'voice' as const : 'chat' as const }]
-    : [
-        { config: preferred, runtime: 'voice' as const },
-        { config: chat, runtime: 'chat' as const },
-      ];
+  const localCandidates = [{
+    config: preferred,
+    runtime: surface === 'voice' ? 'voice' as const : 'chat' as const,
+  }];
 
   for (const candidate of localCandidates) {
     const local = candidate.config;
@@ -291,8 +289,8 @@ export async function POST(request: NextRequest) {
     model: choice.model,
     messages,
     system,
-    maxTokens: surfaceKind === 'voice' ? 50 : 600,
-    temperature: surfaceKind === 'voice' ? 0.45 : 0.65,
+    maxTokens: surfaceKind === 'voice' ? 50 : 320,
+    temperature: surfaceKind === 'voice' ? 0.45 : 0.35,
     maxRetries: choice.provider === 'ollama' ? 0 : 1,
     onFinish: async ({ text }) => {
       if (!text.trim()) return;

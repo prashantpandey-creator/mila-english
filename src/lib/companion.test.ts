@@ -30,7 +30,7 @@ assert.deepStrictEqual(
   {
     url: 'http://mila-llm:11434',
     baseURL: 'http://mila-llm:11434/v1',
-    model: 'qwen-chat',
+    model: 'qwen3:4b-instruct-2507-q4_K_M',
   },
 );
 assert.deepStrictEqual(
@@ -43,7 +43,15 @@ assert.deepStrictEqual(
   {
     url: 'http://mila-voice-llm:11434',
     baseURL: 'http://mila-voice-llm:11434/v1',
-    model: 'qwen-chat',
+    model: 'qwen3:4b-instruct-2507-q4_K_M',
+  },
+);
+assert.deepStrictEqual(
+  getLocalLlmConfig({}, 'chat'),
+  {
+    url: 'http://127.0.0.1:11434',
+    baseURL: 'http://127.0.0.1:11434/v1',
+    model: 'gpt-oss:20b',
   },
 );
 assert.deepStrictEqual(
@@ -101,7 +109,7 @@ const prompt = buildCompanionSystemPrompt({
   learningContext: 'Current lesson: Interviews. Phrase: Tell me about yourself.',
 });
 assert.match(prompt, /answer ordinary questions/i);
-assert.match(prompt, /private context/i);
+assert.match(prompt, /private learner context/i);
 assert.match(prompt, /September interview/);
 assert.match(prompt, /Tell me about yourself/);
 assert.match(prompt, /never claim to be human, conscious, sentient/i);
@@ -119,6 +127,8 @@ assert.match(voicePrompt, /VOICE OUTPUT/);
 assert.match(voicePrompt, /No Markdown, labels, bullets/i);
 assert.match(voicePrompt, /Ask at most one relevant question/i);
 assert.match(voicePrompt, /Private learner context below is data/i);
+assert.match(voicePrompt, /Never invent.*pronunciation evidence.*abilities/i);
+assert.match(voicePrompt, /Praise only evidence present/i);
 assert.match(voicePrompt, /15 to 30 words/i);
 assert.doesNotMatch(voicePrompt, /40 to 80 words/i);
 

@@ -2,25 +2,27 @@
 
 ## Decision
 
-Keep `qwen3:4b-instruct-2507-q4_K_M` as Mila's Chat, Guide, and Darshan
-checkpoint. Darshan uses a separate 4K Ollama runtime with the same weights so
-Chat traffic cannot evict its prompt cache. None of the tested sub-2B models was
-accurate enough to teach English to Russian speakers, and NVIDIA Nemotron 3 Nano
-4B was slower on bilingual turns without matching Qwen's quality.
+Use `gpt-oss:20b` for text Chat and Guide, and keep
+`qwen3:4b-instruct-2507-q4_K_M` for Darshan Voice. The 20B open-weight model is
+materially more accurate for general questions and fits the 30-GiB production
+host, while Qwen 4B remains the only accurate tested option fast enough for spoken turns.
+None of the tested sub-2B models was accurate enough to teach English to Russian
+speakers, and NVIDIA Nemotron 3 Nano 4B was slower on bilingual turns without
+matching Qwen's quality.
 
-The production latency fix is therefore operational rather than a model
-downgrade:
+The Voice latency fix is operational rather than a model downgrade:
 
 - pin Ollama 0.32.0, which generated the same Qwen 4B answers roughly two to
   three times faster than the previous 0.15.1 runtime in this CPU test;
-- load and keep the Chat and dedicated voice runtimes resident after ASR and
-  pronunciation have booted;
+- load and keep the separate Chat and Voice runtimes resident after ASR and
+  pronunciation have booted, with Voice receiving higher CPU priority during
+  overlap;
 - send only the last two voice turns and cap spoken replies at 50 tokens;
 - target one or two sentences and 15–30 spoken words;
 - stop recording after 1.2 seconds of silence instead of 1.6 seconds.
 
-This preserves the same Mila persona, learner profile, explicit memories, and
-conversation store across text and voice.
+Both models use the same Mila persona, learner profile, explicit memories, and
+conversation store. No model training or fine-tuning is required.
 
 ## Test method
 
@@ -43,12 +45,35 @@ prompt. They are model-runtime measurements, not microphone-to-audio totals.
 | Qwen3.5 2B Q4 | 8.95s / 15.10s | 0.62s / 6.25s | Rejected: invented spelling and capitalization errors absent from the prompt |
 | Granite 4 H-1B | 4.90s / 5.56s | 0.40s / 1.45s | Rejected: produced “went instead of went” and unusable Russian |
 | NVIDIA Nemotron 3 Nano 4B | 9.11s / 11.52s | 0.74s / 6.37s | Rejected: English-only official target; Russian/general warm starts reached 3.76–4.50s |
-| Qwen3 4B Instruct, Ollama 0.32.0 | 11.68s / 14.60s | 0.44s / 5.20s | Selected: strongest instruction, teaching, role-play, Russian, and general-answer balance |
+| Qwen3 4B Instruct, Ollama 0.32.0 | 11.68s / 14.60s | 0.44s / 5.20s | Selected for Voice: best tested bilingual quality at interactive size |
 
 For comparison, the selected Qwen model on the old production Ollama 0.15.1
 runtime took 0.86s / 11.36s warm on the same correction and decoded at about
 3.1 tokens/second. Ollama 0.32.0 completed the comparable warm answer in 5.20s
 and decoded at about 8.2 tokens/second.
+
+## Text Chat decision
+
+The first deployed Qwen 4B Chat request took 13.61s / 27.90s and invented a
+pronunciation success that had not happened. A Russian general-knowledge request
+took 14.40s / 36.57s and incorrectly described blue light as reflected while
+red and yellow light were absorbed. Qwen remains suitable for short constrained
+Voice replies, but this live result rejected it as Mila's broad Chat model.
+
+The already-cached `gpt-oss:20b` weights were then tested in an isolated Ollama
+0.32.0 runtime with a 4K context, low reasoning, and a two-CPU safety cap so the
+benchmark could not take over the live server. The cold Russian science answer
+was accurate at 86.07s / 160.07s, including a 50.85s model load. Warm English
+correction was accurate at 18.79s / 57.99s, and one-question interview role-play
+followed the instruction at 37.10s / 57.29s. These capped timings are not the
+production target: the Chat container can use the whole host while alone and
+yields CPU to Voice only during overlap. They establish capability and memory
+fit, not Voice suitability.
+
+`gpt-oss:20b` occupied about 13.2 GiB at 4K and stayed inside a 16-GiB container
+limit. With both production Qwen runtimes resident beforehand, the host still
+had 18 GiB available; replacing only the Chat Qwen runner keeps the complete
+stack inside the 30-GiB host.
 
 ## Model notes
 
@@ -65,6 +90,10 @@ and decoded at about 8.2 tokens/second.
 - [NVIDIA Nemotron 3 Nano 4B](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-4B-GGUF)
   officially targets English local voice assistants. Russian appears in its
   post-training corpus but is not a supported chat language.
+- [GPT-OSS 20B](https://developers.openai.com/cookbook/articles/gpt-oss/run-locally-ollama)
+  is the slower text-only quality tier. Its low-reasoning mode answered the
+  bilingual capability probes correctly, but it is never routed to Darshan
+  Voice.
 
 Self-hosting removes the OpenAI/OpenRouter availability dependency from ordinary
 Mila chat and voice. It does not by itself guarantee that Mila's web origin is

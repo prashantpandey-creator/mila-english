@@ -14,10 +14,10 @@ services:
       - PRON_URL=http://mila-pron:8000
       - ASR_URL=http://mila-asr:8001
       - LOCAL_LLM_URL=${LOCAL_LLM_URL:-http://mila-llm:11434}
-      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
+      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-gpt-oss:20b}
       - LOCAL_LLM_REASONING_EFFORT=${LOCAL_LLM_REASONING_EFFORT:-low}
       - LOCAL_VOICE_LLM_URL=${LOCAL_VOICE_LLM_URL:-http://mila-voice-llm:11434}
-      - LOCAL_VOICE_LLM_MODEL=${LOCAL_VOICE_LLM_MODEL:-}
+      - LOCAL_VOICE_LLM_MODEL=${LOCAL_VOICE_LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
       - LOCAL_VOICE_LLM_REASONING_EFFORT=${LOCAL_VOICE_LLM_REASONING_EFFORT:-low}
       - ALLOW_EXTERNAL_CHAT_FALLBACK=${ALLOW_EXTERNAL_CHAT_FALLBACK:-false}
       - OPENROUTER_CHAT_MODEL=${OPENROUTER_CHAT_MODEL:-}
@@ -58,12 +58,15 @@ services:
     image: ollama/ollama:0.32.0
     container_name: mila-llm
     restart: unless-stopped
+    # GPT-OSS gets the whole host while alone, but yields CPU to Darshan when
+    # Chat and Voice overlap. The hard memory ceiling protects ASR and Voice.
+    cpu_shares: 256
+    mem_limit: 16g
     environment:
       - OLLAMA_HOST=0.0.0.0:11434
       - OLLAMA_CONTEXT_LENGTH=${OLLAMA_CONTEXT_LENGTH:-8192}
       # The deployment warms Ollama only after the speech services have booted.
-      # Keeping this 2.5 GB model resident removes a 5-10 second cold load from
-      # every spoken turn; current production headroom is checked at deploy.
+      # Keeping Chat resident removes a model load from the first turn after idle.
       - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:--1}
       - OLLAMA_MAX_LOADED_MODELS=1
       - OLLAMA_NUM_PARALLEL=1
@@ -84,6 +87,7 @@ services:
     image: ollama/ollama:0.32.0
     container_name: mila-voice-llm
     restart: unless-stopped
+    cpu_shares: 1024
     environment:
       - OLLAMA_HOST=0.0.0.0:11434
       - OLLAMA_CONTEXT_LENGTH=4096

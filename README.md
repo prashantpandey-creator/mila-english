@@ -41,22 +41,22 @@ intentionally not committed; place `pron-service/model.onnx` as described in
 
 ## Self-hosted companion model
 
-Mila can use an already-trained [Qwen3](https://github.com/QwenLM/Qwen3) model
-through Ollama; no fine-tuning or training job is required. The default is
-`qwen3:4b-instruct-2507-q4_K_M`, a compact multilingual instruction model. Its
-weights are downloaded once, stored in the `mila_llm` Docker volume, and kept
+Mila uses two already-trained models through private Ollama runtimes; no
+fine-tuning or training job is required. [GPT-OSS 20B](https://developers.openai.com/cookbook/articles/gpt-oss/run-locally-ollama)
+powers text Chat and the floating guide. A compact multilingual
+[Qwen3](https://github.com/QwenLM/Qwen3) 4B instruction model powers Darshan
+Voice. Their weights are downloaded once into separate Docker volumes and kept
 out of Git and application images.
 
-The same companion endpoint, learner context, explicit memories, model
-checkpoint, and conversation store power full text Chat, the floating guide,
-and Darshan. Production gives Darshan a separate 4K Ollama runtime and a compact
-spoken prompt so text-chat traffic cannot evict its voice prompt cache; if that
-runtime is unavailable, voice falls back to the private Chat runtime before any
-external provider. Darshan adds local speech recognition before the chat request
-and browser speech output after it; it does not use a second conversational
-personality. OpenAI Realtime
-remains an optional supported-region enhancement, not a dependency of the local
-voice conversation.
+The same companion endpoint, learner context, explicit memories, persona, and
+conversation store power Chat, the guide, and Darshan, while model routing is
+surface-specific. Darshan has a separate 4K Ollama runtime and compact spoken
+prompt so text-chat traffic cannot evict its voice prompt cache. It never falls
+back to CPU-bound GPT-OSS: if its Qwen runtime is unavailable, Mila uses the
+built-in response path or an explicitly enabled external fallback. Darshan adds
+local speech recognition before the chat request and browser speech output after
+it. OpenAI Realtime remains an optional supported-region enhancement, not a
+dependency of the local voice conversation.
 
 For native development, install Ollama and run:
 
@@ -71,32 +71,31 @@ both run on the host. For the Docker stack, Ollama is available only to Mila on
 the private Docker network and is intentionally not published on a host port:
 
 ```bash
-docker compose up -d mila-llm
+docker compose up -d mila-llm mila-voice-llm
 docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm \
+  ollama pull gpt-oss:20b
+docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm \
   ollama pull qwen3:4b-instruct-2507-q4_K_M
 docker compose up -d
 ```
 
-The 4B quantization needs materially more memory than its 2.5 GB weights alone;
-use a host with at least 8 GB RAM for the full stack. On a smaller host, set
-`LOCAL_LLM_MODEL=qwen3:1.7b-q4_K_M` in `.env`, pull that exact tag instead, and
-restart the app. The 1.7B model reduces memory and latency at the cost of weaker
-reasoning and less consistent teaching. `OLLAMA_CONTEXT_LENGTH` defaults to
-8192 for Chat and 4096 for Darshan, `OLLAMA_NUM_PARALLEL` to one, and one model
-per runtime is kept loaded to keep CPU deployment predictable. Production pins
-Ollama 0.32.0 and warms both runtimes after ASR and pronunciation are healthy;
-this avoids reloading weights or rebuilding the voice prompt cache on every
-Darshan turn without creating a startup memory spike. The measured model
-comparison and rejection reasons are recorded in
+Production deliberately splits the workload: `gpt-oss:20b` handles text Chat
+and Guide for stronger factual and general answers, while
+`qwen3:4b-instruct-2507-q4_K_M` handles Darshan Voice for latency and Russian
+teaching quality. Both are pretrained; no training or fine-tuning is required.
+The Chat container has a 16 GB memory ceiling and lower CPU shares, so Voice
+wins scheduling priority when both are active. `OLLAMA_CONTEXT_LENGTH` defaults
+to 8192 for Chat and 4096 for Darshan, `OLLAMA_NUM_PARALLEL` to one, and one
+model per runtime is kept loaded. Production pins Ollama 0.32.0 and warms both
+runtimes after ASR and pronunciation are healthy. The measured model comparison,
+live timings, and rejection reasons are recorded in
 [`docs/LOCAL_MODEL_BENCHMARK_2026-07-16.md`](docs/LOCAL_MODEL_BENCHMARK_2026-07-16.md).
 
-`gpt-oss:20b` is also supported without training. When selected, Mila injects
-`reasoning_effort=low` so the model does not exhaust a short conversational
-response budget on hidden reasoning. It needs substantially more memory and is
-best treated as a slower, deliberate-answer option on a CPU-only host rather
-than as the default live-voice model. Set `LOCAL_LLM_MODEL=gpt-oss:20b`, pull
-that exact tag, and keep `LOCAL_LLM_REASONING_EFFORT=low` unless latency is not
-interactive.
+Mila injects `reasoning_effort=low` for GPT-OSS so it does not exhaust a short
+conversational response budget on hidden reasoning. A smaller machine can set
+`LOCAL_LLM_MODEL=qwen3:4b-instruct-2507-q4_K_M` to share the Voice checkpoint,
+or use `qwen3:1.7b-q4_K_M` when even 4B does not fit; both fallbacks reduce
+quality. Never point Darshan at GPT-OSS on a CPU-only host.
 
 The production deployment pulls the configured model, starts Mila and both
 speech services, then runs a short warm-up prompt and verifies that Ollama kept
