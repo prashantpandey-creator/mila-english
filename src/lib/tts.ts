@@ -139,12 +139,18 @@ export async function ttsSpeak(text: string, lang = 'en-US', rate = 0.85): Promi
   return ttsSpeakBrowser(text, lang, rate);
 }
 
+/** Mila's mascot voice character: slightly raised pitch so the assistant
+ *  sounds like the little robot it lives in, not a studio narrator. Applied
+ *  wherever the mascot/assistant speaks (Darshan + guide), never to lesson
+ *  audio or the Piper reading voice. */
+export const MASCOT_PITCH = 1.2;
+
 /** Speak strictly via the browser engine, never Piper. Callers that must share
  *  speechSynthesis's own queue with other utterances (e.g. a Darshan filler
  *  followed by streamed answer chunks) use this so both sounds go through one
  *  serialized engine — a Piper clip plays on a separate Audio element and
  *  would overlap them. */
-export async function ttsSpeakBrowser(text: string, lang = 'en-US', rate = 0.85): Promise<void> {
+export async function ttsSpeakBrowser(text: string, lang = 'en-US', rate = 0.85, pitch = 1): Promise<void> {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   if (!text.trim()) return;
   const voices = await loadVoices();
@@ -152,6 +158,7 @@ export async function ttsSpeakBrowser(text: string, lang = 'en-US', rate = 0.85)
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
     u.rate = rate;
+    u.pitch = pitch;
     // Installed voices are the provider-independent path. Only fall back to a
     // browser-managed voice when the device has no suitable local voice.
     const best = chooseVoice(voices.filter((voice) => voice.localService), lang) || chooseVoice(voices, lang);
@@ -223,6 +230,7 @@ export async function createStreamingTtsSession(
   rate = 0.9,
   onStart?: () => void,
   cancelOnCreate = true,
+  pitch = 1,
 ): Promise<StreamingTtsSession> {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     return { push: () => {}, finish: async () => {}, cancel: () => {} };
@@ -262,6 +270,7 @@ export async function createStreamingTtsSession(
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
     utterance.rate = rate;
+    utterance.pitch = pitch;
     if (voice) utterance.voice = voice;
     speaking = true;
     let settled = false;

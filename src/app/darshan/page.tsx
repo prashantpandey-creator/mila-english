@@ -11,6 +11,8 @@ import { toSpokenText } from "@/lib/spokenText";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
 import { streamVoiceReply } from "@/lib/voiceChatStream";
 import { draftMatches, endpointSilenceMs, pickBackchannel } from "@/lib/voiceTurn";
+import { parseVoiceCommand } from "@/lib/voiceCommands";
+import { MASCOT_PITCH } from "@/lib/tts";
 
 const INVITES = [
   "What do you wish to know?",
@@ -175,6 +177,26 @@ export default function DarshanPage() {
     transcriptionRef.current = null;
     latestPartialRef.current = null;
     if (!text || !activeRef.current) return;
+
+    // Spoken navigation ("open lessons", "назад") acts instantly — no model.
+    // Darshan minimizes into the mascot, which speaks the confirmation and
+    // keeps listening; speaking it here would die with this page's unmount.
+    const command = parseVoiceCommand(text);
+    if (command) {
+      setLiveText(text);
+      abortDraft();
+      const confirmation = command.kind === "back"
+        ? (lang === "ru" ? "Возвращаюсь." : "Going back.")
+        : (lang === "ru" ? `Открываю: ${command.labelRu}.` : `Opening ${command.labelEn}.`);
+      try { sessionStorage.setItem("mila-voice-mode", "1"); } catch {}
+      window.dispatchEvent(new CustomEvent("mila-voice-mode", {
+        detail: { speak: confirmation, locale: lang === "ru" ? "ru-RU" : "en-US" },
+      }));
+      if (command.kind === "back") router.back();
+      else router.push(command.route);
+      return;
+    }
+
     setLiveText(text);
     setAnswer("");
     setVoiceError("");
@@ -199,7 +221,7 @@ export default function DarshanPage() {
     const sessionPromise = createStreamingTtsSession(spokenLocale, 0.9, () => {
       if (!activeRef.current || turnRef.current !== turnId) return;
       setPhase("manifesting");
-    }, !fillerPlayedRef.current);
+    }, !fillerPlayedRef.current, MASCOT_PITCH);
     speechSessionRef.current = sessionPromise;
 
     const endTurn = (restAndListen: boolean) => {
@@ -235,7 +257,7 @@ export default function DarshanPage() {
           const fresh = createStreamingTtsSession(spokenLocale, 0.9, () => {
             if (!activeRef.current || turnRef.current !== turnId) return;
             setPhase("manifesting");
-          });
+          }, true, MASCOT_PITCH);
           speechSessionRef.current = fresh;
           sessionBox.current = await fresh;
           sessionBox.pushedAny = false;
@@ -340,7 +362,7 @@ export default function DarshanPage() {
           fillerPlayedRef.current = true;
           // Browser engine only: the filler must share speechSynthesis's queue
           // with the answer chunks — a Piper clip would overlap them.
-          void ttsSpeakBrowser(pick.text, fillerLocale, 1);
+          void ttsSpeakBrowser(pick.text, fillerLocale, 1, MASCOT_PITCH);
         },
         onAutoStop: (transcript) => void submitTranscript(transcript),
         onError: (error) => {

@@ -7,7 +7,11 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useChat } from 'ai/react'
 import { useI18n } from '@/lib/i18n-provider'
 import { announceCompanionHistoryUpdated, useCompanionHistory } from '@/lib/use-companion-history'
-import { ttsSpeak } from '@/lib/tts'
+import { MASCOT_PITCH, createStreamingTtsSession, spokenLocaleForText, ttsSpeakBrowser } from '@/lib/tts'
+import { startLocalTranscription } from '@/lib/localTranscription'
+import { streamVoiceReply } from '@/lib/voiceChatStream'
+import { parseVoiceCommand } from '@/lib/voiceCommands'
+import { toSpokenText } from '@/lib/spokenText'
 
 type GuideContext = {
   authenticated: boolean
@@ -53,6 +57,8 @@ export default function MilaGuide() {
   const [speechSupported, setSpeechSupported] = useState(false)
   const [context, setContext] = useState<GuideContext | null>(null)
   const [guideError, setGuideError] = useState('')
+  const [voiceMode, setVoiceMode] = useState(false)
+  const pendingSpeakRef = useRef<{ text: string; locale: string } | null>(null)
 
   const {
     messages,
@@ -146,6 +152,120 @@ export default function MilaGuide() {
 
   useEffect(() => () => window.speechSynthesis?.cancel(), [])
 
+  // ── Hands-free voice mode ─────────────────────────────────────────────────
+  // Darshan hands off here on a spoken navigation command ("open lessons"):
+  // it minimizes into this mascot, which announces the move and keeps
+  // listening on every page. Conversation turns ride the FAST voice model
+  // (surface 'voice') with the current pathname, so "what is this?" answers
+  // about the page you are on. Spoken commands keep navigating.
+  useEffect(() => {
+    const onVoiceMode = (event: Event) => {
+      const detail = (event as CustomEvent).detail
+      if (detail?.speak) pendingSpeakRef.current = { text: detail.speak, locale: detail.locale || 'en-US' }
+      setOpen(false)
+      setVoiceMode(true)
+    }
+    window.addEventListener('mila-voice-mode', onVoiceMode)
+    try {
+      if (sessionStorage.getItem('mila-voice-mode') === '1') {
+        sessionStorage.removeItem('mila-voice-mode')
+        setVoiceMode(true)
+      }
+    } catch { /* storage unavailable */ }
+    return () => window.removeEventListener('mila-voice-mode', onVoiceMode)
+  }, [])
+
+  useEffect(() => {
+    if (!voiceMode || isVoiceRoom || !context?.authenticated) return
+    let alive = true
+    let session: { stop: () => Promise<unknown>; cancel: () => void } | null = null
+    let restartTimer: number | null = null
+
+    const schedule = (ms: number) => {
+      if (!alive) return
+      restartTimer = window.setTimeout(() => void listen(), ms)
+    }
+
+    const handleVoiceTurn = async (raw: string) => {
+      const text = raw.trim()
+      session = null
+      setListening(false)
+      if (!text || !alive) return schedule(500)
+      const command = parseVoiceCommand(text)
+      const locale = spokenLocaleForText(text, lang === 'ru' ? 'ru-RU' : 'en-US')
+      if (command) {
+        const confirmation = command.kind === 'back'
+          ? (lang === 'ru' ? 'Возвращаюсь.' : 'Going back.')
+          : (lang === 'ru' ? `Открываю: ${command.labelRu}.` : `Opening ${command.labelEn}.`)
+        pendingSpeakRef.current = { text: confirmation, locale }
+        if (command.kind === 'back') router.back()
+        else router.push(command.route)
+        return // pathname change re-runs this effect and resumes listening
+      }
+      setGuideError('')
+      try {
+        const tts = await createStreamingTtsSession(locale, 0.98, () => setSpeaking(true), true, MASCOT_PITCH)
+        const { reply } = await streamVoiceReply({
+          text,
+          lang: lang === 'ru' ? 'ru' : 'en',
+          pathname,
+          onDelta: (full) => {
+            const spoken = toSpokenText(full)
+            if (spoken && alive) tts.push(spoken)
+          },
+        })
+        const spoken = toSpokenText(reply)
+        if (spoken) {
+          announceCompanionHistoryUpdated()
+          await tts.finish(spoken, true)
+        } else {
+          tts.cancel()
+        }
+      } catch {
+        if (alive) setGuideError(lang === 'ru' ? 'Не получилось ответить.' : 'I could not answer that.')
+      } finally {
+        setSpeaking(false)
+      }
+      schedule(400)
+    }
+
+    const listen = async () => {
+      if (!alive) return
+      const pending = pendingSpeakRef.current
+      pendingSpeakRef.current = null
+      if (pending) await ttsSpeakBrowser(pending.text, pending.locale, 1, MASCOT_PITCH).catch(() => {})
+      if (!alive) return
+      try {
+        const started = await startLocalTranscription({
+          language: 'auto',
+          onAutoStop: (transcript) => void handleVoiceTurn(transcript.text),
+          onError: (error) => {
+            session = null
+            setListening(false)
+            if (!alive || error.message === 'cancelled') return
+            if (error.message === 'no-speech' || error.message === 'transcribe-empty') return schedule(600)
+            setVoiceMode(false)
+          },
+        })
+        if (!alive) return started.cancel()
+        session = started
+        setListening(true)
+      } catch {
+        if (alive) setVoiceMode(false)
+      }
+    }
+
+    void listen()
+    return () => {
+      alive = false
+      if (restartTimer !== null) window.clearTimeout(restartTimer)
+      session?.cancel()
+      setListening(false)
+      setSpeaking(false)
+      window.speechSynthesis?.cancel()
+    }
+  }, [voiceMode, isVoiceRoom, context?.authenticated, pathname, lang, router])
+
   const ask = async (prompt: string) => {
     if (!context?.authenticated || isLoading || isHistoryHydrating) return
     setGuideError('')
@@ -193,13 +313,13 @@ export default function MilaGuide() {
     recognition.start()
   }
 
-  // Route through ttsSpeak so the chatbot inherits the warm Piper voice (with
-  // the browser voice as automatic fallback). ttsSpeak resolves when playback
-  // ends, so the "speaking" state brackets the whole spoken line.
+  // The mascot speaks in its own character voice — browser engine with the
+  // MASCOT_PITCH profile — so the little robot and its voice finally match.
+  // (Piper's studio voice stays for lesson/reading audio elsewhere.)
   const speak = async (text: string) => {
     setSpeaking(true)
     try {
-      await ttsSpeak(text, 'en-US', 0.92)
+      await ttsSpeakBrowser(text, spokenLocaleForText(text, lang === 'ru' ? 'ru-RU' : 'en-US'), 0.95, MASCOT_PITCH)
     } finally {
       setSpeaking(false)
     }
@@ -296,6 +416,7 @@ export default function MilaGuide() {
               <>
                 <button type="button" disabled={isHistoryHydrating} onClick={() => ask(lang === 'ru' ? 'Объясни, что я могу делать на этой странице.' : 'Explain what I can do on this page.')}><span>?</span>{lang === 'ru' ? 'Объясни страницу' : 'Explain this page'}</button>
                 <button type="button" onClick={() => router.push('/darshan')}><span>◉</span>{lang === 'ru' ? 'Поговорить голосом' : 'Voice practice'}</button>
+                <button type="button" onClick={() => { setOpen(false); setVoiceMode(true) }}><span>∿</span>{lang === 'ru' ? 'Свободный диалог' : 'Hands-free'}</button>
               </>
             ) : context && (
               // Guest FAQ — always visible so answers don't consume the options.
@@ -342,7 +463,21 @@ export default function MilaGuide() {
         </button>
       )}
 
-      <button className="mila-guide__launcher" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={open ? (lang === 'ru' ? 'Свернуть Милу' : 'Collapse Mila') : (lang === 'ru' ? 'Открыть помощницу Милу' : 'Open Mila assistant')}>
+      <button
+        className="mila-guide__launcher"
+        type="button"
+        onClick={() => {
+          if (voiceMode) { setVoiceMode(false); return }
+          setOpen((value) => !value)
+        }}
+        aria-expanded={open}
+        aria-label={voiceMode
+          ? (lang === 'ru' ? 'Остановить голосовой режим' : 'Stop voice mode')
+          : open
+            ? (lang === 'ru' ? 'Свернуть Милу' : 'Collapse Mila')
+            : (lang === 'ru' ? 'Открыть помощницу Милу' : 'Open Mila assistant')}
+        title={voiceMode ? (lang === 'ru' ? 'Голосовой режим — коснись, чтобы остановить' : 'Voice mode — tap to stop') : undefined}
+      >
         <span className="mila-guide__orbit" aria-hidden><i /><i /></span>
         <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} priority />
         <span className="mila-guide__state" aria-hidden />
