@@ -2,7 +2,7 @@
 // Venus blush belongs to Mila's warm companion identity; voice cyan is reserved
 // for audio; Jupiter gold marks language, travel, mastery, and earned progress.
 export const C = {
-  pageBg: 'transparent',
+  pageBg: 'var(--surface-page, transparent)',
   venus: '#f28bad',
   venusBright: '#ffbdd0',
   venusDeep: '#5b1932',
@@ -29,10 +29,10 @@ export const C = {
   gold: '#f2c75c',
   goldL: 'rgba(242,199,92,0.14)',
   purple: '#24d39a',
-  warm: '#a7ada9',
-  dark: '#f7f8f5',
+  warm: 'var(--surface-muted, #a7ada9)',
+  dark: 'var(--surface-text, #f7f8f5)',
   white: 'rgba(5,11,8,0.88)',
-  card: 'rgba(5,11,8,0.88)',
-  line: 'rgba(154,242,211,0.14)',
-  navBg: 'rgba(0,5,3,0.88)',
+  card: 'var(--surface-card, rgba(5,11,8,0.88))',
+  line: 'var(--surface-line, rgba(154,242,211,0.14))',
+  navBg: 'var(--surface-nav, rgba(0,5,3,0.88))',
 };

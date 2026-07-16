@@ -10,11 +10,13 @@
 //                 progress, classrooms for lessons, social for the talk rooms,
 //                 the club set for the front door).
 // Versioned custom scenes live in public/visuals; legacy place clips remain in
-// public/ambience. If one fails to load the component quietly falls back to noir.
+// public/ambience. If one fails to load, the component quietly falls back to
+// the route's warm or focus surface color.
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { usePathname } from 'next/navigation';
 import { useScene } from '@/lib/scene';
 import { COUNTRY_SCENES, MILA_STUDIO, TOPIC_SCENES, visualScenesForRoute, type VisualScene } from '@/lib/visualScenes';
+import { routeSurfaceForPath } from '@/lib/routeSurface';
 
 const HOLD_MS = 28000; // how long each scene breathes before the next (calm cadence)
 
@@ -25,6 +27,7 @@ type SceneStyle = CSSProperties & {
 
 export default function Atmosphere() {
   const pathname = usePathname() || '/';
+  const surface = routeSurfaceForPath(pathname);
   const { country, topic } = useScene();
   const [allowMotion, setAllowMotion] = useState(false);
 
@@ -129,10 +132,10 @@ export default function Atmosphere() {
     };
   }, [activeScene.id, dead, playVideo]);
 
-  if (dead) return <div className="atmosphere" aria-hidden />;
+  if (dead) return <div className={`atmosphere atmosphere--${surface}`} aria-hidden />;
 
   return (
-    <div className={`atmosphere atmosphere--${activeScene.grade ?? 'quiet'} ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
+    <div className={`atmosphere atmosphere--${activeScene.grade ?? 'quiet'} atmosphere--${surface} ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
       {playVideo ? (
         <video
           ref={vidRef}

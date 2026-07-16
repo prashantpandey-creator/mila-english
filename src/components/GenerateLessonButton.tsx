@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n-provider';
+import MilaIcon from '@/components/ui/MilaIcon';
+import { C } from '@/lib/theme';
 
 // Commission a lesson from the AI — on success we walk straight into it
 // (router.refresh() would not re-run the lessons page's client fetch).
@@ -34,7 +36,7 @@ export default function GenerateLessonButton() {
   return (
     <div style={{marginBottom:18}}>
       <div style={{display:'flex',gap:10,padding:'14px',borderRadius:16,
-        background:'rgba(212,175,55,0.07)',border:'1px solid rgba(212,175,55,0.3)',
+        background:C.card,border:`1px solid ${C.line}`,boxShadow:'var(--surface-card-shadow)',
         backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)'}}>
         <input
           type="text"
@@ -43,17 +45,17 @@ export default function GenerateLessonButton() {
           onChange={e => setTopic(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleGenerate(); }}
           disabled={loading}
-          style={{flex:1,padding:'11px 14px',borderRadius:11,border:'1px solid rgba(255,255,255,0.14)',
-            background:'rgba(255,255,255,0.06)',color:'#f2ede3',fontSize:'0.9rem',outline:'none'}}
+          style={{flex:1,minWidth:0,padding:'11px 14px',borderRadius:11,border:'1px solid var(--surface-control-line)',
+            background:'var(--surface-control)',color:C.dark,fontSize:'0.9rem',outline:'none'}}
         />
         <button
           onClick={handleGenerate}
           disabled={loading || !topic.trim()}
           style={{padding:'11px 20px',borderRadius:11,border:'none',whiteSpace:'nowrap',
-            background:'linear-gradient(135deg,#e8b96a,#d4af37)',color:'#17130a',fontWeight:800,fontSize:'0.88rem',
+            background:'linear-gradient(135deg,#b54b72,#983556)',color:'#fff',fontWeight:800,fontSize:'0.88rem',
             cursor:(loading||!topic.trim())?'default':'pointer',opacity:(loading||!topic.trim())?0.55:1,
-            boxShadow:'0 4px 16px rgba(212,175,55,0.3)'}}>
-          {loading ? (lang==='ru'?'✨ Мила пишет…':'✨ Mila is writing…') : (lang==='ru'?'✨ Создать урок':'✨ Commission it')}
+            boxShadow:'0 8px 20px rgba(168,61,100,.2)',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:7}}>
+          <MilaIcon name="sparkle" size={16}/>{loading ? (lang==='ru'?'Мила пишет…':'Mila is writing…') : (lang==='ru'?'Создать урок':'Commission it')}
         </button>
       </div>
       {err && (

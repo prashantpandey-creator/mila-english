@@ -6,6 +6,7 @@ import { SceneProvider } from '@/lib/scene'
 import Atmosphere from '@/components/Atmosphere'
 import PwaRegister from '@/components/PwaRegister'
 import MilaGuide from '@/components/MilaGuide'
+import RouteSurface from '@/components/RouteSurface'
 
 const displayFont = Onest({
   subsets: ['latin', 'cyrillic'],
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#000000',
+  width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#fff9fb',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -40,8 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SceneProvider>
           <Atmosphere />
           <I18nProvider>
-            <div className="animate-in">{children}</div>
-            <MilaGuide />
+            <RouteSurface>
+              <div className="animate-in">{children}</div>
+              <MilaGuide />
+            </RouteSurface>
           </I18nProvider>
         </SceneProvider>
       </body>

@@ -18,6 +18,14 @@ export type MilaIconName =
   | 'streak'
   | 'sparkle'
   | 'volume'
+  | 'conversation'
+  | 'cafe'
+  | 'travel'
+  | 'flower'
+  | 'trophy'
+  | 'lock'
+  | 'target'
+  | 'arrow'
 
 export default function MilaIcon({
   name,
@@ -81,6 +89,30 @@ export default function MilaIcon({
       break
     case 'volume':
       glyph = <><path d="M4 10h4l4-3.5v11L8 14H4zM15 9.2a4 4 0 0 1 0 5.6M17.5 6.8a7.4 7.4 0 0 1 0 10.4" /><circle cx="19.5" cy="5" r="1" className="mila-icon__accent-fill" /></>
+      break
+    case 'conversation':
+      glyph = <><path d="M4 5.5h11.5v8H9l-3.5 2.7v-2.7H4z" /><path d="M9 16.5h5.8l3.7 2.5v-2.5H20v-7h-2" /><path className="mila-icon__accent" d="M7.5 9h4.7M14.5 12.5h2" /></>
+      break
+    case 'cafe':
+      glyph = <><path d="M5 9h11v5.5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" /><path d="M16 11h1.8a2.2 2.2 0 0 1 0 4.4H16M4 21h15" /><path className="mila-icon__accent" d="M8 6.5c-1-1 .8-1.8 0-3M12 6.5c-1-1 .8-1.8 0-3" /></>
+      break
+    case 'travel':
+      glyph = <><path d="m3.5 12 16.8-7-5.7 15-3.2-6-7.9-2Z" /><path d="m11.4 14 8.9-9M11.4 14l-1.2 4" /><circle cx="5.2" cy="5.3" r="1" className="mila-icon__accent-fill" /></>
+      break
+    case 'flower':
+      glyph = <><ellipse cx="12" cy="7.3" rx="3.1" ry="4.4" /><ellipse cx="12" cy="7.3" rx="3.1" ry="4.4" transform="rotate(72 12 12)" /><ellipse cx="12" cy="7.3" rx="3.1" ry="4.4" transform="rotate(144 12 12)" /><ellipse cx="12" cy="7.3" rx="3.1" ry="4.4" transform="rotate(216 12 12)" /><ellipse cx="12" cy="7.3" rx="3.1" ry="4.4" transform="rotate(288 12 12)" /><circle cx="12" cy="12" r="2.4" className="mila-icon__accent-fill" /></>
+      break
+    case 'trophy':
+      glyph = <><path d="M8 4h8v4.5a4 4 0 0 1-8 0zM12 12.5V18M8.5 21h7M10 18h4" /><path d="M8 6H4.5v1.5A3.5 3.5 0 0 0 8 11M16 6h3.5v1.5A3.5 3.5 0 0 1 16 11" /><path className="mila-icon__accent" d="m10.4 7.6 1.1 1.1 2.2-2.4" /></>
+      break
+    case 'lock':
+      glyph = <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10" /><circle cx="12" cy="15" r="1.2" className="mila-icon__accent-fill" /><path d="M12 16.2v1.7" /></>
+      break
+    case 'target':
+      glyph = <><circle cx="11" cy="13" r="8" /><circle cx="11" cy="13" r="4" /><circle cx="11" cy="13" r="1.2" className="mila-icon__accent-fill" /><path className="mila-icon__accent" d="m14 10 6-6M16.5 4H20v3.5" /></>
+      break
+    case 'arrow':
+      glyph = <><path d="M4 12h15M14 7l5 5-5 5" /><circle cx="5" cy="12" r="1" className="mila-icon__accent-fill" /></>
       break
   }
 

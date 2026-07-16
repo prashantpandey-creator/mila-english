@@ -1897,11 +1897,396 @@ body { color: #f7f7f8; }
   .room-card:hover { border-color: color-mix(in srgb,var(--room-tone,var(--mercury)) 36%,transparent); background: linear-gradient(145deg,rgba(9,13,11,.88),rgba(3,5,4,.94)); box-shadow: 0 18px 48px rgba(0,0,0,.5),0 0 28px var(--room-glow,rgba(36,211,154,.07)); }
 }
 
-/* The mobile source is art-directed, so it no longer needs the nearly opaque
-   stock-footage scrim. The scene stays visible while fading cleanly into the
-   solid-black product sections below. */
+/* Keep the art-directed mobile scene legible. Surface-specific rules below
+   decide whether the route fades into the warm welcome room or focus studio. */
 @media (max-width: 640px) {
   .landing-hero::before {
     background: linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(0,0,0,.36) 34%,rgba(0,0,0,.72) 72%,#000 100%);
   }
+}
+
+/* ── Two-room Mila: a warm welcome outside, a quiet focus studio inside ── */
+html[data-mila-surface="welcome"] { background: #fff8fa; }
+html[data-mila-surface="focus"] { background: #0c0a0e; }
+
+.mila-surface {
+  min-height: 100vh;
+  color: var(--surface-text);
+  transition: background-color .32s ease,color .24s ease;
+}
+.mila-surface--focus {
+  --surface-page: transparent;
+  --surface-text: #faf6f8;
+  --surface-muted: #bdb1b8;
+  --surface-card: rgba(25,20,27,.9);
+  --surface-nav: rgba(12,10,14,.9);
+  --surface-line: rgba(255,255,255,.12);
+  --surface-control: rgba(255,255,255,.055);
+  --surface-control-line: rgba(255,255,255,.16);
+  --surface-control-shadow: 0 2px 8px rgba(0,0,0,.36);
+  --surface-track: rgba(255,255,255,.1);
+  --surface-card-shadow: 0 14px 42px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.04);
+  --surface-card-shadow-hover: 0 18px 48px rgba(0,0,0,.54),0 0 28px rgba(36,211,154,.07);
+  --surface-card-line-hover: rgba(36,211,154,.38);
+  --surface-icon-tile: linear-gradient(145deg,rgba(36,211,154,.07),rgba(106,220,245,.025));
+}
+.mila-surface--welcome {
+  --surface-page: rgba(255,248,250,.96);
+  --surface-text: #2f2530;
+  --surface-muted: #6f6269;
+  --surface-card: rgba(255,255,255,.86);
+  --surface-nav: rgba(255,250,252,.9);
+  --surface-line: rgba(93,46,66,.13);
+  --surface-control: rgba(255,255,255,.76);
+  --surface-control-line: #cdb9c2;
+  --surface-control-shadow: 0 2px 9px rgba(93,46,66,.07);
+  --surface-track: rgba(93,46,66,.1);
+  --surface-card-shadow: 0 20px 60px rgba(93,46,66,.1),0 2px 8px rgba(93,46,66,.05),inset 0 1px 0 rgba(255,255,255,.94);
+  --surface-card-shadow-hover: 0 22px 62px rgba(93,46,66,.14),0 4px 12px rgba(93,46,66,.06);
+  --surface-card-line-hover: rgba(168,61,100,.3);
+  --surface-icon-tile: linear-gradient(145deg,rgba(242,139,173,.14),rgba(36,211,154,.055));
+  --venus-readable: #a83d64;
+  --mercury-readable: #08785b;
+  --voice-readable: #0c7895;
+  --jupiter-readable: #906600;
+  min-height: 100vh;
+  background: var(--surface-page);
+}
+.mila-surface--front { background: transparent; }
+
+.atmosphere--focus { background: #0c0a0e; }
+.atmosphere--focus::after {
+  background:
+    radial-gradient(980px 720px at 82% 8%,rgba(91,25,50,.1),transparent 62%),
+    linear-gradient(180deg,rgba(12,10,14,.6),rgba(12,10,14,.86) 56%,rgba(12,10,14,.97));
+}
+.atmosphere--welcome { background: #fff8fa; }
+.atmosphere--welcome video,
+.atmosphere--welcome img {
+  filter: saturate(.86) contrast(.96) brightness(1.05) blur(.2px);
+  transform: scale(1.015);
+}
+.atmosphere--welcome video.is-on,
+.atmosphere--welcome img.is-on { opacity: .52; }
+.atmosphere--welcome::after,
+.atmosphere--welcome.atmosphere--motion::after,
+.atmosphere--welcome.atmosphere--brand::after {
+  background:
+    radial-gradient(700px 520px at 78% 28%,rgba(255,255,255,.14),transparent 68%),
+    linear-gradient(180deg,rgba(255,248,250,.08),rgba(255,248,250,.18) 58%,rgba(255,248,250,.72));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Shared welcome furniture. Inline page styles consume the semantic tokens
+   above; these classes handle the remaining route chrome. */
+.mila-surface--welcome .welcome-page,
+.mila-surface--welcome .welcome-dashboard { background: var(--surface-page); }
+.mila-surface--welcome .welcome-toolbar {
+  border-color: var(--surface-line) !important;
+  background: var(--surface-nav) !important;
+  box-shadow: 0 9px 32px rgba(93,46,66,.07);
+  backdrop-filter: blur(20px) saturate(1.08) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.08) !important;
+}
+.mila-surface--welcome .welcome-toolbar__quiet:hover { color: var(--venus-readable) !important; border-color: rgba(168,61,100,.28) !important; background: rgba(242,139,173,.09) !important; }
+.mila-surface--welcome .welcome-brand-mark { color: var(--venus-readable) !important; background: linear-gradient(145deg,#fff,rgba(242,139,173,.16)) !important; box-shadow: 0 8px 24px rgba(168,61,100,.1) !important; }
+.mila-surface--welcome .lang-toggle { border: 1px solid var(--surface-line); background: rgba(255,255,255,.68); }
+.mila-surface--welcome .lang-toggle button { color: var(--surface-muted); }
+.mila-surface--welcome .lang-toggle button.active,
+.mila-surface--welcome .landing-nav .lang-toggle button.active {
+  color: #421223;
+  background: linear-gradient(135deg,#ffd4df,#f7a6bd);
+  box-shadow: 0 5px 18px rgba(168,61,100,.13);
+}
+
+.mila-surface--welcome .journey-card {
+  --journey-readable: var(--mercury-readable);
+  color: var(--surface-text);
+  border-color: var(--surface-line);
+  background:
+    radial-gradient(470px 130px at 0% 50%,var(--journey-glow),transparent 62%),
+    rgba(255,255,255,.86);
+  box-shadow: var(--surface-card-shadow);
+}
+.mila-surface--welcome .journey-card[data-kind="listening"] { --journey-readable: var(--voice-readable); }
+.mila-surface--welcome .journey-card[data-kind="vocabulary"],
+.mila-surface--welcome .journey-card[data-kind="grammar"] { --journey-readable: var(--jupiter-readable); }
+.mila-surface--welcome .journey-card[data-kind="tutor"] { --journey-readable: var(--venus-readable); }
+.mila-surface--welcome .journey-card__copy strong { color: var(--surface-text); }
+.mila-surface--welcome .journey-card__copy small { color: var(--surface-muted); }
+.mila-surface--welcome .journey-card__icon,
+.mila-surface--welcome .journey-card__action { color: var(--journey-readable); }
+.mila-surface--welcome .journey-card__icon {
+  border-color: color-mix(in srgb,var(--journey-readable) 20%,transparent);
+  background: color-mix(in srgb,var(--journey-readable) 7%,white);
+}
+
+/* Front door — the light, human room. The contained coach console remains a
+   dark focus preview, making the mode transition visible before sign-up. */
+.mila-surface--welcome .landing-page {
+  --landing-ink: #2f2530;
+  --landing-muted: #6f6269;
+  --landing-gold: var(--venus-readable);
+  --landing-gold-bright: var(--venus-readable);
+  --landing-coral: var(--venus);
+  --landing-mint: var(--mercury-readable);
+  --landing-bg: #fff8fa;
+  color: var(--landing-ink);
+  background: transparent;
+}
+.mila-surface--welcome .landing-nav {
+  border-color: rgba(93,46,66,.12);
+  background: rgba(255,250,252,.86);
+  box-shadow: 0 9px 32px rgba(93,46,66,.07);
+}
+.mila-surface--welcome .landing-brand__mark {
+  border-color: rgba(168,61,100,.28);
+  color: var(--venus-readable);
+  background: linear-gradient(145deg,#fff,rgba(242,139,173,.16));
+  box-shadow: inset 0 1px 0 #fff,0 8px 28px rgba(168,61,100,.1);
+}
+.mila-surface--welcome .landing-brand__name { color: var(--landing-ink); }
+.mila-surface--welcome .landing-brand__descriptor { border-color: rgba(93,46,66,.14); color: #7a6871; }
+.mila-surface--welcome .landing-signin {
+  border-color: rgba(8,120,91,.22);
+  color: var(--mercury-readable);
+  background: rgba(255,255,255,.66);
+}
+.mila-surface--welcome .landing-hero::before {
+  background:
+    linear-gradient(90deg,rgba(255,248,250,.995) 0%,rgba(255,248,250,.96) 43%,rgba(255,248,250,.57) 71%,rgba(255,248,250,.18) 100%),
+    linear-gradient(0deg,#fff8fa 0%,transparent 26%);
+}
+.mila-surface--welcome .landing-hero::after { background: linear-gradient(90deg,transparent,rgba(168,61,100,.24),rgba(8,120,91,.18),transparent); }
+.mila-surface--welcome .landing-hero__glow {
+  display: block;
+  opacity: .78;
+  background: radial-gradient(circle,rgba(242,139,173,.2),rgba(255,255,255,.04) 58%,transparent 72%);
+  filter: blur(105px);
+}
+.mila-surface--welcome .landing-eyebrow { color: var(--venus-readable); }
+.mila-surface--welcome .landing-eyebrow__dot { background: var(--mercury-readable); box-shadow: 0 0 0 6px rgba(36,211,154,.12),0 0 22px rgba(8,120,91,.22); }
+.mila-surface--welcome .landing-hero h1 { color: var(--landing-ink); }
+.mila-surface--welcome .landing-hero h1 em {
+  color: transparent;
+  background: linear-gradient(105deg,#a83d64 0%,#d55e87 68%,#08785b 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.mila-surface--welcome .landing-hero__lede { color: #5f545d; }
+.mila-surface--welcome .landing-button--primary,
+.mila-surface--welcome .mobile-quickstart > button {
+  border-color: #a83d64;
+  color: #fff;
+  background: linear-gradient(135deg,#b54b72,#983556);
+  box-shadow: 0 16px 42px rgba(168,61,100,.2),inset 0 1px 0 rgba(255,255,255,.24);
+}
+.mila-surface--welcome .landing-button--secondary {
+  border-color: rgba(8,120,91,.22);
+  color: var(--mercury-readable);
+  background: rgba(255,255,255,.7);
+}
+.mila-surface--welcome .landing-assurance { color: #756a73; }
+.mila-surface--welcome .landing-assurance svg { color: var(--mercury-readable); }
+
+.mila-surface--welcome .coach-demo {
+  border-color: rgba(242,139,173,.26);
+  background: linear-gradient(155deg,rgba(25,20,27,.97),rgba(12,10,14,.985));
+  box-shadow: 0 36px 88px rgba(93,46,66,.24),0 14px 40px rgba(168,61,100,.1),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.mila-surface--welcome .coach-demo::before { background: linear-gradient(135deg,rgba(242,139,173,.32),transparent 42%,rgba(36,211,154,.08) 76%,rgba(242,199,92,.1)); }
+.mila-surface--welcome .coach-demo__run { border-color: rgba(36,211,154,.28); color: var(--mercury-bright); background: rgba(36,211,154,.075); }
+
+.mila-surface--welcome .landing-trust {
+  border-color: rgba(93,46,66,.1);
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 14px 42px rgba(93,46,66,.06);
+}
+.mila-surface--welcome .landing-trust__inner > div { border-color: rgba(93,46,66,.1); }
+.mila-surface--welcome .landing-trust__inner > div > span { color: var(--venus-readable); }
+.mila-surface--welcome .landing-trust__inner > div:nth-child(2) > span { color: var(--jupiter-readable); }
+.mila-surface--welcome .landing-trust__inner > div:nth-child(3) > span { color: var(--mercury-readable); }
+.mila-surface--welcome .landing-trust__inner p { color: #756a73; }
+.mila-surface--welcome .landing-trust__inner strong { color: var(--landing-ink); }
+
+.mila-surface--welcome .landing-story { background: #fff8fa; }
+.mila-surface--welcome .session-story__intro h2,
+.mila-surface--welcome .landing-section__heading h2,
+.mila-surface--welcome .landing-cta h2,
+.mila-surface--welcome .session-step h3,
+.mila-surface--welcome .room-card > strong { color: var(--landing-ink); }
+.mila-surface--welcome .session-story__intro p,
+.mila-surface--welcome .landing-section__heading p,
+.mila-surface--welcome .landing-cta p,
+.mila-surface--welcome .session-step__copy > p,
+.mila-surface--welcome .room-card__copy { color: #6f6269; }
+.mila-surface--welcome .landing-section__label,
+.mila-surface--welcome .landing-section__heading > span { color: var(--venus-readable); }
+.mila-surface--welcome .session-story__line { background: rgba(93,46,66,.12); }
+.mila-surface--welcome .session-story__line span { background: linear-gradient(var(--venus-readable),transparent); }
+.mila-surface--welcome .session-step {
+  border-color: rgba(93,46,66,.12);
+  background: rgba(255,255,255,.8);
+  box-shadow: var(--surface-card-shadow);
+}
+.mila-surface--welcome .session-step__copy > div > span { color: rgba(93,46,66,.27); }
+.mila-surface--welcome .session-step__copy > div > i { border-color: rgba(168,61,100,.18); color: var(--venus-readable); background: rgba(242,139,173,.1); }
+.mila-surface--welcome .story-ui {
+  border-color: rgba(255,255,255,.11);
+  color: #faf6f8;
+  background: linear-gradient(155deg,#19141b,#0c0a0e);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055),0 14px 38px rgba(93,46,66,.14);
+}
+.mila-surface--welcome .story-ui__status,
+.mila-surface--welcome .story-insight p,
+.mila-surface--welcome .story-plan-row { color: #bdb1b8; }
+.mila-surface--welcome .story-ui--speak > p,
+.mila-surface--welcome .story-plan-row strong { color: #faf6f8; }
+.mila-surface--welcome .story-phrase span,
+.mila-surface--welcome .story-plan-row { background: rgba(255,255,255,.05); }
+
+.mila-surface--welcome .landing-section--rooms { background: linear-gradient(180deg,#fff2f6,#fff8fa); }
+.mila-surface--welcome .room-card {
+  --room-readable: var(--mercury-readable);
+  border-color: rgba(93,46,66,.12);
+  background: rgba(255,255,255,.84);
+  box-shadow: var(--surface-card-shadow);
+}
+.mila-surface--welcome .room-card[data-room="pronunciation"] { --room-readable: var(--voice-readable); }
+.mila-surface--welcome .room-card[data-room="mentor"] { --room-readable: var(--venus-readable); }
+.mila-surface--welcome .room-card[data-room="course"],
+.mila-surface--welcome .room-card[data-room="progress"] { --room-readable: var(--jupiter-readable); }
+.mila-surface--welcome .room-card::after { display: block; background: var(--room-glow); }
+.mila-surface--welcome .room-card[data-room] .room-card__icon {
+  border-color: color-mix(in srgb,var(--room-readable) 22%,transparent);
+  color: var(--room-readable);
+  background: color-mix(in srgb,var(--room-readable) 7%,white);
+}
+.mila-surface--welcome .room-card[data-room] .room-card__label,
+.mila-surface--welcome .room-card[data-room] .room-card__link { color: var(--room-readable); }
+.mila-surface--welcome .room-visual {
+  border-color: rgba(93,46,66,.11);
+  background: rgba(255,250,252,.82);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.mila-surface--welcome .room-mini-word span { color: var(--landing-ink); }
+.mila-surface--welcome .room-mini-word small { color: var(--voice-readable); }
+.mila-surface--welcome .room-mini-phonemes i { color: var(--jupiter-readable); background: rgba(242,199,92,.13); }
+.mila-surface--welcome .room-visual--course > div { background: rgba(242,139,173,.07); }
+.mila-surface--welcome .room-visual--course i { color: var(--jupiter-readable); }
+.mila-surface--welcome .room-visual--course span { color: #6f6269; }
+.mila-surface--welcome .room-visual--progress > span { color: var(--jupiter-readable); }
+.mila-surface--welcome .room-visual--progress > small,
+.mila-surface--welcome .room-swipehint { color: #756a73; }
+
+.mila-surface--welcome .landing-cta {
+  border-color: rgba(93,46,66,.1);
+  background: linear-gradient(145deg,#fff8fa 0%,#ffedf3 52%,#effbf6 100%);
+}
+.mila-surface--welcome .landing-cta__orb {
+  display: block;
+  opacity: .9;
+  background: radial-gradient(circle,rgba(242,139,173,.25),rgba(36,211,154,.07) 52%,transparent 72%);
+}
+.mila-surface--welcome .landing-footer { border-color: rgba(93,46,66,.1); background: rgba(255,255,255,.92); }
+.mila-surface--welcome .landing-footer__inner { color: #756a73; }
+.mila-surface--welcome .landing-footer__brand strong { color: var(--landing-ink); }
+.mila-surface--welcome .landing-footer__brand small { color: #756a73; }
+.mila-surface--welcome .mobile-quickstart {
+  border-color: rgba(93,46,66,.14);
+  background: rgba(255,250,252,.94);
+  box-shadow: 0 16px 46px rgba(93,46,66,.14);
+}
+.mila-surface--welcome .mobile-quickstart p strong { color: var(--landing-ink); }
+.mila-surface--welcome .mobile-quickstart p small { color: #756a73; }
+
+/* Mila remains warm in welcome mode; once a learner enters a focus route the
+   same companion quietly returns to the dark studio treatment above. */
+.mila-surface--welcome .mila-guide__launcher {
+  border-color: rgba(168,61,100,.22);
+  background: linear-gradient(145deg,rgba(255,255,255,.98),rgba(255,240,244,.98));
+  box-shadow: 0 18px 46px rgba(93,46,66,.18),0 0 28px rgba(242,139,173,.1),inset 0 1px 0 #fff;
+}
+.mila-surface--welcome .mila-guide__state { border-color: #fff8fa; }
+.mila-surface--welcome .mila-guide__nudge,
+.mila-surface--welcome .mila-guide__panel {
+  border-color: rgba(93,46,66,.14);
+  color: var(--surface-text);
+  background: rgba(255,252,253,.975);
+  box-shadow: 0 28px 84px rgba(93,46,66,.2),inset 0 1px 0 #fff;
+}
+.mila-surface--welcome .mila-guide__header { border-color: rgba(93,46,66,.1); background: #fff2f6; }
+.mila-surface--welcome .mila-guide__portrait { border-color: rgba(168,61,100,.2); background: #fff; }
+.mila-surface--welcome .mila-guide__portrait > i { border-color: #fff2f6; }
+.mila-surface--welcome .mila-guide__identity strong { color: var(--venus-readable); }
+.mila-surface--welcome .mila-guide__identity span,
+.mila-surface--welcome .mila-guide__page,
+.mila-surface--welcome .mila-guide__nudge span { color: #756a73; }
+.mila-surface--welcome .mila-guide__page { border-color: rgba(93,46,66,.12); background: #fff; }
+.mila-surface--welcome .mila-guide__close { color: #756a73; }
+.mila-surface--welcome .mila-guide__welcome,
+.mila-surface--welcome .mila-guide__message.is-assistant,
+.mila-surface--welcome .mila-guide__working {
+  border-color: rgba(93,46,66,.12);
+  color: #4f4249;
+  background: #fff;
+  box-shadow: inset 3px 0 0 rgba(242,139,173,.7);
+}
+.mila-surface--welcome .mila-guide__welcome p { color: #4f4249; }
+.mila-surface--welcome .mila-guide__welcome small { color: #756a73; }
+.mila-surface--welcome .mila-guide__actions button {
+  border-color: rgba(93,46,66,.13);
+  color: #5f545d;
+  background: #fff;
+}
+.mila-surface--welcome .mila-guide__composer { border-color: rgba(93,46,66,.14); background: #fff; box-shadow: inset 0 1px 0 #fff; }
+.mila-surface--welcome .mila-guide__composer input { color: var(--surface-text); }
+.mila-surface--welcome .mila-guide__mic { color: var(--voice-readable); background: #fff2f6; }
+.mila-surface--welcome .mila-guide__message.is-user,
+.mila-surface--welcome .mila-guide__send,
+.mila-surface--welcome .mila-guide__guest button:first-child {
+  color: #fff;
+  background: linear-gradient(135deg,#b54b72,#983556);
+  box-shadow: 0 8px 22px rgba(168,61,100,.17);
+}
+.mila-surface--welcome .mila-guide__guest button { border-color: rgba(93,46,66,.13); color: #5f545d; background: #fff; }
+
+@media (hover:hover) and (pointer:fine) {
+  .mila-surface--welcome .landing-signin:hover,
+  .mila-surface--welcome .landing-button--secondary:hover { border-color: rgba(8,120,91,.4); color: #075f49; background: rgba(255,255,255,.9); }
+  .mila-surface--welcome .landing-button--primary:hover { box-shadow: 0 20px 52px rgba(168,61,100,.25),inset 0 1px 0 rgba(255,255,255,.3); }
+  .mila-surface--welcome .room-card:hover {
+    border-color: color-mix(in srgb,var(--room-readable) 30%,transparent);
+    background: rgba(255,255,255,.94);
+    box-shadow: 0 24px 66px rgba(93,46,66,.14),0 0 26px var(--room-glow);
+  }
+  .mila-surface--welcome .journey-card:hover {
+    border-color: color-mix(in srgb,var(--journey-readable) 30%,transparent);
+    background: rgba(255,255,255,.95);
+    box-shadow: var(--surface-card-shadow-hover);
+  }
+}
+
+@media (max-width: 940px) {
+  .mila-surface--welcome .landing-hero::before {
+    background: linear-gradient(180deg,rgba(255,248,250,.82) 0%,rgba(255,248,250,.78) 38%,rgba(255,248,250,.95) 76%,#fff8fa 100%);
+  }
+}
+
+@media (max-width: 640px) {
+  .atmosphere--welcome video.is-on,
+  .atmosphere--welcome img.is-on { opacity: .44; }
+  .mila-surface--welcome { --surface-card: rgba(255,255,255,.94); }
+  .mila-surface--welcome .landing-nav { background: rgba(255,250,252,.94); }
+  .mila-surface--welcome .landing-hero::before {
+    background: linear-gradient(180deg,rgba(255,248,250,.76) 0%,rgba(255,248,250,.82) 34%,rgba(255,248,250,.97) 72%,#fff8fa 100%);
+  }
+  .mila-surface--welcome .landing-hero__lede { color: #554a51; }
+  .mila-surface--welcome .landing-trust__inner > div { border-color: rgba(93,46,66,.1); }
+  .mila-surface--welcome .session-step,
+  .mila-surface--welcome .room-card { background: rgba(255,255,255,.94); }
+  .mila-surface--welcome .room-swipehint span { background: rgba(93,46,66,.12); }
+  .mila-surface--welcome .room-swipehint span:first-child { background: rgba(168,61,100,.56); }
 }

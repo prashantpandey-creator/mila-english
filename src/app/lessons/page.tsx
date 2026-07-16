@@ -10,9 +10,20 @@ import GenerateLessonButton from '@/components/GenerateLessonButton';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import { COURSE_LESSON_IDS, getBuiltinLesson } from '@/lib/builtinLessons';
+import type { MilaIconName } from '@/components/ui/MilaIcon';
 
 const CATS_RU = ['Все','Разговор','Фонетика','Слова','Аудирование'];
 const CATS_EN = ['All','Speaking','Phonetics','Vocabulary','Listening'];
+
+function lessonIcon(id: string, category: string): MilaIconName {
+  if (id === '1') return 'conversation';
+  if (id === '2') return 'cafe';
+  if (id === '3') return 'travel';
+  if (category === 'Фонетика' || category === 'Phonetics') return 'phonetics';
+  if (category === 'Слова' || category === 'Vocabulary') return 'vocabulary';
+  if (category === 'Аудирование' || category === 'Listening') return 'listening';
+  return 'lesson';
+}
 
 export default function LessonsPage() {
   const { t, lang } = useI18n();
@@ -22,7 +33,7 @@ export default function LessonsPage() {
   const staticLessons = COURSE_LESSON_IDS.map((id) => {
     const lesson = getBuiltinLesson(id)!;
     return {
-      id: Number(id), cat: lesson.icon,
+      id: Number(id), icon: lessonIcon(id, lesson.categoryRu),
       catName: lang === 'ru' ? lesson.categoryRu : lesson.categoryEn,
       title: lang === 'ru' ? lesson.titleRu : lesson.titleEn,
       sub: lang === 'ru' ? lesson.subtitleRu : lesson.subtitleEn,
@@ -40,7 +51,7 @@ export default function LessonsPage() {
       .then(r => r.ok ? r.json() : [])
       .then((rows: any[]) => setDbLessons(Array.isArray(rows) ? rows.map(l => ({
         id: `ai-${l.id}`,   // prefixed — static lessons own the bare 1..8 ids
-        cat: '✨',
+        icon: 'sparkle' as const,
         title: l.title,
         sub: l.category || (lang==='ru' ? 'Урок от ИИ' : 'AI-generated lesson'),
         time: `${l.durationMinutes || 5} ${lang==='ru' ? 'мин' : 'min'}`,
@@ -61,10 +72,10 @@ export default function LessonsPage() {
   });
 
   return (
-    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
+    <div className="welcome-page" style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
+      <div className="welcome-toolbar" style={{background:C.navBg,backdropFilter:'blur(12px)',padding:'10px 20px',
+        borderBottom:`1px solid ${C.line}`,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',color:C.dark,letterSpacing:'-0.03em'}}>Mila</span>
         <LangToggle />
       </div>
 

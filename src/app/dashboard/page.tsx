@@ -45,13 +45,13 @@ export default function DashboardPage() {
   if (!m) return null;
 
   return (
-    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
+    <div className="welcome-dashboard" style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
       {/* Top Bar */}
-      <div style={{background:C.navBg,backdropFilter:'blur(18px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
+      <div className="welcome-toolbar" style={{background:C.navBg,backdropFilter:'blur(18px)',padding:'10px 20px',
+        borderBottom:`1px solid ${C.line}`,position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div onClick={()=>router.push('/')} style={{cursor:'pointer',display:'flex',alignItems:'center',gap:9}}>
-          <div style={{width:30,height:30,borderRadius:10,border:'1px solid rgba(242,139,173,0.48)',
+          <div className="welcome-brand-mark" style={{width:30,height:30,borderRadius:10,border:'1px solid rgba(242,139,173,0.48)',
             display:'flex',alignItems:'center',justifyContent:'center',
             fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:750,fontSize:'1rem',color:C.mercuryBright,
             background:'linear-gradient(145deg,rgba(36,211,154,.11),rgba(242,139,173,.08))',
@@ -60,8 +60,8 @@ export default function DashboardPage() {
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <LangToggle />
-          <button onClick={handleLogout}
-            style={{padding:'6px 14px',borderRadius:12,border:'1.5px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.025)',color:'#c8c8cc',
+          <button className="welcome-toolbar__quiet" onClick={handleLogout}
+            style={{padding:'6px 14px',borderRadius:12,border:'1.5px solid var(--surface-control-line, rgba(255,255,255,.2))',background:'var(--surface-control, rgba(255,255,255,.025))',color:C.warm,
               fontWeight:600,fontSize:'0.8rem',cursor:'pointer'}}>
             {lang==='ru'?'Выйти':'Sign Out'}
           </button>

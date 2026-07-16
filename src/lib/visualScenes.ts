@@ -35,6 +35,18 @@ export const MILA_STUDIO: VisualScene = {
   grade: 'brand',
 };
 
+// The light front door: pink flowers, green foliage, and cream fabric carry
+// Mila's Venus/Mercury identity without turning the page into an AI dashboard.
+// The existing campaign studio remains the contained dark focus room.
+export const MILA_GARDEN: VisualScene = {
+  id: 'mila-garden',
+  stillDesktop: '/ambience/stills/woman-flowers.jpg',
+  video: '/ambience/woman-flowers.mp4',
+  focusDesktop: '58% center',
+  focusMobile: '62% center',
+  grade: 'brand',
+};
+
 export const COUNTRY_SCENES: Record<string, VisualScene[]> = {
   uk: [legacyScene('uk-bigben-night', 'place'), legacyScene('uk-tower', 'place')],
   us: [legacyScene('us-manhattan', 'place'), legacyScene('us-empire', 'place')],
@@ -68,15 +80,17 @@ const ROUTE_SCENES: Record<'nature' | 'study' | 'social' | 'club', VisualScene[]
     legacyScene('cathedral-columns', 'study'),
     legacyScene('woman-reading', 'study'),
   ],
-  // The same art-directed campaign scene now unifies the front door and the
-  // learner's main workspace. Future social scenes can simply be appended.
+  // The studio art stays inside active practice; the garden is Mila's softer
+  // arrival room. Future social scenes can simply be appended.
   social: [MILA_STUDIO],
-  club: [MILA_STUDIO],
+  club: [MILA_GARDEN],
 };
 
 export function visualScenesForRoute(path: string): VisualScene[] {
+  if (path === '/' || path.startsWith('/dashboard')) return ROUTE_SCENES.club;
   if (path.startsWith('/progress') || path.startsWith('/achievements')) return ROUTE_SCENES.nature;
-  if (path.startsWith('/lessons') || path.startsWith('/vocabulary') || path.startsWith('/phonetics')) return ROUTE_SCENES.study;
-  if (path.startsWith('/listen') || path.startsWith('/chat') || path.startsWith('/darshan') || path.startsWith('/dashboard') || path.startsWith('/assessment')) return ROUTE_SCENES.social;
+  if (path === '/lessons') return ROUTE_SCENES.club;
+  if (path.startsWith('/lessons/') || path.startsWith('/vocabulary') || path.startsWith('/grammar') || path.startsWith('/phonetics')) return ROUTE_SCENES.study;
+  if (path.startsWith('/listen') || path.startsWith('/chat') || path.startsWith('/darshan') || path.startsWith('/assessment')) return ROUTE_SCENES.social;
   return ROUTE_SCENES.club;
 }
