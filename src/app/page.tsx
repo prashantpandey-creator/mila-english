@@ -2,19 +2,24 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Cormorant_Garamond } from 'next/font/google';
+import { Yeseva_One, Caveat } from 'next/font/google';
 import LangToggle from '@/components/LangToggle';
 import MilaIcon, { MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 import './landing.css';
 
-// The serif the whole design system asks for ('Cormorant Garamond') but never
-// loaded — self-scoped here so no shared file is touched.
-const serif = Cormorant_Garamond({
+// Boho display pair, self-scoped: Yeseva One (chunky warm serif) for headings,
+// Caveat (handwritten) for eyebrows and flourishes. Both carry full Cyrillic.
+const serif = Yeseva_One({
   subsets: ['latin', 'cyrillic'],
-  weight: ['500', '600', '700'],
-  style: ['normal', 'italic'],
+  weight: '400',
   variable: '--lp-font-serif',
+  display: 'swap',
+});
+const accent = Caveat({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['500', '600'],
+  variable: '--lp-font-accent',
   display: 'swap',
 });
 
@@ -275,7 +280,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className={`lp ${serif.variable}`}>
+    <div className={`lp ${serif.variable} ${accent.variable}`}>
       <a className="lp-skip" href="#lp-main">{T('К содержанию', 'Skip to content')}</a>
 
       <header className="lp-nav">
