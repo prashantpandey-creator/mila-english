@@ -13,6 +13,7 @@ import { streamVoiceReply } from '@/lib/voiceChatStream'
 import { parseVoiceCommand } from '@/lib/voiceCommands'
 import { endpointSilenceMs, pickBackchannel } from '@/lib/voiceTurn'
 import { toSpokenText } from '@/lib/spokenText'
+import { ensureGuestSession } from '@/lib/guestSession'
 
 type GuideContext = {
   authenticated: boolean
@@ -64,6 +65,7 @@ export default function MilaGuide() {
   const guidePartialRef = useRef<string | null>(null)
   const backchannelIdxRef = useRef<number | null>(null)
   const turnSeedRef = useRef(0)
+  const guestTriedRef = useRef(false)
 
   const {
     messages,
@@ -182,6 +184,26 @@ export default function MilaGuide() {
     } catch { /* storage unavailable */ }
     return () => window.removeEventListener('mila-voice-mode', onVoiceMode)
   }, [])
+
+  // Voice mode armed while logged out: never sit silent behind the auth gate —
+  // seat a guest session, refresh the guide context, and the loop below starts.
+  useEffect(() => {
+    if (!voiceMode) {
+      guestTriedRef.current = false
+      return
+    }
+    if (isVoiceRoom || !context || context.authenticated || guestTriedRef.current) return
+    guestTriedRef.current = true
+    let cancelled = false
+    void ensureGuestSession().then(async (seated) => {
+      if (!seated || cancelled) return
+      const fresh = await fetch('/api/guide/context')
+        .then((response) => (response.ok ? response.json() : null))
+        .catch(() => null)
+      if (!cancelled && fresh) setContext(fresh)
+    })
+    return () => { cancelled = true }
+  }, [voiceMode, isVoiceRoom, context])
 
   useEffect(() => {
     if (!voiceMode || isVoiceRoom || !context?.authenticated) return

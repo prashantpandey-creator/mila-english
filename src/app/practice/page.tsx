@@ -13,6 +13,7 @@ import { streamVoiceReply } from "@/lib/voiceChatStream";
 import { endpointSilenceMs, pickBackchannel } from "@/lib/voiceTurn";
 import { parseVoiceCommand } from "@/lib/voiceCommands";
 import { getBuiltinLesson } from "@/lib/builtinLessons";
+import { ensureGuestSession } from "@/lib/guestSession";
 
 // The focused speaking room. Unlike the retired Darshan room this one has a
 // job: it drills the CURRENT LESSON by voice — one small task per turn, fed
@@ -39,6 +40,7 @@ function PracticeRoom() {
 
   const activeRef = useRef(false);
   const turnRef = useRef(0);
+  const guestTriedRef = useRef(false);
   const micRef = useRef<TranscriptionSession | null>(null);
   const partialRef = useRef<string | null>(null);
   const backchannelIdxRef = useRef<number | null>(null);
@@ -148,6 +150,17 @@ function PracticeRoom() {
           micRef.current = null;
           if (!activeRef.current || problem.message === "cancelled") return;
           if (problem.message === "no-speech" || problem.message === "transcribe-empty") return scheduleListen(600);
+          if (problem.message === "auth-required" && !guestTriedRef.current) {
+            // Never dead-end on auth: seat a guest and continue the practice.
+            guestTriedRef.current = true;
+            void ensureGuestSession().then((seated) => {
+              if (seated && activeRef.current) return scheduleListen(300);
+              setError(lang === "ru" ? "Войди в аккаунт, чтобы практиковаться голосом." : "Log in to practise by voice.");
+              setPhase("resting");
+              setRunning(false);
+            });
+            return;
+          }
           setError(problem.message === "auth-required"
             ? (lang === "ru" ? "Войди в аккаунт, чтобы практиковаться голосом." : "Log in to practise by voice.")
             : (lang === "ru" ? "Не удалось распознать речь. Проверь микрофон." : "I could not transcribe that. Check the microphone."));
@@ -185,15 +198,31 @@ function PracticeRoom() {
     turnRef.current += 1;
     const turnId = turnRef.current;
     setPhase("thinking");
+    const kickoff = lang === "ru" ? "Начнём практику." : "Let's start the practice.";
+    let started = false;
     try {
-      await speakTurn(lang === "ru" ? "Начнём практику." : "Let's start the practice.", turnId);
-      if (activeRef.current && turnRef.current === turnId) void listenLoop();
+      await speakTurn(kickoff, turnId);
+      started = true;
     } catch {
-      setRunning(false);
-      activeRef.current = false;
-      setPhase("resting");
-      setError(lang === "ru" ? "Мила не смогла начать. Попробуй ещё раз." : "Mila could not start. Try again.");
+      // Most common cause: no session yet. Seat a guest and retry once.
+      if (!guestTriedRef.current) {
+        guestTriedRef.current = true;
+        if (await ensureGuestSession()) {
+          try {
+            await speakTurn(kickoff, turnId);
+            started = true;
+          } catch { /* fall through to the error state */ }
+        }
+      }
     }
+    if (started) {
+      if (activeRef.current && turnRef.current === turnId) void listenLoop();
+      return;
+    }
+    setRunning(false);
+    activeRef.current = false;
+    setPhase("resting");
+    setError(lang === "ru" ? "Мила не смогла начать. Попробуй ещё раз." : "Mila could not start. Try again.");
   }, [lang, listenLoop, phase, running, speakTurn]);
 
   const exit = useCallback(() => {
