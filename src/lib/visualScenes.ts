@@ -80,10 +80,16 @@ const ROUTE_SCENES: Record<'nature' | 'study' | 'social' | 'club', VisualScene[]
     legacyScene('cathedral-columns', 'study'),
     legacyScene('woman-reading', 'study'),
   ],
-  // The studio art stays inside active practice; the garden is Mila's softer
-  // arrival room. Future social scenes can simply be appended.
+  // The studio art stays inside active practice. The front door is the city:
+  // café windows, night skylines, silk — the world the modern learner is
+  // heading toward. The garden scene stays defined above for future rooms.
   social: [MILA_STUDIO],
-  club: [MILA_GARDEN],
+  club: [
+    legacyScene('woman-coffee', 'brand', '55% center'),
+    legacyScene('us-manhattan', 'place'),
+    legacyScene('uk-bigben-night', 'place'),
+    legacyScene('woman-silk', 'brand'),
+  ],
 };
 
 export function visualScenesForRoute(path: string): VisualScene[] {
