@@ -22,6 +22,7 @@ services:
       - ALLOW_EXTERNAL_CHAT_FALLBACK=${ALLOW_EXTERNAL_CHAT_FALLBACK:-false}
       - OPENROUTER_CHAT_MODEL=${OPENROUTER_CHAT_MODEL:-}
       - ASR_URL=${ASR_URL:-http://mila-asr:8001}
+      - TTS_URL=${TTS_URL:-http://mila-tts:8002}
       - TELEGRAM_TRANSLATOR_BOT_TOKEN=${TELEGRAM_TRANSLATOR_BOT_TOKEN:-}
       - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET:-}
     volumes:
@@ -55,6 +56,22 @@ services:
       - ASR_CPU_THREADS=${ASR_CPU_THREADS:-4}
     networks:
       - mila
+
+  mila-tts:
+    build: ./tts-service
+    container_name: mila-tts
+    restart: unless-stopped
+    # Piper CPU neural voice (warm US female). Hard-bounded so it never competes
+    # with the resident Ollama models — synthesis is ~150-250ms per spoken line.
+    mem_limit: 1g
+    cpus: 2.0
+    networks:
+      - mila
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   mila-llm:
     image: ollama/ollama:0.32.0

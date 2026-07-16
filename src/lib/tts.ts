@@ -53,11 +53,90 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   });
 }
 
+// ── Piper (self-hosted neural voice) — the human-sounding path ───────────────
+// A warm US-female Piper voice (en_US-amy-medium) runs on our own CPU behind the
+// same-origin /api/tts proxy. It synthesizes a phrase in ~150–250ms and sounds
+// far less robotic than the browser's speechSynthesis. Any failure — offline,
+// blocked route, Russian text, a device with no English voice on the box — falls
+// straight through to the browser path, which stays the resilient fallback.
+
+/** Decide whether Piper should handle this utterance. Pure + tested: Piper's
+ *  amy is English-only, so we take English locales and reject predominantly
+ *  Cyrillic text (a Russian string mis-tagged en-US must never be forced through
+ *  an English voice). Everything else is the browser's job. */
+export function shouldUsePiper(text: string, lang: string): boolean {
+  if (!text.trim()) return false;
+  if (!lang.toLowerCase().startsWith('en')) return false;
+  return spokenLocaleForText(text, lang) !== 'ru-RU';
+}
+
+// A new spoken line supersedes whatever Piper clip is playing. We keep a single
+// canceller and settle its promise on stop, so the superseded call never hangs.
+let _piperCancel: (() => void) | null = null;
+
+function stopPiper(): void {
+  const cancel = _piperCancel;
+  _piperCancel = null;
+  cancel?.();
+}
+
+/** Fetch a WAV from /api/tts and play it. Resolves true only when a clip
+ *  actually played to the end; any failure resolves false so the caller can
+ *  fall back to the browser voice. Never throws. */
+async function speakViaPiper(text: string): Promise<boolean> {
+  if (typeof window === 'undefined' || typeof fetch === 'undefined' || typeof Audio === 'undefined') {
+    return false;
+  }
+  let url: string | null = null;
+  const myCancel = { fn: null as null | (() => void) };
+  try {
+    // Fail fast into the browser fallback if the service hangs — a synthesis is
+    // ~250ms, so 6s is a generous ceiling that still guarantees the user hears
+    // *something* rather than silence.
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6_000);
+    let res: Response;
+    try {
+      res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text }),
+        signal: ctrl.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+    if (!res.ok) return false;
+    const blob = await res.blob();
+    if (!blob.size) return false;
+    url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    stopPiper(); // supersede any prior clip (settles its promise)
+    return await new Promise<boolean>((resolve) => {
+      myCancel.fn = () => { try { audio.pause(); } catch { /* no-op */ } resolve(false); };
+      _piperCancel = myCancel.fn;
+      audio.onended = () => resolve(true);
+      audio.onerror = () => resolve(false);
+      audio.play().catch(() => resolve(false));
+    });
+  } catch {
+    return false;
+  } finally {
+    if (url) URL.revokeObjectURL(url);
+    if (_piperCancel === myCancel.fn) _piperCancel = null;
+  }
+}
+
 /** Speak text with the given BCP-47 locale. Returns a Promise that resolves when done. */
 export async function ttsSpeak(text: string, lang = 'en-US', rate = 0.85): Promise<void> {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  if (typeof window === 'undefined') return;
   if (!text.trim()) return;
-  // Cancel any ongoing speech first (prevents queue build-up / hangs)
+  // A new line supersedes anything currently speaking on either engine.
+  window.speechSynthesis?.cancel();
+  stopPiper();
+  // Human voice first; on any failure, fall through to the browser path below.
+  if (shouldUsePiper(text, lang) && (await speakViaPiper(text))) return;
+  if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const voices = await loadVoices();
   return new Promise((resolve) => {

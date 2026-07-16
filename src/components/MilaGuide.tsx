@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useChat } from 'ai/react'
 import { useI18n } from '@/lib/i18n-provider'
 import { announceCompanionHistoryUpdated, useCompanionHistory } from '@/lib/use-companion-history'
+import { ttsSpeak } from '@/lib/tts'
 
 type GuideContext = {
   authenticated: boolean
@@ -192,16 +193,16 @@ export default function MilaGuide() {
     recognition.start()
   }
 
-  const speak = (text: string) => {
-    if (!window.speechSynthesis) return
-    window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'en-US'
-    utterance.rate = 0.92
-    utterance.onstart = () => setSpeaking(true)
-    utterance.onend = () => setSpeaking(false)
-    utterance.onerror = () => setSpeaking(false)
-    window.speechSynthesis.speak(utterance)
+  // Route through ttsSpeak so the chatbot inherits the warm Piper voice (with
+  // the browser voice as automatic fallback). ttsSpeak resolves when playback
+  // ends, so the "speaking" state brackets the whole spoken line.
+  const speak = async (text: string) => {
+    setSpeaking(true)
+    try {
+      await ttsSpeak(text, 'en-US', 0.92)
+    } finally {
+      setSpeaking(false)
+    }
   }
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
