@@ -58,7 +58,10 @@ services:
     environment:
       - OLLAMA_HOST=0.0.0.0:11434
       - OLLAMA_CONTEXT_LENGTH=${OLLAMA_CONTEXT_LENGTH:-8192}
-      - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:-15m}
+      # Keep the model unloaded between requests on this shared VPS. Warming the
+      # 2.5 GB model while ASR and pronunciation boot can exhaust host memory
+      # and restart the public web container.
+      - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:-0}
       - OLLAMA_MAX_LOADED_MODELS=1
       - OLLAMA_NUM_PARALLEL=1
     volumes:

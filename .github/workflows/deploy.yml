@@ -54,8 +54,21 @@ jobs:
             local_llm_model="${local_llm_model:-qwen3:4b-instruct-2507-q4_K_M}"
             docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama pull "$local_llm_model"
             docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama show "$local_llm_model" >/dev/null
-            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama run "$local_llm_model" "Reply with OK only." >/dev/null
-            docker compose -f docker-compose.prod.yml up -d
+            # Bring the public app back before loading the heavier speech
+            # services. Do not warm the LLM here: keeping it resident while ASR
+            # and pronunciation initialize can OOM the shared production host.
+            docker compose -f docker-compose.prod.yml up -d --no-deps mila
+            for attempt in $(seq 1 30); do
+              if docker exec mila node -e "require('http').get('http://localhost:3000/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"; then
+                break
+              fi
+              if [ "$attempt" -eq 30 ]; then
+                docker logs --tail 100 mila
+                exit 1
+              fi
+              sleep 2
+            done
+            docker compose -f docker-compose.prod.yml up -d --no-deps mila-pron mila-asr
             wait_for_health() {
               container="$1"
               port="$2"
@@ -68,9 +81,15 @@ jobs:
               docker logs --tail 100 "$container"
               return 1
             }
-            wait_for_health mila-pron 8000
-            wait_for_health mila-asr 8001
-            docker exec mila node -e "Promise.all([fetch('http://mila-pron:8000/health'),fetch('http://mila-asr:8001/health')]).then(rs=>{console.log('local speech services',rs.map(r=>r.status));process.exit(rs.every(r=>r.ok)?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
+            pron_ready=false
+            asr_ready=false
+            if wait_for_health mila-pron 8000; then pron_ready=true; fi
+            if wait_for_health mila-asr 8001; then asr_ready=true; fi
+            if [ "$pron_ready" = true ] && [ "$asr_ready" = true ]; then
+              docker exec mila node -e "Promise.all([fetch('http://mila-pron:8000/health'),fetch('http://mila-asr:8001/health')]).then(rs=>{console.log('local speech services',rs.map(r=>r.status));process.exit(rs.every(r=>r.ok)?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
+            else
+              echo "Speech service warning: pronunciation=$pron_ready asr=$asr_ready"
+            fi
             docker exec mila node -e "fetch('http://mila-llm:11434/api/tags').then(async r=>{if(!r.ok)throw new Error('Ollama status '+r.status);const d=await r.json();const wanted=process.env.LOCAL_LLM_MODEL||'qwen3:4b-instruct-2507-q4_K_M';const names=(d.models||[]).map(m=>m.name);console.log('local companion model',wanted,names.includes(wanted)?'ready':'missing');process.exit(names.includes(wanted)?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
             if docker exec mila sh -lc 'test -n "$OPENAI_API_KEY"'; then
               docker exec mila node -e "fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+process.env.OPENAI_API_KEY}}).then(r=>console.log('Optional OpenAI credential status',r.status)).catch(e=>console.warn(e.message))" || true
