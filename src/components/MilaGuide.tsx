@@ -96,11 +96,15 @@ export default function MilaGuide() {
 
     const timer = window.setTimeout(() => {
       const alreadyShown = sessionStorage.getItem('mila-guide-nudge')
-      if (!alreadyShown && pathname !== '/darshan') {
-        setNudge(true)
-        sessionStorage.setItem('mila-guide-nudge', '1')
-      }
-    }, 1100)
+      if (alreadyShown || pathname === '/darshan') return
+      sessionStorage.setItem('mila-guide-nudge', '1')
+      // On the welcome door, Mila opens herself and greets like a receptionist —
+      // the first thing a new (often confused) visitor sees is a friendly hello
+      // with tappable options. Inside the app she keeps the lighter nudge so she
+      // never interrupts someone mid-task.
+      if (pathname === '/') setOpen(true)
+      else setNudge(true)
+    }, pathname === '/' ? 1500 : 1100)
     return () => window.clearTimeout(timer)
   }, [])
 
@@ -157,6 +161,18 @@ export default function MilaGuide() {
     router.push('/dashboard')
     router.refresh()
     setContext(null)
+  }
+
+  // Guest FAQ chips answer INLINE — no login wall, no empty composer. Canned
+  // bilingual replies so "Is it free?" gets answered the instant it's asked;
+  // the real LLM chat opens once they start a session.
+  const faqAnswer = (question: string, answerEn: string, answerRu: string) => {
+    setGuideError('')
+    setMessages((prev) => [
+      ...prev,
+      { id: `faq-q-${Date.now()}`, role: 'user', content: question },
+      { id: `faq-a-${Date.now() + 1}`, role: 'assistant', content: lang === 'ru' ? answerRu : answerEn },
+    ])
   }
 
   const startListening = () => {
@@ -236,6 +252,18 @@ export default function MilaGuide() {
               <div className="mila-guide__welcome">
                 <p>{welcome}</p>
                 {context?.name && <small>{lang === 'ru' ? `Рада видеть тебя, ${context.name}.` : `Good to see you, ${context.name}.`}</small>}
+                {/* Members get quick-start questions inline; guest FAQ chips live
+                    in the always-visible actions row so they survive an answer. */}
+                {context?.authenticated && (
+                  <div className="mila-guide__chips">
+                    {context.continueHref && (
+                      <button type="button" onClick={() => router.push(context.continueHref!)}>{continueLabel || (lang === 'ru' ? 'Продолжить' : 'Continue')}</button>
+                    )}
+                    <button type="button" disabled={isHistoryHydrating} onClick={() => ask(lang === 'ru' ? 'С чего мне лучше начать сегодня?' : 'What should I start with today?')}>{lang === 'ru' ? 'С чего начать?' : 'Where do I start?'}</button>
+                    <button type="button" onClick={() => router.push('/assessment')}>{lang === 'ru' ? 'Проверить уровень' : 'Check my level'}</button>
+                    <button type="button" onClick={() => router.push('/darshan')}>{lang === 'ru' ? 'Поговорить голосом' : 'Voice practice'}</button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -263,10 +291,25 @@ export default function MilaGuide() {
             {context?.authenticated && context.continueHref && (
               <button type="button" onClick={() => router.push(context.continueHref!)}><span>↗</span>{continueLabel}</button>
             )}
-            {context?.authenticated && (
+            {context?.authenticated ? (
               <>
                 <button type="button" disabled={isHistoryHydrating} onClick={() => ask(lang === 'ru' ? 'Объясни, что я могу делать на этой странице.' : 'Explain what I can do on this page.')}><span>?</span>{lang === 'ru' ? 'Объясни страницу' : 'Explain this page'}</button>
                 <button type="button" onClick={() => router.push('/darshan')}><span>◉</span>{lang === 'ru' ? 'Поговорить голосом' : 'Voice practice'}</button>
+              </>
+            ) : context && (
+              // Guest FAQ — always visible so answers don't consume the options.
+              <>
+                <button type="button" onClick={() => faqAnswer(
+                  lang === 'ru' ? 'Что это за приложение?' : 'What is this app?',
+                  'Mila is a personal English tutor. She hears every sound you speak, gives gentle feedback, builds lessons around your goals, and you can practise by voice — all in a friendly chat like this.',
+                  'Mila — персональная наставница по английскому. Она слышит каждый твой звук, мягко поправляет, собирает уроки под твои цели, и с ней можно говорить голосом — всё в дружеском чате, как этот.',
+                )}><span>?</span>{lang === 'ru' ? 'Что это?' : 'What is this?'}</button>
+                <button type="button" onClick={() => faqAnswer(
+                  lang === 'ru' ? 'Это бесплатно?' : 'Is it free?',
+                  'Yes — start free right now, no card needed. Tap “Start free” below.',
+                  'Да — начни бесплатно прямо сейчас, без карты. Нажми «Начать бесплатно» ниже.',
+                )}><span>₽</span>{lang === 'ru' ? 'Это бесплатно?' : 'Is it free?'}</button>
+                <button type="button" onClick={() => router.push('/assessment')}><span>◎</span>{lang === 'ru' ? 'Проверить уровень' : 'Check my level'}</button>
               </>
             )}
           </div>

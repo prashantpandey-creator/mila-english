@@ -1266,6 +1266,10 @@ h1, h2 {
 .mila-guide__welcome { align-self: flex-start; max-width: 92%; padding: 14px 15px; border: 1px solid rgba(255,255,255,.11); border-radius: 18px 18px 18px 5px; background: #09090a; box-shadow: inset 3px 0 0 rgba(106,220,245,.68); }
 .mila-guide__welcome p { margin: 0; color: #d7d7db; font-size: 12px; line-height: 1.58; }
 .mila-guide__welcome small { display: block; margin-top: 7px; color: #9999a0; font-size: 9px; }
+.mila-guide__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+.mila-guide__chips button { min-height: 30px; padding: 0 11px; border: 1px solid rgba(106,220,245,.24); border-radius: 999px; color: #d7ecf2; background: rgba(106,220,245,.07); font-size: 10px; font-weight: 700; cursor: pointer; transition: border-color .15s, background .15s, color .15s; }
+.mila-guide__chips button:hover { border-color: rgba(106,220,245,.5); background: rgba(106,220,245,.13); color: #eafaff; }
+.mila-guide__chips button:disabled { opacity: .5; cursor: default; }
 .mila-guide__message { position: relative; max-width: 88%; padding: 11px 38px 11px 13px; border-radius: 17px; }
 .mila-guide__message p { margin: 0; color: inherit; font-size: 12px; line-height: 1.58; white-space: pre-wrap; }
 .mila-guide__message.is-user { align-self: flex-end; padding-right: 13px; border-radius: 17px 17px 5px 17px; color: #260c13; background: linear-gradient(135deg,#ff9bad,#ff718a); box-shadow: 0 9px 24px rgba(255,113,138,.12); }
