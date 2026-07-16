@@ -40,6 +40,13 @@ h1, h2 {
   position: fixed; inset: 0; z-index: -2; overflow: hidden;
   background: var(--noir);
 }
+.atmosphere picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 /* The footage is a WHISPER, not a picture — heavily dimmed, blurred, and
    near-monochrome so it reads as moving texture deep behind the glass. Never a
    recognizable figure competing with the words. Subtlety is the whole point. */
@@ -47,43 +54,70 @@ h1, h2 {
 .atmosphere video,
 .atmosphere img {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; opacity: 0; transition: opacity 3s ease;
-  filter: saturate(0.64) contrast(1.08) brightness(0.82) blur(4px);
-  transform: scale(1.06); /* hide the blur's soft edges */
+  object-fit: cover;
+  object-position: var(--scene-focus-desktop, center center);
+  opacity: 0;
+  transition: opacity 2.4s ease;
+  filter: saturate(.68) contrast(1.08) brightness(.82) blur(3px);
+  transform: scale(1.04); /* hide the blur's soft edges */
 }
 /* Visible enough to read as a real place, quiet enough never to compete. */
 .atmosphere video.is-on,
 .atmosphere img.is-on { opacity: 0.5; }
 
+/* Custom campaign art is already graded and detailed. Preserve that detail;
+   the page scrims provide readability without turning it back into texture. */
+.atmosphere--brand img {
+  filter: saturate(.88) contrast(1.07) brightness(.9) blur(.2px);
+  transform: scale(1.015);
+}
+.atmosphere--brand img.is-on { opacity: .84; }
+
 /* The curated front-door loop is allowed to read as a real scene. Inner-room
    stills keep the quieter treatment above so learning surfaces stay calm. */
 .atmosphere--motion video {
-  object-position: 74% center;
+  object-position: var(--scene-focus-desktop, 74% center);
   filter: saturate(.68) contrast(1.1) brightness(.84) blur(1px);
 }
 .atmosphere--motion video.is-on { opacity: .88; }
 .atmosphere--motion::after {
   background:
-    radial-gradient(900px 720px at 82% 18%, rgba(255,255,255,.035), transparent 64%),
-    radial-gradient(700px 560px at 92% 68%, rgba(255,117,138,.035), transparent 68%),
-    linear-gradient(180deg, rgba(0,0,0,.34) 0%, rgba(0,0,0,.58) 58%, rgba(0,0,0,.9) 100%);
+    radial-gradient(900px 720px at 82% 18%, rgba(36,211,154,.035), transparent 64%),
+    radial-gradient(700px 560px at 92% 68%, rgba(106,220,245,.025), transparent 68%),
+    linear-gradient(180deg, rgba(0,0,0,.26) 0%, rgba(0,0,0,.52) 58%, rgba(0,0,0,.88) 100%);
 }
 
 /* Front-door video only: a very slow drift so it reads as a gentle pan, not
    fast motion. 40s ease over a 3% zoom — barely perceptible, beautiful. */
 .atmosphere-slow { animation: none; }
+.atmosphere--motion img.atmosphere-slow { animation: atmosDrift 38s cubic-bezier(.45,0,.55,1) alternate infinite; }
 @keyframes atmosDrift {
-  from { transform: scale(1.06) translate3d(0, 0, 0); }
-  to   { transform: scale(1.12) translate3d(-1.5%, -1%, 0); }
+  from { transform: scale(1.015) translate3d(0, 0, 0); }
+  to   { transform: scale(1.045) translate3d(-1%, -.6%, 0); }
 }
 .atmosphere::after {
   content: ''; position: absolute; inset: 0;
   background:
     radial-gradient(1200px 800px at 85% -10%, rgba(255,255,255,.025), transparent 62%),
-    radial-gradient(1000px 700px at -10% 25%, rgba(255,117,138,.025), transparent 58%),
+    radial-gradient(1000px 700px at -10% 25%, rgba(36,211,154,.022), transparent 58%),
     linear-gradient(180deg, rgba(0,0,0,.64) 0%, rgba(0,0,0,.78) 50%, rgba(0,0,0,.94) 100%);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
+}
+.atmosphere--brand::after {
+  background:
+    radial-gradient(900px 640px at 78% 34%, rgba(36,211,154,.035), transparent 66%),
+    radial-gradient(600px 520px at 76% 52%, rgba(106,220,245,.025), transparent 62%),
+    linear-gradient(180deg,rgba(0,0,0,.24),rgba(0,0,0,.48) 60%,rgba(0,0,0,.84));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+@media (max-width: 640px) {
+  .atmosphere video,
+  .atmosphere img { object-position: var(--scene-focus-mobile, center center); }
+  .atmosphere--motion img.atmosphere-slow { animation: none; }
+  .atmosphere--brand img { transform: scale(1.01); }
 }
 
 .card {
@@ -1423,7 +1457,7 @@ body { color: #f7f7f8; }
   --landing-ink: #f7f7f8;
   --landing-muted: #a7a7ad;
   --landing-bg: #000;
-  background: #000;
+  background: transparent;
 }
 .landing-nav {
   border-color: rgba(255,255,255,.11);
@@ -1831,4 +1865,13 @@ body { color: #f7f7f8; }
   .coach-demo__run:hover { border-color: rgba(36,211,154,.36); background: rgba(36,211,154,.075); }
   .coach-demo__hear:hover { border-color: rgba(106,220,245,.36); background: rgba(106,220,245,.075); }
   .room-card:hover { border-color: rgba(36,211,154,.26); background: linear-gradient(145deg,rgba(7,27,19,.82),rgba(3,13,9,.9)); }
+}
+
+/* The mobile source is art-directed, so it no longer needs the nearly opaque
+   stock-footage scrim. The scene stays visible while fading cleanly into the
+   solid-black product sections below. */
+@media (max-width: 640px) {
+  .landing-hero::before {
+    background: linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(0,0,0,.36) 34%,rgba(0,0,0,.72) 72%,#000 100%);
+  }
 }

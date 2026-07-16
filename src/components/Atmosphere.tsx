@@ -9,55 +9,19 @@
 //   3. ROUTE    — otherwise draw from the room's themed pool (nature for
 //                 progress, classrooms for lessons, social for the talk rooms,
 //                 the club set for the front door).
-// Clips live in public/ambience (720p, committed). If one fails to load the
-// component quietly falls back to pure noir.
-import { useEffect, useRef, useState } from 'react';
+// Versioned custom scenes live in public/visuals; legacy place clips remain in
+// public/ambience. If one fails to load the component quietly falls back to noir.
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { usePathname } from 'next/navigation';
 import { useScene } from '@/lib/scene';
-
-// All clips share ONE warm luminous grade — golden highlights, lifted shadows,
-// full saturation, soft vignette. Sourced hi-res (mostly 4K), supersampled to
-// 1080p. Aesthetic: beautiful, warm, cinematic — women lead the people pool.
-// Each country carries its own tradition, not just a landmark — the backdrop
-// gives a "dhyāna" (meditative) sense of the place you're training to enter.
-const COUNTRY_POOLS: Record<string, string[]> = {
-  uk: ['/ambience/uk-bigben-night.mp4', '/ambience/uk-tower.mp4'],
-  us: ['/ambience/us-manhattan.mp4', '/ambience/us-empire.mp4'],
-  in: ['/ambience/in-taj-aerial.mp4', '/ambience/in-saree-wedding.mp4', '/ambience/in-saree-dance.mp4', '/ambience/in-diwali.mp4', '/ambience/in-palace.mp4', '/ambience/in-holi.mp4'],
-};
-
-const TOPIC_POOLS: Record<string, string[]> = {
-  airport:     ['/ambience/us-empire.mp4'],
-  hotel:       ['/ambience/venice-night.mp4'],
-  cafe:        ['/ambience/woman-coffee.mp4'],
-  directions:  ['/ambience/venice-night.mp4'],
-  emergencies: ['/ambience/uk-bigben-night.mp4'],
-};
-
-const ROUTE_POOLS: Record<string, string[]> = {
-  // progress/achievements — awe of nature, warm: golden peaks, aurora, cliffs
-  nature: ['/ambience/nature-peaks.mp4', '/ambience/nature-aurora.mp4', '/ambience/nature-cliff.mp4', '/ambience/nature-volcano.mp4'],
-  // lessons/study — gothic learning halls, warmly lit: cathedral naves + columns
-  learn:  ['/ambience/cathedral-light.mp4', '/ambience/cathedral-columns.mp4', '/ambience/woman-reading.mp4'],
-  // the talk/practice rooms — beautiful women: golden field, silk, coffee, flowers
-  social: ['/ambience/woman-golden.mp4', '/ambience/woman-silk.mp4', '/ambience/woman-hair.mp4', '/ambience/woman-flowers.mp4', '/ambience/woman-coffee.mp4'],
-  // Front door / auth — one coherent learning scene. A single light clip avoids
-  // downloading a rotating gallery on mobile and keeps the brand story focused.
-  club:   ['/ambience/woman-reading.mp4'],
-};
-
-function routePool(path: string): string[] {
-  if (path.startsWith('/progress') || path.startsWith('/achievements')) return ROUTE_POOLS.nature;
-  if (path.startsWith('/lessons') || path.startsWith('/vocabulary') || path.startsWith('/phonetics')) return ROUTE_POOLS.learn;
-  if (path.startsWith('/listen') || path.startsWith('/chat') || path.startsWith('/darshan') || path.startsWith('/dashboard') || path.startsWith('/assessment')) return ROUTE_POOLS.social;
-  return ROUTE_POOLS.club;
-}
+import { COUNTRY_SCENES, MILA_STUDIO, TOPIC_SCENES, visualScenesForRoute, type VisualScene } from '@/lib/visualScenes';
 
 const HOLD_MS = 28000; // how long each scene breathes before the next (calm cadence)
 
-// A clip path → its extracted still. Motion belongs only at the front door;
-// every inner room shows a frozen graded frame instead.
-const stillOf = (clip: string) => clip.replace('/ambience/', '/ambience/stills/').replace('.mp4', '.jpg');
+type SceneStyle = CSSProperties & {
+  '--scene-focus-desktop': string;
+  '--scene-focus-mobile': string;
+};
 
 export default function Atmosphere() {
   const pathname = usePathname() || '/';
@@ -90,16 +54,17 @@ export default function Atmosphere() {
   // Resolve the active pool, most specific signal wins. A key string lets us
   // reset the rotation whenever the resolved scene changes (tap a new flag →
   // instant new place), without depending on array identity.
-  let clips: string[];
+  let scenes: VisualScene[];
   let sceneKey: string;
-  if (country && COUNTRY_POOLS[country]) { clips = COUNTRY_POOLS[country]; sceneKey = `c:${country}`; }
-  else if (topic && TOPIC_POOLS[topic]) { clips = TOPIC_POOLS[topic]; sceneKey = `t:${topic}`; }
-  else { clips = routePool(pathname); sceneKey = `r:${pathname}`; }
+  if (country && COUNTRY_SCENES[country]) { scenes = COUNTRY_SCENES[country]; sceneKey = `c:${country}`; }
+  else if (topic && TOPIC_SCENES[topic]) { scenes = TOPIC_SCENES[topic]; sceneKey = `t:${topic}`; }
+  else { scenes = visualScenesForRoute(pathname); sceneKey = `r:${pathname}`; }
 
   const [idx, setIdx] = useState(0);
   const [on, setOn] = useState(false);
   const [dead, setDead] = useState(false);
   const vidRef = useRef<HTMLVideoElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // New scene → restart rotation from the top of its pool.
@@ -107,20 +72,45 @@ export default function Atmosphere() {
 
   // Gentle rotation through the pool (both stills and the front-door video).
   useEffect(() => {
-    if (dead || clips.length < 2) return;
+    if (dead || scenes.length < 2) return;
     const t = setTimeout(() => {
       setOn(false);
-      fadeTimerRef.current = setTimeout(() => setIdx(i => (i + 1) % clips.length), 2800);
+      fadeTimerRef.current = setTimeout(() => setIdx(i => (i + 1) % scenes.length), 2800);
     }, HOLD_MS);
     return () => {
       clearTimeout(t);
       if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
     };
-  }, [idx, dead, clips.length]);
+  }, [idx, dead, scenes.length]);
+
+  const activeScene = scenes[idx] ?? scenes[0] ?? MILA_STUDIO;
+  const playVideo = motion && Boolean(activeScene.video);
+  const sceneStyle: SceneStyle = {
+    '--scene-focus-desktop': activeScene.focusDesktop ?? 'center center',
+    '--scene-focus-mobile': activeScene.focusMobile ?? activeScene.focusDesktop ?? 'center center',
+  };
+
+  // Cached images can finish before React attaches onLoad. Reconcile that
+  // fast path after a scene change so a warm-cache visit never stays black.
+  useEffect(() => {
+    const image = imgRef.current;
+    if (playVideo || !image) return;
+    let active = true;
+    const reveal = () => {
+      if (active && image.naturalWidth > 0) setOn(true);
+    };
+    if (image.complete) reveal();
+    else image.addEventListener('load', reveal);
+    image.decode?.().then(reveal).catch(() => {});
+    return () => {
+      active = false;
+      image.removeEventListener('load', reveal);
+    };
+  }, [activeScene.id, playVideo, sceneKey]);
 
   // Front-door video playback (only when motion is on).
   useEffect(() => {
-    if (!motion) return;
+    if (!playVideo) return;
     const v = vidRef.current;
     if (!v || dead) return;
     v.muted = true;
@@ -137,35 +127,42 @@ export default function Atmosphere() {
       document.removeEventListener('visibilitychange', syncPlayback);
       v.pause();
     };
-  }, [idx, dead, sceneKey, motion]);
+  }, [activeScene.id, dead, playVideo]);
 
   if (dead) return <div className="atmosphere" aria-hidden />;
 
   return (
-    <div className={`atmosphere ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
-      {motion ? (
+    <div className={`atmosphere atmosphere--${activeScene.grade ?? 'quiet'} ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
+      {playVideo ? (
         <video
           ref={vidRef}
           key={`${sceneKey}:${idx}`}
           className={`atmosphere-slow ${on ? 'is-on' : ''}`}
+          style={sceneStyle}
           muted
           loop
           playsInline
           preload="metadata"
-          poster={stillOf(clips[idx])}
+          poster={activeScene.stillDesktop}
           onCanPlay={(e) => { setOn(true); const v = e.currentTarget; v.muted = true; if (!document.hidden) v.play().catch(() => {}); }}
           onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
-          src={clips[idx]}
+          src={activeScene.video}
         />
       ) : (
-        <img
-          key={`${sceneKey}:${idx}`}
-          className={on ? 'is-on' : ''}
-          onLoad={() => setOn(true)}
-          onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
-          src={stillOf(clips[idx])}
-          alt=""
-        />
+        <picture key={`${sceneKey}:${idx}`}>
+          {activeScene.stillMobile && <source media="(max-width: 640px)" srcSet={activeScene.stillMobile} />}
+          <img
+            ref={imgRef}
+            className={`${motion ? 'atmosphere-slow ' : ''}${on ? 'is-on' : ''}`}
+            style={sceneStyle}
+            onLoad={() => setOn(true)}
+            onError={() => { if (idx === 0) setDead(true); else setIdx(0); }}
+            src={activeScene.stillDesktop}
+            alt=""
+            decoding="async"
+            fetchPriority={pathname === '/' ? 'high' : 'auto'}
+          />
+        </picture>
       )}
     </div>
   );
