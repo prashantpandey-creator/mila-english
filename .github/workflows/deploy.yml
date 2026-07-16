@@ -3,40 +3,28 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+concurrency:
+  group: mila-production
+  cancel-in-progress: false
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         with:
           host: 209.182.233.163
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: OPENAI_API_KEY,OPENROUTER_API_KEY
           command_timeout: 30m
           script: |
             set -e
             cd /root/mila 2>/dev/null || git clone https://github.com/prashantpandey-creator/mila-english.git /root/mila
             cd /root/mila && git fetch --all && git reset --hard origin/main
-            # Keep secrets out of Git while ensuring repository secrets refresh
-            # the server-side environment on every deploy.
-            touch .env
-            upsert_secret() {
-              key="$1"
-              value="$2"
-              [ -n "$value" ] || return 0
-              temp_file="$(mktemp)"
-              awk -F= -v key="$key" '$1 != key { print }' .env > "$temp_file"
-              printf '%s=%s\n' "$key" "$value" >> "$temp_file"
-              chmod 600 "$temp_file"
-              mv "$temp_file" .env
-            }
-            upsert_secret OPENAI_API_KEY "$OPENAI_API_KEY"
-            upsert_secret OPENROUTER_API_KEY "$OPENROUTER_API_KEY"
+            # Provider keys are optional and remain in the server-side .env.
+            # Do not forward them through the SSH action: exported values appear
+            # in the remote shell command line to privileged process inspection.
+            touch .env && chmod 600 .env
             test -f pron-service/model.onnx || { echo "model.onnx missing — see pron-service/README.md"; exit 1; }
             docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d mila-llm
