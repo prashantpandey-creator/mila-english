@@ -215,18 +215,21 @@ export type StreamingTtsSession = {
   cancel: () => void;
 };
 
-/** Queue short phrases as an append-only model response streams in. */
+/** Queue short phrases as an append-only model response streams in.
+ *  Pass cancelOnCreate=false when a filler utterance is already speaking and
+ *  the session's chunks should queue behind it instead of silencing it. */
 export async function createStreamingTtsSession(
   fallbackLang = 'en-US',
   rate = 0.9,
   onStart?: () => void,
+  cancelOnCreate = true,
 ): Promise<StreamingTtsSession> {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     return { push: () => {}, finish: async () => {}, cancel: () => {} };
   }
 
   const synthesis = window.speechSynthesis;
-  synthesis.cancel();
+  if (cancelOnCreate) synthesis.cancel();
   const voices = await loadVoices();
   let latestText = '';
   let consumed = 0;

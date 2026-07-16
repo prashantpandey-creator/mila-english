@@ -17,6 +17,15 @@ export type TranscriptionSession = {
   cancel: () => void;
 };
 
+// Mid-speech partials only help when the ASR box can transcribe a prefix
+// faster than the learner pauses; on a starved CPU they queue ahead of the
+// final transcription (the server serializes jobs) and make the turn SLOWER.
+// We remember the last partial round-trip across sessions and stand down while
+// it exceeds the budget, decaying it each new session so a recovered box gets
+// re-probed after a few turns.
+const PARTIAL_ROUND_TRIP_BUDGET_MS = 2_000;
+let recentPartialRoundTripMs = 0;
+
 async function transcribeBlob(blob: Blob, language: 'en' | 'ru' | 'auto'): Promise<LocalTranscript> {
   const form = new FormData();
   const extension = blob.type.includes('mp4') ? 'm4a'
@@ -79,6 +88,7 @@ export async function startLocalTranscription(args: {
   const PARTIAL_MS = args.partialAfterMs && args.partialAfterMs > 0
     ? Math.max(300, args.partialAfterMs)
     : 0;
+  recentPartialRoundTripMs *= 0.5;
   let spoke = false;
   let lastVoiceAt = startedAt;
   let frame = 0;
@@ -113,7 +123,10 @@ export async function startLocalTranscription(args: {
         return record;
       })
       .catch(() => null)
-      .finally(() => { if (inFlight?.voiceAtSnapshot === voiceAtSnapshot) inFlight = null; });
+      .finally(() => {
+        recentPartialRoundTripMs = performance.now() - snapshotAt;
+        if (inFlight?.voiceAtSnapshot === voiceAtSnapshot) inFlight = null;
+      });
     inFlight = { voiceAtSnapshot, promise };
   };
 
@@ -181,7 +194,7 @@ export async function startLocalTranscription(args: {
       && elapsed >= MIN_MS && now - lastVoiceAt >= PARTIAL_MS
     ) {
       pauseArmed = true;
-      firePartial();
+      if (recentPartialRoundTripMs < PARTIAL_ROUND_TRIP_BUDGET_MS) firePartial();
     }
     const silenceMs = Math.min(5_000, Math.max(500, args.getSilenceMs?.() ?? SILENCE_MS));
     if (elapsed >= MAX_MS || (spoke && elapsed >= MIN_MS && now - lastVoiceAt >= silenceMs)) {

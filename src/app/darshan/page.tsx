@@ -63,6 +63,7 @@ export default function DarshanPage() {
   const draftRef = useRef<Draft | null>(null);
   const requestControllerRef = useRef<AbortController | null>(null);
   const backchannelIndexRef = useRef<number | null>(null);
+  const fillerPlayedRef = useRef(false);
 
   const clearRestartTimer = useCallback(() => {
     if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
@@ -179,7 +180,9 @@ export default function DarshanPage() {
     setVoiceError("");
     setPhase("thinking");
     clearRestartTimer();
-    cancelSpeechSession();
+    // When the endpoint filler is speaking, the cleanup already ran in
+    // onScoring — a second cancel here would silence the filler itself.
+    if (!fillerPlayedRef.current) cancelSpeechSession();
     const turnId = turnRef.current + 1;
     turnRef.current = turnId;
     loadingRef.current = true;
@@ -192,16 +195,18 @@ export default function DarshanPage() {
 
     const requestLang = lang === "ru" ? "ru" : "en";
     const spokenLocale = spokenLocaleForText(text, lang === "ru" ? "ru-RU" : "en-US");
+    // Never cancel on create while the filler hums — chunks queue behind it.
     const sessionPromise = createStreamingTtsSession(spokenLocale, 0.9, () => {
       if (!activeRef.current || turnRef.current !== turnId) return;
       setPhase("manifesting");
-    });
+    }, !fillerPlayedRef.current);
     speechSessionRef.current = sessionPromise;
 
     const endTurn = (restAndListen: boolean) => {
       if (turnRef.current !== turnId) return;
       if (speechSessionRef.current === sessionPromise) speechSessionRef.current = null;
       requestControllerRef.current = null;
+      fillerPlayedRef.current = false;
       loadingRef.current = false;
       setIsBusy(false);
       if (!activeRef.current || !restAndListen) return;
@@ -245,21 +250,6 @@ export default function DarshanPage() {
         });
         return response.reply;
       };
-
-      // First sound: a finished matching draft speaks immediately with no
-      // filler; anything slower gets a spoken backchannel while it thinks.
-      const draftReady = draftHit && draft!.done && !!toSpokenText(draft!.text);
-      if (!draftReady) {
-        const pick = pickBackchannel(
-          spokenLocale === "ru-RU" ? "ru" : "en",
-          turnId,
-          backchannelIndexRef.current,
-        );
-        backchannelIndexRef.current = pick.index;
-        // Browser engine only: the filler must share speechSynthesis's queue
-        // with the answer chunks — a Piper clip would overlap them.
-        void ttsSpeakBrowser(pick.text, spokenLocale, 1);
-      }
 
       let reply = "";
       if (draftHit) {
@@ -314,6 +304,7 @@ export default function DarshanPage() {
     setAnswer("");
     setPhase("listening");
     latestPartialRef.current = null;
+    fillerPlayedRef.current = false;
     try {
       const session = await startLocalTranscription({
         language: "auto",
@@ -329,7 +320,28 @@ export default function DarshanPage() {
           latestPartialRef.current = null;
           abortDraft();
         },
-        onScoring: () => setPhase("thinking"),
+        onScoring: () => {
+          // End of turn — first sound NOW, before transcription finishes. On a
+          // slow ASR box this is the difference between a breath and ten
+          // seconds of "is she even hearing me".
+          setPhase("thinking");
+          if (!activeRef.current || fillerPlayedRef.current) return;
+          cancelSpeechSession();
+          const fillerLocale = spokenLocaleForText(
+            latestPartialRef.current || "",
+            lang === "ru" ? "ru-RU" : "en-US",
+          );
+          const pick = pickBackchannel(
+            fillerLocale === "ru-RU" ? "ru" : "en",
+            turnRef.current + 1,
+            backchannelIndexRef.current,
+          );
+          backchannelIndexRef.current = pick.index;
+          fillerPlayedRef.current = true;
+          // Browser engine only: the filler must share speechSynthesis's queue
+          // with the answer chunks — a Piper clip would overlap them.
+          void ttsSpeakBrowser(pick.text, fillerLocale, 1);
+        },
         onAutoStop: (transcript) => void submitTranscript(transcript),
         onError: (error) => {
           transcriptionRef.current = null;
@@ -369,7 +381,7 @@ export default function DarshanPage() {
     } finally {
       listeningStartRef.current = false;
     }
-  }, [abortDraft, fireDraft, lang, scheduleListening, submitTranscript]);
+  }, [abortDraft, cancelSpeechSession, fireDraft, lang, scheduleListening, submitTranscript]);
 
   useEffect(() => {
     startListeningRef.current = startListening;

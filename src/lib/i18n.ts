@@ -232,8 +232,10 @@ export function t(key: keyof typeof RU, lang: Lang): string {
 }
 
 export function getLangFromStorage(): Lang {
-  if (typeof window === 'undefined') return 'ru';
-  return (localStorage.getItem('mila_lang') as Lang) || 'ru';
+  // English is the interim default (owner request 2026-07-17) — a saved
+  // preference always wins, so a learner who picked Russian keeps it.
+  if (typeof window === 'undefined') return 'en';
+  return (localStorage.getItem('mila_lang') as Lang) || 'en';
 }
 
 export function setLangStorage(lang: Lang) {
