@@ -15,8 +15,8 @@ The Voice latency fix is operational rather than a model downgrade:
 - pin Ollama 0.32.0, which generated the same Qwen 4B answers roughly two to
   three times faster than the previous 0.15.1 runtime in this CPU test;
 - load and keep the separate Chat and Voice runtimes resident after ASR and
-  pronunciation have booted, with Voice receiving higher CPU priority during
-  overlap;
+  pronunciation have booted, with Chat hard-capped at four CPUs and Voice
+  receiving higher priority during overlap;
 - send only the last two voice turns and cap spoken replies at 50 tokens;
 - target one or two sentences and 15–30 spoken words;
 - stop recording after 1.2 seconds of silence instead of 1.6 seconds.
@@ -66,14 +66,19 @@ benchmark could not take over the live server. The cold Russian science answer
 was accurate at 86.07s / 160.07s, including a 50.85s model load. Warm English
 correction was accurate at 18.79s / 57.99s, and one-question interview role-play
 followed the instruction at 37.10s / 57.29s. These capped timings are not the
-production target: the Chat container can use the whole host while alone and
-yields CPU to Voice only during overlap. They establish capability and memory
-fit, not Voice suitability.
+production target because the Chat container is hard-capped at four CPUs to
+protect the site and Voice. They establish capability and memory fit, not Voice
+suitability.
 
 `gpt-oss:20b` occupied about 13.2 GiB at 4K and stayed inside a 16-GiB container
 limit. With both production Qwen runtimes resident beforehand, the host still
 had 18 GiB available; replacing only the Chat Qwen runner keeps the complete
 stack inside the 30-GiB host.
+
+An initial production warm-up at 8K with no CPU quota starved HTTPS and SSH on
+the 8-vCPU host, so that configuration failed acceptance and was canceled.
+Production therefore matches the proven 4K memory profile and hard-caps Chat at
+four CPUs. The cap trades some text latency for site and Darshan availability.
 
 ## Model notes
 
