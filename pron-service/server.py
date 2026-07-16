@@ -94,9 +94,19 @@ def score(audio, reference):
         out_words.append({"word": wtxt, "score": wa, "verdict": verdict(wa), "phonemes": phonemes})
     overall = int(round(np.mean(accs))) if accs else 0
     worst = min(out_words, key=lambda w: w["score"]) if out_words else None
-    tip = (f"Polish “{worst['word']}” — say it once more." if worst and worst["score"] < GOOD
-           else "Clean run. Next one.")
-    return {"score": overall, "words": out_words, "tip": tip}
+    tip, tip_ru = build_tips(worst)
+    return {"score": overall, "words": out_words, "tip": tip, "tip_ru": tip_ru}
+
+
+def build_tips(worst):
+    """One encouraging suggestion, in both languages. `tip` stays English for
+    backward compatibility; `tip_ru` is additive — the RU UI can prefer it."""
+    if worst and worst["score"] < GOOD:
+        w = worst["word"]
+        return (f"Polish “{w}” — say it once more.",
+                f"Отшлифуй «{w}» — скажи ещё раз.")
+    return ("Clean run. Next one.",
+            "Отлично получилось. Следующая!")
 
 
 def decode(raw: bytes) -> np.ndarray:
@@ -124,5 +134,8 @@ def health():
 async def pronounce(audio: UploadFile = File(...), reference: str = Form(...)):
     a = decode(await audio.read())
     if a is None or len(a) < 1600:
-        return {"score": 0, "words": [], "tip": "Didn't catch that — say it again."}
+        # Technical no-capture, NOT a pronunciation judgment — both languages.
+        return {"score": 0, "words": [],
+                "tip": "Didn't catch that — say it again.",
+                "tip_ru": "Не расслышала — скажи ещё раз."}
     return score(a, reference)

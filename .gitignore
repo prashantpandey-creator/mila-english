@@ -10,3 +10,7 @@ MILA_*AGREEMENT*.txt
 mary-*.txt
 output/
 tmp/
+# Private business/legal artifacts — contain real names, emails, equity terms. Never commit.
+NEXT_STEPS.md
+scripts/generate_mila_agreement*.py
+scripts/generate_mila_signature_copy.py
