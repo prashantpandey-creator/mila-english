@@ -80,19 +80,12 @@ function stopPiper(): void {
   cancel?.();
 }
 
-/** Fetch a WAV from /api/tts and play it. Resolves true only when a clip
- *  actually played to the end; any failure resolves false so the caller can
- *  fall back to the browser voice. Never throws. */
-async function speakViaPiper(text: string): Promise<boolean> {
-  if (typeof window === 'undefined' || typeof fetch === 'undefined' || typeof Audio === 'undefined') {
-    return false;
-  }
-  let url: string | null = null;
-  const myCancel = { fn: null as null | (() => void) };
+/** Fetch a synthesized WAV for the text; null on any failure so the caller
+ *  can fall back to the browser voice. Never throws. Fail-fast ceiling keeps
+ *  a hung service from producing silence. */
+async function fetchPiperClip(text: string): Promise<Blob | null> {
+  if (typeof window === 'undefined' || typeof fetch === 'undefined') return null;
   try {
-    // Fail fast into the browser fallback if the service hangs — a synthesis is
-    // ~250ms, so 6s is a generous ceiling that still guarantees the user hears
-    // *something* rather than silence.
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 6_000);
     let res: Response;
@@ -106,25 +99,42 @@ async function speakViaPiper(text: string): Promise<boolean> {
     } finally {
       clearTimeout(timer);
     }
-    if (!res.ok) return false;
+    if (!res.ok) return null;
     const blob = await res.blob();
-    if (!blob.size) return false;
-    url = URL.createObjectURL(blob);
+    return blob.size ? blob : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Play a fetched clip. True only when it played to the end. Registers with
+ *  the module canceller so a newer spoken line supersedes it cleanly. */
+async function playPiperClip(blob: Blob, onPlayStart?: () => void): Promise<boolean> {
+  if (typeof Audio === 'undefined') return false;
+  const url = URL.createObjectURL(blob);
+  const myCancel = { fn: null as null | (() => void) };
+  try {
     const audio = new Audio(url);
     stopPiper(); // supersede any prior clip (settles its promise)
     return await new Promise<boolean>((resolve) => {
       myCancel.fn = () => { try { audio.pause(); } catch { /* no-op */ } resolve(false); };
       _piperCancel = myCancel.fn;
+      audio.onplaying = () => onPlayStart?.();
       audio.onended = () => resolve(true);
       audio.onerror = () => resolve(false);
       audio.play().catch(() => resolve(false));
     });
-  } catch {
-    return false;
   } finally {
-    if (url) URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
     if (_piperCancel === myCancel.fn) _piperCancel = null;
   }
+}
+
+/** Fetch and play in one step — the one-shot ttsSpeak path. */
+async function speakViaPiper(text: string): Promise<boolean> {
+  const blob = await fetchPiperClip(text);
+  if (!blob) return false;
+  return playPiperClip(blob);
 }
 
 /** Speak text with the given BCP-47 locale. Returns a Promise that resolves when done. */
@@ -140,10 +150,34 @@ export async function ttsSpeak(text: string, lang = 'en-US', rate = 0.85): Promi
 }
 
 /** Mila's mascot voice character: slightly raised pitch so the assistant
- *  sounds like the little robot it lives in, not a studio narrator. Applied
- *  wherever the mascot/assistant speaks (Darshan + guide), never to lesson
- *  audio or the Piper reading voice. */
+ *  sounds like the little robot it lives in, not a studio narrator. Only the
+ *  BROWSER engine honors pitch — when Piper carries the line (the owner's
+ *  chosen "good voice", 2026-07-17), character comes from the voice itself. */
 export const MASCOT_PITCH = 1.2;
+
+// ── Instant fillers ──────────────────────────────────────────────────────────
+// Backchannels must sound within a breath of end-of-turn; a live Piper fetch
+// (~1.5s on prod) would defeat their purpose. Voice surfaces pre-cache the
+// fixed pool once; a cached filler plays instantly in the good voice, and
+// anything uncached (all Russian — Piper's amy is English-only) uses the
+// browser voice immediately rather than waiting.
+const _fillerClips = new Map<string, Blob>();
+
+export async function prefetchFillerClips(texts: string[]): Promise<void> {
+  await Promise.all(texts.map(async (text) => {
+    if (_fillerClips.has(text) || !shouldUsePiper(text, 'en-US')) return;
+    const blob = await fetchPiperClip(text);
+    if (blob) _fillerClips.set(text, blob);
+  }));
+}
+
+/** Speak a backchannel with zero added latency: cached Piper clip when we
+ *  have one, browser voice otherwise. */
+export async function ttsSpeakFiller(text: string, lang = 'en-US', rate = 1): Promise<void> {
+  const cached = _fillerClips.get(text);
+  if (cached && (await playPiperClip(cached))) return;
+  return ttsSpeakBrowser(text, lang, rate);
+}
 
 /** Speak strictly via the browser engine, never Piper. Callers that must share
  *  speechSynthesis's own queue with other utterances (e.g. a Darshan filler
@@ -247,7 +281,12 @@ export async function createStreamingTtsSession(
   let speaking = false;
   let resolved = false;
   let currentTimer: ReturnType<typeof setTimeout> | null = null;
-  const queue: string[] = [];
+  // Each chunk pre-fetches its Piper clip AT ENQUEUE TIME, so synthesis of
+  // sentence N+1 overlaps playback of sentence N — the ~1.5s prod synthesis
+  // cost is only ever audible before the very first chunk (and the endpoint
+  // filler covers that gap). Piper carries the good voice; the browser engine
+  // remains the always-available fallback per chunk.
+  const queue: Array<{ text: string; clip: Promise<Blob | null> | null }> = [];
   let resolveFinished!: () => void;
   const finished = new Promise<void>((resolve) => { resolveFinished = resolve; });
 
@@ -258,20 +297,19 @@ export async function createStreamingTtsSession(
     }
   };
 
+  const markStarted = () => {
+    if (started || cancelled) return;
+    started = true;
+    onStart?.();
+  };
+
   const speakNext = () => {
     if (speaking || cancelled) return;
-    const text = queue.shift();
-    if (!text) {
+    const item = queue.shift();
+    if (!item) {
       resolveIfDone();
       return;
     }
-    const lang = spokenLocaleForText(text, fallbackLang);
-    const voice = chooseVoice(voices.filter((candidate) => candidate.localService), lang) || chooseVoice(voices, lang);
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = rate;
-    utterance.pitch = pitch;
-    if (voice) utterance.voice = voice;
     speaking = true;
     let settled = false;
     const settle = () => {
@@ -283,23 +321,45 @@ export async function createStreamingTtsSession(
       if (!cancelled) speakNext();
       else resolveIfDone();
     };
+    // Generous ceiling: covers a slow clip fetch plus a long sentence.
     currentTimer = setTimeout(() => {
       synthesis.cancel();
+      stopPiper();
       settle();
-    }, 12_000);
-    utterance.onstart = () => {
-      if (started || cancelled) return;
-      started = true;
-      onStart?.();
-    };
-    utterance.onend = settle;
-    utterance.onerror = settle;
-    synthesis.speak(utterance);
+    }, 20_000);
+    void (async () => {
+      const lang = spokenLocaleForText(item.text, fallbackLang);
+      const clip = item.clip ? await item.clip : null;
+      if (cancelled || settled) {
+        settle();
+        return;
+      }
+      if (clip && (await playPiperClip(clip, markStarted))) {
+        settle();
+        return;
+      }
+      if (cancelled || settled) {
+        settle();
+        return;
+      }
+      const voice = chooseVoice(voices.filter((candidate) => candidate.localService), lang) || chooseVoice(voices, lang);
+      const utterance = new SpeechSynthesisUtterance(item.text);
+      utterance.lang = lang;
+      utterance.rate = rate;
+      utterance.pitch = pitch;
+      if (voice) utterance.voice = voice;
+      utterance.onstart = markStarted;
+      utterance.onend = settle;
+      utterance.onerror = settle;
+      synthesis.speak(utterance);
+    })();
   };
 
   const enqueue = (text: string) => {
     if (!text || cancelled) return;
-    queue.push(text);
+    const lang = spokenLocaleForText(text, fallbackLang);
+    const clip = shouldUsePiper(text, lang) ? fetchPiperClip(text) : null;
+    queue.push({ text, clip });
     speakNext();
   };
 
@@ -334,6 +394,7 @@ export async function createStreamingTtsSession(
       finishing = true;
       queue.length = 0;
       synthesis.cancel();
+      stopPiper();
       if (currentTimer) clearTimeout(currentTimer);
       currentTimer = null;
       speaking = false;

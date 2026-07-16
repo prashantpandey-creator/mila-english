@@ -6,11 +6,11 @@ import { MilaVoid } from "@/components/darshan/MilaVoid";
 import { MilaBindu, type BinduState } from "@/components/darshan/MilaBindu";
 import { useI18n } from "@/lib/i18n-provider";
 import { startLocalTranscription, type TranscriptionSession } from "@/lib/localTranscription";
-import { createStreamingTtsSession, spokenLocaleForText, ttsSpeakBrowser } from "@/lib/tts";
+import { createStreamingTtsSession, prefetchFillerClips, spokenLocaleForText, ttsSpeakFiller } from "@/lib/tts";
 import { toSpokenText } from "@/lib/spokenText";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
 import { streamVoiceReply } from "@/lib/voiceChatStream";
-import { endpointSilenceMs, pickBackchannel } from "@/lib/voiceTurn";
+import { backchannelTexts, endpointSilenceMs, pickBackchannel } from "@/lib/voiceTurn";
 import { parseVoiceCommand } from "@/lib/voiceCommands";
 import { getBuiltinLesson } from "@/lib/builtinLessons";
 import { ensureGuestSession } from "@/lib/guestSession";
@@ -118,7 +118,7 @@ function PracticeRoom() {
           const fillerLocale = spokenLocaleForText(partialRef.current || "", uiLocale);
           const pick = pickBackchannel(fillerLocale === "ru-RU" ? "ru" : "en", turnId, backchannelIdxRef.current);
           backchannelIdxRef.current = pick.index;
-          void ttsSpeakBrowser(pick.text, fillerLocale, 1, TEACHER_PITCH);
+          void ttsSpeakFiller(pick.text, fillerLocale, 1);
         },
         onAutoStop: (transcript) => {
           void (async () => {
@@ -194,6 +194,7 @@ function PracticeRoom() {
     }
     setError("");
     setRunning(true);
+    void prefetchFillerClips(backchannelTexts("en"));
     activeRef.current = true;
     turnRef.current += 1;
     const turnId = turnRef.current;

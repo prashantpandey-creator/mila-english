@@ -55,14 +55,19 @@ const finishCurrent = () => {
 
 async function main() {
   const { createStreamingTtsSession } = await import('./tts');
+  // Chunks now pre-fetch a Piper clip before speaking (browser voice is the
+  // per-chunk fallback), so speech starts a tick after push, not synchronously.
+  const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 25));
 
   const session = await createStreamingTtsSession('en-US');
   const answer = 'You corrected that sentence. Теперь попробуем ещё один вопрос.';
   session.push(answer);
+  await tick();
   assert.strictEqual(spoken.length, 1);
   assert.strictEqual(spoken[0].lang, 'en-US');
   const finished = session.finish(answer);
   finishCurrent();
+  await tick();
   assert.strictEqual(spoken.length, 2, 'the second phrase starts only after the first ends');
   assert.strictEqual(spoken[1].lang, 'ru-RU');
   finishCurrent();
@@ -70,10 +75,12 @@ async function main() {
 
   const cancelledSession = await createStreamingTtsSession('en-US');
   cancelledSession.push('This is the first phrase. This is the second phrase.');
+  await tick();
   assert.strictEqual(spoken.length, 3);
   const stale = current;
   cancelledSession.cancel();
   stale?.onend?.();
+  await tick();
   assert.strictEqual(spoken.length, 3, 'a stale completion cannot start queued speech after cancellation');
 
   delete (globalThis as any).window;

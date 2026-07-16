@@ -1212,6 +1212,26 @@ h1, h2 {
   50% { box-shadow: 0 0 0 12px rgba(106,220,245,.13), 0 26px 60px rgba(0,7,17,.6), 0 0 46px rgba(69,202,234,.3); }
 }
 
+.mila-guide__voicechip {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(126,229,251,.45);
+  background: rgba(12, 10, 20, .92);
+  color: #7de5fb;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0,7,17,.45);
+  transition: transform .18s ease, border-color .18s ease;
+  z-index: 2;
+}
+.mila-guide__voicechip:hover { transform: scale(1.12); border-color: rgba(126,229,251,.8); }
+.mila-guide__voicechip svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
 .mila-guide__caption {
   position: fixed;
   right: 18px;

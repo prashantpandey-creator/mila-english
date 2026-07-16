@@ -14,6 +14,11 @@ const BACKCHANNELS: Record<VoiceLocale, string[]> = {
 
 export type BackchannelPick = { text: string; index: number };
 
+/** The fixed filler pool for a locale — exported so TTS can pre-cache clips. */
+export function backchannelTexts(locale: VoiceLocale): string[] {
+  return [...BACKCHANNELS[locale]];
+}
+
 /** Deterministic per-seed pick that never repeats the previous index. */
 export function pickBackchannel(
   locale: VoiceLocale,

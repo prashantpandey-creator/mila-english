@@ -7,11 +7,11 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useChat } from 'ai/react'
 import { useI18n } from '@/lib/i18n-provider'
 import { announceCompanionHistoryUpdated, useCompanionHistory } from '@/lib/use-companion-history'
-import { MASCOT_PITCH, createStreamingTtsSession, spokenLocaleForText, ttsSpeakBrowser } from '@/lib/tts'
+import { MASCOT_PITCH, createStreamingTtsSession, prefetchFillerClips, spokenLocaleForText, ttsSpeak, ttsSpeakBrowser, ttsSpeakFiller } from '@/lib/tts'
 import { startLocalTranscription } from '@/lib/localTranscription'
 import { streamVoiceReply } from '@/lib/voiceChatStream'
 import { parseVoiceCommand } from '@/lib/voiceCommands'
-import { endpointSilenceMs, pickBackchannel } from '@/lib/voiceTurn'
+import { backchannelTexts, endpointSilenceMs, pickBackchannel } from '@/lib/voiceTurn'
 import { toSpokenText } from '@/lib/spokenText'
 import { ensureGuestSession } from '@/lib/guestSession'
 
@@ -208,6 +208,7 @@ export default function MilaGuide() {
   useEffect(() => {
     if (!voiceMode || isVoiceRoom || !context?.authenticated) return
     let alive = true
+    void prefetchFillerClips(backchannelTexts('en'))
     let session: { stop: () => Promise<unknown>; cancel: () => void } | null = null
     let restartTimer: number | null = null
     let fillerPlayedThisTurn = false
@@ -305,7 +306,7 @@ export default function MilaGuide() {
               backchannelIdxRef.current,
             )
             backchannelIdxRef.current = pick.index
-            void ttsSpeakBrowser(pick.text, fillerLocale, 1, MASCOT_PITCH)
+            void ttsSpeakFiller(pick.text, fillerLocale, 1)
           },
           onAutoStop: (transcript) => void handleVoiceTurn(transcript.text),
           onError: (error) => {
@@ -389,7 +390,7 @@ export default function MilaGuide() {
   const speak = async (text: string) => {
     setSpeaking(true)
     try {
-      await ttsSpeakBrowser(text, spokenLocaleForText(text, lang === 'ru' ? 'ru-RU' : 'en-US'), 0.95, MASCOT_PITCH)
+      await ttsSpeak(text, spokenLocaleForText(text, lang === 'ru' ? 'ru-RU' : 'en-US'), 0.95)
     } finally {
       setSpeaking(false)
     }
@@ -557,6 +558,20 @@ export default function MilaGuide() {
         <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} priority />
         <span className="mila-guide__state" aria-hidden />
       </button>
+
+      {/* One-tap voice: the mascot assists hands-free without the chat panel.
+          Hidden while voice mode runs — then the mascot itself is the stop. */}
+      {!voiceMode && (
+        <button
+          className="mila-guide__voicechip"
+          type="button"
+          onClick={() => { setOpen(false); setVoiceMode(true) }}
+          aria-label={lang === 'ru' ? 'Говорить с Милой' : 'Talk to Mila'}
+          title={lang === 'ru' ? 'Говорить с Милой' : 'Talk to Mila'}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
+        </button>
+      )}
     </aside>
   )
 }
