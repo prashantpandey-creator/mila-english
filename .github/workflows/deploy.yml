@@ -43,8 +43,7 @@ jobs:
             docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama pull "$local_llm_model"
             docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama show "$local_llm_model" >/dev/null
             # Bring the public app back before loading the heavier speech
-            # services. Do not warm the LLM here: keeping it resident while ASR
-            # and pronunciation initialize can OOM the shared production host.
+            # services. Warm the LLM only after those services have initialized.
             docker compose -f docker-compose.prod.yml up -d --no-deps mila
             for attempt in $(seq 1 30); do
               if docker exec mila node -e "require('http').get('http://localhost:3000/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"; then
@@ -78,6 +77,11 @@ jobs:
             else
               echo "Speech service warning: pronunciation=$pron_ready asr=$asr_ready"
             fi
+            # Runtime measurements show that the resident model fits safely
+            # after ASR and pronunciation are loaded and avoids the cold-start
+            # penalty on every Darshan turn.
+            docker exec mila node -e "fetch('http://mila-llm:11434/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({model:process.env.LOCAL_LLM_MODEL||'qwen3:4b-instruct-2507-q4_K_M',messages:[{role:'user',content:'Reply with OK.'}],stream:false,keep_alive:-1,options:{num_ctx:4096,num_predict:1,temperature:0}})}).then(async r=>{if(!r.ok)throw new Error('Ollama warm-up status '+r.status);await r.json();console.log('local companion model warmed');}).catch(e=>{console.error(e.message);process.exit(1)})"
+            docker exec mila node -e "fetch('http://mila-llm:11434/api/ps').then(async r=>{if(!r.ok)throw new Error('Ollama ps status '+r.status);const d=await r.json();const wanted=(process.env.LOCAL_LLM_MODEL||'qwen3:4b-instruct-2507-q4_K_M').toLowerCase();const loaded=(d.models||[]).some(m=>(m.name||m.model||'').toLowerCase()===wanted);console.log('local companion residency',loaded?'ready':'missing');process.exit(loaded?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
             docker exec mila node -e "fetch('http://mila-llm:11434/api/tags').then(async r=>{if(!r.ok)throw new Error('Ollama status '+r.status);const d=await r.json();const wanted=process.env.LOCAL_LLM_MODEL||'qwen3:4b-instruct-2507-q4_K_M';const names=(d.models||[]).map(m=>m.name);console.log('local companion model',wanted,names.includes(wanted)?'ready':'missing');process.exit(names.includes(wanted)?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})"
             if docker exec mila sh -lc 'test -n "$OPENAI_API_KEY"'; then
               docker exec mila node -e "fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+process.env.OPENAI_API_KEY}}).then(r=>console.log('Optional OpenAI credential status',r.status)).catch(e=>console.warn(e.message))" || true

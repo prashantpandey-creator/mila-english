@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
       take: 3,
     }),
-    listCompanionMessages(userId, 18),
+    listCompanionMessages(userId, surfaceKind === 'voice' ? 6 : 18),
     listCompanionMemories(userId),
   ]);
 
@@ -267,8 +267,8 @@ export async function POST(request: NextRequest) {
     model: choice.model,
     messages,
     system,
-    maxTokens: surfaceKind === 'voice' ? 140 : 600,
-    temperature: 0.65,
+    maxTokens: surfaceKind === 'voice' ? 60 : 600,
+    temperature: surfaceKind === 'voice' ? 0.45 : 0.65,
     maxRetries: choice.provider === 'ollama' ? 0 : 1,
     onFinish: async ({ text }) => {
       if (!text.trim()) return;

@@ -85,6 +85,8 @@ assert.match(voicePrompt, /reply will be read aloud/i);
 assert.match(voicePrompt, /no Markdown, headings, bullets/i);
 assert.match(voicePrompt, /Ask no more than one question/i);
 assert.match(voicePrompt, /FINAL OUTPUT CONTRACT/);
+assert.match(voicePrompt, /15 to 35 words/i);
+assert.doesNotMatch(voicePrompt, /40 to 80 words/i);
 
 const friendlyVoicePrompt = buildCompanionSystemPrompt({
   persona: 'Register: concise; playful; a little emoji is fine.',

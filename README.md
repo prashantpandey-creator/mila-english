@@ -79,7 +79,11 @@ use a host with at least 8 GB RAM for the full stack. On a smaller host, set
 restart the app. The 1.7B model reduces memory and latency at the cost of weaker
 reasoning and less consistent teaching. `OLLAMA_CONTEXT_LENGTH` defaults to
 8192, `OLLAMA_NUM_PARALLEL` to one, and only one model is kept loaded to keep
-CPU deployment predictable.
+CPU deployment predictable. Production pins Ollama 0.32.0 and warms the model
+after ASR and pronunciation are healthy; this avoids reloading the weights on
+every Darshan turn without creating a startup memory spike. The measured model
+comparison and rejection reasons are recorded in
+[`docs/LOCAL_MODEL_BENCHMARK_2026-07-16.md`](docs/LOCAL_MODEL_BENCHMARK_2026-07-16.md).
 
 `gpt-oss:20b` is also supported without training. When selected, Mila injects
 `reasoning_effort=low` so the model does not exhaust a short conversational
@@ -89,10 +93,10 @@ than as the default live-voice model. Set `LOCAL_LLM_MODEL=gpt-oss:20b`, pull
 that exact tag, and keep `LOCAL_LLM_REASONING_EFFORT=low` unless latency is not
 interactive.
 
-The production deployment pulls and runs a short smoke prompt against the
-configured model before restarting Mila, then verifies app-to-Ollama
-connectivity. Chat prompts stay inside the private runtime network; the initial
-model download still
+The production deployment pulls the configured model, starts Mila and both
+speech services, then runs a short warm-up prompt and verifies that Ollama kept
+the model resident. Chat prompts stay inside the private runtime network; the
+initial model download still
 requires outbound access to Ollama's registry. Russian-network availability of
 the Mila web origin must still be acceptance-tested from Russia without a VPN.
 

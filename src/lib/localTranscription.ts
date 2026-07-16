@@ -57,7 +57,9 @@ export async function startLocalTranscription(args: {
   const startedAt = performance.now();
   const MIN_MS = 800;
   const MAX_MS = 20_000;
-  const SILENCE_MS = 1_600;
+  // A long end-of-turn delay makes every voice reply feel slow. This still
+  // leaves room for a natural pause without adding 1.6 seconds after speech.
+  const SILENCE_MS = 1_200;
   const THRESHOLD = 0.008;
   let spoke = false;
   let lastVoiceAt = startedAt;
