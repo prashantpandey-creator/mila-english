@@ -6,7 +6,7 @@ import { MilaVoid } from "@/components/darshan/MilaVoid";
 import { MilaBindu, type BinduState } from "@/components/darshan/MilaBindu";
 import { useI18n } from "@/lib/i18n-provider";
 import { startLocalTranscription, type LocalTranscript, type TranscriptionSession } from "@/lib/localTranscription";
-import { createStreamingTtsSession, spokenLocaleForText, ttsSpeak, type StreamingTtsSession } from "@/lib/tts";
+import { createStreamingTtsSession, spokenLocaleForText, ttsSpeakBrowser, type StreamingTtsSession } from "@/lib/tts";
 import { toSpokenText } from "@/lib/spokenText";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
 import { streamVoiceReply } from "@/lib/voiceChatStream";
@@ -256,7 +256,9 @@ export default function DarshanPage() {
           backchannelIndexRef.current,
         );
         backchannelIndexRef.current = pick.index;
-        void ttsSpeak(pick.text, spokenLocale, 1);
+        // Browser engine only: the filler must share speechSynthesis's queue
+        // with the answer chunks — a Piper clip would overlap them.
+        void ttsSpeakBrowser(pick.text, spokenLocale, 1);
       }
 
       let reply = "";

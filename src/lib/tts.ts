@@ -136,8 +136,17 @@ export async function ttsSpeak(text: string, lang = 'en-US', rate = 0.85): Promi
   stopPiper();
   // Human voice first; on any failure, fall through to the browser path below.
   if (shouldUsePiper(text, lang) && (await speakViaPiper(text))) return;
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
+  return ttsSpeakBrowser(text, lang, rate);
+}
+
+/** Speak strictly via the browser engine, never Piper. Callers that must share
+ *  speechSynthesis's own queue with other utterances (e.g. a Darshan filler
+ *  followed by streamed answer chunks) use this so both sounds go through one
+ *  serialized engine — a Piper clip plays on a separate Audio element and
+ *  would overlap them. */
+export async function ttsSpeakBrowser(text: string, lang = 'en-US', rate = 0.85): Promise<void> {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  if (!text.trim()) return;
   const voices = await loadVoices();
   return new Promise((resolve) => {
     const u = new SpeechSynthesisUtterance(text);
