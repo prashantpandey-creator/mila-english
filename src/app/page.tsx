@@ -364,7 +364,7 @@ export default function HomePage() {
 
           <div className="session-story__steps">
             {methodSteps.map((step) => (
-              <article className="session-step" key={step.key}>
+              <article className="session-step" data-step={step.key} key={step.key}>
                 <div className="session-step__copy">
                   <div><span>{step.number}</span><i><Icon name={step.icon} size={19}/></i></div>
                   <h3>{step.title}</h3>
@@ -388,12 +388,16 @@ export default function HomePage() {
           <div className="room-grid">
             {rooms.map((room) => (
               <button className={`room-card ${room.className}`} data-room={room.id} key={room.href} onClick={() => router.push(isLoggedIn ? room.href : '/register')}>
-                <span className="room-card__icon"><Icon name={room.icon} /></span>
+                <span className="room-card__head">
+                  <span className="room-card__icon"><Icon name={room.icon} /></span>
+                  <span className="room-card__label">{room.label}</span>
+                  <span className="room-card__link">{lang === 'ru' ? 'Открыть' : 'Explore'} <Icon name="arrow" size={16} /></span>
+                </span>
+                <span className="room-card__body">
+                  <strong>{room.title}</strong>
+                  <span className="room-card__copy">{room.copy}</span>
+                </span>
                 <RoomVisual id={room.id}/>
-                <span className="room-card__label">{room.label}</span>
-                <strong>{room.title}</strong>
-                <span className="room-card__copy">{room.copy}</span>
-                <span className="room-card__link">{lang === 'ru' ? 'Открыть' : 'Explore'} <Icon name="arrow" size={16} /></span>
               </button>
             ))}
           </div>

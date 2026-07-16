@@ -109,7 +109,7 @@ export default function LoginPage() {
         .welcome-auth::before,
         .welcome-auth::after {
           content: '';
-          position: fixed;
+          position: absolute;
           z-index: -1;
           border-radius: 999px;
           pointer-events: none;
@@ -194,11 +194,9 @@ export default function LoginPage() {
           max-width: 420px;
           padding: clamp(1.7rem, 5vw, 2.6rem) clamp(1.25rem, 5vw, 2.25rem) 2rem;
           border: 1px solid rgba(255,255,255,.82);
-          border-radius: 1.75rem;
-          background: rgba(255, 255, 255, .72);
-          box-shadow: 0 28px 80px var(--auth-shadow), inset 0 1px 0 #fff;
-          backdrop-filter: blur(28px) saturate(1.08);
-          -webkit-backdrop-filter: blur(28px) saturate(1.08);
+          border-radius: 1.25rem;
+          background: rgba(255, 255, 255, .94);
+          box-shadow: 0 1px 2px rgba(116,57,82,.035), 0 16px 48px rgba(116,57,82,.1);
         }
         .welcome-auth__intro { margin-bottom: 1.8rem; text-align: center; }
         .welcome-auth__bloom {
@@ -208,9 +206,9 @@ export default function LoginPage() {
           display: grid;
           place-items: center;
           border: 1px solid rgba(220, 111, 153, .15);
-          border-radius: 1.45rem;
+          border-radius: 1rem;
           background: linear-gradient(145deg, #fff, var(--auth-pink-soft));
-          box-shadow: 0 16px 38px rgba(194, 80, 124, .13);
+          box-shadow: 0 8px 20px rgba(194, 80, 124, .08);
           font-size: 2rem;
           transform: rotate(-3deg);
         }
@@ -296,7 +294,7 @@ export default function LoginPage() {
         @media (max-width: 480px) {
           .welcome-auth__nav { padding: .7rem 1rem; }
           .welcome-auth__main { align-items: flex-start; padding-top: clamp(1.3rem, 7vh, 3.25rem); }
-          .welcome-auth__card { border-radius: 1.5rem; }
+          .welcome-auth__card { border-radius: 1.1rem; box-shadow: 0 1px 3px rgba(116,57,82,.06); }
         }
         @media (prefers-reduced-motion: reduce) {
           .welcome-auth__button, .welcome-auth__input { transition: none; }

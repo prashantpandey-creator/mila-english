@@ -1934,15 +1934,15 @@ html[data-mila-surface="focus"] { background: #0c0a0e; }
   --surface-page: rgba(255,248,250,.96);
   --surface-text: #2f2530;
   --surface-muted: #6f6269;
-  --surface-card: rgba(255,255,255,.86);
+  --surface-card: rgba(255,255,255,.98);
   --surface-nav: rgba(255,250,252,.9);
-  --surface-line: rgba(93,46,66,.13);
+  --surface-line: rgba(93,46,66,.1);
   --surface-control: rgba(255,255,255,.76);
   --surface-control-line: #cdb9c2;
-  --surface-control-shadow: 0 2px 9px rgba(93,46,66,.07);
+  --surface-control-shadow: 0 1px 3px rgba(93,46,66,.055);
   --surface-track: rgba(93,46,66,.1);
-  --surface-card-shadow: 0 20px 60px rgba(93,46,66,.1),0 2px 8px rgba(93,46,66,.05),inset 0 1px 0 rgba(255,255,255,.94);
-  --surface-card-shadow-hover: 0 22px 62px rgba(93,46,66,.14),0 4px 12px rgba(93,46,66,.06);
+  --surface-card-shadow: 0 1px 2px rgba(63,32,45,.035),0 10px 28px rgba(93,46,66,.065);
+  --surface-card-shadow-hover: 0 2px 4px rgba(63,32,45,.04),0 16px 38px rgba(93,46,66,.09);
   --surface-card-line-hover: rgba(168,61,100,.3);
   --surface-icon-tile: linear-gradient(145deg,rgba(242,139,173,.14),rgba(36,211,154,.055));
   --venus-readable: #a83d64;
@@ -2289,4 +2289,334 @@ html[data-mila-surface="focus"] { background: #0c0a0e; }
   .mila-surface--welcome .room-card { background: rgba(255,255,255,.94); }
   .mila-surface--welcome .room-swipehint span { background: rgba(93,46,66,.12); }
   .mila-surface--welcome .room-swipehint span:first-child { background: rgba(168,61,100,.56); }
+}
+
+/* ── Card system v2: quiet surfaces, one hierarchy, no nested glass ─────
+   This block intentionally owns welcome-card geometry after the legacy dark
+   styles above. Glass is reserved for navigation and Mila's floating panel. */
+.mila-surface--welcome .mila-card,
+.mila-surface--welcome .welcome-panel,
+.mila-surface--welcome .lesson-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.metric-grid { grid-template-columns: repeat(auto-fit,minmax(92px,1fr)); }
+.badge-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.secondary-tools-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.badge-tile.is-locked .badge-tile__title { color: #5f5258 !important; }
+.badge-tile.is-locked .badge-tile__copy { color: #75686e !important; }
+.streak-card-v2 { position: relative; overflow: hidden; }
+.streak-card-v2::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(var(--venus-readable),var(--mercury-readable));
+}
+
+/* Dashboard journeys are one calm practice sheet, not five floating modals. */
+.mila-surface--welcome .journey-stack {
+  gap: 0;
+  padding: 5px;
+  overflow: hidden;
+  border: 1px solid var(--surface-line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--surface-card-shadow);
+}
+.mila-surface--welcome .journey-card {
+  min-height: 70px;
+  padding: 11px 13px 11px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: inset 2px 0 color-mix(in srgb,var(--journey-readable) 30%,transparent);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.mila-surface--welcome .journey-card + .journey-card { border-top: 1px solid rgba(93,46,66,.075); }
+.mila-surface--welcome .journey-card__icon {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 13px;
+  background: color-mix(in srgb,var(--journey-readable) 8%,white);
+  box-shadow: none;
+}
+.mila-surface--welcome .journey-card__copy strong,
+.mila-surface--welcome .journey-card__copy small {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+.mila-surface--welcome .journey-card__copy small { max-width: 36ch; line-height: 1.35; }
+.mila-surface--welcome .journey-card__action { color: var(--mercury-readable); }
+
+/* Lessons use the same action-sheet grammar as the dashboard journeys. */
+.mila-surface--welcome .lesson-stack {
+  gap: 0 !important;
+  padding: 5px;
+  overflow: hidden;
+  border: 1px solid var(--surface-line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--surface-card-shadow);
+}
+.mila-surface--welcome .lesson-card {
+  padding: 13px 12px !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.mila-surface--welcome .lesson-card + .lesson-card { border-top: 1px solid rgba(93,46,66,.075) !important; }
+.mila-surface--welcome .lesson-card:hover { transform: none !important; background: #fff8fa !important; }
+
+/* Landing method: one editorial process sheet with compact focus insets. */
+.mila-surface--welcome .session-story__steps {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--surface-line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: var(--surface-card-shadow);
+}
+.mila-surface--welcome .session-step {
+  --step-tone: var(--venus-readable);
+  min-height: 292px;
+  grid-template-columns: minmax(170px,.78fr) minmax(260px,1.22fr);
+  gap: 24px;
+  padding: 25px;
+  border: 0;
+  border-bottom: 1px solid var(--surface-line);
+  border-radius: 0;
+  background: linear-gradient(90deg,color-mix(in srgb,var(--step-tone) 3.5%,white),#fff 44%);
+  box-shadow: none;
+}
+.mila-surface--welcome .session-step[data-step="understand"] { --step-tone: var(--mercury-readable); }
+.mila-surface--welcome .session-step[data-step="improve"] { --step-tone: var(--voice-readable); }
+.mila-surface--welcome .session-step:last-child { border-bottom: 0; }
+.mila-surface--welcome .session-step__copy > div > span {
+  color: color-mix(in srgb,var(--step-tone) 52%,#8b7981);
+  font-size: 21px;
+}
+.mila-surface--welcome .session-step__copy > div > i {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 12px;
+  color: var(--step-tone);
+  background: color-mix(in srgb,var(--step-tone) 8%,white);
+}
+.mila-surface--welcome .session-step h3 {
+  margin: 23px 0 9px;
+  font-size: 26px;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+.mila-surface--welcome .session-step__copy > p { max-width: 31ch; font-size: 12px; line-height: 1.62; }
+.mila-surface--welcome .story-ui {
+  min-height: 190px;
+  padding: 17px;
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055),0 8px 22px rgba(48,28,37,.11);
+}
+.mila-surface--welcome .story-wave { height: 72px; }
+.mila-surface--welcome .story-phrase { margin-top: 23px; }
+.mila-surface--welcome .story-insight { margin-top: 17px; padding-top: 14px; }
+.mila-surface--welcome .story-plan-row { padding: 11px 12px; }
+
+/* Landing modes: real grid geometry and normal-flow previews. */
+.mila-surface--welcome .room-grid {
+  display: grid;
+  width: auto;
+  grid-template-columns: repeat(12,minmax(0,1fr));
+  grid-auto-rows: auto;
+  gap: 15px;
+  padding: 0;
+  overflow: visible;
+}
+.mila-surface--welcome .room-card {
+  --room-readable: var(--venus-readable) !important;
+  min-width: 0;
+  min-height: 300px;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(175px,.82fr);
+  grid-template-areas: "head visual" "body visual";
+  grid-template-rows: auto 1fr;
+  align-items: stretch;
+  gap: 20px 24px;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid var(--surface-line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--surface-card-shadow);
+  transform: none;
+}
+.mila-surface--welcome .room-card[data-room="pronunciation"] { grid-column: span 7; }
+.mila-surface--welcome .room-card[data-room="mentor"] { grid-column: span 5; }
+.mila-surface--welcome .room-card[data-room="course"],
+.mila-surface--welcome .room-card[data-room="progress"] { grid-column: span 6; }
+.mila-surface--welcome .room-card::after {
+  display: block;
+  width: 100%;
+  height: 3px;
+  inset: 0 0 auto;
+  border-radius: 0;
+  background: linear-gradient(90deg,var(--venus-readable),rgba(242,139,173,.08) 54%,transparent);
+  filter: none;
+  opacity: .72;
+}
+.mila-surface--welcome .room-card__head {
+  grid-area: head;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mila-surface--welcome .room-card__icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border: 0;
+  border-radius: 12px;
+  color: var(--venus-readable);
+  background: rgba(242,139,173,.1);
+}
+.mila-surface--welcome .room-card__label {
+  min-width: 0;
+  margin: 0;
+  color: var(--venus-readable);
+  font-size: 9px;
+  letter-spacing: .12em;
+}
+.mila-surface--welcome .room-card__link {
+  flex: 0 0 auto;
+  margin: 0 0 0 auto;
+  padding: 0;
+  color: var(--mercury-readable);
+  font-size: 10px;
+}
+.mila-surface--welcome .room-card__body {
+  grid-area: body;
+  min-width: 0;
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+}
+.mila-surface--welcome .room-card__body > strong {
+  max-width: 15ch;
+  margin: 0;
+  color: var(--landing-ink);
+  font: 750 24px/1.08 var(--font-display,'Manrope'),sans-serif;
+  letter-spacing: -.04em;
+}
+.mila-surface--welcome .room-card__copy {
+  max-width: 34ch;
+  margin-top: 9px;
+  color: #6f6269;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.mila-surface--welcome .room-visual {
+  position: relative;
+  grid-area: visual;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  min-height: 188px;
+  border: 0;
+  border-radius: 16px;
+  background: #fff5f8;
+  box-shadow: none;
+}
+.mila-surface--welcome .room-card[data-room="pronunciation"] .room-visual { background: #f3fbfd; }
+.mila-surface--welcome .room-card[data-room="course"] .room-visual,
+.mila-surface--welcome .room-card[data-room="progress"] .room-visual { background: #fffaf0; }
+.mila-surface--welcome .room-swipehint { display: none; }
+
+@media (hover:hover) and (pointer:fine) {
+  .mila-surface--welcome .journey-card:hover {
+    transform: none;
+    border-color: transparent;
+    background: color-mix(in srgb,var(--journey-readable) 5%,white);
+    box-shadow: inset 2px 0 color-mix(in srgb,var(--journey-readable) 42%,transparent);
+  }
+  .mila-surface--welcome .room-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(168,61,100,.2);
+    background: #fff;
+    box-shadow: var(--surface-card-shadow-hover);
+  }
+}
+
+@media (max-width: 900px) {
+  .mila-surface--welcome .room-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .mila-surface--welcome .room-card[data-room] { grid-column: auto; }
+}
+
+@media (max-width: 720px) {
+  .mila-surface--welcome .landing-story,
+  .mila-surface--welcome .landing-section--rooms { padding-block: 72px; }
+  .mila-surface--welcome .session-story { gap: 30px; }
+  .mila-surface--welcome .session-step {
+    min-height: 270px;
+    grid-template-columns: minmax(145px,.8fr) minmax(210px,1.2fr);
+    gap: 17px;
+    padding: 19px;
+  }
+  .mila-surface--welcome .session-step h3 { margin-top: 18px; font-size: 23px; }
+  .mila-surface--welcome .story-ui { min-height: 172px; padding: 14px; }
+  .mila-surface--welcome .story-wave { height: 62px; }
+
+  .mila-surface--welcome .room-card {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    grid-template-areas: "head" "body" "visual";
+    grid-template-rows: auto auto 112px;
+    gap: 13px;
+    padding: 17px;
+    border-radius: 17px;
+  }
+  .mila-surface--welcome .room-card__body { align-self: start; }
+  .mila-surface--welcome .room-card__body > strong { max-width: none; font-size: 20px; }
+  .mila-surface--welcome .room-card__copy { margin-top: 6px; font-size: 11px; }
+  .mila-surface--welcome .room-visual { min-height: 112px; border-radius: 13px; }
+}
+
+@media (max-width: 520px) {
+  .mila-surface--welcome .session-story__steps { border-radius: 18px; }
+  .mila-surface--welcome .session-step {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 18px;
+  }
+  .mila-surface--welcome .session-step h3 { margin-top: 15px; }
+  .mila-surface--welcome .session-step__copy > p { max-width: 42ch; }
+  .mila-surface--welcome .story-ui { min-height: 158px; }
+  .mila-surface--welcome .story-wave { height: 54px; }
+
+  .mila-surface--welcome .room-grid { grid-template-columns: 1fr; }
+  .mila-surface--welcome .room-card {
+    grid-template-columns: minmax(0,1fr) 108px;
+    grid-template-areas: "head head" "body visual";
+    grid-template-rows: auto minmax(112px,auto);
+    align-items: stretch;
+  }
+  .mila-surface--welcome .room-card__link { font-size: 0; gap: 0; }
+  .mila-surface--welcome .room-card__link svg { width: 17px; height: 17px; }
+  .mila-surface--welcome .room-visual { height: 100%; }
+  .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .badge-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+@media (max-width: 440px) {
+  .lesson-generator__control { flex-direction: column; }
+  .lesson-generator__button { width: 100%; min-height: 44px; }
+}
+
+@media (max-width: 380px) {
+  .secondary-tools-grid { grid-template-columns: 1fr; }
 }

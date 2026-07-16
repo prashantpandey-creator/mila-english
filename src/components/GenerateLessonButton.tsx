@@ -34,8 +34,8 @@ export default function GenerateLessonButton() {
   };
 
   return (
-    <div style={{marginBottom:18}}>
-      <div style={{display:'flex',gap:10,padding:'14px',borderRadius:16,
+    <div className="lesson-generator" style={{marginBottom:18}}>
+      <div className="lesson-generator__control" style={{display:'flex',gap:10,padding:'14px',borderRadius:16,
         background:C.card,border:`1px solid ${C.line}`,boxShadow:'var(--surface-card-shadow)',
         backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)'}}>
         <input
@@ -45,12 +45,14 @@ export default function GenerateLessonButton() {
           onChange={e => setTopic(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleGenerate(); }}
           disabled={loading}
+          className="lesson-generator__input"
           style={{flex:1,minWidth:0,padding:'11px 14px',borderRadius:11,border:'1px solid var(--surface-control-line)',
             background:'var(--surface-control)',color:C.dark,fontSize:'0.9rem',outline:'none'}}
         />
         <button
           onClick={handleGenerate}
           disabled={loading || !topic.trim()}
+          className="lesson-generator__button"
           style={{padding:'11px 20px',borderRadius:11,border:'none',whiteSpace:'nowrap',
             background:'linear-gradient(135deg,#b54b72,#983556)',color:'#fff',fontWeight:800,fontSize:'0.88rem',
             cursor:(loading||!topic.trim())?'default':'pointer',opacity:(loading||!topic.trim())?0.55:1,

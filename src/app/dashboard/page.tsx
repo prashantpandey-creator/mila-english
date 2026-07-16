@@ -164,7 +164,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Secondary tools */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
+        <div className="secondary-tools-grid" style={{display:'grid',gap:10,marginBottom:20}}>
           {[
             {icon:'lessons' as MilaIconName,label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons',tone:C.jupiter},
             {icon:'progress' as MilaIconName,label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',tone:C.mercury},

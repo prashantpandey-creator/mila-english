@@ -18,9 +18,9 @@ export default function ProgressSummary({ items }: {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${items.length},1fr)`, gap: 12 }}>
+    <div className="metric-grid" style={{ display: 'grid', gap: 10 }}>
       {items.map((s, i) => (
-        <Card key={i} hover={false} padding="16px 12px" style={{ textAlign: 'center' }}>
+        <Card key={i} hover={false} padding="15px 10px" style={{ textAlign: 'center', boxShadow: 'none' }}>
           <div style={{ width: 34, height: 28, display: 'grid', placeItems: 'center', margin: '0 auto 2px', color: readable(s.color) }}><MilaIcon name={s.icon} size={21} /></div>
           <div style={{ fontFamily: "var(--font-display, 'Manrope'),sans-serif", fontSize: '1.65rem', fontWeight: 700, color: `var(--jupiter-readable, ${C.jupiter})`, lineHeight: 1.15 }}>{s.val}</div>
           <div style={{ fontSize: '0.72rem', color: C.warm, letterSpacing: '0.02em' }}>{s.label}</div>

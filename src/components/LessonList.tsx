@@ -9,13 +9,13 @@ export default function LessonList({ lessons, onSelect }: {
   onSelect: (id: number | string) => void;
 }) {
   return (
-    <div style={{display:'flex',flexDirection:'column',gap:12}}>
+    <div className="lesson-stack" style={{display:'flex',flexDirection:'column',gap:10}}>
       {lessons.map(l=>(
-        <div key={l.id} onClick={()=>onSelect(l.id)}
-          style={{cursor:'pointer',background:C.card,backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'16px 20px',
+        <div className="lesson-card" key={l.id} onClick={()=>onSelect(l.id)}
+          style={{cursor:'pointer',background:C.card,borderRadius:16,padding:'16px 20px',
             boxShadow:'var(--surface-card-shadow)',display:'flex',alignItems:'center',gap:14,
             border:'2px solid transparent',transition:'all 0.2s'}}
-          onMouseEnter={e=>{e.currentTarget.style.borderColor=C.jupiter;e.currentTarget.style.transform='translateY(-2px)'}}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor='var(--jupiter-readable, var(--jupiter))';e.currentTarget.style.transform='translateY(-1px)'}}
           onMouseLeave={e=>{e.currentTarget.style.borderColor='transparent';e.currentTarget.style.transform='none'}}>
           <div style={{width:44,height:44,borderRadius:14,background:C.jupiterL,color:'var(--jupiter-readable, var(--jupiter))',
             border:'1px solid color-mix(in srgb, var(--jupiter-readable, var(--jupiter)) 18%, transparent)',
