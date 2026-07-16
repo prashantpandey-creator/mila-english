@@ -22,7 +22,7 @@ export default function SkillRadar() {
         {[0.33,0.66,1].map(f=>(
           <circle key={f} cx={cx} cy={cy} r={r*f} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1"/>
         ))}
-        <polygon points={pts} fill={C.roseL} stroke={C.rose} strokeWidth="2" opacity="0.85"/>
+        <polygon points={pts} fill={C.mercuryL} stroke={C.mercury} strokeWidth="2" opacity="0.85"/>
         {SKILLS.map((s,i)=>{
           const angle = (Math.PI*2*i)/SKILLS.length - Math.PI/2;
           const lx = cx + Math.cos(angle)*(r+25), ly = cy + Math.sin(angle)*(r+25);

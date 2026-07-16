@@ -3,7 +3,7 @@
 
 import { C } from '@/lib/theme';
 
-export default function ProgressRing({ percent, label, color = C.rose }: { percent: number; label: string; color?: string }) {
+export default function ProgressRing({ percent, label, color = C.mercury }: { percent: number; label: string; color?: string }) {
   const r = 40, circ = 2 * Math.PI * r;
   const offset = circ - (percent / 100) * circ;
   return (

@@ -57,8 +57,8 @@ export default function Chat() {
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
       {/* Header */}
-      <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+      <div style={{background:C.navBg,backdropFilter:'blur(18px)',padding:'10px 20px',
+        borderBottom:`1px solid ${C.line}`,display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
         <h1 style={{margin:0,fontWeight:800,fontSize:'1rem',color:C.dark}}>
           {lang==='ru' ? 'Мила · наставница' : 'Mila · tutor & companion'}
@@ -106,7 +106,7 @@ export default function Chat() {
             <div style={{
               maxWidth:'80%',borderRadius:18,padding:'12px 16px',fontSize:'0.95rem',lineHeight:1.5,whiteSpace:'pre-wrap',
               ...(m.role === 'user'
-                ? {background:C.rose,color:'white',borderBottomRightRadius:4}
+                ? {background:`linear-gradient(135deg,${C.mercuryBright},${C.mercury})`,color:'#031d14',borderBottomRightRadius:4,boxShadow:'0 8px 24px rgba(36,211,154,.12)'}
                 : {background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.dark,borderBottomLeftRadius:4,boxShadow:'0 2px 8px rgba(0,0,0,0.06)',border:'1px solid rgba(255,255,255,0.08)'})
             }}>
               {m.content}
@@ -133,22 +133,22 @@ export default function Chat() {
       </div>
 
       {/* Input */}
-      <div style={{background:'rgba(255,255,255,0.95)',backdropFilter:'blur(12px)',padding:'12px 16px',
-        borderTop:'1px solid rgba(0,0,0,0.06)',flexShrink:0}}>
+      <div style={{background:'rgba(0,5,3,.9)',backdropFilter:'blur(18px)',padding:'12px 16px',
+        borderTop:`1px solid ${C.line}`,flexShrink:0}}>
         <form onSubmit={handleSubmit} style={{display:'flex',gap:10,maxWidth:600,margin:'0 auto'}}>
           <input
             value={input}
             onChange={handleInputChange}
             placeholder={lang==='ru' ? 'Спроси Милу или попрактикуйся…' : 'Ask Mila anything or practise English…'}
             disabled={isLoading || isHydrating || isClearing}
-            style={{flex:1,padding:'12px 16px',borderRadius:14,border:`1.5px solid ${isLoading?'rgba(255,255,255,0.14)':C.rose+'60'}`,
+            style={{flex:1,padding:'12px 16px',borderRadius:14,border:`1.5px solid ${isLoading?'rgba(255,255,255,0.14)':'rgba(36,211,154,.34)'}`,
               fontSize:'0.95rem',outline:'none',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.dark,
               fontFamily:"'Manrope','Inter',sans-serif"}}
           />
           <button type="submit" disabled={isLoading || isHydrating || isClearing || !input.trim()}
             style={{padding:'12px 22px',borderRadius:14,border:'none',
-              background:isLoading||isHydrating||isClearing||!input.trim()?'rgba(255,255,255,0.14)':`linear-gradient(135deg,${C.rose},#c13e58)`,
-              color:'white',fontWeight:700,cursor:isLoading||!input.trim()?'default':'pointer',
+              background:isLoading||isHydrating||isClearing||!input.trim()?'rgba(255,255,255,0.14)':`linear-gradient(135deg,${C.mercuryBright},${C.mercury})`,
+              color:isLoading||isHydrating||isClearing||!input.trim()?C.warm:'#031d14',fontWeight:800,cursor:isLoading||!input.trim()?'default':'pointer',
               fontSize:'0.95rem',transition:'all 0.2s'}}>
             {lang==='ru' ? 'Отправить' : 'Send'}
           </button>

@@ -19,6 +19,7 @@ export default function LearningJourneyCard({
     <button
       type="button"
       className="journey-card"
+      data-kind={kind}
       onClick={onClick}
       aria-label={`${title}. ${subtitle}`}
     >

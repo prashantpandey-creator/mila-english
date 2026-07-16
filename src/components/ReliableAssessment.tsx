@@ -49,11 +49,11 @@ export default function ReliableAssessment({ lang, busy, error, onComplete, onCa
       </div>
 
       <div style={{height:5,borderRadius:999,background:'rgba(255,255,255,0.09)',overflow:'hidden',marginBottom:26}}>
-        <div style={{height:'100%',width:`${progress}%`,background:'linear-gradient(90deg,#d4af37,#e8cd7a)',transition:'width .25s ease'}} />
+        <div style={{height:'100%',width:`${progress}%`,background:`linear-gradient(90deg,${C.mercury},${C.mercuryBright})`,transition:'width .25s ease'}} />
       </div>
 
       <div style={{background:'rgba(255,255,255,0.055)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:18,padding:'24px 20px',textAlign:'left',boxShadow:'0 16px 42px rgba(0,0,0,.28)'}}>
-        <div style={{fontSize:'0.72rem',letterSpacing:'0.14em',textTransform:'uppercase',fontWeight:700,color:C.gold,marginBottom:9}}>
+        <div style={{fontSize:'0.72rem',letterSpacing:'0.14em',textTransform:'uppercase',fontWeight:700,color:C.jupiter,marginBottom:9}}>
           {lang === 'ru' ? 'Надёжная проверка' : 'Reliable assessment'} · {question.level}
         </div>
         <h2 style={{fontSize:'1.35rem',lineHeight:1.35,color:C.dark,margin:'0 0 7px'}}>{question.prompt}</h2>
@@ -68,10 +68,10 @@ export default function ReliableAssessment({ lang, busy, error, onComplete, onCa
               <button key={option} type="button" role="radio" aria-checked={active} disabled={busy}
                 onClick={() => choose(optionIndex)}
                 style={{padding:'12px 14px',borderRadius:11,textAlign:'left',cursor:busy?'default':'pointer',fontSize:'0.92rem',lineHeight:1.4,
-                  border:active?'1.5px solid #d4af37':'1px solid rgba(255,255,255,0.13)',
-                  background:active?'rgba(212,175,55,0.16)':'rgba(11,14,20,0.42)',color:C.dark}}>
+                  border:active?`1.5px solid ${C.mercury}`:'1px solid rgba(255,255,255,0.13)',
+                  background:active?C.mercuryL:'rgba(11,14,20,0.42)',color:C.dark}}>
                 <span style={{display:'inline-grid',placeItems:'center',width:23,height:23,borderRadius:'50%',marginRight:10,
-                  border:active?'1px solid #d4af37':'1px solid rgba(255,255,255,.2)',color:active?C.gold:C.warm,fontSize:'0.72rem'}}>
+                  border:active?`1px solid ${C.mercury}`:'1px solid rgba(255,255,255,.2)',color:active?C.mercury:C.warm,fontSize:'0.72rem'}}>
                   {String.fromCharCode(65 + optionIndex)}
                 </span>
                 {option}
@@ -86,8 +86,8 @@ export default function ReliableAssessment({ lang, busy, error, onComplete, onCa
 
         <button type="button" disabled={!Number.isInteger(selected) || busy} onClick={advance}
           style={{width:'100%',marginTop:18,padding:'12px 16px',borderRadius:11,border:'none',fontWeight:800,
-            background:Number.isInteger(selected)&&!busy?'linear-gradient(135deg,#e8b96a,#d4af37)':'rgba(255,255,255,.11)',
-            color:Number.isInteger(selected)&&!busy?'#17130a':'#746f66',cursor:Number.isInteger(selected)&&!busy?'pointer':'default'}}>
+            background:Number.isInteger(selected)&&!busy?`linear-gradient(135deg,${C.mercuryBright},${C.mercury})`:'rgba(255,255,255,.11)',
+            color:Number.isInteger(selected)&&!busy?C.white:'#746f66',cursor:Number.isInteger(selected)&&!busy?'pointer':'default'}}>
           {busy
             ? (lang === 'ru' ? 'Сохраняю результат…' : 'Saving result…')
             : index === RELIABLE_ASSESSMENT_QUESTIONS.length - 1

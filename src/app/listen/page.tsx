@@ -11,9 +11,9 @@ import { PHRASES, PACKS, SOUND_INFO } from '@/lib/phrases';
 import { useScene } from '@/lib/scene';
 
 const VERDICT = {
-  good:  { fg: '#8fce84', bg: 'rgba(143,206,132,0.16)' },
-  close: { fg: '#e0b64e', bg: 'rgba(212,175,55,0.18)' },
-  miss:  { fg: '#e8556d', bg: 'rgba(232,85,109,0.16)' },
+  good:  { fg: C.jupiter, bg: C.jupiterL },
+  close: { fg: C.mercury, bg: C.mercuryL },
+  miss:  { fg: C.rose, bg: C.roseL },
 };
 
 export default function ListenPage() {
@@ -129,7 +129,7 @@ export default function ListenPage() {
 
   const ring = (score: number) => {
     const r = 26, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
-    const col = score >= 80 ? C.sage : score >= 55 ? C.gold : C.rose;
+    const col = score >= 80 ? C.jupiter : score >= 55 ? C.mercury : C.rose;
     return (
       <svg width="62" height="62" viewBox="0 0 62 62" style={{flex:'0 0 auto'}}>
         <circle cx="31" cy="31" r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="7"/>
@@ -147,21 +147,21 @@ export default function ListenPage() {
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <span style={{fontSize:'0.7rem',fontWeight:700,color:C.purple,background:'rgba(167,139,250,0.16)',padding:'3px 9px',borderRadius:20}}>Level B1</span>
+          <span style={{fontSize:'0.7rem',fontWeight:700,color:C.jupiter,background:C.jupiterL,padding:'3px 9px',borderRadius:20}}>Level B1</span>
           <LangToggle/>
         </div>
       </div>
 
       <div style={{maxWidth:460,margin:'0 auto',padding:'22px 20px'}}>
         {/* pack picker */}
-        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#c9a961',marginBottom:8}}>
+        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:C.jupiter,marginBottom:8}}>
           {lang==='ru'?'Ситуация':'Situation'}
         </div>
         <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:16}}>
           {PACKS.map(p=>(
             <button key={p.id} onClick={()=>onPack(p.id)}
               style={{flex:'0 0 auto',fontSize:'0.82rem',fontWeight:pack===p.id?700:600,cursor:'pointer',
-                color:pack===p.id?'white':C.warm,background:pack===p.id?C.sage:'rgba(255,255,255,0.07)',
+                color:pack===p.id?'#02140f':C.warm,background:pack===p.id?C.mercury:'rgba(255,255,255,0.07)',
                 border:pack===p.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 13px',borderRadius:20}}>
               {p.emoji} {lang==='ru'?p.ru:p.en}
             </button>
@@ -169,14 +169,14 @@ export default function ListenPage() {
         </div>
 
         {/* accent picker */}
-        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#c9a961',marginBottom:8}}>
+        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:C.jupiter,marginBottom:8}}>
           {lang==='ru'?'Акцент':'Accent'}
         </div>
         <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:18}}>
           {ACCENTS.map(a=>(
             <button key={a.id} onClick={()=>setAccent(a)}
               style={{flex:'0 0 auto',fontSize:'0.85rem',fontWeight:accent.id===a.id?700:600,cursor:'pointer',
-                color:accent.id===a.id?'white':C.warm,background:accent.id===a.id?C.rose:'rgba(255,255,255,0.07)',
+                color:accent.id===a.id?'#021418':C.warm,background:accent.id===a.id?C.voice:'rgba(255,255,255,0.07)',
                 border:accent.id===a.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 14px',borderRadius:20}}>
               {a.flag} {a.label}
             </button>
@@ -185,17 +185,17 @@ export default function ListenPage() {
 
         {/* phrase card */}
         <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'22px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:14,
-          border: inDrill ? '1.5px solid #e9d5ff' : 'none'}}>
-          <div style={{fontSize:'0.72rem',color:inDrill?C.purple:'#9d9483',fontWeight:inDrill?700:600,marginBottom:8}}>
+          border: inDrill ? `1.5px solid ${C.jupiter}` : 'none'}}>
+          <div style={{fontSize:'0.72rem',color:inDrill?C.jupiter:C.voice,fontWeight:inDrill?700:600,marginBottom:8}}>
             {inDrill
               ? `🎯 ${lang==='ru'?'Персональная тренировка':'Personal drill'} · ${drillIdx!+1}/${drills.length} · /${phrase.sound}/`
               : `${lang==='ru'?'Слушай и повтори':'Listen & repeat'} · ${pos+1}/${items.length}`}
           </div>
           <div style={{fontSize:'1.4rem',fontWeight:700,color:C.dark,lineHeight:1.3}}>{phrase.text}</div>
-          <div style={{fontSize:'0.85rem',color:'#9a8fb0',marginTop:6,fontFamily:'ui-monospace,monospace'}}>{phrase.ipa}</div>
+          <div style={{fontSize:'0.85rem',color:C.voice,marginTop:6,fontFamily:'ui-monospace,monospace'}}>{phrase.ipa}</div>
           <button onClick={onListen} disabled={phase==='speaking'}
             style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,width:'100%',marginTop:16,
-              background:C.roseL,color:C.rose,fontWeight:700,fontSize:'0.95rem',padding:'12px',borderRadius:14,border:'none',
+              background:C.voiceL,color:C.voice,fontWeight:700,fontSize:'0.95rem',padding:'12px',borderRadius:14,border:`1px solid ${C.voice}`,
               cursor:phase==='speaking'?'default':'pointer',opacity:phase==='speaking'?0.7:1}}>
             🔊 {phase==='speaking' ? (lang==='ru'?'Звучит…':'Playing…') : `${lang==='ru'?'Прослушать':'Hear it'} — ${accent.flag} ${accent.label}`}
           </button>
@@ -244,21 +244,21 @@ export default function ListenPage() {
         {/* mic + next */}
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <button onClick={next}
-            style={{flex:1,height:52,borderRadius:16,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.warm,fontWeight:600,fontSize:'0.95rem',cursor:'pointer'}}>
+            style={{flex:1,height:52,borderRadius:16,border:`1.5px solid ${C.mercury}`,background:C.mercuryL,backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.mercury,fontWeight:600,fontSize:'0.95rem',cursor:'pointer'}}>
             {lang==='ru'?'Следующая →':'Next phrase →'}
           </button>
           <button onClick={onMic} disabled={micBusy}
             aria-label={phase==='recording'?(lang==='ru'?'Остановить':'Stop'):(lang==='ru'?'Произнести':'Say it back')}
             style={{width:64,height:64,borderRadius:'50%',border:'none',
               cursor:micBusy?'default':'pointer',opacity:1,
-              background:phase==='recording'?C.gold:phase==='scoring'?C.purple:C.rose,color:'white',fontSize:'1.5rem',
-              boxShadow:`0 6px 20px ${phase==='recording'?'rgba(212,175,55,.4)':'rgba(233,30,99,.35)'}`,
+              background:phase==='recording'?C.voice:phase==='scoring'?C.mercury:C.voiceL,color:phase==='recording'||phase==='scoring'?'#021418':C.voice,fontSize:'1.5rem',
+              boxShadow:`0 6px 20px ${phase==='scoring'?'rgba(36,211,154,.34)':'rgba(106,220,245,.34)'}`,
               animation:phase==='recording'?'pulse 1.2s ease-in-out infinite':'none'}}>
             {phase==='recording' ? '⏹' : phase==='scoring' ? '⏳' : '🎙️'}
           </button>
         </div>
         <div style={{textAlign:'center',fontSize:'0.78rem',marginTop:10,
-          color:phase==='recording'?C.gold:phase==='scoring'?C.purple:'#948b7c',
+          color:phase==='recording'?C.voice:phase==='scoring'?C.mercury:'#948b7c',
           fontWeight:(phase==='recording'||phase==='scoring')?700:400}}>
           {phase==='recording'
             ? (lang==='ru'?'Слушаю… говори, потом нажми ⏹ (или просто закончи)':'Listening… speak, then tap ⏹ (or just finish)')
@@ -294,7 +294,7 @@ export default function ListenPage() {
             })}
             <button onClick={loadDrills} disabled={drillLoading}
               style={{width:'100%',marginTop:6,padding:'12px',borderRadius:12,border:'none',
-                background:'linear-gradient(135deg,#c4b5fd,#a78bfa)',color:'white',fontWeight:800,fontSize:'0.9rem',
+                background:`linear-gradient(135deg,${C.mercury},${C.mercuryBright})`,color:'#02140f',fontWeight:800,fontSize:'0.9rem',
                 cursor:drillLoading?'default':'pointer',opacity:drillLoading?0.7:1}}>
               {drillLoading
                 ? (lang==='ru'?'✨ Мила готовит упражнения…':'✨ Mila is building your drills…')

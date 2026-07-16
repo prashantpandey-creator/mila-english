@@ -19,13 +19,13 @@ export default function LessonContent({ words, currentWord, lang, onPrev, onNext
       </div>
       <div style={{display:'flex',gap:10,justifyContent:'center'}}>
         <button onClick={onPrev}
-          style={{padding:'12px 24px',borderRadius:12,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',cursor:'pointer',fontSize:'1.2rem'}}>←</button>
+          style={{padding:'12px 24px',borderRadius:12,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.warm,cursor:'pointer',fontSize:'1.2rem'}}>←</button>
         <button onClick={()=>onSpeak(words[currentWord])}
-          style={{padding:'12px 24px',borderRadius:12,border:'none',background:C.rose,color:'white',cursor:'pointer',fontWeight:600}}>
+          style={{padding:'12px 24px',borderRadius:12,border:'none',background:C.voice,color:C.white,cursor:'pointer',fontWeight:600}}>
           🔊 {lang==='ru'?'Слушать':'Listen'}
         </button>
         <button onClick={onNext}
-          style={{padding:'12px 24px',borderRadius:12,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',cursor:'pointer',fontSize:'1.2rem'}}>
+          style={{padding:'12px 24px',borderRadius:12,border:`1.5px solid ${isLast?C.jupiter:C.mercury}`,background:isLast?C.jupiterL:C.mercuryL,backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:isLast?C.jupiter:C.mercury,cursor:'pointer',fontSize:'1.2rem'}}>
           {isLast ? '✅' : '→'}
         </button>
       </div>

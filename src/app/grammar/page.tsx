@@ -61,31 +61,31 @@ export default function GrammarPage() {
         <LangToggle/>
       </div>
       <main style={{maxWidth:520,margin:'0 auto',padding:'28px 20px'}}>
-        <div style={{fontSize:'0.72rem',fontWeight:800,color:C.gold,textTransform:'uppercase',letterSpacing:1.4}}>{lang==='ru'?'Грамматика в речи':'Grammar in conversation'}</div>
+        <div style={{fontSize:'0.72rem',fontWeight:800,color:C.jupiter,textTransform:'uppercase',letterSpacing:1.4}}>{lang==='ru'?'Грамматика в речи':'Grammar in conversation'}</div>
         <h1 style={{color:C.dark,margin:'7px 0 6px'}}>{lang==='ru'?'Выбери естественную фразу':'Choose the natural phrase'}</h1>
         <p style={{color:C.warm,margin:'0 0 20px'}}>{lang==='ru'?'Пять коротких примеров — без сухой теории.':'Five short examples, without dry theory.'}</p>
 
         {!done ? <>
-          <div style={{display:'flex',gap:5,marginBottom:18}}>{QUESTIONS.map((_,i)=><div key={i} style={{flex:1,height:5,borderRadius:4,background:i<=index?C.gold:'rgba(255,255,255,0.12)'}}/>)}</div>
+          <div style={{display:'flex',gap:5,marginBottom:18}}>{QUESTIONS.map((_,i)=><div key={i} style={{flex:1,height:5,borderRadius:4,background:i<=index?C.mercury:'rgba(255,255,255,0.12)'}}/>)}</div>
           <Card hover={false} padding="24px" style={{marginBottom:14}}>
             <div style={{fontSize:'0.78rem',color:C.warm,marginBottom:10}}>{index+1} / {QUESTIONS.length}</div>
             <div style={{fontSize:'1.45rem',fontWeight:750,color:C.dark,marginBottom:20}}>{question.sentence}</div>
             <div style={{display:'grid',gap:10}}>{question.options.map(option=>{
               const isRight=selected && option===question.answer;
               const isWrong=selected===option && option!==question.answer;
-              return <button key={option} onClick={()=>choose(option)} disabled={Boolean(selected)} style={{padding:'14px',borderRadius:13,border:`1.5px solid ${isRight?C.sage:isWrong?C.rose:'rgba(255,255,255,0.14)'}`,background:isRight?'rgba(143,206,132,0.16)':isWrong?C.roseL:'rgba(255,255,255,0.05)',color:C.dark,fontSize:'1rem',fontWeight:700,cursor:selected?'default':'pointer',textAlign:'left'}}>{isRight?'✓ ':isWrong?'• ':''}{option}</button>;
+              return <button key={option} onClick={()=>choose(option)} disabled={Boolean(selected)} style={{padding:'14px',borderRadius:13,border:`1.5px solid ${isRight?C.mercury:isWrong?C.rose:'rgba(255,255,255,0.14)'}`,background:isRight?C.mercuryL:isWrong?C.roseL:'rgba(255,255,255,0.05)',color:C.dark,fontSize:'1rem',fontWeight:700,cursor:selected?'default':'pointer',textAlign:'left'}}>{isRight?'✓ ':isWrong?'• ':''}{option}</button>;
             })}</div>
           </Card>
-          {selected && <Card hover={false} padding="16px" style={{marginBottom:14,border:`1px solid ${selected===question.answer?'rgba(143,206,132,.35)':'rgba(212,175,55,.35)'}`}}>
-            <div style={{fontWeight:750,color:selected===question.answer?C.sage:C.gold,marginBottom:4}}>{selected===question.answer?(lang==='ru'?'Отлично — звучит естественно.':'Exactly — that sounds natural.'):(lang==='ru'?'Хорошая попытка. Посмотри на подсказку.':'Good try. Use this clue.')}</div>
+          {selected && <Card hover={false} padding="16px" style={{marginBottom:14,border:`1px solid ${selected===question.answer?C.mercury:C.rose}`}}>
+            <div style={{fontWeight:750,color:selected===question.answer?C.mercury:C.rose,marginBottom:4}}>{selected===question.answer?(lang==='ru'?'Отлично — звучит естественно.':'Exactly — that sounds natural.'):(lang==='ru'?'Хорошая попытка. Посмотри на подсказку.':'Good try. Use this clue.')}</div>
             <div style={{color:C.warm,lineHeight:1.5}}>{lang==='ru'?question.ru:`Correct: “${question.answer}”. ${question.ru}`}</div>
           </Card>}
-          <button onClick={advance} disabled={!selected} style={{width:'100%',padding:'15px',borderRadius:14,border:'none',background:selected?C.sage:'rgba(255,255,255,0.08)',color:selected?'white':C.warm,fontWeight:800,cursor:selected?'pointer':'default'}}>{index===QUESTIONS.length-1?(lang==='ru'?'Показать результат':'See result'):(lang==='ru'?'Продолжить →':'Continue →')}</button>
+          <button onClick={advance} disabled={!selected} style={{width:'100%',padding:'15px',borderRadius:14,border:'none',background:selected?C.mercury:'rgba(255,255,255,0.08)',color:selected?C.white:C.warm,fontWeight:800,cursor:selected?'pointer':'default'}}>{index===QUESTIONS.length-1?(lang==='ru'?'Показать результат':'See result'):(lang==='ru'?'Продолжить →':'Continue →')}</button>
         </> : <Card hover={false} padding="28px" style={{textAlign:'center'}}>
           <div style={{fontSize:'3.2rem'}}>{score>=80?'🌟':'🌱'}</div>
           <h2 style={{color:C.dark,margin:'10px 0 5px'}}>{lang==='ru'?'Практика завершена':'Practice complete'}</h2>
-          <p style={{color:C.warm,margin:'0 0 22px'}}>{lang==='ru'?`Верно: ${correct} из ${QUESTIONS.length} · ${score}%`:`Correct: ${correct} of ${QUESTIONS.length} · ${score}%`}</p>
-          <div style={{display:'flex',gap:10}}><button onClick={restart} style={{flex:1,padding:13,borderRadius:12,border:'1px solid rgba(255,255,255,.14)',background:'transparent',color:C.warm,fontWeight:700,cursor:'pointer'}}>{lang==='ru'?'Ещё раз':'Again'}</button><button onClick={()=>router.push('/dashboard')} style={{flex:1,padding:13,borderRadius:12,border:'none',background:C.rose,color:'white',fontWeight:800,cursor:'pointer'}}>{lang==='ru'?'Готово':'Done'}</button></div>
+          <p style={{color:C.jupiter,margin:'0 0 22px',fontWeight:700}}>{lang==='ru'?`Верно: ${correct} из ${QUESTIONS.length} · ${score}%`:`Correct: ${correct} of ${QUESTIONS.length} · ${score}%`}</p>
+          <div style={{display:'flex',gap:10}}><button onClick={restart} style={{flex:1,padding:13,borderRadius:12,border:'1px solid rgba(255,255,255,.14)',background:'transparent',color:C.warm,fontWeight:700,cursor:'pointer'}}>{lang==='ru'?'Ещё раз':'Again'}</button><button onClick={()=>router.push('/dashboard')} style={{flex:1,padding:13,borderRadius:12,border:'none',background:C.mercury,color:C.white,fontWeight:800,cursor:'pointer'}}>{lang==='ru'?'Готово':'Done'}</button></div>
         </Card>}
       </main>
     </div>

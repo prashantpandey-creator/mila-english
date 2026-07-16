@@ -190,12 +190,20 @@ export default function AssessmentVoice() {
     error:      lang==='ru' ? 'Что-то пошло не так' : 'Something went wrong',
   }[phase];
 
-  const orbColor = phase==='speaking' ? C.gold : phase==='listening' ? C.rose : phase==='thinking' ? C.purple : 'rgba(212,175,55,0.5)';
+  const orbColor = phase==='speaking' || phase==='listening'
+    ? C.voice
+    : phase==='thinking' || phase==='connecting'
+    ? C.mercury
+    : phase==='finalizing'
+    ? C.jupiter
+    : phase==='error'
+    ? C.rose
+    : C.mercury;
 
   return (
     <div style={{minHeight:'100vh',background:'transparent',fontFamily:"'Manrope','Inter',sans-serif",display:'flex',flexDirection:'column'}}>
       <div style={{background:C.navBg,backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',padding:'12px 20px',
-        borderBottom:'1px solid rgba(212,175,55,0.18)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+        borderBottom:'1px solid rgba(36,211,154,0.18)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
         <LangToggle/>
       </div>
@@ -221,7 +229,7 @@ export default function AssessmentVoice() {
           />
         ) : (
         <>
-        <div style={{fontSize:'0.72rem',fontWeight:700,letterSpacing:'0.24em',textTransform:'uppercase',color:'#c9a961',marginBottom:14}}>
+        <div style={{fontSize:'0.72rem',fontWeight:700,letterSpacing:'0.24em',textTransform:'uppercase',color:C.jupiter,marginBottom:14}}>
           {lang==='ru'?'Проверка уровня':'Level assessment'}
         </div>
         <h1 style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'2rem',color:C.dark,margin:'0 0 8px',lineHeight:1.1}}>
@@ -237,8 +245,8 @@ export default function AssessmentVoice() {
           <div style={{width:'100%',display:'grid',gap:11,marginBottom:24}}>
             <button type="button" onClick={beginLocalVoice}
               style={{width:'100%',padding:'15px 18px',borderRadius:13,border:'none',cursor:'pointer',
-                background:'linear-gradient(135deg,#e8b96a,#d4af37)',color:'#17130a',fontWeight:800,fontSize:'0.98rem',
-                boxShadow:'0 7px 24px rgba(212,175,55,.24)'}}>
+                background:`linear-gradient(135deg,${C.voice},${C.voiceBright})`,color:'#021418',fontWeight:800,fontSize:'0.98rem',
+                boxShadow:'0 7px 24px rgba(106,220,245,.24)'}}>
               🎙️ {lang==='ru'?'Голосовая проверка · 3–5 минут':'Voice level check · 3–5 minutes'}
               <span style={{display:'block',fontSize:'0.73rem',fontWeight:600,opacity:.72,marginTop:3}}>
                 {lang==='ru'?'Только сервер Mila · без VPN':'Mila server only · no VPN'}
@@ -259,9 +267,9 @@ export default function AssessmentVoice() {
         {/* The orb — tap to begin, then it breathes with the conversation */}
         {mode === 'voice' && <button onClick={start} disabled={live || phase==='connecting' || phase==='finalizing'}
           aria-label={lang==='ru'?'Начать':'Begin'}
-          style={{width:132,height:132,borderRadius:'50%',border:'1px solid rgba(212,175,55,0.4)',
+          style={{width:132,height:132,borderRadius:'50%',border:`1px solid ${orbColor}`,
             cursor:(phase==='idle'||phase==='error')?'pointer':'default',position:'relative',
-            background:`radial-gradient(circle at 50% 40%, ${orbColor}, rgba(212,175,55,0.06) 70%)`,
+            background:`radial-gradient(circle at 50% 40%, ${orbColor}, rgba(0,0,0,0.08) 72%)`,
             boxShadow:`0 0 60px ${orbColor}`,
             transition:'all 0.5s ease',
             animation: live ? 'pulse 2.4s ease-in-out infinite' : 'none'}}>
@@ -269,7 +277,7 @@ export default function AssessmentVoice() {
         </button>}
 
         {mode === 'voice' && <div style={{marginTop:22,fontSize:'0.9rem',fontWeight:700,
-          color: phase==='speaking'?C.gold:phase==='listening'?C.rose:phase==='thinking'?C.purple:C.warm,
+          color: phase==='speaking'||phase==='listening'?C.voice:phase==='thinking'||phase==='connecting'?C.mercury:phase==='finalizing'?C.jupiter:phase==='error'?C.rose:C.warm,
           minHeight:22}}>
           {statusText}
         </div>}
@@ -278,15 +286,15 @@ export default function AssessmentVoice() {
         {mode === 'voice' && (examinerText || youText) && (
           <div style={{marginTop:22,width:'100%',display:'flex',flexDirection:'column',gap:10}}>
             {examinerText && (
-              <div style={{background:'rgba(212,175,55,0.08)',border:'1px solid rgba(212,175,55,0.2)',borderRadius:14,padding:'12px 16px',
+              <div style={{background:C.voiceL,border:'1px solid rgba(106,220,245,0.24)',borderRadius:14,padding:'12px 16px',
                 fontSize:'0.92rem',color:C.dark,textAlign:'left',lineHeight:1.5}}>
-                <span style={{color:'#c9a961',fontWeight:700}}>Mila · </span>{examinerText}
+                <span style={{color:C.voice,fontWeight:700}}>Mila · </span>{examinerText}
               </div>
             )}
             {youText && (
-              <div style={{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:14,padding:'12px 16px',
+              <div style={{background:C.mercuryL,border:'1px solid rgba(36,211,154,0.22)',borderRadius:14,padding:'12px 16px',
                 fontSize:'0.92rem',color:C.warm,textAlign:'left',lineHeight:1.5}}>
-                <span style={{color:C.rose,fontWeight:700}}>{lang==='ru'?'Ты · ':'You · '}</span>{youText}
+                <span style={{color:C.mercury,fontWeight:700}}>{lang==='ru'?'Ты · ':'You · '}</span>{youText}
               </div>
             )}
           </div>
@@ -295,10 +303,10 @@ export default function AssessmentVoice() {
         {mode === 'voice' && phase==='error' && (
           <div style={{marginTop:20,background:C.roseL,color:C.rose,borderRadius:12,padding:'12px 16px',fontSize:'0.88rem',maxWidth:400}}>
             {errMsg}
-            <button onClick={start} style={{display:'block',margin:'10px auto 0',padding:'8px 18px',borderRadius:10,border:'none',background:C.rose,color:'white',fontWeight:700,cursor:'pointer'}}>
+            <button onClick={start} style={{display:'block',margin:'10px auto 0',padding:'8px 18px',borderRadius:10,border:'none',background:C.mercury,color:'#02140f',fontWeight:700,cursor:'pointer'}}>
               {lang==='ru'?'Попробовать снова':'Try again'}
             </button>
-            <button onClick={beginReliable} style={{display:'block',margin:'8px auto 0',padding:'8px 18px',borderRadius:10,border:'1px solid rgba(232,85,109,.35)',background:'transparent',color:C.rose,fontWeight:700,cursor:'pointer'}}>
+            <button onClick={beginReliable} style={{display:'block',margin:'8px auto 0',padding:'8px 18px',borderRadius:10,border:`1px solid ${C.mercury}`,background:C.mercuryL,color:C.mercury,fontWeight:700,cursor:'pointer'}}>
               {lang==='ru'?'Пройти надёжный тест':'Use reliable test'}
             </button>
           </div>

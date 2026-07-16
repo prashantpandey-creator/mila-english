@@ -21,10 +21,10 @@ export default function ProgressPage() {
 
   const minutes = data ? Math.round(data.totalTimeSeconds/60) : null;
   const stats=[
-    {emoji:'⭐',l:lang==='ru'?'Уроков':'Lessons',v:data?.completedLessons ?? '…',c:C.sage},
-    {emoji:'🎯',l:lang==='ru'?'Ср. балл':'Avg score',v:data?(data.avgScore||0):'…',c:C.rose},
-    {emoji:'⏱',l:lang==='ru'?'Минут':'Minutes',v:minutes ?? '…',c:C.gold},
-    {emoji:'🔥',l:lang==='ru'?'Дней подряд':'Day streak',v:me?.streakDays ?? '…',c:C.purple},
+    {emoji:'⭐',l:lang==='ru'?'Уроков':'Lessons',v:data?.completedLessons ?? '…',c:C.jupiter},
+    {emoji:'🎯',l:lang==='ru'?'Ср. балл':'Avg score',v:data?(data.avgScore||0):'…',c:C.jupiter},
+    {emoji:'⏱',l:lang==='ru'?'Минут':'Minutes',v:minutes ?? '…',c:C.mercury},
+    {emoji:'🔥',l:lang==='ru'?'Дней подряд':'Day streak',v:me?.streakDays ?? '…',c:C.jupiter},
   ];
 
   const weak = Array.isArray(data?.weakPhonemes) ? data.weakPhonemes.filter((p:any)=>p.attempts>0) : [];
@@ -42,8 +42,8 @@ export default function ProgressPage() {
 
         {data && (
           <div style={{display:'flex',justifyContent:'center',gap:24,marginTop:20}}>
-            <ProgressRing percent={Math.min(data.avgScore||0,100)} label={lang==='ru'?'Средний балл':'Average score'} color={C.rose}/>
-            <ProgressRing percent={Math.min((data.completedLessons||0)*10,100)} label={lang==='ru'?'До след. уровня':'To next level'} color={C.sage}/>
+            <ProgressRing percent={Math.min(data.avgScore||0,100)} label={lang==='ru'?'Средний балл':'Average score'} color={C.jupiter}/>
+            <ProgressRing percent={Math.min((data.completedLessons||0)*10,100)} label={lang==='ru'?'До след. уровня':'To next level'} color={C.mercury}/>
           </div>
         )}
 
@@ -60,7 +60,7 @@ export default function ProgressPage() {
               const meta = SOUND_INFO[p.phoneme] || {};
               return (
                 <div key={p.phoneme} style={{display:'flex',alignItems:'center',gap:11,marginBottom:10}}>
-                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:'rgba(232,85,109,0.16)',color:C.rose,
+                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:C.voiceL,color:C.voice,
                     fontWeight:800,fontFamily:'ui-monospace,monospace',display:'flex',alignItems:'center',justifyContent:'center'}}>{p.phoneme}</span>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'0.82rem',fontWeight:700,color:C.dark}}>
@@ -68,14 +68,14 @@ export default function ProgressPage() {
                       <span style={{fontWeight:600,color:'#948b7c'}}> · {p.attempts}× · {lang==='ru'?'освоено':'mastery'} {Math.round((p.mastery||0)*100)}%</span>
                     </div>
                     <div style={{height:5,borderRadius:3,background:'rgba(255,255,255,0.10)',marginTop:5}}>
-                      <div style={{height:'100%',width:`${Math.round((p.mastery||0)*100)}%`,borderRadius:3,background:C.sage,transition:'width .4s'}}/>
+                      <div style={{height:'100%',width:`${Math.round((p.mastery||0)*100)}%`,borderRadius:3,background:C.jupiter,transition:'width .4s'}}/>
                     </div>
                   </div>
                 </div>
               );
             })}
             <button onClick={()=>router.push('/listen')}
-              style={{width:'100%',marginTop:8,padding:'11px',borderRadius:12,border:'none',background:C.roseL,color:C.rose,fontWeight:700,cursor:'pointer',fontSize:'0.88rem'}}>
+              style={{width:'100%',marginTop:8,padding:'11px',borderRadius:12,border:'none',background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer',fontSize:'0.88rem'}}>
               🎙️ {lang==='ru'?'Тренировать сейчас':'Drill them now'}
             </button>
           </div>
@@ -93,7 +93,7 @@ export default function ProgressPage() {
                   <div style={{fontSize:'0.88rem',fontWeight:600,color:C.dark}}>{r.lessonTitle || (lang==='ru'?'Урок':'Lesson')}</div>
                   <div style={{fontSize:'0.72rem',color:C.warm}}>{r.category || ''}</div>
                 </div>
-                <span style={{fontSize:'0.85rem',fontWeight:800,color:r.score>=80?C.sage:r.score>=55?C.gold:C.rose}}>
+                <span style={{fontSize:'0.85rem',fontWeight:800,color:r.score>=55?C.jupiter:C.rose}}>
                   {r.score != null ? r.score : (r.completed ? '✓' : '—')}
                 </span>
               </div>
@@ -109,8 +109,8 @@ export default function ProgressPage() {
               {lang==='ru'?'Пока нет данных. Пройди урок или потренируй произношение — статистика появится здесь.':'No data yet. Complete a lesson or practice pronunciation — your stats will grow here.'}
             </p>
             <div style={{display:'flex',gap:10,justifyContent:'center'}}>
-              <button onClick={()=>router.push('/listen')} style={{padding:'11px 18px',borderRadius:12,border:'none',background:C.rose,color:'white',fontWeight:700,cursor:'pointer'}}>🎙️ {lang==='ru'?'Произношение':'Pronunciation'}</button>
-              <button onClick={()=>router.push('/lessons')} style={{padding:'11px 18px',borderRadius:12,border:'none',background:C.sage,color:'white',fontWeight:700,cursor:'pointer'}}>📚 {lang==='ru'?'Уроки':'Lessons'}</button>
+              <button onClick={()=>router.push('/listen')} style={{padding:'11px 18px',borderRadius:12,border:'none',background:C.voice,color:C.white,fontWeight:700,cursor:'pointer'}}>🎙️ {lang==='ru'?'Произношение':'Pronunciation'}</button>
+              <button onClick={()=>router.push('/lessons')} style={{padding:'11px 18px',borderRadius:12,border:'none',background:C.jupiter,color:C.white,fontWeight:700,cursor:'pointer'}}>📚 {lang==='ru'?'Уроки':'Lessons'}</button>
             </div>
           </div>
         )}

@@ -9,7 +9,7 @@ export default function SpacedRepetitionTimer({ repetitionCount, lang }: { repet
   const days = INTERVALS[Math.min(repetitionCount, INTERVALS.length - 1)];
   return (
     <div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'4px 12px',borderRadius:20,
-      background:C.sageL,color:C.sage,fontWeight:600,fontSize:'0.75rem'}}>
+      background:C.jupiterL,color:C.jupiter,fontWeight:700,fontSize:'0.75rem',border:'1px solid rgba(242,199,92,.14)'}}>
       ⏱ {lang==='ru'?`Повтор через ${days} дн.`:`Next review in ${days}d`}
     </div>
   );

@@ -47,13 +47,14 @@ export default function DashboardPage() {
   return (
     <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
       {/* Top Bar */}
-      <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',
+      <div style={{background:C.navBg,backdropFilter:'blur(18px)',padding:'10px 20px',
         borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
         display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div onClick={()=>router.push('/')} style={{cursor:'pointer',display:'flex',alignItems:'center',gap:9}}>
-          <div style={{width:30,height:30,borderRadius:10,border:'1px solid rgba(106,220,245,0.48)',
+          <div style={{width:30,height:30,borderRadius:10,border:'1px solid rgba(36,211,154,0.48)',
             display:'flex',alignItems:'center',justifyContent:'center',
-            fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:750,fontSize:'1rem',color:'#b7f2ff'}}>M</div>
+            fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:750,fontSize:'1rem',color:C.mercuryBright,
+            background:'linear-gradient(145deg,rgba(36,211,154,.1),rgba(106,220,245,.025))'}}>M</div>
           <span style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.18rem',letterSpacing:'-0.03em',color:C.dark}}>Mila</span>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
@@ -63,8 +64,9 @@ export default function DashboardPage() {
               fontWeight:600,fontSize:'0.8rem',cursor:'pointer'}}>
             {lang==='ru'?'Выйти':'Sign Out'}
           </button>
-          <div style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.rose},#c13e58)`,
-            display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:700,fontSize:'0.8rem'}}>
+          <div style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.mercury},#0a7d5c)`,
+            display:'flex',alignItems:'center',justifyContent:'center',color:'#03150e',fontWeight:800,fontSize:'0.8rem',
+            boxShadow:'0 0 18px rgba(36,211,154,.16)'}}>
             {user?.name ? user.name[0].toUpperCase() : (lang==='ru'?'Г':'G')}
           </div>
         </div>
@@ -74,7 +76,7 @@ export default function DashboardPage() {
         {/* Greeting */}
         <div style={{marginBottom:24}}>
           <h1 style={{display:'flex',alignItems:'center',gap:9,fontSize:'1.6rem',fontWeight:800,margin:0,color:C.dark}}>
-            {getGreeting()} <span style={{display:'grid',color:C.gold}}><MilaIcon name="sparkle" size={22}/></span>
+            {getGreeting()} <span style={{display:'grid',color:C.mercury}}><MilaIcon name="sparkle" size={22}/></span>
           </h1>
           <div style={{display:'flex',alignItems:'center',gap:10,marginTop:6}}>
             <p style={{color:C.warm,margin:0}}>
@@ -87,13 +89,13 @@ export default function DashboardPage() {
         {/* AI Assessment Banner (If pending) */}
         {user?.level === 'pending' && (
           <Card hover={false} padding="24px" style={{ marginBottom: 24 }}>
-            <div style={{width:34,height:34,display:'grid',placeItems:'center',marginBottom:8,color:C.gold}}><MilaIcon name="sparkle" size={28}/></div>
+            <div style={{width:34,height:34,display:'grid',placeItems:'center',marginBottom:8,color:C.jupiter}}><MilaIcon name="sparkle" size={28}/></div>
             <h2 style={{fontSize:'1.5rem',margin:'0 0 6px',color:C.dark}}>{lang==='ru'?'Твой личный план обучения':'Your custom learning plan'}</h2>
             <p style={{fontSize:'0.9rem',lineHeight:1.55,margin:'0 0 16px',color:C.warm}}>{lang==='ru'?'Пройди надёжный тест через сервер Mila — без внешнего ИИ. Голосовой вариант доступен там, где его поддерживает провайдер.':'Take the reliable Mila-only test with no external AI. Voice remains available where the provider supports it.'}</p>
             <button onClick={()=>router.push('/assessment')}
               style={{width:'100%',padding:'13px',borderRadius:12,border:'none',
-                background:'linear-gradient(135deg,#c4f6ff,#66d7f0)',color:'#05212a',fontWeight:800,fontSize:'1rem',
-                cursor:'pointer',boxShadow:'0 8px 26px rgba(74,200,231,0.24)'}}>
+                background:`linear-gradient(135deg,${C.mercuryBright},${C.mercury})`,color:'#032018',fontWeight:800,fontSize:'1rem',
+                cursor:'pointer',boxShadow:'0 10px 30px rgba(36,211,154,0.22)'}}>
               {lang==='ru'?'Проверить уровень →':'Check my level →'}
             </button>
           </Card>
@@ -107,7 +109,7 @@ export default function DashboardPage() {
           <Card hover={false} padding="20px" style={{ marginBottom: 24 }}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
               <div>
-                <div style={{fontSize:'0.72rem',fontWeight:700,color:C.gold,textTransform:'uppercase',letterSpacing:1.5,marginBottom:4}}>
+                <div style={{fontSize:'0.72rem',fontWeight:700,color:C.jupiter,textTransform:'uppercase',letterSpacing:1.5,marginBottom:4}}>
                   {lang==='ru'?'Персональный план':'Custom plan'}
                 </div>
                 <div style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',letterSpacing:'-0.03em',color:C.dark}}>Level {user.level.toUpperCase()}</div>
@@ -144,14 +146,14 @@ export default function DashboardPage() {
         {/* Stats */}
         <div style={{marginBottom:20}}>
           <ProgressSummary items={[
-            {icon:'lesson',val:stats?.completedLessons ?? '…',label:lang==='ru'?'Уроков пройдено':'Lessons done',color:C.sage},
-            {icon:'time',val:stats ? Math.round(stats.totalTimeSeconds/60) : '…',label:lang==='ru'?'Минут':'Minutes',color:C.rose},
+            {icon:'lesson',val:stats?.completedLessons ?? '…',label:lang==='ru'?'Уроков пройдено':'Lessons done',color:C.jupiter},
+            {icon:'time',val:stats ? Math.round(stats.totalTimeSeconds/60) : '…',label:lang==='ru'?'Минут':'Minutes',color:C.voice},
           ]}/>
         </div>
 
         {/* Pronunciation */}
         <Card hover={false} padding="20px 24px" style={{ marginBottom: 16, textAlign: 'center' }}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,fontWeight:700,fontSize:'1rem',color:C.dark,marginBottom:4}}><span style={{display:'grid',color:C.gold}}><MilaIcon name="pronunciation" size={18}/></span>{lang==='ru'?'Произношение':'Pronunciation'}</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,fontWeight:700,fontSize:'1rem',color:C.dark,marginBottom:4}}><span style={{display:'grid',color:C.voice}}><MilaIcon name="pronunciation" size={18}/></span>{lang==='ru'?'Произношение':'Pronunciation'}</div>
           <p style={{fontSize:'0.85rem',color:C.warm,margin:'0 0 14px'}}>{lang==='ru'?'Нажми и послушай':'Tap to listen'}</p>
           <div style={{display:'flex',justifyContent:'center',gap:20}}>
             {['hello','world','thank you'].map(w=>(
@@ -163,14 +165,14 @@ export default function DashboardPage() {
         {/* Secondary tools */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
           {[
-            {icon:'lessons' as MilaIconName,label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons'},
-            {icon:'progress' as MilaIconName,label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress'},
-            {icon:'badges' as MilaIconName,label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements'},
-            {icon:'phonetics' as MilaIconName,label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics'},
-            {icon:'voice' as MilaIconName,label:lang==='ru'?'Голосовая':'Voice lounge',sub:lang==='ru'?'Свободный разговор':'Open conversation',href:'/darshan'},
+            {icon:'lessons' as MilaIconName,label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons',tone:C.jupiter},
+            {icon:'progress' as MilaIconName,label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',tone:C.mercury},
+            {icon:'badges' as MilaIconName,label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements',tone:C.jupiter},
+            {icon:'phonetics' as MilaIconName,label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics',tone:C.voice},
+            {icon:'voice' as MilaIconName,label:lang==='ru'?'Голосовая':'Voice lounge',sub:lang==='ru'?'Свободный разговор':'Open conversation',href:'/darshan',tone:C.voice},
           ].map((l,i)=>(
             <Card key={i} onClick={()=>router.push(l.href)} padding="14px" style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <IconTile size={40}><span style={{display:'grid',color:C.gold}}><MilaIcon name={l.icon} size={20}/></span></IconTile>
+              <IconTile size={40}><span style={{display:'grid',color:l.tone}}><MilaIcon name={l.icon} size={20}/></span></IconTile>
               <div><div style={{fontWeight:600,fontSize:'0.95rem',color:C.dark}}>{l.label}</div><div style={{fontSize:'0.8rem',color:C.warm}}>{l.sub}</div></div>
             </Card>
           ))}

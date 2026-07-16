@@ -7,9 +7,9 @@ import { ACCENTS, startListening } from '@/lib/speech';
 import { ttsSpeak } from '@/lib/tts';
 
 const VERDICT = {
-  good:  { fg: '#8fce84', bg: 'rgba(143,206,132,0.16)' },
-  close: { fg: '#e0b64e', bg: 'rgba(212,175,55,0.18)' },
-  miss:  { fg: '#e8556d', bg: 'rgba(232,85,109,0.16)' },
+  good:  { fg: C.jupiter, bg: C.jupiterL },
+  close: { fg: C.mercury, bg: C.mercuryL },
+  miss:  { fg: C.rose, bg: C.roseL },
 };
 
 /** A friendly onboarding card shown only on the first phrase */
@@ -40,16 +40,16 @@ function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => voi
         </div>
       ))}
 
-      <div style={{marginTop:8,background:'rgba(167,139,250,0.16)',borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20}}>
-        <span style={{fontSize:'0.82rem',color:'#a78bfa',fontWeight:600}}>
+      <div style={{marginTop:8,background:C.mercuryL,borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20}}>
+        <span style={{fontSize:'0.82rem',color:C.mercury,fontWeight:600}}>
           💡 {lang==='ru' ? 'Говори ровно и чётко — модель слышит каждую фонему' : 'Speak clearly and steadily — the model hears every phoneme'}
         </span>
       </div>
 
       <button onClick={onStart}
         style={{width:'100%',maxWidth:340,padding:'16px',borderRadius:16,border:'none',
-          background:`linear-gradient(135deg,${C.rose},#e8556d)`,color:'white',fontWeight:800,fontSize:'1.1rem',
-          cursor:'pointer',boxShadow:'0 6px 20px rgba(233,30,99,0.3)',letterSpacing:'0.01em'}}>
+          background:`linear-gradient(135deg,${C.mercury},${C.mercuryBright})`,color:'#02140f',fontWeight:800,fontSize:'1.1rem',
+          cursor:'pointer',boxShadow:'0 6px 20px rgba(36,211,154,0.3)',letterSpacing:'0.01em'}}>
         {lang==='ru' ? '🚀 Начать упражнение' : '🚀 Start Exercise'}
       </button>
     </div>
@@ -169,7 +169,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
 
   const ring = (score: number) => {
     const r = 24, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
-    const col = score >= 80 ? C.sage : score >= 55 ? C.gold : C.rose;
+    const col = score >= 80 ? C.jupiter : score >= 55 ? C.mercury : C.rose;
     return (
       <svg width="58" height="58" viewBox="0 0 58 58" style={{flex:'0 0 auto'}}>
         <circle cx="29" cy="29" r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="6"/>
@@ -192,26 +192,26 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
     <div style={{textAlign:'center'}}>
       {/* Progress label + phrase counter */}
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-        <span style={{fontSize:'0.72rem',color:'#9d9483',fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>
+        <span style={{fontSize:'0.72rem',color:C.jupiter,fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>
           {lang==='ru' ? 'Произношение' : 'Speaking Exercise'}
         </span>
-        <span style={{fontSize:'0.72rem',color:'#9d9483',fontWeight:700,background:'rgba(255,255,255,0.08)',borderRadius:20,padding:'2px 10px'}}>
+        <span style={{fontSize:'0.72rem',color:C.mercury,fontWeight:700,background:C.mercuryL,borderRadius:20,padding:'2px 10px'}}>
           {pos + 1} / {phrases.length}
         </span>
       </div>
 
       {/* ── Phrase Card ────────────────────────────────────────────────────── */}
       <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'24px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:12}}>
-        <div style={{fontSize:'0.72rem',fontWeight:700,color:C.purple,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>
+        <div style={{fontSize:'0.72rem',fontWeight:700,color:C.jupiter,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>
           🎯 {lang==='ru' ? 'Повтори эту фразу:' : 'Repeat this phrase:'}
         </div>
         <div style={{fontSize:'1.35rem',fontWeight:700,color:C.dark,lineHeight:1.35,marginBottom:6}}>{phrase.en}</div>
         <div style={{fontSize:'0.9rem',color:C.warm}}>{phrase.ru}</div>
         <button onClick={onListen} disabled={phase==='speaking' || phase==='recording'}
           style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,
-            width:'100%',marginTop:16,padding:'10px 18px',borderRadius:12,border:'none',
-            background: phase==='speaking' ? C.roseL : 'rgba(232,85,109,0.16)',
-            color:C.rose,fontWeight:700,cursor:(phase==='speaking'||phase==='recording')?'default':'pointer',fontSize:'0.9rem',opacity:(phase==='recording')?0.5:1}}>
+            width:'100%',marginTop:16,padding:'10px 18px',borderRadius:12,
+            background:C.voiceL,border:`1px solid ${C.voice}`,
+            color:C.voice,fontWeight:700,cursor:(phase==='speaking'||phase==='recording')?'default':'pointer',fontSize:'0.9rem',opacity:(phase==='recording')?0.5:1}}>
           🔊 {phase==='speaking' ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Послушать':'Hear it first')}
         </button>
       </div>
@@ -275,15 +275,15 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
             <button onClick={onMic} disabled={micBusy}
               style={{width:72,height:72,borderRadius:'50%',border:'none',
                 cursor:micBusy?'default':'pointer',
-                background: phase==='recording' ? C.gold : phase==='scoring' ? '#a78bfa' : C.rose,
-                color:'white',fontSize:'1.6rem',
-                boxShadow:`0 8px 24px ${phase==='recording'?'rgba(212,175,55,.45)':phase==='scoring'?'rgba(124,58,237,.35)':'rgba(233,30,99,.35)'}`,
+                background: phase==='recording' ? C.voice : phase==='scoring' ? C.mercury : C.voiceL,
+                color:phase==='recording'||phase==='scoring'?'#021418':C.voice,fontSize:'1.6rem',
+                boxShadow:`0 8px 24px ${phase==='scoring'?'rgba(36,211,154,.35)':'rgba(106,220,245,.35)'}`,
                 animation: phase==='recording' ? 'pulse 1.2s ease-in-out infinite' : 'none',
                 transition:'background 0.2s'}}>
               {phase==='recording' ? '⏹' : phase==='scoring' ? '⏳' : '🎙️'}
             </button>
             <div style={{fontSize:'0.82rem',fontWeight:600,color:
-              phase==='recording' ? C.gold : phase==='scoring' ? '#a78bfa' : C.warm,
+              phase==='recording' ? C.voice : phase==='scoring' ? C.mercury : C.warm,
               lineHeight:1.5,maxWidth:300}}>
               {phase==='recording'
                 ? (lang==='ru' ? '🔴 Слушаю... Скажи фразу, потом нажми ⏹' : '🔴 Listening… say the phrase, then tap ⏹ to stop')
@@ -299,11 +299,11 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
         {hasResult && (
           <div style={{display:'flex',gap:10,width:'100%'}}>
             <button onClick={onMic} disabled={micBusy}
-              style={{flex:1,padding:'14px',borderRadius:16,border:'1.5px solid rgba(255,255,255,0.14)',background:'rgba(255,255,255,0.05)',color:C.warm,fontWeight:700,cursor:'pointer'}}>
+              style={{flex:1,padding:'14px',borderRadius:16,border:`1.5px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer'}}>
               🎙️ {lang==='ru' ? 'Ещё раз' : 'Try again'}
             </button>
             <button onClick={next}
-              style={{flex:2,padding:'16px',borderRadius:16,border:'none',background:`linear-gradient(135deg,${C.sage},#8fce84)`,color:'white',fontWeight:800,fontSize:'1.05rem',cursor:'pointer',boxShadow:'0 6px 18px rgba(91,140,90,0.3)'}}>
+              style={{flex:2,padding:'16px',borderRadius:16,border:'none',background:`linear-gradient(135deg,${C.mercury},${C.mercuryBright})`,color:'#02140f',fontWeight:800,fontSize:'1.05rem',cursor:'pointer',boxShadow:'0 6px 18px rgba(36,211,154,0.3)'}}>
               {pos >= phrases.length - 1 ? (lang==='ru' ? 'Завершить урок' : 'Complete lesson') : (lang==='ru' ? 'Продолжить →' : 'Continue →')}
             </button>
           </div>

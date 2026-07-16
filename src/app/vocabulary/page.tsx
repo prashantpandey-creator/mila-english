@@ -72,7 +72,7 @@ export default function VocabPage() {
         {status === 'ready' && word && <>
           <WordCard word={{en:word.english,ru:word.translationNative,phonetic:word.phonetic}} flipped={flipped} onFlip={()=>{setFlipped(!flipped);if(!flipped)speak(word.english);}} lang={lang}/>
           <div style={{marginBottom:20}}><SpacedRepetitionTimer repetitionCount={word.review?.repetitionCount ?? 0} lang={lang}/></div>
-          <button onClick={()=>speak(word.english)} disabled={playing} style={{padding:'12px 28px',borderRadius:14,border:'none',background:playing?C.rose:C.roseL,color:playing?'white':C.rose,fontWeight:600,cursor:'pointer',fontSize:'1rem',marginBottom:20}}>
+          <button onClick={()=>speak(word.english)} disabled={playing} style={{padding:'12px 28px',borderRadius:14,border:`1px solid ${C.voice}`,background:playing?C.voice:C.voiceL,color:playing?'#021418':C.voice,fontWeight:600,cursor:'pointer',fontSize:'1rem',marginBottom:20}}>
             🔊 {playing ? (lang==='ru'?'Воспроизведение…':'Playing…') : (lang==='ru'?'Прослушать':'Listen')}
           </button>
           <div style={{opacity:saving?0.55:1,pointerEvents:saving?'none':'auto'}}>

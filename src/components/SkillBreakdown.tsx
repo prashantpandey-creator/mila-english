@@ -6,10 +6,10 @@ import SkillProgressBar from './SkillProgressBar';
 
 export default function SkillBreakdown({ lang }: { lang: 'ru'|'en' }) {
   const skills = [
-    { label: lang==='ru'?'Говорение':'Speaking', val: 62, color: C.rose },
-    { label: lang==='ru'?'Аудирование':'Listening', val: 74, color: C.sage },
-    { label: lang==='ru'?'Словарь':'Vocabulary', val: 55, color: C.gold },
-    { label: lang==='ru'?'Грамматика':'Grammar', val: 40, color: C.purple },
+    { label: lang==='ru'?'Говорение':'Speaking', val: 62, color: C.mercury },
+    { label: lang==='ru'?'Аудирование':'Listening', val: 74, color: C.voice },
+    { label: lang==='ru'?'Словарь':'Vocabulary', val: 55, color: C.jupiter },
+    { label: lang==='ru'?'Грамматика':'Grammar', val: 40, color: C.jupiter },
   ];
   return (
     <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)',marginTop:16,display:'flex',flexDirection:'column',gap:12}}>

@@ -21,15 +21,15 @@ export default function AssessmentPlayer() {
         {q.options.map(o=>(
           <button key={o} onClick={()=>setPicked(o)}
             style={{padding:'10px',borderRadius:10,cursor:'pointer',fontSize:'0.9rem',
-              border:picked===o?`2px solid ${C.rose}`:'1.5px solid rgba(255,255,255,0.14)',
-              background:picked===o?C.roseL:'white',color:C.dark}}>
+              border:picked===o?`2px solid ${C.mercury}`:'1.5px solid rgba(255,255,255,0.14)',
+              background:picked===o?C.mercuryL:'rgba(255,255,255,0.05)',color:C.dark}}>
             {o}
           </button>
         ))}
       </div>
       <button disabled={!picked} onClick={()=>{setI(Math.min(i+1,QUESTIONS.length-1)); setPicked(null);}}
         style={{marginTop:14,padding:'10px 20px',borderRadius:10,border:'none',
-          background:picked?C.sage:'rgba(255,255,255,0.14)',color:'white',fontWeight:600,cursor:picked?'pointer':'default'}}>
+          background:picked?C.mercury:'rgba(255,255,255,0.14)',color:picked?C.white:C.warm,fontWeight:600,cursor:picked?'pointer':'default'}}>
         Next →
       </button>
     </div>

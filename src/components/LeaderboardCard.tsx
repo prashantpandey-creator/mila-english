@@ -8,7 +8,7 @@ import MilaIcon from '@/components/ui/MilaIcon';
 export default function LeaderboardCard({ lang, stats }: { lang: 'ru'|'en'; stats?: { completedLessons: number; avgScore: number } | null }) {
   return (
     <Card hover={false} padding="16px 20px" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-      <IconTile><span style={{color:C.gold,display:'grid'}}><MilaIcon name="practice" size={21}/></span></IconTile>
+      <IconTile><span style={{color:C.jupiter,display:'grid'}}><MilaIcon name="practice" size={21}/></span></IconTile>
       <div style={{ flex: 1 }}>
         <div style={{ fontWeight: 700, fontSize: '0.95rem', color: C.dark }}>
           {lang==='ru'?'Твоя практика':'Your practice'}

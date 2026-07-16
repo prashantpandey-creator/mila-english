@@ -15,7 +15,7 @@ export default function DailyLessonCard({ title, subtitle, onStart }: {
           <div style={{ fontWeight: 700, fontSize: '1.05rem', color: C.dark }}>{title}</div>
           <div style={{ fontSize: '0.85rem', color: C.warm, marginTop: 3 }}>{subtitle}</div>
         </div>
-        <div style={{ fontSize: '1.3rem', color: C.gold }}>→</div>
+        <div style={{ fontSize: '1.3rem', color: C.jupiter }}>→</div>
       </div>
     </Card>
   );
