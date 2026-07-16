@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
+import ThemeToggle from '@/components/ThemeToggle';
 import StreakCounter from '@/components/StreakCounter';
 import ProgressSummary from '@/components/ProgressSummary';
 import PronunciationButton from '@/components/PronunciationButton';
@@ -58,8 +59,9 @@ export default function DashboardPage() {
             boxShadow:'0 0 22px rgba(242,139,173,.08)'}}>M</div>
           <span style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.18rem',letterSpacing:'-0.03em',color:C.dark}}>Mila</span>
         </div>
-        <div style={{display:'flex',alignItems:'center',gap:12}}>
+        <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',justifyContent:'flex-end'}}>
           <LangToggle />
+          <ThemeToggle />
           <button className="welcome-toolbar__quiet" onClick={handleLogout}
             style={{padding:'6px 14px',borderRadius:12,border:'1.5px solid var(--surface-control-line, rgba(255,255,255,.2))',background:'var(--surface-control, rgba(255,255,255,.025))',color:C.warm,
               fontWeight:600,fontSize:'0.8rem',cursor:'pointer'}}>

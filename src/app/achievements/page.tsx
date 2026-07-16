@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import LangToggle from '@/components/LangToggle';
+import ThemeToggle from '@/components/ThemeToggle';
 import BadgeGrid from '@/components/BadgeGrid';
 import StreakBadge from '@/components/StreakBadge';
 import { useI18n } from '@/lib/i18n-provider';
@@ -20,7 +21,7 @@ export default function AchievementsPage() {
   return (
     <div className="welcome-page" style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
       <div className="welcome-toolbar" style={{background:C.navBg,backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:`1px solid ${C.line}`,display:'flex',justifyContent:'space-between'}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',color:C.dark,letterSpacing:'-0.03em'}}>Mila</span><LangToggle/>
+        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',color:C.dark,letterSpacing:'-0.03em'}}>Mila</span><span style={{display:'flex',alignItems:'center',gap:10}}><LangToggle/><ThemeToggle/></span>
       </div>
       <div style={{maxWidth:500,margin:'0 auto',padding:'24px 20px'}}>
         <h1 style={{fontSize:'1.5rem',fontWeight:800,color:C.dark,marginBottom:16}}>{t('achievements_title')}</h1>

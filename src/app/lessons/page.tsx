@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
+import ThemeToggle from '@/components/ThemeToggle';
 import CategoryFilter from '@/components/CategoryFilter';
 import LessonList from '@/components/LessonList';
 import GenerateLessonButton from '@/components/GenerateLessonButton';
@@ -76,7 +77,10 @@ export default function LessonsPage() {
       <div className="welcome-toolbar" style={{background:C.navBg,backdropFilter:'blur(12px)',padding:'10px 20px',
         borderBottom:`1px solid ${C.line}`,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',color:C.dark,letterSpacing:'-0.03em'}}>Mila</span>
-        <LangToggle />
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <LangToggle />
+          <ThemeToggle />
+        </div>
       </div>
 
       <div style={{maxWidth:600,margin:'0 auto',padding:'24px 20px'}}>
