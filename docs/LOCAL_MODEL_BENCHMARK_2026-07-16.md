@@ -52,6 +52,20 @@ runtime took 0.86s / 11.36s warm on the same correction and decoded at about
 3.1 tokens/second. Ollama 0.32.0 completed the comparable warm answer in 5.20s
 and decoded at about 8.2 tokens/second.
 
+The 0.8B model received a second context-engineering trial with a compact
+production-style contract, three worked examples, 2K context, low temperature,
+and a two-CPU/3-GiB cage. Its first correction took 27.80s cold and produced the
+awkward, incomplete “You went there instead of going” rather than the requested
+“went, not go” correction. The following Russian probe did not complete within
+two minutes, so the run was aborted. Prompt context did not clear the teaching
+or operational gate; 0.8B remains unsuitable as Mila's autonomous teacher.
+
+Darshan therefore treats generated speech as a draft, not an authority. The
+server collects the short Qwen response, applies a deterministic script guard,
+stores only the guarded text, and sends only that controlled script to browser
+TTS. This costs token-level streaming but prevents the speaker from reading raw
+emoji, markup, or unsupported pronunciation/progress claims.
+
 ## Text Chat decision
 
 The first deployed Qwen 4B Chat request took 13.61s / 27.90s and invented a

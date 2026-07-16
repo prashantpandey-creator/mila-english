@@ -210,3 +210,22 @@ export function builtInCompanionReply(
     ? 'Моя локальная разговорная модель сейчас недоступна, поэтому я не буду выдумывать ответ. Пока я всё ещё могу объяснить эту страницу, подсказать следующий шаг или начать практику.'
     : 'My local conversation model is unavailable right now, so I won’t invent an answer. I can still explain this page, suggest the next learning step, or start an English practice.';
 }
+
+/** Remove claims and markup that a spoken model must never pass to TTS. */
+export function sanitizeVoiceReply(value: string): string {
+  return value
+    .replace(/[\p{Extended_Pictographic}\uFE0E\uFE0F\u200D]/gu, '')
+    .replace(/\s*[–—-]\s*(?:great|excellent|amazing|well done|nice work|good job)\b[!.]?/giu, ' ')
+    .replace(/^(?:great|excellent|amazing|well done|nice work|good job)\b[!.]?\s*/iu, '')
+    .replace(/\bYou\s+(?:used|said|pronounced|read)\b[^.!?]{0,96}\b(?:correctly|perfectly|clearly|well)\b[.!?]?/giu, ' ')
+    .replace(/\b(?:I (?:did )?hear|I could hear|I can hear|I listened to)\b[^.!?]*[.!?]?/giu, ' ')
+    .replace(/\bYour pronunciation (?:was|is|sounds?)\b[^.!?]*[.!?]?/giu, ' ')
+    .replace(/(?:Я (?:действительно )?слышала|Я услышала|Я слышу|Я могу слышать)[^.!?]*[.!?]?/giu, ' ')
+    .replace(/(?:Твоё|Ваше) произношение[^.!?]*[.!?]?/giu, ' ')
+    .replace(/^(?:Отлично|Прекрасно|Молодец|Хорошая работа)[!.]?\s*/iu, '')
+    .replace(/[*_#`]+/gu, '')
+    .replace(/\s+([,.;:!?])/gu, '$1')
+    .replace(/([.!?]["”']?)\s*[–—-]\s*(?=[A-ZА-ЯЁ])/gu, '$1 ')
+    .replace(/\s{2,}/gu, ' ')
+    .trim();
+}

@@ -10,6 +10,7 @@ import {
   isSensitiveMemory,
   ollamaHasModel,
   parseMemoryCommand,
+  sanitizeVoiceReply,
   type CompanionLocale,
 } from '@/lib/companion';
 import {
@@ -292,7 +293,7 @@ export async function POST(request: NextRequest) {
     maxTokens: surfaceKind === 'voice' ? 50 : 320,
     temperature: surfaceKind === 'voice' ? 0.25 : 0.35,
     maxRetries: choice.provider === 'ollama' ? 0 : 1,
-    onFinish: async ({ text }) => {
+    onFinish: surfaceKind === 'voice' ? undefined : async ({ text }) => {
       if (!text.trim()) return;
       try {
         await saveCompanionTurn(userId, latestUserMessage, text, turnContext);
@@ -301,6 +302,25 @@ export async function POST(request: NextRequest) {
       }
     },
   });
+
+  if (surfaceKind === 'voice') {
+    let rawReply = '';
+    for await (const delta of result.textStream) rawReply += delta;
+    const reply = sanitizeVoiceReply(rawReply) || (locale === 'ru'
+      ? 'Я могу ответить по тексту, но не буду выдумывать то, чего не слышала или не видела.'
+      : 'I can respond to the text, but I will not invent anything I did not hear or see.');
+    await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
+    return new Response(`0:${JSON.stringify(reply)}\n`, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Vercel-AI-Data-Stream': 'v1',
+        'X-Mila-Model-Provider': choice.provider,
+        'X-Mila-Model': choice.modelId,
+        'X-Mila-Model-Runtime': choice.runtime,
+        'X-Mila-Voice-Script': 'controlled',
+      },
+    });
+  }
 
   return result.toDataStreamResponse({
     headers: {

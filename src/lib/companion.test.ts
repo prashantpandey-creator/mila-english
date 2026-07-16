@@ -6,6 +6,7 @@ import {
   isSensitiveMemory,
   ollamaHasModel,
   parseMemoryCommand,
+  sanitizeVoiceReply,
 } from './companion';
 
 assert.deepStrictEqual(
@@ -145,5 +146,15 @@ const friendlyVoicePrompt = buildCompanionSystemPrompt({
   memories: [],
 });
 assert.doesNotMatch(friendlyVoicePrompt, /a little emoji is fine/i);
+
+assert.strictEqual(
+  sanitizeVoiceReply('"Yesterday I went to the market." – great! You used past tense correctly. Just remember: "go" becomes "went" in past. 😊'),
+  '"Yesterday I went to the market." Just remember: "go" becomes "went" in past.',
+);
+assert.strictEqual(
+  sanitizeVoiceReply('Отлично! Я слышала идеальный звук th. По тексту лучше: I think it is good. 🎉'),
+  'По тексту лучше: I think it is good.',
+);
+assert.strictEqual(sanitizeVoiceReply('**Use “went,” not “go.”**'), 'Use “went,” not “go.”');
 
 console.log('companion core: all assertions pass');

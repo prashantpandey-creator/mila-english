@@ -55,8 +55,10 @@ prompt so text-chat traffic cannot evict its voice prompt cache. It never falls
 back to CPU-bound GPT-OSS: if its Qwen runtime is unavailable, Mila uses the
 built-in response path or an explicitly enabled external fallback. Darshan adds
 local speech recognition before the chat request and browser speech output after
-it. OpenAI Realtime remains an optional supported-region enhancement, not a
-dependency of the local voice conversation.
+it. A deterministic controller validates the complete Voice script and removes
+unsupported hearing/progress claims, praise without evidence, emoji, and markup;
+the speaker never receives raw model tokens. OpenAI Realtime remains an optional
+supported-region enhancement, not a dependency of the local voice conversation.
 
 For native development, install Ollama and run:
 
