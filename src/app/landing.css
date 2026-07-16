@@ -364,7 +364,7 @@
 .mila-surface--welcome .lp { isolation: isolate; }
 .mila-surface--welcome .lp::before {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(62, 40, 32, 0.14), rgba(58, 38, 34, 0.24) 55%, rgba(54, 36, 34, 0.32));
+  background: linear-gradient(180deg, rgba(52, 33, 28, 0.3), rgba(48, 31, 28, 0.42) 55%, rgba(44, 29, 27, 0.5));
 }
 .mila-surface--welcome .lp {
   position: relative;
@@ -374,9 +374,9 @@
   --lp-strong: #241c26;
   --lp-gold: #a87e1e;
   --lp-gold-bright: #906600;
-  --lp-glass: rgba(252, 245, 238, 0.58);
-  --lp-panel: rgba(250, 242, 234, 0.88);
-  --lp-band: rgba(248, 240, 232, 0.42);
+  --lp-glass: rgba(248, 239, 230, 0.55);
+  --lp-panel: rgba(246, 236, 226, 0.86);
+  --lp-band: rgba(244, 234, 224, 0.4);
   --lp-inset: rgba(93, 46, 66, 0.05);
   --lp-inset-strong: rgba(247, 239, 231, 0.78);
   --lp-line: rgba(93, 46, 66, 0.12);
@@ -385,7 +385,7 @@
   --lp-voice: #0c7895;
   --lp-emerald: #08785b;
 }
-.mila-surface--welcome .lp-nav { background: rgba(246, 238, 230, 0.78); border-bottom-color: rgba(93, 46, 66, 0.1); }
+.mila-surface--welcome .lp-nav { background: rgba(240, 230, 220, 0.8); border-bottom-color: rgba(93, 46, 66, 0.12); }
 .mila-surface--welcome .lp-nav .lang-toggle { background: rgba(93, 46, 66, 0.07); }
 .mila-surface--welcome .lp-brand__mark { background: linear-gradient(150deg, rgba(144, 102, 0, 0.12), rgba(255, 255, 255, 0.6)); }
 .mila-surface--welcome .lp-signin { background: rgba(144, 102, 0, 0.06); }
