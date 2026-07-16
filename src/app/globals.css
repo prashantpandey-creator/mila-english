@@ -1195,6 +1195,49 @@ h1, h2 {
 .mila-guide[data-state="speaking"] .mila-guide__launcher > img { animation: milaAgentSpeak .55s ease-in-out infinite alternate; }
 .mila-guide[data-state="speaking"] .mila-guide__state { background: #ff7b90; box-shadow: 0 0 15px rgba(255,123,144,.72); }
 
+/* Hands-free voice mode — the mascot grows into a presence: larger body,
+   a slow breathing halo while idle, a wide soft ring while listening. */
+.mila-guide[data-voice="1"] .mila-guide__launcher {
+  transform: scale(1.16);
+  border-color: rgba(126,229,251,.55);
+  box-shadow: 0 0 0 8px rgba(106,220,245,.08), 0 26px 60px rgba(0,7,17,.6), 0 0 40px rgba(69,202,234,.24);
+}
+.mila-guide[data-voice="1"] .mila-guide__launcher:hover { transform: scale(1.16) translateY(-2px); }
+.mila-guide[data-voice="1"][data-state="idle"] .mila-guide__launcher { animation: milaVoiceBreathe 3.2s ease-in-out infinite; }
+.mila-guide[data-voice="1"][data-state="listening"] .mila-guide__launcher {
+  box-shadow: 0 0 0 14px rgba(106,220,245,.12), 0 0 0 26px rgba(106,220,245,.05), 0 26px 60px rgba(0,7,17,.6), 0 0 46px rgba(69,202,234,.32);
+}
+@keyframes milaVoiceBreathe {
+  0%, 100% { box-shadow: 0 0 0 8px rgba(106,220,245,.08), 0 26px 60px rgba(0,7,17,.6), 0 0 40px rgba(69,202,234,.24); }
+  50% { box-shadow: 0 0 0 12px rgba(106,220,245,.13), 0 26px 60px rgba(0,7,17,.6), 0 0 46px rgba(69,202,234,.3); }
+}
+
+.mila-guide__caption {
+  position: fixed;
+  right: 18px;
+  bottom: 106px;
+  max-width: 300px;
+  max-height: 132px;
+  overflow: hidden;
+  z-index: 60;
+  pointer-events: none;
+  background: rgba(15, 12, 22, .92);
+  color: #f4f0ff;
+  border: 1px solid rgba(126,229,251,.24);
+  border-radius: 16px;
+  padding: 11px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 14px 38px rgba(0,7,17,.42);
+  animation: milaCaptionIn .26s ease;
+}
+.mila-guide[data-state="listening"] .mila-guide__caption { border-color: rgba(106,220,245,.42); }
+.mila-guide[data-state="speaking"] .mila-guide__caption { border-color: rgba(255,123,144,.42); }
+@keyframes milaCaptionIn {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: none; }
+}
+
 .mila-guide__nudge {
   position: absolute;
   right: 90px;

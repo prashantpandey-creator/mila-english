@@ -23,6 +23,10 @@ assert.strictEqual(gotoRoute('take me home'), '/dashboard');
 assert.strictEqual(gotoRoute('open pronunciation'), '/phonetics');
 assert.strictEqual(gotoRoute('open listening'), '/listen');
 
+// The practice room.
+assert.strictEqual(gotoRoute('open speaking practice'), '/practice');
+assert.strictEqual(gotoRoute('открой практику'), '/practice');
+
 // Navigation — RU.
 assert.strictEqual(gotoRoute('открой уроки'), '/lessons');
 assert.strictEqual(gotoRoute('Покажи словарь'), '/vocabulary');
