@@ -172,7 +172,7 @@ export default function DashboardPage() {
             {icon:'progress' as MilaIconName,label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',tone:C.mercury},
             {icon:'badges' as MilaIconName,label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements',tone:C.jupiter},
             {icon:'phonetics' as MilaIconName,label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics',tone:C.voice},
-            {icon:'voice' as MilaIconName,label:lang==='ru'?'Голосовая':'Voice lounge',sub:lang==='ru'?'Свободный разговор':'Open conversation',href:'/darshan',tone:C.voice},
+            {icon:'voice' as MilaIconName,label:lang==='ru'?'Практика':'Speaking practice',sub:lang==='ru'?'Голосом, по уроку':'By voice, lesson-focused',href:'/practice',tone:C.voice},
           ].map((l,i)=>(
             <Card key={i} onClick={()=>router.push(l.href)} padding="14px" style={{ display:'flex', alignItems:'center', gap:12 }}>
               <IconTile size={40}><span style={{display:'grid',color:l.tone}}><MilaIcon name={l.icon} size={20}/></span></IconTile>

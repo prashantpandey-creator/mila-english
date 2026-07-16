@@ -13,6 +13,7 @@ import { streamVoiceReply } from '@/lib/voiceChatStream'
 import { parseVoiceCommand } from '@/lib/voiceCommands'
 import { endpointSilenceMs, pickBackchannel } from '@/lib/voiceTurn'
 import { toSpokenText } from '@/lib/spokenText'
+import { ensureGuestSession } from '@/lib/guestSession'
 
 type GuideContext = {
   authenticated: boolean
@@ -64,6 +65,7 @@ export default function MilaGuide() {
   const guidePartialRef = useRef<string | null>(null)
   const backchannelIdxRef = useRef<number | null>(null)
   const turnSeedRef = useRef(0)
+  const guestTriedRef = useRef(false)
 
   const {
     messages,
@@ -182,6 +184,26 @@ export default function MilaGuide() {
     } catch { /* storage unavailable */ }
     return () => window.removeEventListener('mila-voice-mode', onVoiceMode)
   }, [])
+
+  // Voice mode armed while logged out: never sit silent behind the auth gate —
+  // seat a guest session, refresh the guide context, and the loop below starts.
+  useEffect(() => {
+    if (!voiceMode) {
+      guestTriedRef.current = false
+      return
+    }
+    if (isVoiceRoom || !context || context.authenticated || guestTriedRef.current) return
+    guestTriedRef.current = true
+    let cancelled = false
+    void ensureGuestSession().then(async (seated) => {
+      if (!seated || cancelled) return
+      const fresh = await fetch('/api/guide/context')
+        .then((response) => (response.ok ? response.json() : null))
+        .catch(() => null)
+      if (!cancelled && fresh) setContext(fresh)
+    })
+    return () => { cancelled = true }
+  }, [voiceMode, isVoiceRoom, context])
 
   useEffect(() => {
     if (!voiceMode || isVoiceRoom || !context?.authenticated) return
@@ -394,7 +416,7 @@ export default function MilaGuide() {
         : (lang === 'ru' ? 'Готова помочь' : 'Ready to help')
 
   return (
-    <aside className={`mila-guide ${pathname === '/' ? 'is-home' : ''} ${open ? 'is-open' : ''}`} data-state={agentState} aria-label={lang === 'ru' ? 'Помощница Мила' : 'Mila assistant'}>
+    <aside className={`mila-guide ${pathname === '/' ? 'is-home' : ''} ${open ? 'is-open' : ''}`} data-state={agentState} data-voice={voiceMode ? '1' : '0'} aria-label={lang === 'ru' ? 'Помощница Мила' : 'Mila assistant'}>
       {open && (
         <section className="mila-guide__panel" role="dialog" aria-modal="false" aria-label={lang === 'ru' ? 'Чат с Милой' : 'Chat with Mila'}>
           <header className="mila-guide__header">
@@ -513,17 +535,7 @@ export default function MilaGuide() {
       {/* Voice-mode caption — what she heard and what she is saying, floating
           above the mascot while the panel stays closed. */}
       {voiceMode && !open && voiceCaption && (
-        <div
-          aria-live="polite"
-          style={{
-            position: 'fixed', right: 18, bottom: 96, maxWidth: 300, zIndex: 60,
-            background: 'rgba(22, 17, 30, 0.92)', color: '#fff', borderRadius: 14,
-            padding: '10px 14px', fontSize: 13, lineHeight: 1.45, pointerEvents: 'none',
-            maxHeight: 130, overflow: 'hidden',
-          }}
-        >
-          {voiceCaption}
-        </div>
+        <div className="mila-guide__caption" aria-live="polite">{voiceCaption}</div>
       )}
 
       <button

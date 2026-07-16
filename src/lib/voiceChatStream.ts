@@ -40,6 +40,8 @@ export type VoiceReplyRequest = {
   text: string;
   lang: 'ru' | 'en';
   pathname?: string;
+  /** 'voice' (default) for open conversation, 'practice' for focused lesson drills. */
+  surface?: 'voice' | 'practice';
   speculative?: boolean;
   signal?: AbortSignal;
   onDelta?: (fullText: string) => void;
@@ -58,7 +60,7 @@ export async function streamVoiceReply(request: VoiceReplyRequest): Promise<Voic
       context: {
         pathname: request.pathname ?? '/darshan',
         lang: request.lang,
-        surface: 'voice',
+        surface: request.surface ?? 'voice',
         speculative: request.speculative === true,
       },
     }),

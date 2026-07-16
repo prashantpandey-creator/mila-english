@@ -192,12 +192,19 @@ export async function POST(request: NextRequest) {
     ? 'guide'
     : payload?.context?.surface === 'voice'
       ? 'voice'
-      : 'chat';
+      : payload?.context?.surface === 'practice'
+        ? 'practice'
+        : 'chat';
+  // Practice is voice-grade end to end: fast spoken model, short replies,
+  // sentence-streamed fail-closed guard.
+  const spoken = surfaceKind === 'voice' || surfaceKind === 'practice';
   const surface = surfaceKind === 'guide'
     ? 'floating guide'
     : surfaceKind === 'voice'
       ? 'Darshan voice conversation'
-      : 'full tutor chat';
+      : surfaceKind === 'practice'
+        ? 'focused speaking practice'
+        : 'full tutor chat';
   const turnContext = { pathname, locale, surface };
   // Speculative voice drafts run against partial transcripts: they must never
   // persist a turn or execute a memory command heard mid-sentence.
@@ -249,7 +256,7 @@ export async function POST(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
       take: 3,
     }),
-    listCompanionMessages(userId, surfaceKind === 'voice' ? 4 : 18),
+    listCompanionMessages(userId, spoken ? 4 : 18),
     listCompanionMemories(userId),
   ]);
 
@@ -272,13 +279,13 @@ export async function POST(request: NextRequest) {
     surface,
     learnerSummary,
     recentSummary,
-    memories: (surfaceKind === 'voice' ? memories.slice(-6) : memories)
-      .map((memory) => safeContextValue(memory.content, '', surfaceKind === 'voice' ? 160 : 300))
+    memories: (spoken ? memories.slice(-6) : memories)
+      .map((memory) => safeContextValue(memory.content, '', spoken ? 160 : 300))
       .filter(Boolean),
     learningContext,
   });
 
-  const choice = await chooseModel(surfaceKind);
+  const choice = await chooseModel(surfaceKind === 'practice' ? 'voice' : surfaceKind);
   if (!choice) {
     const reply = builtInCompanionReply(latestUserMessage, pathname, locale, profile?.level);
     await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
@@ -290,7 +297,7 @@ export async function POST(request: NextRequest) {
       .filter((message): message is typeof message & { role: 'user' | 'assistant' } => message.role === 'user' || message.role === 'assistant')
       .map((message) => ({
         role: message.role,
-        content: surfaceKind === 'voice' ? message.content.slice(0, 600) : message.content,
+        content: spoken ? message.content.slice(0, 600) : message.content,
       })),
     { role: 'user', content: latestUserMessage },
   ];
@@ -299,11 +306,11 @@ export async function POST(request: NextRequest) {
     model: choice.model,
     messages,
     system,
-    maxTokens: surfaceKind === 'voice' ? 50 : 320,
-    temperature: surfaceKind === 'voice' ? 0.25 : 0.35,
+    maxTokens: spoken ? (surfaceKind === 'practice' ? 60 : 50) : 320,
+    temperature: spoken ? 0.25 : 0.35,
     maxRetries: choice.provider === 'ollama' ? 0 : 1,
     abortSignal: request.signal,
-    onFinish: surfaceKind === 'voice' ? undefined : async ({ text }) => {
+    onFinish: spoken ? undefined : async ({ text }) => {
       if (!text.trim()) return;
       try {
         await saveCompanionTurn(userId, latestUserMessage, text, turnContext);
@@ -313,7 +320,7 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  if (surfaceKind === 'voice') {
+  if (spoken) {
     // Sentence-streamed fail-closed guard. Every evidence pattern in
     // voiceReplyHasUnsupportedEvidence is sentence-local ([^.!?] windows), so
     // checking sentence-by-sentence detects exactly what the whole-reply check
