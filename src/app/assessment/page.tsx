@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import ReliableAssessment from '@/components/ReliableAssessment';
 import LocalVoiceAssessment from '@/components/LocalVoiceAssessment';
+import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
+import MilaIcon from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import type { AssessmentResult } from '@/lib/assessment';
@@ -201,14 +203,14 @@ export default function AssessmentVoice() {
     : C.mercury;
 
   return (
-    <div style={{minHeight:'100vh',background:'transparent',fontFamily:"'Manrope','Inter',sans-serif",display:'flex',flexDirection:'column'}}>
-      <div style={{background:C.navBg,backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',padding:'12px 20px',
-        borderBottom:'1px solid rgba(36,211,154,0.18)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
-        <LangToggle/>
-      </div>
+    <AppShell className="assessment-page">
+      <AppHeader
+        title={lang==='ru' ? 'Проверка уровня' : 'Level assessment'}
+        eyebrow={lang==='ru' ? 'Голос и навыки' : 'Voice & skills'}
+        actions={<LangToggle/>}
+      />
 
-      <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'32px 24px',textAlign:'center',maxWidth:610,margin:'0 auto',width:'100%'}}>
+      <AppMain width="work" centered className="assessment-page__main">
         {mode === 'local-voice' ? (
           <LocalVoiceAssessment
             key="local-voice-assessment"
@@ -229,37 +231,36 @@ export default function AssessmentVoice() {
           />
         ) : (
         <>
-        <div style={{fontSize:'0.72rem',fontWeight:700,letterSpacing:'0.24em',textTransform:'uppercase',color:C.jupiter,marginBottom:14}}>
+        <div className="focus-kicker">
           {lang==='ru'?'Проверка уровня':'Level assessment'}
         </div>
-        <h1 style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'2rem',color:C.dark,margin:'0 0 8px',lineHeight:1.1}}>
+        <h1 className="focus-title">
           {lang==='ru'?'Узнай свой уровень':'Find your level'}
         </h1>
-        <p style={{color:C.warm,fontSize:'0.95rem',lineHeight:1.6,margin:'0 0 34px',maxWidth:400}}>
+        <p className="focus-copy">
           {lang==='ru'
             ? 'Основная голосовая проверка отправляет запись только на сервер Mila и рассчитана на работу в России без VPN.'
             : 'The primary voice check sends audio only to Mila and is designed to work in Russia without a VPN.'}
         </p>
 
         {mode === 'choice' && (
-          <div style={{width:'100%',display:'grid',gap:11,marginBottom:24}}>
+          <div className="assessment-page__choices">
             <button type="button" onClick={beginLocalVoice}
-              style={{width:'100%',padding:'15px 18px',borderRadius:13,border:'none',cursor:'pointer',
-                background:`linear-gradient(135deg,${C.voice},${C.voiceBright})`,color:'#021418',fontWeight:800,fontSize:'0.98rem',
-                boxShadow:'0 7px 24px rgba(106,220,245,.24)'}}>
-              🎙️ {lang==='ru'?'Голосовая проверка · 3–5 минут':'Voice level check · 3–5 minutes'}
-              <span style={{display:'block',fontSize:'0.73rem',fontWeight:600,opacity:.72,marginTop:3}}>
+              className="focus-button focus-button--voice">
+              <MilaIcon name="voice" size={19}/>
+              {lang==='ru'?'Голосовая проверка · 3–5 минут':'Voice level check · 3–5 minutes'}
+              <span>
                 {lang==='ru'?'Только сервер Mila · без VPN':'Mila server only · no VPN'}
               </span>
             </button>
             <button type="button" onClick={beginReliable}
-              style={{width:'100%',padding:'12px 18px',borderRadius:13,cursor:'pointer',fontWeight:700,fontSize:'0.9rem',border:'1px solid rgba(255,255,255,.16)',background:'rgba(255,255,255,.05)',color:C.dark}}>
+              className="focus-button focus-button--quiet">
               {lang==='ru'?'Тест без микрофона · 5–7 минут':'No-microphone test · 5–7 minutes'}
             </button>
             <button type="button" onClick={start}
-              style={{width:'100%',padding:'12px 18px',borderRadius:13,cursor:'pointer',fontWeight:700,fontSize:'0.9rem',
-                border:'1px solid rgba(255,255,255,.16)',background:'rgba(255,255,255,.05)',color:C.dark}}>
-              ✨ {lang==='ru'?'Живое AI-собеседование (где доступно)':'Live AI interview (where supported)'}
+              className="focus-button focus-button--quiet">
+              <MilaIcon name="sparkle" size={18}/>
+              {lang==='ru'?'Живое AI-собеседование (где доступно)':'Live AI interview (where supported)'}
             </button>
           </div>
         )}
@@ -267,33 +268,30 @@ export default function AssessmentVoice() {
         {/* The orb — tap to begin, then it breathes with the conversation */}
         {mode === 'voice' && <button onClick={start} disabled={live || phase==='connecting' || phase==='finalizing'}
           aria-label={lang==='ru'?'Начать':'Begin'}
-          style={{width:132,height:132,borderRadius:'50%',border:`1px solid ${orbColor}`,
-            cursor:(phase==='idle'||phase==='error')?'pointer':'default',position:'relative',
-            background:`radial-gradient(circle at 50% 40%, ${orbColor}, rgba(0,0,0,0.08) 72%)`,
-            boxShadow:`0 0 60px ${orbColor}`,
-            transition:'all 0.5s ease',
-            animation: live ? 'pulse 2.4s ease-in-out infinite' : 'none'}}>
-          <span style={{fontSize:'2.4rem'}}>{phase==='finalizing'?'✨':phase==='speaking'?'🌸':'🎙️'}</span>
+          className={`assessment-page__orb ${live ? 'is-live' : ''}`}
+          style={{'--assessment-orb':orbColor,cursor:(phase==='idle'||phase==='error')?'pointer':'default'} as any}>
+          <MilaIcon
+            name={phase==='finalizing'?'sparkle':phase==='speaking'?'conversation':'voice'}
+            size={38}
+          />
         </button>}
 
-        {mode === 'voice' && <div style={{marginTop:22,fontSize:'0.9rem',fontWeight:700,
+        {mode === 'voice' && <div className="assessment-page__status" style={{
           color: phase==='speaking'||phase==='listening'?C.voice:phase==='thinking'||phase==='connecting'?C.mercury:phase==='finalizing'?C.jupiter:phase==='error'?C.rose:C.warm,
-          minHeight:22}}>
+        }}>
           {statusText}
         </div>}
 
         {/* Live captions — examiner's question + your answer */}
         {mode === 'voice' && (examinerText || youText) && (
-          <div style={{marginTop:22,width:'100%',display:'flex',flexDirection:'column',gap:10}}>
+          <div className="assessment-page__captions" aria-live="polite">
             {examinerText && (
-              <div style={{background:C.voiceL,border:'1px solid rgba(106,220,245,0.24)',borderRadius:14,padding:'12px 16px',
-                fontSize:'0.92rem',color:C.dark,textAlign:'left',lineHeight:1.5}}>
+              <div className="assessment-page__caption is-mila">
                 <span style={{color:C.voice,fontWeight:700}}>Mila · </span>{examinerText}
               </div>
             )}
             {youText && (
-              <div style={{background:C.mercuryL,border:'1px solid rgba(36,211,154,0.22)',borderRadius:14,padding:'12px 16px',
-                fontSize:'0.92rem',color:C.warm,textAlign:'left',lineHeight:1.5}}>
+              <div className="assessment-page__caption is-you">
                 <span style={{color:C.mercury,fontWeight:700}}>{lang==='ru'?'Ты · ':'You · '}</span>{youText}
               </div>
             )}
@@ -301,25 +299,26 @@ export default function AssessmentVoice() {
         )}
 
         {mode === 'voice' && phase==='error' && (
-          <div style={{marginTop:20,background:C.roseL,color:C.rose,borderRadius:12,padding:'12px 16px',fontSize:'0.88rem',maxWidth:400}}>
+          <div className="assessment-page__error" role="alert">
             {errMsg}
-            <button onClick={start} style={{display:'block',margin:'10px auto 0',padding:'8px 18px',borderRadius:10,border:'none',background:C.mercury,color:'#02140f',fontWeight:700,cursor:'pointer'}}>
+            <button onClick={start} className="focus-button focus-button--mercury">
               {lang==='ru'?'Попробовать снова':'Try again'}
             </button>
-            <button onClick={beginReliable} style={{display:'block',margin:'8px auto 0',padding:'8px 18px',borderRadius:10,border:`1px solid ${C.mercury}`,background:C.mercuryL,color:C.mercury,fontWeight:700,cursor:'pointer'}}>
+            <button onClick={beginReliable} className="focus-button focus-button--quiet">
               {lang==='ru'?'Пройти надёжный тест':'Use reliable test'}
             </button>
           </div>
         )}
 
         {mode === 'voice' && phase==='idle' && (
-          <div style={{marginTop:26,fontSize:'0.78rem',color:'#8b8373'}}>
-            🎧 {lang==='ru'?'Нужен микрофон и современный браузер':'Needs a microphone and a modern browser'}
+          <div className="assessment-page__hint">
+            <MilaIcon name="listening" size={15}/>
+            <span>{lang==='ru'?'Нужен микрофон и современный браузер':'Needs a microphone and a modern browser'}</span>
           </div>
         )}
         </>
         )}
-      </div>
-    </div>
+      </AppMain>
+    </AppShell>
   );
 }

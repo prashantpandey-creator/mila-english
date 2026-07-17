@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { C } from '@/lib/theme';
 import { ttsSpeak } from '@/lib/tts';
+import MilaIcon from '@/components/ui/MilaIcon';
 
 export default function AudioPlayer({ word = 'pronunciation' }: { word?: string }) {
   const [playing, setPlaying] = useState(false);
@@ -21,7 +22,7 @@ export default function AudioPlayer({ word = 'pronunciation' }: { word?: string 
       style={{display:'flex',alignItems:'center',gap:10,padding:'12px 20px',borderRadius:14,
         border:`1px solid ${C.voice}`,background:playing ? C.voice : C.voiceL,color:playing?'#021418':C.voice,fontWeight:600,
         cursor:playing?'default':'pointer',marginTop:16,transition:'background 0.2s'}}>
-      🔊 {playing ? 'Playing…' : `Listen: ${word}`}
+      <MilaIcon name="volume" size={17}/>{playing ? 'Playing…' : `Listen: ${word}`}
     </button>
   );
 }

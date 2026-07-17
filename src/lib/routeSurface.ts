@@ -6,6 +6,7 @@ const FOCUS_ROUTES = [
   '/vocabulary',
   '/grammar',
   '/phonetics',
+  '/practice',
   '/chat',
   '/darshan',
 ];

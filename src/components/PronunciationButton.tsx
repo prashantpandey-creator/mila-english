@@ -22,7 +22,7 @@ export default function PronunciationButton({ word, size = 52 }: { word: string;
       <div style={{fontWeight:600,fontSize:'1rem',color:C.dark,marginBottom:6}}>{word}</div>
       <button onClick={speak} disabled={playing} aria-label={`Listen to ${word}`}
         style={{cursor:playing?'default':'pointer',width:size,height:size,borderRadius:'50%',
-          border:`1px solid ${playing?C.voice:'rgba(106,220,245,.2)'}`,color:C.voice,
+          border:`1px solid ${playing?C.voice:'rgba(106,220,245,.2)'}`,color:'var(--voice-readable,var(--voice))',
           background:playing?C.voiceL:'rgba(106,220,245,.045)',
           display:'grid',placeItems:'center',margin:'0 auto',padding:0,
           transition:'background 0.2s,border-color .2s,color .2s,box-shadow .2s',opacity:playing?0.78:1,

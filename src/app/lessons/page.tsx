@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import CategoryFilter from '@/components/CategoryFilter';
 import LessonList from '@/components/LessonList';
 import GenerateLessonButton from '@/components/GenerateLessonButton';
+import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import { COURSE_LESSON_IDS, getBuiltinLesson } from '@/lib/builtinLessons';
@@ -73,24 +74,23 @@ export default function LessonsPage() {
   });
 
   return (
-    <div className="welcome-page" style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      <div className="welcome-toolbar" style={{background:C.navBg,backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:`1px solid ${C.line}`,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',color:C.dark,letterSpacing:'-0.03em'}}>Mila</span>
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
+    <AppShell className="welcome-page lessons-page">
+      <AppHeader
+        className="lessons-page__header"
+        title={t('lessons_title')}
+        actions={<>
           <LangToggle />
           <ThemeToggle />
-        </div>
-      </div>
+        </>}
+      />
 
-      <div style={{maxWidth:600,margin:'0 auto',padding:'24px 20px'}}>
-        <h1 style={{fontSize:'1.5rem',fontWeight:800,color:C.dark,margin:0}}>{t('lessons_title')}</h1>
+      <AppMain width="work" className="lessons-page__main">
         <p style={{color:C.warm,margin:'4px 0 20px'}}>{t('lessons_subtitle')}</p>
 
         <GenerateLessonButton />
         <CategoryFilter categories={cats} active={activeCat} onChange={setActiveCat}/>
         <LessonList lessons={activeCat===0 ? [...filtered, ...dbLessons] : filtered} onSelect={(id)=>router.push(`/lessons/${id}`)}/>
-      </div>
-    </div>
+      </AppMain>
+    </AppShell>
   );
 }

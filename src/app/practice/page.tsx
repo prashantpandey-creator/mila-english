@@ -234,61 +234,320 @@ function PracticeRoom() {
   const lessonTitle = lesson ? (lang === "ru" ? lesson.titleRu : lesson.titleEn) : "";
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-black">
-      <MilaVoid phase={phase} />
+    <main className="practice-room" data-phase={phase}>
+      <MilaVoid phase={phase} className="practice-room__void" />
+      <div className="practice-room__veil" aria-hidden="true" />
 
-      <button
-        onClick={exit}
-        aria-label={lang === "ru" ? "Выйти из практики" : "Leave practice"}
-        className="absolute z-30 rounded-full p-2.5 text-[#fbcfe8] hover:text-white transition-colors"
-        style={{ top: "max(1.1rem, env(safe-area-inset-top, 0px))", right: "max(1.1rem, env(safe-area-inset-right, 0px))" }}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-        </svg>
-      </button>
+      <header className="practice-header">
+        <span className="practice-header__spacer" aria-hidden="true" />
+        <div className="practice-header__copy">
+          <p className="practice-header__eyebrow">
+            {lang === "ru" ? "Разговорная практика" : "Speaking practice"}
+          </p>
+          {lessonTitle && <p className="practice-header__title">{lessonTitle}</p>}
+        </div>
+        <button
+          type="button"
+          onClick={exit}
+          aria-label={lang === "ru" ? "Выйти из практики" : "Leave practice"}
+          className="practice-header__exit"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </header>
 
-      <div className="absolute top-0 left-0 right-0 z-20 pt-5 text-center" style={{ paddingTop: "max(1.2rem, env(safe-area-inset-top, 0px))" }}>
-        <p className="text-[11px] uppercase tracking-[0.18em] text-pink-200/60 m-0">
-          {lang === "ru" ? "Разговорная практика" : "Speaking practice"}
-        </p>
-        {lessonTitle && <p className="text-sm text-pink-100/80 mt-1 m-0">{lessonTitle}</p>}
-      </div>
+      <section className="practice-orb" aria-label={lang === "ru" ? "Голосовая практика с Милой" : "Voice practice with Mila"}>
+        <button
+          type="button"
+          onClick={begin}
+          aria-label={running ? (lang === "ru" ? "Прервать" : "Interrupt") : (lang === "ru" ? "Начать практику" : "Begin practice")}
+          className="practice-orb__button"
+        >
+          <MilaBindu state={phase} size={300} className="practice-orb__visual" />
+        </button>
+      </section>
 
-      <button
-        type="button"
-        onClick={begin}
-        aria-label={running ? (lang === "ru" ? "Прервать" : "Interrupt") : (lang === "ru" ? "Начать практику" : "Begin practice")}
-        className="absolute left-1/2 z-10 outline-none"
-        style={{ top: "44%", transform: "translate(-50%, -50%)", background: "transparent", border: "none", cursor: "pointer" }}
-      >
-        <MilaBindu state={phase} size={300} />
-      </button>
-
-      <div className="absolute left-1/2 z-20 w-[88%] max-w-md -translate-x-1/2 text-center" style={{ top: "68%" }} aria-live="polite">
-        {taskText && phase !== "listening" && (
-          <p className="text-pink-50 text-base leading-relaxed m-0">{taskText}</p>
-        )}
-        {heardText && phase === "listening" && (
-          <p className="text-pink-200/85 text-sm leading-relaxed m-0">{heardText}</p>
-        )}
-      </div>
-
-      <div className="absolute bottom-[7%] left-1/2 z-20 w-[90%] max-w-md -translate-x-1/2 text-center" aria-live="polite">
-        <p className="text-[11px] tracking-[0.1em] uppercase m-0">
+      <footer className="practice-live" aria-live="polite">
+        {(taskText && phase !== "listening") || (heardText && phase === "listening") ? (
+          <p className="practice-live__caption">
+            {phase === "listening" ? heardText : taskText}
+          </p>
+        ) : null}
+        <p className="practice-live__status">
           {!running ? (
-            <span className="text-pink-200/60">{lang === "ru" ? "Коснись сферы, чтобы начать" : "Touch the orb to begin"}</span>
+            <span>{lang === "ru" ? "Коснись сферы, чтобы начать" : "Touch the orb to begin"}</span>
           ) : phase === "listening" ? (
-            <span className="text-pink-400">● {lang === "ru" ? "Говори" : "Your turn"}</span>
+            <span className="practice-live__status--listening"><i aria-hidden />{lang === "ru" ? "Говори" : "Your turn"}</span>
           ) : phase === "thinking" ? (
-            <span className="text-purple-400">{lang === "ru" ? "Мила думает…" : "Mila is thinking…"}</span>
+            <span className="practice-live__status--thinking">{lang === "ru" ? "Мила думает…" : "Mila is thinking…"}</span>
           ) : (
-            <span className="text-pink-300">{lang === "ru" ? "Слушай задание" : "Listen to the task"}</span>
+            <span className="practice-live__status--speaking">{lang === "ru" ? "Слушай задание" : "Listen to the task"}</span>
           )}
         </p>
-        {error && <p className="text-xs text-rose-200 mt-2" role="alert">{error}</p>}
-      </div>
-    </div>
+        {error && <p className="practice-live__error" role="alert">{error}</p>}
+      </footer>
+
+      <style jsx>{`
+        .practice-room {
+          position: fixed;
+          inset: 0;
+          isolation: isolate;
+          display: grid;
+          grid-template-rows: auto minmax(0, 1fr) auto;
+          gap: clamp(0.5rem, 2dvh, 1.25rem);
+          width: 100%;
+          height: 100dvh;
+          min-height: 100dvh;
+          box-sizing: border-box;
+          overflow-x: hidden;
+          overflow-y: auto;
+          padding:
+            max(0.75rem, env(safe-area-inset-top, 0px))
+            max(0.75rem, env(safe-area-inset-right, 0px))
+            max(0.75rem, env(safe-area-inset-bottom, 0px))
+            max(0.75rem, env(safe-area-inset-left, 0px));
+          color: var(--surface-text, #f7f8f5);
+          background: var(--surface-page, #020604);
+        }
+
+        .practice-room__veil {
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          pointer-events: none;
+          background:
+            radial-gradient(circle at 50% 48%, rgba(242, 139, 173, 0.08), transparent 38%),
+            linear-gradient(180deg, rgba(2, 6, 4, 0.18), rgba(2, 6, 4, 0.68));
+        }
+
+        .practice-header {
+          position: relative;
+          z-index: 2;
+          display: grid;
+          grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+          align-items: start;
+          width: min(100%, 42rem);
+          margin-inline: auto;
+        }
+
+        .practice-header__copy {
+          min-width: 0;
+          padding-top: 0.4rem;
+          text-align: center;
+        }
+
+        .practice-header__eyebrow,
+        .practice-header__title,
+        .practice-live__caption,
+        .practice-live__status,
+        .practice-live__error {
+          margin: 0;
+        }
+
+        .practice-header__eyebrow {
+          color: var(--surface-text, #f7f8f5);
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.16em;
+          line-height: 1.35;
+          text-transform: uppercase;
+          text-shadow: 0 1px 16px #020604;
+        }
+
+        .practice-header__title {
+          margin-top: 0.3rem;
+          overflow: hidden;
+          color: var(--surface-muted, #bdb1b8);
+          font-size: clamp(0.84rem, 2.8vw, 1rem);
+          font-weight: 500;
+          line-height: 1.35;
+          text-overflow: ellipsis;
+          text-shadow: 0 1px 16px #020604;
+          white-space: nowrap;
+        }
+
+        .practice-header__exit {
+          display: grid;
+          place-items: center;
+          width: 2.75rem;
+          height: 2.75rem;
+          margin: 0;
+          padding: 0;
+          border: 1px solid rgba(255, 255, 255, 0.24);
+          border-radius: 999px;
+          color: var(--surface-text, #f7f8f5);
+          background: var(--surface-card, #07100c);
+          cursor: pointer;
+          transition: border-color 160ms ease, background 160ms ease;
+        }
+
+        .practice-header__exit:hover {
+          border-color: rgba(255, 255, 255, 0.52);
+          background: var(--surface-raised, #0c1812);
+        }
+
+        .practice-header__exit:focus-visible,
+        .practice-orb__button:focus-visible {
+          outline: 3px solid var(--voice, #6adcf5);
+          outline-offset: 4px;
+        }
+
+        .practice-orb {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          min-width: 0;
+          min-height: 0;
+          place-items: center;
+        }
+
+        .practice-orb__button {
+          display: grid;
+          place-items: center;
+          margin: 0;
+          padding: 0;
+          border: 0;
+          border-radius: 999px;
+          background: transparent;
+          cursor: pointer;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .practice-live {
+          position: relative;
+          z-index: 2;
+          display: grid;
+          gap: 0.55rem;
+          width: min(100%, 34rem);
+          min-height: 3.25rem;
+          margin-inline: auto;
+          padding: 0.8rem clamp(1rem, 4vw, 1.4rem);
+          box-sizing: border-box;
+          border: 1px solid var(--surface-line, rgba(154,242,211,.14));
+          border-radius: 1rem;
+          color: var(--surface-text, #f7f8f5);
+          background: var(--surface-card, #07100c);
+          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
+          text-align: center;
+        }
+
+        .practice-live__caption {
+          color: var(--surface-text, #f7f8f5);
+          font-size: clamp(0.9rem, 3vw, 1rem);
+          font-weight: 500;
+          line-height: 1.48;
+          overflow-wrap: anywhere;
+        }
+
+        .practice-live__status {
+          color: var(--surface-muted, #bdb1b8);
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          line-height: 1.35;
+          text-transform: uppercase;
+        }
+
+        .practice-live__status--listening {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          color: var(--voice-bright, #b7f2ff);
+        }
+
+        .practice-live__status--listening i {
+          width: 0.45rem;
+          height: 0.45rem;
+          border-radius: 50%;
+          background: var(--voice, #6adcf5);
+          box-shadow: 0 0 0 0.28rem rgba(106,220,245,.12);
+        }
+
+        .practice-live__status--thinking {
+          color: var(--mercury-bright, #9af2d3);
+        }
+
+        .practice-live__status--speaking {
+          color: var(--mercury-bright, #9af2d3);
+        }
+
+        .practice-live__error {
+          color: var(--danger, #ff6b6b);
+          font-size: 0.8rem;
+          font-weight: 600;
+          line-height: 1.4;
+        }
+
+        :global(.practice-room__void) {
+          z-index: -2;
+          background: var(--surface-page, #020604);
+        }
+
+        :global(.practice-orb__visual) {
+          width: clamp(8rem, 42vmin, 18.75rem) !important;
+          height: clamp(8rem, 42vmin, 18.75rem) !important;
+          max-width: calc(100vw - 2rem);
+          max-height: 100%;
+        }
+
+        @media (max-height: 560px) and (orientation: landscape) {
+          .practice-room {
+            grid-template-columns: minmax(9rem, 0.7fr) minmax(12rem, 1fr);
+            grid-template-rows: auto minmax(0, 1fr);
+            column-gap: clamp(0.75rem, 3vw, 2rem);
+            row-gap: 0.35rem;
+            padding-block:
+              max(0.45rem, env(safe-area-inset-top, 0px))
+              max(0.45rem, env(safe-area-inset-bottom, 0px));
+          }
+
+          .practice-header {
+            grid-column: 1 / -1;
+          }
+
+          .practice-orb {
+            grid-column: 1;
+            grid-row: 2;
+          }
+
+          .practice-live {
+            align-self: center;
+            grid-column: 2;
+            grid-row: 2;
+            max-height: 100%;
+            overflow-y: auto;
+          }
+
+          :global(.practice-orb__visual) {
+            width: min(35dvh, 11rem) !important;
+            height: min(35dvh, 11rem) !important;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .practice-room {
+            gap: 0.45rem;
+          }
+
+          .practice-header__eyebrow {
+            font-size: 0.66rem;
+            letter-spacing: 0.12em;
+          }
+
+          .practice-live {
+            padding: 0.7rem 0.8rem;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .practice-header__exit {
+            transition: none;
+          }
+        }
+      `}</style>
+    </main>
   );
 }
 

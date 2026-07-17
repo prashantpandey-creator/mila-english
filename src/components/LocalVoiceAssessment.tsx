@@ -7,6 +7,7 @@ import { scoreLocalVoicePlacement, type VoicePromptId, type VoiceTranscriptSampl
 import { ttsSpeak } from '@/lib/tts'
 import type { AssessmentResult } from '@/lib/assessment'
 import { C } from '@/lib/theme'
+import MilaIcon from '@/components/ui/MilaIcon'
 
 type CalibrationPrompt = {
   id: 'calibration'
@@ -177,7 +178,7 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
       <span>{index+1} / {PROMPTS.length}</span>
     </div>
     <div style={{height:5,borderRadius:5,background:'rgba(255,255,255,.09)',overflow:'hidden',marginBottom:24}}><div style={{height:'100%',width:`${((index+1)/PROMPTS.length)*100}%`,background:`linear-gradient(90deg,${C.mercury},${C.mercuryBright})`}}/></div>
-    <div style={{background:'rgba(255,255,255,.055)',border:'1px solid rgba(255,255,255,.12)',borderRadius:18,padding:'24px 20px'}}>
+    <div className="focus-card" style={{padding:'24px 20px'}}>
       <div style={{fontSize:'0.72rem',fontWeight:800,color:C.jupiter,letterSpacing:1.2,textTransform:'uppercase'}}>
         {prompt.kind === 'read'
           ? (lang==='ru'?'Калибровка произношения':'Pronunciation calibration')
@@ -187,10 +188,10 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
       <p style={{fontSize:'0.84rem',color:C.warm,margin:'0 0 16px'}}>
         {lang==='ru' ? prompt.ru : prompt.kind === 'read' ? 'Read this sentence aloud. It is used only as a pronunciation baseline.' : 'Speak naturally for about 15–20 seconds. Mila will show what it heard.'}
       </p>
-      {prompt.kind === 'read' && <button onClick={()=>ttsSpeak(prompt.en,'en-GB',.8)} disabled={phase==='recording'||phase==='scoring'} style={{width:'100%',padding:11,borderRadius:11,border:`1px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer'}}>🔊 {lang==='ru'?'Послушать':'Listen'}</button>}
+      {prompt.kind === 'read' && <button onClick={()=>ttsSpeak(prompt.en,'en-GB',.8)} disabled={phase==='recording'||phase==='scoring'} style={{width:'100%',padding:11,borderRadius:11,border:`1px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}><MilaIcon name="volume" size={17}/>{lang==='ru'?'Послушать':'Listen'}</button>}
       {pronunciation && <div style={{marginTop:14,padding:14,borderRadius:12,background:C.jupiterL,color:C.dark}}>
         <strong style={{color:C.jupiter}}>{lang==='ru'?'Произношение':'Pronunciation'}: {pronunciation.score}/100</strong>
-        <div style={{fontSize:'0.83rem',color:C.warm,marginTop:4}}>🌱 {pronunciation.tip}</div>
+        <div style={{fontSize:'0.83rem',color:C.warm,marginTop:4,display:'flex',alignItems:'flex-start',gap:6}}><MilaIcon name="sparkle" size={14} style={{flex:'0 0 auto',marginTop:2}}/><span>{pronunciation.tip}</span></div>
       </div>}
       {transcript && <div style={{marginTop:14,padding:14,borderRadius:12,background:C.mercuryL,color:C.dark,textAlign:'left'}}>
         <strong style={{color:C.mercury}}>{lang==='ru'?'Mila услышала':'Mila heard'}:</strong>
@@ -198,9 +199,15 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
       </div>}
       {(message||error) && <div role="alert" style={{marginTop:14,padding:12,borderRadius:11,background:C.roseL,color:C.rose,fontSize:'0.84rem'}}>{message||error}</div>}
       {phase==='scored' ? <div style={{display:'flex',gap:9,marginTop:16}}>
-        <button onClick={record} style={{flex:1,padding:13,borderRadius:12,border:`1px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer'}}>🎙️ {lang==='ru'?'Ещё раз':'Again'}</button>
+        <button onClick={record} style={{flex:1,padding:13,borderRadius:12,border:`1px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}><MilaIcon name="voice" size={17}/>{lang==='ru'?'Ещё раз':'Again'}</button>
         <button onClick={next} disabled={busy} style={{flex:2,padding:13,borderRadius:12,border:'none',background:C.mercury,color:'#02140f',fontWeight:800,cursor:'pointer'}}>{index===PROMPTS.length-1?(lang==='ru'?'Узнать уровень':'Get my level'):(lang==='ru'?'Продолжить →':'Continue →')}</button>
-      </div> : <button onClick={record} disabled={phase==='scoring'||busy} style={{width:'100%',marginTop:16,padding:14,borderRadius:12,border:`1px solid ${phase==='scoring'?C.mercury:C.voice}`,background:phase==='recording'?C.voice:phase==='scoring'?C.mercuryL:C.voiceL,color:phase==='recording'?'#021418':phase==='scoring'?C.mercury:C.voice,fontWeight:800,cursor:'pointer'}}>{phase==='recording'?'⏹ '+(lang==='ru'?'Закончить':'Stop'):phase==='scoring'?'⏳ '+(lang==='ru'?'Обрабатываю':'Processing'):'🎙️ '+(lang==='ru'?'Начать запись':'Start recording')}</button>}
+      </div> : <button onClick={record} disabled={phase==='scoring'||busy} style={{width:'100%',marginTop:16,padding:14,borderRadius:12,border:`1px solid ${phase==='scoring'?C.mercury:C.voice}`,background:phase==='recording'?C.voice:phase==='scoring'?C.mercuryL:C.voiceL,color:phase==='recording'?'#021418':phase==='scoring'?C.mercury:C.voice,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
+        {phase==='recording'
+          ? <><span style={{width:13,height:13,borderRadius:3,background:'currentColor'}} aria-hidden/>{lang==='ru'?'Закончить':'Stop'}</>
+          : phase==='scoring'
+          ? <><MilaIcon name="sparkle" size={17}/>{lang==='ru'?'Обрабатываю':'Processing'}</>
+          : <><MilaIcon name="voice" size={17}/>{lang==='ru'?'Начать запись':'Start recording'}</>}
+      </button>}
     </div>
     <p style={{fontSize:'0.75rem',lineHeight:1.5,color:'#8b8373',margin:'14px auto 0',maxWidth:450}}>{lang==='ru'?'Аудио отправляется только на сервер Mila, обрабатывается локальными моделями и удаляется сразу после запроса. Внешний AI-провайдер не используется.':'Audio goes only to Mila, is processed by local models, and is deleted immediately after the request. No external AI provider is used.'}</p>
   </div>

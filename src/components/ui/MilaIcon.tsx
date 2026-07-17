@@ -24,6 +24,7 @@ export type MilaIconName =
   | 'flower'
   | 'trophy'
   | 'lock'
+  | 'close'
   | 'target'
   | 'arrow'
 
@@ -107,6 +108,9 @@ export default function MilaIcon({
       break
     case 'lock':
       glyph = <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10" /><circle cx="12" cy="15" r="1.2" className="mila-icon__accent-fill" /><path d="M12 16.2v1.7" /></>
+      break
+    case 'close':
+      glyph = <><path d="M6 6l12 12M18 6 6 18" /><circle cx="12" cy="12" r="9" className="mila-icon__accent" /></>
       break
     case 'target':
       glyph = <><circle cx="11" cy="13" r="8" /><circle cx="11" cy="13" r="4" /><circle cx="11" cy="13" r="1.2" className="mila-icon__accent-fill" /><path className="mila-icon__accent" d="m14 10 6-6M16.5 4H20v3.5" /></>

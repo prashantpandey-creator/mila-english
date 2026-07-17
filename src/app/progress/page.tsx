@@ -6,6 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import ThemeToggle from '@/components/ThemeToggle';
 import ProgressSummary from '@/components/ProgressSummary';
 import ProgressRing from '@/components/ProgressRing';
+import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import { SOUND_INFO } from '@/lib/phrases';
@@ -33,12 +34,13 @@ export default function ProgressPage() {
   const recent = Array.isArray(data?.recentLessons) ? data.recentLessons : [];
 
   return (
-    <div className="welcome-page" style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      <div className="welcome-toolbar" style={{background:C.navBg,backdropFilter:'blur(12px)',padding:'10px 20px',borderBottom:`1px solid ${C.line}`,display:'flex',justifyContent:'space-between'}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',color:C.dark,letterSpacing:'-0.03em'}}>Mila</span><span style={{display:'flex',alignItems:'center',gap:10}}><LangToggle/><ThemeToggle/></span>
-      </div>
-      <div style={{maxWidth:500,margin:'0 auto',padding:'24px 20px'}}>
-        <h1 style={{fontSize:'1.5rem',fontWeight:800,color:C.dark,marginBottom:16}}>{t('progress_title')}</h1>
+    <AppShell className="welcome-page progress-page">
+      <AppHeader
+        className="progress-page__header"
+        title={t('progress_title')}
+        actions={<><LangToggle/><ThemeToggle/></>}
+      />
+      <AppMain width="compact" className="progress-page__main">
 
         <ProgressSummary items={stats.map(s=>({icon:s.icon,val:s.v,label:s.l,color:s.c}))}/>
 
@@ -116,7 +118,7 @@ export default function ProgressPage() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </AppMain>
+    </AppShell>
   );
 }

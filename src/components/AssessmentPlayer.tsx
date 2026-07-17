@@ -14,7 +14,7 @@ export default function AssessmentPlayer() {
   const [picked, setPicked] = useState<string | null>(null);
   const q = QUESTIONS[i];
   return (
-    <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)',marginTop:16}}>
+    <div className="focus-card" style={{padding:'20px',marginTop:16}}>
       <div style={{fontSize:'0.8rem',color:C.warm,marginBottom:8}}>Question {i+1} / {QUESTIONS.length}</div>
       <div style={{fontWeight:700,fontSize:'1rem',color:C.dark,marginBottom:14}}>{q.q}</div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>

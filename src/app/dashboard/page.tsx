@@ -10,6 +10,7 @@ import ProgressSummary from '@/components/ProgressSummary';
 import PronunciationButton from '@/components/PronunciationButton';
 import LeaderboardCard from '@/components/LeaderboardCard';
 import { Card, IconTile } from '@/components/ui/Card';
+import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import LearningJourneyCard from '@/components/LearningJourneyCard';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
@@ -46,20 +47,11 @@ export default function DashboardPage() {
   if (!m) return null;
 
   return (
-    <div className="welcome-dashboard" style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      {/* Top Bar */}
-      <div className="welcome-toolbar" style={{background:C.navBg,backdropFilter:'blur(18px)',padding:'10px 20px',
-        borderBottom:`1px solid ${C.line}`,position:'sticky',top:0,zIndex:50,
-        display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-        <div onClick={()=>router.push('/')} style={{cursor:'pointer',display:'flex',alignItems:'center',gap:9}}>
-          <div className="welcome-brand-mark" style={{width:30,height:30,borderRadius:10,border:'1px solid rgba(242,139,173,0.48)',
-            display:'flex',alignItems:'center',justifyContent:'center',
-            fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:750,fontSize:'1rem',color:C.mercuryBright,
-            background:'linear-gradient(145deg,rgba(36,211,154,.11),rgba(242,139,173,.08))',
-            boxShadow:'0 0 22px rgba(242,139,173,.08)'}}>M</div>
-          <span style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.18rem',letterSpacing:'-0.03em',color:C.dark}}>Mila</span>
-        </div>
-        <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',justifyContent:'flex-end'}}>
+    <AppShell className="welcome-dashboard dashboard-page">
+      <AppHeader
+        backHref="/"
+        className="dashboard-page__header"
+        actions={<>
           <LangToggle />
           <ThemeToggle />
           <button className="welcome-toolbar__quiet" onClick={handleLogout}
@@ -67,15 +59,15 @@ export default function DashboardPage() {
               fontWeight:600,fontSize:'0.8rem',cursor:'pointer'}}>
             {lang==='ru'?'Выйти':'Sign Out'}
           </button>
-          <div style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.mercury},#0a7d5c)`,
+          <div className="dashboard-page__avatar" style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.mercury},#0a7d5c)`,
             display:'flex',alignItems:'center',justifyContent:'center',color:'#03150e',fontWeight:800,fontSize:'0.8rem',
             boxShadow:'0 0 18px rgba(36,211,154,.16)'}}>
             {user?.name ? user.name[0].toUpperCase() : (lang==='ru'?'Г':'G')}
           </div>
-        </div>
-      </div>
+        </>}
+      />
 
-      <div style={{maxWidth:560,margin:'0 auto',padding:'28px 20px'}}>
+      <AppMain width="work" className="dashboard-page__main">
         {/* Greeting */}
         <div style={{marginBottom:24}}>
           <h1 style={{display:'flex',alignItems:'center',gap:9,fontSize:'1.6rem',fontWeight:800,margin:0,color:C.dark}}>
@@ -92,7 +84,7 @@ export default function DashboardPage() {
         {/* AI Assessment Banner (If pending) */}
         {user?.level === 'pending' && (
           <Card hover={false} padding="24px" style={{ marginBottom: 24 }}>
-            <div style={{width:34,height:34,display:'grid',placeItems:'center',marginBottom:8,color:C.jupiter}}><MilaIcon name="sparkle" size={28}/></div>
+            <div style={{width:34,height:34,display:'grid',placeItems:'center',marginBottom:8,color:'var(--jupiter-readable,var(--jupiter))'}}><MilaIcon name="sparkle" size={28}/></div>
             <h2 style={{fontSize:'1.5rem',margin:'0 0 6px',color:C.dark}}>{lang==='ru'?'Твой личный план обучения':'Your custom learning plan'}</h2>
             <p style={{fontSize:'0.9rem',lineHeight:1.55,margin:'0 0 16px',color:C.warm}}>{lang==='ru'?'Пройди надёжный тест через сервер Mila — без внешнего ИИ. Голосовой вариант доступен там, где его поддерживает провайдер.':'Take the reliable Mila-only test with no external AI. Voice remains available where the provider supports it.'}</p>
             <button onClick={()=>router.push('/assessment')}
@@ -112,7 +104,7 @@ export default function DashboardPage() {
           <Card hover={false} padding="20px" style={{ marginBottom: 24 }}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
               <div>
-                <div style={{fontSize:'0.72rem',fontWeight:700,color:C.jupiter,textTransform:'uppercase',letterSpacing:1.5,marginBottom:4}}>
+                <div style={{fontSize:'0.72rem',fontWeight:700,color:'var(--jupiter-readable,var(--jupiter))',textTransform:'uppercase',letterSpacing:1.5,marginBottom:4}}>
                   {lang==='ru'?'Персональный план':'Custom plan'}
                 </div>
                 <div style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',letterSpacing:'-0.03em',color:C.dark}}>Level {user.level.toUpperCase()}</div>
@@ -133,7 +125,7 @@ export default function DashboardPage() {
             {kind:'level' as const,ru:'Определить уровень',en:'Level check',ruSub:'Короткая голосовая проверка',enSub:'A short voice check',href:'/assessment'},
             {kind:'listening' as const,ru:'Аудирование',en:'Listening',ruSub:'Слушай, различай и повторяй',enSub:'Hear, notice and repeat',href:'/listen'},
             {kind:'vocabulary' as const,ru:'Новые слова',en:'New words',ruSub:'Личные сохранённые повторения',enSub:'Personal saved reviews',href:'/vocabulary'},
-            {kind:'tutor' as const,ru:'ИИ-наставник',en:'AI tutor',ruSub:'Живая практика с Милой',enSub:'Live practice with Mila',href:'/chat'},
+            {kind:'tutor' as const,ru:'Мила-наставница',en:'Talk with Mila',ruSub:'Живая голосовая практика',enSub:'Calm, live voice practice',href:'/darshan'},
             {kind:'grammar' as const,ru:'Грамматика',en:'Grammar',ruSub:'Практика без сухих правил',enSub:'Patterns without dry rules',href:'/grammar'},
           ].map((item)=>(
             <LearningJourneyCard
@@ -156,7 +148,7 @@ export default function DashboardPage() {
 
         {/* Pronunciation */}
         <Card hover={false} padding="20px 24px" style={{ marginBottom: 16, textAlign: 'center' }}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,fontWeight:700,fontSize:'1rem',color:C.dark,marginBottom:4}}><span style={{display:'grid',color:C.voice}}><MilaIcon name="pronunciation" size={18}/></span>{lang==='ru'?'Произношение':'Pronunciation'}</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,fontWeight:700,fontSize:'1rem',color:C.dark,marginBottom:4}}><span style={{display:'grid',color:'var(--voice-readable,var(--voice))'}}><MilaIcon name="pronunciation" size={18}/></span>{lang==='ru'?'Произношение':'Pronunciation'}</div>
           <p style={{fontSize:'0.85rem',color:C.warm,margin:'0 0 14px'}}>{lang==='ru'?'Нажми и послушай':'Tap to listen'}</p>
           <div style={{display:'flex',justifyContent:'center',gap:20}}>
             {['hello','world','thank you'].map(w=>(
@@ -168,11 +160,11 @@ export default function DashboardPage() {
         {/* Secondary tools */}
         <div className="secondary-tools-grid" style={{display:'grid',gap:10,marginBottom:20}}>
           {[
-            {icon:'lessons' as MilaIconName,label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons',tone:C.jupiter},
-            {icon:'progress' as MilaIconName,label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',tone:C.mercury},
-            {icon:'badges' as MilaIconName,label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements',tone:C.jupiter},
-            {icon:'phonetics' as MilaIconName,label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics',tone:C.voice},
-            {icon:'voice' as MilaIconName,label:lang==='ru'?'Практика':'Speaking practice',sub:lang==='ru'?'Голосом, по уроку':'By voice, lesson-focused',href:'/practice',tone:C.voice},
+            {icon:'lessons' as MilaIconName,label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons',tone:'var(--jupiter-readable,var(--jupiter))'},
+            {icon:'progress' as MilaIconName,label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',tone:'var(--mercury-readable,var(--mercury))'},
+            {icon:'badges' as MilaIconName,label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements',tone:'var(--jupiter-readable,var(--jupiter))'},
+            {icon:'phonetics' as MilaIconName,label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics',tone:'var(--voice-readable,var(--voice))'},
+            {icon:'voice' as MilaIconName,label:lang==='ru'?'Практика':'Speaking practice',sub:lang==='ru'?'Голосом, по уроку':'By voice, lesson-focused',href:'/practice',tone:'var(--voice-readable,var(--voice))'},
           ].map((l,i)=>(
             <Card key={i} onClick={()=>router.push(l.href)} padding="14px" style={{ display:'flex', alignItems:'center', gap:12 }}>
               <IconTile size={40}><span style={{display:'grid',color:l.tone}}><MilaIcon name={l.icon} size={20}/></span></IconTile>
@@ -182,7 +174,7 @@ export default function DashboardPage() {
         </div>
 
         <LeaderboardCard lang={lang} stats={stats}/>
-      </div>
-    </div>
+      </AppMain>
+    </AppShell>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n-provider';
 import MilaIcon from '@/components/ui/MilaIcon';
 import { C } from '@/lib/theme';
+import { Card } from '@/components/ui/Card';
 
 // Commission a lesson from the AI — on success we walk straight into it
 // (router.refresh() would not re-run the lessons page's client fetch).
@@ -35,9 +36,7 @@ export default function GenerateLessonButton() {
 
   return (
     <div className="lesson-generator" style={{marginBottom:18}}>
-      <div className="lesson-generator__control" style={{display:'flex',gap:10,padding:'14px',borderRadius:16,
-        background:C.card,border:`1px solid ${C.line}`,boxShadow:'var(--surface-card-shadow)',
-        backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)'}}>
+      <Card className="lesson-generator__control" padding="14px" style={{display:'flex',gap:10}}>
         <input
           type="text"
           placeholder={lang==='ru'?'Закажи урок: «собеседование в IT», «светская беседа»…':'Commission a lesson: “job interview”, “small talk at dinner”…'}
@@ -59,7 +58,7 @@ export default function GenerateLessonButton() {
             boxShadow:'0 8px 20px rgba(168,61,100,.2)',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:7}}>
           <MilaIcon name="sparkle" size={16}/>{loading ? (lang==='ru'?'Мила пишет…':'Mila is writing…') : (lang==='ru'?'Создать урок':'Commission it')}
         </button>
-      </div>
+      </Card>
       {err && (
         <div style={{marginTop:8,fontSize:'0.8rem',color:'#e8556d',textAlign:'center'}}>
           {lang==='ru'?'Не получилось — попробуй ещё раз.':'Something failed — try once more.'}

@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { C } from '@/lib/theme';
 import { ACCENTS, startListening } from '@/lib/speech';
 import { ttsSpeak } from '@/lib/tts';
+import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 
 const VERDICT = {
   good:  { fg: C.jupiter, bg: C.jupiterL },
@@ -16,7 +17,9 @@ const VERDICT = {
 function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => void }) {
   return (
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:0,textAlign:'center'}}>
-      <div style={{fontSize:'3.5rem',marginBottom:12}}>🎙️</div>
+      <div style={{width:64,height:64,display:'grid',placeItems:'center',marginBottom:14,borderRadius:18,color:C.voice,background:C.voiceL,border:`1px solid ${C.voice}`}}>
+        <MilaIcon name="voice" size={30}/>
+      </div>
       <h2 style={{fontSize:'1.4rem',fontWeight:800,color:C.dark,margin:'0 0 8px'}}>
         {lang==='ru' ? 'Задание: произноси вслух!' : 'Speaking Exercise!'}
       </h2>
@@ -28,29 +31,28 @@ function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => voi
 
       {/* How it works steps */}
       {[
-        { icon: '🔊', en: 'Tap Listen to hear the phrase', ru: 'Нажми «Послушать», чтобы услышать фразу' },
-        { icon: '🎙️', en: 'Tap the mic and say it clearly', ru: 'Нажми микрофон и произнеси чётко' },
-        { icon: '📊', en: 'Get an instant phoneme score', ru: 'Получи оценку за каждый звук' },
-        { icon: '🌱', en: 'Use the feedback, then continue when ready', ru: 'Используй подсказку и продолжай, когда готова' },
+        { icon: 'volume' as MilaIconName, en: 'Tap Listen to hear the phrase', ru: 'Нажми «Послушать», чтобы услышать фразу' },
+        { icon: 'voice' as MilaIconName, en: 'Tap the mic and say it clearly', ru: 'Нажми микрофон и произнеси чётко' },
+        { icon: 'progress' as MilaIconName, en: 'Get an instant phoneme score', ru: 'Получи оценку за каждый звук' },
+        { icon: 'sparkle' as MilaIconName, en: 'Use the feedback, then continue when ready', ru: 'Используй подсказку и продолжай, когда готова' },
       ].map(s => (
-        <div key={s.en} style={{display:'flex',alignItems:'center',gap:12,width:'100%',maxWidth:340,
-          background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:14,padding:'12px 16px',marginBottom:8,boxShadow:'0 1px 8px rgba(0,0,0,0.45)',textAlign:'left'}}>
-          <span style={{fontSize:'1.4rem',flex:'0 0 auto'}}>{s.icon}</span>
+        <div className="focus-card" key={s.en} style={{display:'flex',alignItems:'center',gap:12,width:'100%',maxWidth:340,
+          padding:'12px 16px',marginBottom:8,textAlign:'left'}}>
+          <span style={{width:32,height:32,display:'grid',placeItems:'center',flex:'0 0 auto',borderRadius:9,color:C.mercury,background:C.mercuryL}}><MilaIcon name={s.icon} size={18}/></span>
           <span style={{fontSize:'0.88rem',color:C.dark,fontWeight:500}}>{lang==='ru' ? s.ru : s.en}</span>
         </div>
       ))}
 
-      <div style={{marginTop:8,background:C.mercuryL,borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20}}>
-        <span style={{fontSize:'0.82rem',color:C.mercury,fontWeight:600}}>
-          💡 {lang==='ru' ? 'Говори ровно и чётко — модель слышит каждую фонему' : 'Speak clearly and steadily — the model hears every phoneme'}
-        </span>
+      <div style={{marginTop:8,display:'flex',alignItems:'flex-start',gap:8,background:C.mercuryL,borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20,color:C.mercury,textAlign:'left'}}>
+        <MilaIcon name="sparkle" size={16} style={{flex:'0 0 auto',marginTop:1}}/>
+        <span style={{fontSize:'0.82rem',fontWeight:600}}>{lang==='ru' ? 'Говори ровно и чётко — модель слышит каждую фонему' : 'Speak clearly and steadily — the model hears every phoneme'}</span>
       </div>
 
       <button onClick={onStart}
-        style={{width:'100%',maxWidth:340,padding:'16px',borderRadius:16,border:'none',
+        style={{width:'100%',maxWidth:340,padding:'16px',borderRadius:16,border:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:8,
           background:`linear-gradient(135deg,${C.mercury},${C.mercuryBright})`,color:'#02140f',fontWeight:800,fontSize:'1.1rem',
           cursor:'pointer',boxShadow:'0 6px 20px rgba(36,211,154,0.3)',letterSpacing:'0.01em'}}>
-        {lang==='ru' ? '🚀 Начать упражнение' : '🚀 Start Exercise'}
+        {lang==='ru' ? 'Начать упражнение' : 'Start Exercise'} <MilaIcon name="arrow" size={18}/>
       </button>
     </div>
   );
@@ -113,7 +115,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
       msg === 'unsupported'
         ? (lang === 'ru' ? 'Микрофон не поддерживается — открой в Chrome.' : 'Speech input needs Chrome — open there to practice.')
         : msg === 'no-speech'
-        ? (lang === 'ru' ? 'Микрофон не уловил речь — это не оценка произношения. Нажми 🎙️ и начни говорить сразу.' : 'The mic did not capture speech — your pronunciation was not graded. Tap 🎙️ and speak right away.')
+        ? (lang === 'ru' ? 'Микрофон не уловил речь — это не оценка произношения. Нажми кнопку микрофона и начни говорить сразу.' : 'The mic did not capture speech — your pronunciation was not graded. Tap the microphone button and speak right away.')
         : msg === 'score-failed' || msg === 'score-empty'
         ? (lang === 'ru' ? 'Сервис оценки временно недоступен — запись не оценивалась. Попробуй снова.' : 'Scoring is temporarily unavailable — your recording was not graded. Please try again.')
         : (lang === 'ru' ? 'Техническая ошибка микрофона — это не оценка твоей речи. Попробуй снова.' : 'There was a microphone issue — this is not a judgment of your speech. Please try again.')
@@ -201,9 +203,9 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
       </div>
 
       {/* ── Phrase Card ────────────────────────────────────────────────────── */}
-      <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'24px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:12}}>
-        <div style={{fontSize:'0.72rem',fontWeight:700,color:C.jupiter,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>
-          🎯 {lang==='ru' ? 'Повтори эту фразу:' : 'Repeat this phrase:'}
+      <div className="focus-card" style={{padding:'24px 20px',marginBottom:12}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,fontSize:'0.72rem',fontWeight:700,color:C.jupiter,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>
+          <MilaIcon name="target" size={15}/>{lang==='ru' ? 'Повтори эту фразу:' : 'Repeat this phrase:'}
         </div>
         <div style={{fontSize:'1.35rem',fontWeight:700,color:C.dark,lineHeight:1.35,marginBottom:6}}>{phrase.en}</div>
         <div style={{fontSize:'0.9rem',color:C.warm}}>{phrase.ru}</div>
@@ -212,22 +214,25 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
             width:'100%',marginTop:16,padding:'10px 18px',borderRadius:12,
             background:C.voiceL,border:`1px solid ${C.voice}`,
             color:C.voice,fontWeight:700,cursor:(phase==='speaking'||phase==='recording')?'default':'pointer',fontSize:'0.9rem',opacity:(phase==='recording')?0.5:1}}>
-          🔊 {phase==='speaking' ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Послушать':'Hear it first')}
+          <MilaIcon name="volume" size={17}/>{phase==='speaking' ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Послушать':'Hear it first')}
         </button>
       </div>
 
       {/* ── Scored Result Card ─────────────────────────────────────────────── */}
       {phase==='scored' && result && (
-        <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'16px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:12,textAlign:'left'}}>
+        <div className="focus-card" style={{padding:'16px 20px',marginBottom:12,textAlign:'left'}}>
           <div style={{display:'flex',alignItems:'center',gap:14}}>
             {ring(result.score)}
             <div style={{flex:1}}>
-              <div style={{fontSize:'0.9rem',fontWeight:700,color:C.dark,marginBottom:6}}>
+              <div style={{display:'flex',alignItems:'flex-start',gap:6,fontSize:'0.9rem',fontWeight:700,color:C.dark,marginBottom:6}}>
+                <MilaIcon name={result.score >= 80 ? 'trophy' : result.score >= 55 ? 'sparkle' : 'target'} size={17} style={{flex:'0 0 auto',marginTop:1}}/>
+                <span>
                 {result.score >= 80
-                  ? (lang==='ru' ? '🌟 Ясно и уверенно!' : '🌟 Clear and confident!')
+                  ? (lang==='ru' ? 'Ясно и уверенно!' : 'Clear and confident!')
                   : result.score >= 55
-                  ? (lang==='ru' ? '✨ Хорошая работа — осталась небольшая доработка.' : '✨ Good work — one small adjustment.')
-                  : (lang==='ru' ? '🌱 Полезная отправная точка — попробуй подсказку или продолжай.' : '🌱 A useful starting point — try the tip or continue.')}
+                  ? (lang==='ru' ? 'Хорошая работа — осталась небольшая доработка.' : 'Good work — one small adjustment.')
+                  : (lang==='ru' ? 'Полезная отправная точка — попробуй подсказку или продолжай.' : 'A useful starting point — try the tip or continue.')}
+                </span>
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
                 {result.words.map((w:any,i:number) => (
@@ -248,8 +253,8 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
               ))}
             </div>
           )}
-          <div style={{marginTop:10,fontSize:'0.82rem',color:C.warm,lineHeight:1.5,background:C.pageBg,borderRadius:10,padding:'8px 12px'}}>
-            💡 {result.tip}
+          <div style={{marginTop:10,display:'flex',alignItems:'flex-start',gap:7,fontSize:'0.82rem',color:C.warm,lineHeight:1.5,background:C.pageBg,borderRadius:10,padding:'8px 12px'}}>
+            <MilaIcon name="sparkle" size={15} style={{flex:'0 0 auto',marginTop:2}}/><span>{result.tip}</span>
           </div>
         </div>
       )}
@@ -259,10 +264,13 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
         <div style={{background:C.roseL,borderRadius:14,padding:'12px 16px',fontSize:'0.88rem',marginBottom:12,textAlign:'left'}}>
           <div style={{color:C.rose,fontWeight:700,marginBottom:showMicTip?6:0}}>{errMsg}</div>
           {showMicTip && (
-            <div style={{fontSize:'0.8rem',color:'#c0392b',lineHeight:1.5}}>
+            <div style={{display:'flex',alignItems:'flex-start',gap:6,fontSize:'0.8rem',color:'#c0392b',lineHeight:1.5}}>
+              <MilaIcon name="target" size={15} style={{flex:'0 0 auto',marginTop:2}}/>
+              <span>
               {lang==='ru'
-                ? '📌 Убедись, что микрофон включён и браузер имеет к нему доступ. Говори сразу после нажатия — не делай паузу.'
-                : '📌 Make sure your mic is allowed in the browser. Speak immediately after tapping — don\'t pause.'}
+                ? 'Убедись, что микрофон включён и браузер имеет к нему доступ. Говори сразу после нажатия — не делай паузу.'
+                : 'Make sure your mic is allowed in the browser. Speak immediately after tapping — don\'t pause.'}
+              </span>
             </div>
           )}
         </div>
@@ -280,17 +288,19 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
                 boxShadow:`0 8px 24px ${phase==='scoring'?'rgba(36,211,154,.35)':'rgba(106,220,245,.35)'}`,
                 animation: phase==='recording' ? 'pulse 1.2s ease-in-out infinite' : 'none',
                 transition:'background 0.2s'}}>
-              {phase==='recording' ? '⏹' : phase==='scoring' ? '⏳' : '🎙️'}
+              {phase==='recording'
+                ? <span style={{width:16,height:16,borderRadius:4,background:'currentColor'}} aria-hidden/>
+                : <MilaIcon name={phase==='scoring'?'sparkle':'voice'} size={27}/>}
             </button>
             <div style={{fontSize:'0.82rem',fontWeight:600,color:
               phase==='recording' ? C.voice : phase==='scoring' ? C.mercury : C.warm,
               lineHeight:1.5,maxWidth:300}}>
               {phase==='recording'
-                ? (lang==='ru' ? '🔴 Слушаю... Скажи фразу, потом нажми ⏹' : '🔴 Listening… say the phrase, then tap ⏹ to stop')
+                ? (lang==='ru' ? 'Слушаю... Скажи фразу, потом нажми остановить' : 'Listening… say the phrase, then tap stop')
                 : phase==='scoring'
-                ? (lang==='ru' ? '⏳ Оцениваю произношение...' : '⏳ Analyzing your pronunciation...')
+                ? (lang==='ru' ? 'Оцениваю произношение...' : 'Analyzing your pronunciation...')
                 : phase==='error'
-                ? (lang==='ru' ? 'Попробуй снова 👇' : 'Try again 👇')
+                ? (lang==='ru' ? 'Попробуй снова' : 'Try again')
                 : (lang==='ru' ? 'Нажми и произнеси фразу вслух' : 'Tap to start speaking')}
             </div>
           </>
@@ -299,8 +309,8 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
         {hasResult && (
           <div style={{display:'flex',gap:10,width:'100%'}}>
             <button onClick={onMic} disabled={micBusy}
-              style={{flex:1,padding:'14px',borderRadius:16,border:`1.5px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer'}}>
-              🎙️ {lang==='ru' ? 'Ещё раз' : 'Try again'}
+              style={{flex:1,padding:'14px',borderRadius:16,border:`1.5px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+              <MilaIcon name="voice" size={17}/>{lang==='ru' ? 'Ещё раз' : 'Try again'}
             </button>
             <button onClick={next}
               style={{flex:2,padding:'16px',borderRadius:16,border:'none',background:`linear-gradient(135deg,${C.mercury},${C.mercuryBright})`,color:'#02140f',fontWeight:800,fontSize:'1.05rem',cursor:'pointer',boxShadow:'0 6px 18px rgba(36,211,154,0.3)'}}>

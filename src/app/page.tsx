@@ -2,26 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Yeseva_One, Caveat } from 'next/font/google';
 import LangToggle from '@/components/LangToggle';
 import MilaIcon, { MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 import './landing.css';
-
-// Boho display pair, self-scoped: Yeseva One (chunky warm serif) for headings,
-// Caveat (handwritten) for eyebrows and flourishes. Both carry full Cyrillic.
-const serif = Yeseva_One({
-  subsets: ['latin', 'cyrillic'],
-  weight: '400',
-  variable: '--lp-font-serif',
-  display: 'swap',
-});
-const accent = Caveat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['500', '600'],
-  variable: '--lp-font-accent',
-  display: 'swap',
-});
 
 type IconName = 'sound' | 'voice' | 'spark' | 'chart' | 'arrow' | 'play' | 'lock' | 'check' | 'home' | 'shield' | 'phone';
 type DemoKey = 'uk' | 'us' | 'in';
@@ -112,7 +96,6 @@ export default function HomePage() {
   const [demoKey, setDemoKey] = useState<DemoKey>('uk');
   const [demoPhase, setDemoPhase] = useState<DemoPhase>('result');
   const [canSpeak, setCanSpeak] = useState(false);
-  const [showDock, setShowDock] = useState(false);
   const demo = DEMOS[demoKey];
   const isLoggedIn = sessionStatus === 'in';
   const authReady = sessionStatus !== 'loading';
@@ -125,12 +108,8 @@ export default function HomePage() {
       .catch(() => setSessionStatus('out'));
     setCanSpeak('speechSynthesis' in window);
 
-    const onScroll = () => setShowDock(window.scrollY > 430);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       controller.abort();
-      window.removeEventListener('scroll', onScroll);
       if (timerRef.current) clearTimeout(timerRef.current);
       window.speechSynthesis?.cancel();
     };
@@ -208,7 +187,7 @@ export default function HomePage() {
     },
     {
       accent: ['#a83d64', 'rgba(168, 61, 100, 0.08)', 'rgba(168, 61, 100, 0.32)'], icon: 'tutor', cls: 'lp-door--main', href: '/darshan',
-      kicker: T('AI-наставница', 'AI mentor'),
+      kicker: T('Мила-наставница', 'Mila tutor'),
       title: T('Разговаривай с Милой вслух', 'Talk it through with Mila'),
       copy: T('Живой голосовой диалог в спокойном пространстве. Никакого судейства — только внимание.', 'Live voice conversation in a calm, private space. No judgement — only attention.'),
     },
@@ -235,7 +214,7 @@ export default function HomePage() {
   const cities = [
     { src: '/ambience/stills/uk-bigben-night.jpg', code: 'LDN', name: T('Лондон', 'London'), note: T('Британский английский', 'British English') },
     { src: '/ambience/stills/us-manhattan.jpg', code: 'NYC', name: T('Нью-Йорк', 'New York'), note: T('Американский английский', 'American English') },
-    { src: '/ambience/stills/in-taj-aerial.jpg', code: 'BOM', name: T('Мумбаи', 'Mumbai'), note: T('Индийский английский', 'Indian English') },
+    { src: '/ambience/stills/in-taj-aerial.jpg', code: 'AGR', name: T('Агра', 'Agra'), note: T('Индийский английский', 'Indian English') },
   ];
 
   const homeRows = [
@@ -280,7 +259,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className={`lp ${serif.variable} ${accent.variable}`}>
+    <div className="lp">
       <a className="lp-skip" href="#lp-main">{T('К содержанию', 'Skip to content')}</a>
 
       <header className="lp-nav">
@@ -581,15 +560,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      <div className={`lp-dock ${showDock ? 'is-visible' : ''}`} aria-hidden={!showDock}>
-        <div>
-          <span className="lp-brand__mark">M</span>
-          <p><strong>Mila</strong><small>{T('Твоя практика готова', 'Your practice is ready')}</small></p>
-        </div>
-        <button tabIndex={showDock ? 0 : -1} disabled={!authReady} onClick={startCta}>
-          {!authReady ? '•••' : isLoggedIn ? T('Открыть', 'Open') : T('Начать', 'Start')} <Icon name="arrow" size={15} />
-        </button>
-      </div>
     </div>
   );
 }

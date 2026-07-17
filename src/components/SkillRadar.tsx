@@ -2,6 +2,7 @@
 'use client';
 
 import { C } from '@/lib/theme';
+import { Card } from '@/components/ui/Card';
 
 const SKILLS = [
   { label: 'Speaking', val: 0.6 }, { label: 'Listening', val: 0.75 },
@@ -17,7 +18,7 @@ export default function SkillRadar() {
     return `${x},${y}`;
   }).join(' ');
   return (
-    <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)',marginTop:16,textAlign:'center'}}>
+    <Card padding="20px" style={{marginTop:16,textAlign:'center'}}>
       <svg width="220" height="220" viewBox="0 0 220 220">
         {[0.33,0.66,1].map(f=>(
           <circle key={f} cx={cx} cy={cy} r={r*f} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1"/>
@@ -29,6 +30,6 @@ export default function SkillRadar() {
           return <text key={i} x={lx} y={ly} textAnchor="middle" fontSize="9" fill={C.warm}>{s.label}</text>;
         })}
       </svg>
-    </div>
+    </Card>
   );
 }

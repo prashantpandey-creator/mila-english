@@ -1,10 +1,7 @@
 'use client';
 
-// THE card primitive — one glass surface, used everywhere. Uniform radius,
-// border, shadow, blur, and hover. If a surface on a page isn't a <Card>, it's
-// a bug. This is what makes the app read as one system instead of a pile of
-// mismatched boxes. The structural surface stays neutral; Mercury emerald is
-// interaction while cyan is reserved for voice and listening.
+// Mila's neutral surface primitive. Color belongs to status and actions; the
+// card itself keeps the same geometry in the warm and focus rooms.
 import { CSSProperties, ReactNode } from 'react';
 import { C } from '@/lib/theme';
 
@@ -17,37 +14,36 @@ const BASE: CSSProperties = {
 };
 
 export function Card({
-  children, onClick, hover = !!onClick, padding = '18px 20px', style,
+  children, onClick, hover = !!onClick, padding = '18px 20px', style, className = '',
 }: {
   children: ReactNode;
   onClick?: () => void;
   hover?: boolean;
   padding?: string | number;
   style?: CSSProperties;
+  className?: string;
 }) {
+  const shared = {
+    className: `mila-card${hover ? ' mila-card--hover' : ''}${className ? ` ${className}` : ''}`,
+    style: { ...BASE, padding, cursor: onClick ? 'pointer' : 'default', ...style },
+  };
+
+  if (onClick) {
+    return (
+      <button
+        {...shared}
+        type="button"
+        className={`${shared.className} mila-card--interactive`}
+        onClick={onClick}
+      >
+        {children}
+      </button>
+    );
+  }
+
   return (
     <div
-      className="mila-card"
-      onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          onClick();
-        }
-      } : undefined}
-      style={{ ...BASE, padding, cursor: onClick ? 'pointer' : 'default', ...style }}
-      onMouseEnter={hover ? (e) => {
-        e.currentTarget.style.transform = 'translateY(-1px)';
-        e.currentTarget.style.borderColor = 'var(--surface-card-line-hover, rgba(36,211,154,0.38))';
-        e.currentTarget.style.boxShadow = 'var(--surface-card-shadow-hover, 0 16px 42px rgba(0,0,0,0.54), 0 0 28px rgba(36,211,154,0.07))';
-      } : undefined}
-      onMouseLeave={hover ? (e) => {
-        e.currentTarget.style.transform = 'none';
-        e.currentTarget.style.borderColor = C.line;
-        e.currentTarget.style.boxShadow = BASE.boxShadow as string;
-      } : undefined}
+      {...shared}
     >
       {children}
     </div>

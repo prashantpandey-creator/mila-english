@@ -2,8 +2,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
+import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
+import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import { ACCENTS, playPhrase, hasRealVoice, startListening, missedSound } from '@/lib/speech';
@@ -16,9 +17,16 @@ const VERDICT = {
   miss:  { fg: C.rose, bg: C.roseL },
 };
 
+const PACK_ICONS: Record<string, MilaIconName> = {
+  airport: 'travel',
+  cafe: 'cafe',
+  hotel: 'lessons',
+  directions: 'target',
+  emergencies: 'voice',
+};
+
 export default function ListenPage() {
   const { lang } = useI18n();
-  const router = useRouter();
   const { setScene } = useScene();
   const [m, setM] = useState(false);
   const [accent, setAccent] = useState(ACCENTS[0]);
@@ -141,78 +149,77 @@ export default function ListenPage() {
   };
 
   return (
-    <div style={{minHeight:'100vh',background:C.pageBg,fontFamily:"'Manrope','Inter',sans-serif"}}>
-      <div style={{background:'rgba(0,0,0,0.84)',backdropFilter:'blur(12px)',padding:'10px 20px',
-        borderBottom:'1px solid rgba(255,255,255,0.08)',position:'sticky',top:0,zIndex:50,
-        display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-        <span onClick={()=>router.push('/dashboard')} style={{cursor:'pointer',fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:'1.3rem',color:C.dark,letterSpacing:'0.03em'}}>Mila</span>
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <span style={{fontSize:'0.7rem',fontWeight:700,color:C.jupiter,background:C.jupiterL,padding:'3px 9px',borderRadius:20}}>Level B1</span>
-          <LangToggle/>
-        </div>
-      </div>
+    <AppShell className="listen-page">
+      <AppHeader
+        title={lang==='ru' ? 'Тренировка слуха' : 'Listening studio'}
+        eyebrow={lang==='ru' ? 'Слушай и повторяй' : 'Listen & repeat'}
+        actions={
+          <>
+            <span className="app-header__badge">B1</span>
+            <LangToggle/>
+          </>
+        }
+      />
 
-      <div style={{maxWidth:460,margin:'0 auto',padding:'22px 20px'}}>
-        {/* pack picker */}
-        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:C.jupiter,marginBottom:8}}>
-          {lang==='ru'?'Ситуация':'Situation'}
-        </div>
-        <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:16}}>
-          {PACKS.map(p=>(
-            <button key={p.id} onClick={()=>onPack(p.id)}
-              style={{flex:'0 0 auto',fontSize:'0.82rem',fontWeight:pack===p.id?700:600,cursor:'pointer',
-                color:pack===p.id?'#211804':C.warm,background:pack===p.id?C.jupiter:'rgba(255,255,255,0.07)',
-                border:pack===p.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 13px',borderRadius:20}}>
-              {p.emoji} {lang==='ru'?p.ru:p.en}
-            </button>
-          ))}
-        </div>
+      <AppMain width="compact" className="listen-page__main">
+        <section className="focus-field" aria-labelledby="listen-situation-label">
+          <div id="listen-situation-label" className="focus-field__label">
+            {lang==='ru'?'Ситуация':'Situation'}
+          </div>
+          <div className="focus-chip-strip">
+            {PACKS.map(p=>(
+              <button key={p.id} onClick={()=>onPack(p.id)}
+                className={`focus-chip focus-chip--jupiter ${pack===p.id ? 'is-active' : ''}`}
+                aria-pressed={pack===p.id}>
+                <MilaIcon name={PACK_ICONS[p.id]} size={15}/>{lang==='ru'?p.ru:p.en}
+              </button>
+            ))}
+          </div>
+        </section>
 
-        {/* accent picker */}
-        <div style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:C.jupiter,marginBottom:8}}>
-          {lang==='ru'?'Акцент':'Accent'}
-        </div>
-        <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:18}}>
-          {ACCENTS.map(a=>(
-            <button key={a.id} onClick={()=>setAccent(a)}
-              style={{flex:'0 0 auto',fontSize:'0.85rem',fontWeight:accent.id===a.id?700:600,cursor:'pointer',
-                color:accent.id===a.id?'#021418':C.warm,background:accent.id===a.id?C.voice:'rgba(255,255,255,0.07)',
-                border:accent.id===a.id?'none':'1px solid rgba(255,255,255,0.14)',padding:'7px 14px',borderRadius:20}}>
-              {a.flag} {a.label}
-            </button>
-          ))}
-        </div>
+        <section className="focus-field" aria-labelledby="listen-accent-label">
+          <div id="listen-accent-label" className="focus-field__label">
+            {lang==='ru'?'Акцент':'Accent'}
+          </div>
+          <div className="focus-chip-strip">
+            {ACCENTS.map(a=>(
+              <button key={a.id} onClick={()=>setAccent(a)}
+                className={`focus-chip focus-chip--voice ${accent.id===a.id ? 'is-active' : ''}`}
+                aria-pressed={accent.id===a.id}>
+                {a.flag} {a.label}
+              </button>
+            ))}
+          </div>
+        </section>
 
         {/* phrase card */}
-        <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'22px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:14,
-          border: inDrill ? `1.5px solid ${C.jupiter}` : 'none'}}>
-          <div style={{fontSize:'0.72rem',color:inDrill?C.jupiter:C.voice,fontWeight:inDrill?700:600,marginBottom:8}}>
-            {inDrill
-              ? `🎯 ${lang==='ru'?'Персональная тренировка':'Personal drill'} · ${drillIdx!+1}/${drills.length} · /${phrase.sound}/`
-              : `${lang==='ru'?'Слушай и повтори':'Listen & repeat'} · ${pos+1}/${items.length}`}
+        <section className={`focus-card listen-page__phrase ${inDrill ? 'is-drill' : ''}`}>
+          <div className={`listen-page__phrase-meta ${inDrill ? 'is-drill' : ''}`}>
+            {inDrill && <MilaIcon name="target" size={14}/>}<span>{inDrill
+              ? `${lang==='ru'?'Персональная тренировка':'Personal drill'} · ${drillIdx!+1}/${drills.length} · /${phrase.sound}/`
+              : `${lang==='ru'?'Слушай и повтори':'Listen & repeat'} · ${pos+1}/${items.length}`}</span>
           </div>
-          <div style={{fontSize:'1.4rem',fontWeight:700,color:C.dark,lineHeight:1.3}}>{phrase.text}</div>
-          <div style={{fontSize:'0.85rem',color:C.voice,marginTop:6,fontFamily:'ui-monospace,monospace'}}>{phrase.ipa}</div>
+          <div className="listen-page__phrase-text">{phrase.text}</div>
+          <div className="listen-page__ipa">{phrase.ipa}</div>
           <button onClick={onListen} disabled={phase==='speaking'}
-            style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,width:'100%',marginTop:16,
-              background:C.voiceL,color:C.voice,fontWeight:700,fontSize:'0.95rem',padding:'12px',borderRadius:14,border:`1px solid ${C.voice}`,
-              cursor:phase==='speaking'?'default':'pointer',opacity:phase==='speaking'?0.7:1}}>
-            🔊 {phase==='speaking' ? (lang==='ru'?'Звучит…':'Playing…') : `${lang==='ru'?'Прослушать':'Hear it'} — ${accent.flag} ${accent.label}`}
+            className="listen-page__hear">
+            <MilaIcon name="volume" size={17}/>{phase==='speaking' ? (lang==='ru'?'Звучит…':'Playing…') : `${lang==='ru'?'Прослушать':'Hear it'} — ${accent.flag} ${accent.label}`}
           </button>
-          <div style={{textAlign:'center',fontSize:'0.68rem',color:'#8b8373',marginTop:8}}>
-            {hasRealVoice(accent)
-              ? (lang==='ru'?'✨ Настоящий голос носителя':'✨ Real native voice')
+          <div className="listen-page__voice-note">
+            {hasRealVoice(accent) && <MilaIcon name="sparkle" size={13}/>}<span>{hasRealVoice(accent)
+              ? (lang==='ru'?'Настоящий голос носителя':'Real native voice')
               : (lang==='ru'?'Синтетический голос — настоящий акцент скоро':'Synthetic for now — real accent coming')}
+            </span>
           </div>
-        </div>
+        </section>
 
         {/* score / result */}
         {phase==='scored' && result && (
-          <div style={{background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:20,padding:'18px 20px',boxShadow:'0 2px 16px rgba(0,0,0,0.45)',marginBottom:14}}>
-            <div style={{display:'flex',alignItems:'center',gap:14}}>
+          <section className="focus-card listen-page__result" aria-live="polite">
+            <div className="listen-page__result-head">
               {ring(result.score)}
-              <div style={{flex:1}}>
-                <div style={{fontSize:'0.9rem',fontWeight:700,color:C.dark,marginBottom:6}}>
+              <div className="listen-page__result-copy">
+                <div className="listen-page__result-title">
                   {result.score>=80?(lang==='ru'?'Ясно и уверенно':'Clear and confident'):result.score>=55?(lang==='ru'?'Хорошая работа — одна небольшая доработка':'Good work — one small adjustment'):(lang==='ru'?'Полезная отправная точка — попробуй подсказку':'A useful starting point — try the tip')}
                 </div>
                 <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
@@ -230,38 +237,34 @@ export default function ListenPage() {
                 ))}
               </div>
             )}
-            <div style={{marginTop:11,fontSize:'0.82rem',color:C.warm,lineHeight:1.45,background:C.pageBg,borderRadius:10,padding:'9px 11px'}}>
-              💡 {result.tip}
+            <div className="listen-page__tip">
+              <MilaIcon name="sparkle" size={15}/><span>{result.tip}</span>
             </div>
             <div style={{marginTop:8,fontSize:'0.8rem',color:'#9d9483'}}>{phrase.ru}</div>
-          </div>
+          </section>
         )}
 
         {phase==='error' && (
-          <div style={{background:C.roseL,color:C.rose,borderRadius:14,padding:'12px 16px',fontSize:'0.85rem',marginBottom:14,textAlign:'center'}}>{errMsg}</div>
+          <div className="focus-error" role="alert">{errMsg}</div>
         )}
 
         {/* mic + next */}
-        <div style={{display:'flex',alignItems:'center',gap:12}}>
+        <div className="listen-page__controls">
           <button onClick={next}
-            style={{flex:1,height:52,borderRadius:16,border:`1.5px solid ${C.mercury}`,background:C.mercuryL,backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',color:C.mercury,fontWeight:600,fontSize:'0.95rem',cursor:'pointer'}}>
+            className="focus-button focus-button--mercury">
             {lang==='ru'?'Следующая →':'Next phrase →'}
           </button>
           <button onClick={onMic} disabled={micBusy}
             aria-label={phase==='recording'?(lang==='ru'?'Остановить':'Stop'):(lang==='ru'?'Произнести':'Say it back')}
-            style={{width:64,height:64,borderRadius:'50%',border:'none',
-              cursor:micBusy?'default':'pointer',opacity:1,
-              background:phase==='recording'?C.voice:phase==='scoring'?C.mercury:C.voiceL,color:phase==='recording'||phase==='scoring'?'#021418':C.voice,fontSize:'1.5rem',
-              boxShadow:`0 6px 20px ${phase==='scoring'?'rgba(36,211,154,.34)':'rgba(106,220,245,.34)'}`,
-              animation:phase==='recording'?'pulse 1.2s ease-in-out infinite':'none'}}>
-            {phase==='recording' ? '⏹' : phase==='scoring' ? '⏳' : '🎙️'}
+            className={`listen-page__mic ${phase==='recording' ? 'is-recording' : ''} ${phase==='scoring' ? 'is-scoring' : ''}`}>
+            {phase==='recording' ? <span className="listen-page__stop" aria-hidden/> : <MilaIcon name={phase==='scoring'?'sparkle':'voice'} size={24}/>}
           </button>
         </div>
-        <div style={{textAlign:'center',fontSize:'0.78rem',marginTop:10,
+        <div className="listen-page__mic-status" style={{
           color:phase==='recording'?C.voice:phase==='scoring'?C.mercury:'#948b7c',
-          fontWeight:(phase==='recording'||phase==='scoring')?700:400}}>
+          fontWeight:(phase==='recording'||phase==='scoring')?700:400}} aria-live="polite">
           {phase==='recording'
-            ? (lang==='ru'?'Слушаю… говори, потом нажми ⏹ (или просто закончи)':'Listening… speak, then tap ⏹ (or just finish)')
+            ? (lang==='ru'?'Слушаю… говори, потом нажми остановить':'Listening… speak, then tap stop')
             : phase==='scoring'
             ? (lang==='ru'?'Оцениваю на устройстве…':'Scoring on your device…')
             : (lang==='ru'?'Нажми и произнеси вслух':'Tap the mic and say it aloud')}
@@ -269,11 +272,11 @@ export default function ListenPage() {
 
         {/* weak-sound recap — grows as the session goes */}
         {misses.length > 0 && (
-          <div style={{marginTop:18,background:'rgba(255,255,255,0.05)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',borderRadius:16,padding:'16px 18px',boxShadow:'0 2px 12px rgba(0,0,0,0.45)'}}>
-            <div style={{fontSize:'0.8rem',fontWeight:800,color:C.dark,marginBottom:2}}>
+          <section className="focus-card listen-page__recap">
+            <div className="listen-page__recap-title">
               {lang==='ru'?'Звуки для тренировки':'Sounds to drill'}
             </div>
-            <div style={{fontSize:'0.72rem',color:'#9d9483',marginBottom:12}}>
+            <div className="listen-page__recap-copy">
               {lang==='ru'?'Где ты чаще спотыкаешься':'Where you keep stumbling'}
             </div>
             {misses.map(([snd, info]) => {
@@ -293,22 +296,21 @@ export default function ListenPage() {
               );
             })}
             <button onClick={loadDrills} disabled={drillLoading}
-              style={{width:'100%',marginTop:6,padding:'12px',borderRadius:12,border:'none',
-                background:`linear-gradient(135deg,${C.mercury},${C.mercuryBright})`,color:'#02140f',fontWeight:800,fontSize:'0.9rem',
-                cursor:drillLoading?'default':'pointer',opacity:drillLoading?0.7:1}}>
+              className="focus-button focus-button--mercury">
+              <MilaIcon name="sparkle" size={16}/>
               {drillLoading
-                ? (lang==='ru'?'✨ Мила готовит упражнения…':'✨ Mila is building your drills…')
-                : (lang==='ru'?'✨ Тренировка от ИИ на мои слабые звуки':'✨ AI drills for my weak sounds')}
+                ? (lang==='ru'?'Мила готовит упражнения…':'Mila is building your drills…')
+                : (lang==='ru'?'Тренировка на мои слабые звуки':'Drills for my weak sounds')}
             </button>
-          </div>
+          </section>
         )}
 
-        <div style={{textAlign:'center',fontSize:'0.72rem',color:'#8b8373',marginTop:18,lineHeight:1.5}}>
-          {lang==='ru'
-            ? '🎯 Оценка по фонемам — модель на нашем сервере, мгновенно.'
-            : '🎯 Phoneme-level scoring by our model — instant.'}
+        <div className="listen-page__footnote">
+          <MilaIcon name="target" size={14}/><span>{lang==='ru'
+            ? 'Оценка по фонемам — модель на нашем сервере, мгновенно.'
+            : 'Phoneme-level scoring by our model — instant.'}</span>
         </div>
-      </div>
-    </div>
+      </AppMain>
+    </AppShell>
   );
 }
