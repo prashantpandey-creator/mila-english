@@ -75,7 +75,9 @@ export default function Atmosphere() {
 
   // Gentle rotation through the pool (both stills and the front-door video).
   useEffect(() => {
-    if (dead || scenes.length < 2) return;
+    // Reduced motion, Save-Data, and focused learning rooms hold one stable
+    // poster. Rotation belongs to the front-door motion treatment only.
+    if (!motion || dead || scenes.length < 2) return;
     const t = setTimeout(() => {
       setOn(false);
       fadeTimerRef.current = setTimeout(() => setIdx(i => (i + 1) % scenes.length), 2800);
@@ -84,7 +86,7 @@ export default function Atmosphere() {
       clearTimeout(t);
       if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
     };
-  }, [idx, dead, scenes.length]);
+  }, [idx, dead, motion, scenes.length]);
 
   const activeScene = scenes[idx] ?? scenes[0] ?? MILA_STUDIO;
   const playVideo = motion && Boolean(activeScene.video);
@@ -135,7 +137,7 @@ export default function Atmosphere() {
   if (dead) return <div className={`atmosphere atmosphere--${surface}`} aria-hidden />;
 
   return (
-    <div className={`atmosphere atmosphere--${activeScene.grade ?? 'quiet'} atmosphere--${surface} ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
+    <div className={`atmosphere atmosphere--${activeScene.grade ?? 'quiet'} atmosphere--${surface} ${pathname === '/' ? 'atmosphere--front' : ''} ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
       {playVideo ? (
         <video
           ref={vidRef}

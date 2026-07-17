@@ -35,6 +35,18 @@ export const MILA_STUDIO: VisualScene = {
   grade: 'brand',
 };
 
+// Commissioned front-door artwork: cinematic and editorial, but still about
+// listening, travel, and a safe place to practise. Desktop and mobile are
+// separately composed so neither viewport destroys the focal point.
+export const MILA_ATELIER: VisualScene = {
+  id: 'mila-atelier-v1',
+  stillDesktop: '/visuals/v2/cinematic/mila-atelier-desktop-v1.webp',
+  stillMobile: '/visuals/v2/cinematic/mila-atelier-mobile-v1.webp',
+  focusDesktop: 'center center',
+  focusMobile: 'center center',
+  grade: 'brand',
+};
+
 // The light front door: pink flowers, green foliage, and cream fabric carry
 // Mila's Venus/Mercury identity without turning the page into an AI dashboard.
 // The existing campaign studio remains the contained dark focus room.
@@ -68,7 +80,8 @@ export const TOPIC_SCENES: Record<string, VisualScene[]> = {
   emergencies: [legacyScene('uk-bigben-night', 'place')],
 };
 
-const ROUTE_SCENES: Record<'nature' | 'study' | 'social' | 'club', VisualScene[]> = {
+const ROUTE_SCENES: Record<'front' | 'nature' | 'study' | 'social' | 'club', VisualScene[]> = {
+  front: [MILA_ATELIER],
   nature: [
     legacyScene('nature-peaks', 'nature'),
     legacyScene('nature-aurora', 'nature'),
@@ -97,7 +110,8 @@ const ROUTE_SCENES: Record<'nature' | 'study' | 'social' | 'club', VisualScene[]
 };
 
 export function visualScenesForRoute(path: string): VisualScene[] {
-  if (path === '/' || path.startsWith('/dashboard')) return ROUTE_SCENES.club;
+  if (path === '/') return ROUTE_SCENES.front;
+  if (path.startsWith('/dashboard')) return ROUTE_SCENES.club;
   if (path.startsWith('/progress') || path.startsWith('/achievements')) return ROUTE_SCENES.nature;
   if (path === '/lessons') return ROUTE_SCENES.club;
   if (path.startsWith('/lessons/') || path.startsWith('/vocabulary') || path.startsWith('/grammar') || path.startsWith('/phonetics')) return ROUTE_SCENES.study;

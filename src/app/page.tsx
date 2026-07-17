@@ -211,10 +211,43 @@ export default function HomePage() {
     },
   ];
 
+  const moments = [
+    {
+      src: '/visuals/v2/cinematic/thumb-start-v1.webp',
+      kicker: T('Начни здесь', 'Start here'),
+      title: T('Проверка уровня', 'Level check'),
+      href: '/assessment',
+    },
+    {
+      src: '/visuals/v2/cinematic/thumb-london-v1.webp',
+      kicker: T('Слушай', 'Listen'),
+      title: T('Живая речь', 'Real accents'),
+      href: '/listen',
+    },
+    {
+      src: '/visuals/v2/cinematic/thumb-new-york-v1.webp',
+      kicker: T('Запоминай', 'Remember'),
+      title: T('Новые слова', 'New words'),
+      href: '/vocabulary',
+    },
+    {
+      src: '/visuals/v2/cinematic/thumb-india-v1.webp',
+      kicker: T('Собирай', 'Build'),
+      title: T('Грамматика', 'Grammar'),
+      href: '/grammar',
+    },
+    {
+      src: '/visuals/v2/cinematic/thumb-talk-v1.webp',
+      kicker: T('Говори', 'Speak'),
+      title: T('Мила рядом', 'Talk with Mila'),
+      href: '/darshan',
+    },
+  ];
+
   const cities = [
     { src: '/ambience/stills/uk-bigben-night.jpg', code: 'LDN', name: T('Лондон', 'London'), note: T('Британский английский', 'British English') },
     { src: '/ambience/stills/us-manhattan.jpg', code: 'NYC', name: T('Нью-Йорк', 'New York'), note: T('Американский английский', 'American English') },
-    { src: '/ambience/stills/in-taj-aerial.jpg', code: 'AGR', name: T('Агра', 'Agra'), note: T('Индийский английский', 'Indian English') },
+    { src: '/ambience/stills/in-palace.jpg', code: 'JAI', name: T('Джайпур', 'Jaipur'), note: T('Индийский английский', 'Indian English') },
   ];
 
   const homeRows = [
@@ -281,7 +314,7 @@ export default function HomePage() {
       <main id="lp-main">
         {/* ── Hero ── */}
         <section className="lp-hero">
-          <div className="lp-shell lp-hero__grid">
+          <div className="lp-shell lp-hero__stage">
             <div className="lp-hero__copy">
               <div className="lp-eyebrow"><i />{T('Персональная AI-наставница · Работает в России', 'Private AI English coach · Works in Russia')}</div>
               <h1>{lang === 'ru' ? <>Английский, который <em>слышит тебя.</em></> : <>English that <em>listens back.</em></>}</h1>
@@ -309,8 +342,41 @@ export default function HomePage() {
               </div>
             </div>
 
+          </div>
+
+          <div className="lp-shell lp-storyrail" aria-label={T('Выбери следующую практику', 'Choose your next practice')}>
+            <div className="lp-storyrail__intro">
+              <span>{T('Твоя следующая сцена', 'Your next scene')}</span>
+              <small>{T('Каждая ведёт в живую практику', 'Every frame opens real practice')}</small>
+            </div>
+            <div className="lp-storyrail__track">
+              {moments.map((moment, index) => (
+                <button
+                  key={moment.href}
+                  className={`lp-storyrail__item${index === 0 ? ' is-active' : ''}`}
+                  onClick={() => openDoor(moment.href)}
+                  aria-label={`${moment.kicker}: ${moment.title}`}
+                >
+                  <span className="lp-storyrail__media"><img src={moment.src} alt="" width="320" height="320" decoding="async" /></span>
+                  <span className="lp-storyrail__text"><small>{moment.kicker}</small><strong>{moment.title}</strong></span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <div className="lp-paper">
+          <section className="lp-sample">
+            <div className="lp-shell lp-sample__grid">
+              <Reveal className="lp-section__head lp-sample__intro">
+                <span className="lp-label">{T('Послушай разницу', 'Hear the difference')}</span>
+                <h2>{lang === 'ru' ? <>Один звук. <em>Один ясный шаг.</em></> : <>One sound. <em>One clear next step.</em></>}</h2>
+                <p>{T('Попробуй интерактивный разбор: выбери акцент, услышь слово и посмотри, как Мила превращает речь в понятную практику.', 'Try the live sample: choose an accent, hear the word, and see how Mila turns speech into clear practice.')}</p>
+              </Reveal>
+
             {/* ── Interactive sample ── */}
-            <div className="lp-demo" data-phase={demoPhase} aria-label={T('Интерактивный пример Mila', 'Interactive Mila sample')}>
+            <Reveal>
+              <div className="lp-demo" data-phase={demoPhase} aria-label={T('Интерактивный пример Mila', 'Interactive Mila sample')}>
               <div className="lp-demo__head">
                 <div>
                   <strong>{T('Как Мила слышит речь', 'How Mila hears speech')}</strong>
@@ -367,9 +433,10 @@ export default function HomePage() {
                 <Icon name={demoPhase === 'result' ? 'play' : 'spark'} size={17} />
                 {demoPhase === 'result' ? T('Повторить разбор', 'Replay analysis') : T('Показать разбор Mila', 'Show Mila’s analysis')}
               </button>
+              </div>
+            </Reveal>
             </div>
-          </div>
-        </section>
+          </section>
 
         {/* ── Proof strip ── */}
         <section className="lp-proof" aria-label={T('Почему Mila', 'Why Mila')}>
@@ -548,6 +615,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        </div>
       </main>
 
       <footer className="lp-footer">
