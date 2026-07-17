@@ -103,7 +103,41 @@ async function localLlmReady(config: ReturnType<typeof getLocalLlmConfig>): Prom
   return ready;
 }
 
-async function chooseModel(surface: 'voice' | 'guide' | 'chat'): Promise<ModelChoice | null> {
+/** Build an external (cloud) model choice from configured keys, or null.
+ *  OpenRouter wins over OpenAI when both exist. Voice picks its own model
+ *  envs with a fast multilingual default. */
+function externalChoice(voice: boolean): ModelChoice | null {
+  const openRouterModel = (voice
+    ? process.env.OPENROUTER_VOICE_MODEL?.trim() || 'openai/gpt-4o-mini'
+    : process.env.OPENROUTER_CHAT_MODEL?.trim());
+  if (process.env.OPENROUTER_API_KEY && openRouterModel) {
+    const provider = createOpenAI({
+      name: 'openrouter',
+      baseURL: 'https://openrouter.ai/api/v1',
+      apiKey: process.env.OPENROUTER_API_KEY,
+      compatibility: 'compatible',
+      headers: {
+        'HTTP-Referer': process.env.APP_URL || 'https://mila-english.com',
+        'X-Title': 'Mila English',
+      },
+    });
+    return { model: provider(openRouterModel), provider: 'openrouter', modelId: openRouterModel, runtime: 'external' };
+  }
+  if (process.env.OPENAI_API_KEY) {
+    const modelId = (voice ? process.env.OPENAI_VOICE_MODEL : process.env.OPENAI_CHAT_MODEL)?.trim() || 'gpt-4o-mini';
+    return { model: openai(modelId), provider: 'openai', modelId, runtime: 'external' };
+  }
+  return null;
+}
+
+async function chooseModel(surface: 'voice' | 'guide' | 'chat', externalFirst = false): Promise<ModelChoice | null> {
+  // VOICE_EXTERNAL_FIRST experiment: spoken turns try the fast cloud brain
+  // before the local model; the local model remains the always-there fallback
+  // (see the spoken branch's pre-first-sentence failover).
+  if (externalFirst) {
+    const external = externalChoice(surface === 'voice');
+    if (external) return external;
+  }
   const chat = getLocalLlmConfig(process.env, 'chat');
   const preferred = surface === 'voice' ? getLocalLlmConfig(process.env, 'voice') : chat;
   const localCandidates = [{
@@ -141,27 +175,7 @@ async function chooseModel(surface: 'voice' | 'guide' | 'chat'): Promise<ModelCh
 
   const externalAllowed = /^(?:1|true|yes)$/i.test(process.env.ALLOW_EXTERNAL_CHAT_FALLBACK || '');
   if (!externalAllowed) return null;
-
-  const openRouterModel = process.env.OPENROUTER_CHAT_MODEL?.trim();
-  if (process.env.OPENROUTER_API_KEY && openRouterModel) {
-    const provider = createOpenAI({
-      name: 'openrouter',
-      baseURL: 'https://openrouter.ai/api/v1',
-      apiKey: process.env.OPENROUTER_API_KEY,
-      compatibility: 'compatible',
-      headers: {
-        'HTTP-Referer': process.env.APP_URL || 'https://mila-english.com',
-        'X-Title': 'Mila English',
-      },
-    });
-    return { model: provider(openRouterModel), provider: 'openrouter', modelId: openRouterModel, runtime: 'external' };
-  }
-
-  if (process.env.OPENAI_API_KEY) {
-    const modelId = process.env.OPENAI_CHAT_MODEL?.trim() || 'gpt-4o-mini';
-    return { model: openai(modelId), provider: 'openai', modelId, runtime: 'external' };
-  }
-  return null;
+  return externalChoice(false);
 }
 
 function memoryReply(locale: CompanionLocale, memories: Array<{ content: string }>): string {
@@ -285,7 +299,8 @@ export async function POST(request: NextRequest) {
     learningContext,
   });
 
-  const choice = await chooseModel(surfaceKind === 'practice' ? 'voice' : surfaceKind);
+  const voiceExternalFirst = spoken && /^(?:1|true|yes)$/i.test(process.env.VOICE_EXTERNAL_FIRST || '');
+  const choice = await chooseModel(surfaceKind === 'practice' ? 'voice' : surfaceKind, voiceExternalFirst);
   if (!choice) {
     const reply = builtInCompanionReply(latestUserMessage, pathname, locale, profile?.level);
     await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
@@ -302,15 +317,13 @@ export async function POST(request: NextRequest) {
     { role: 'user', content: latestUserMessage },
   ];
 
-  const result = await streamText({
-    model: choice.model,
+  const generationOptions = {
     messages,
     system,
     maxTokens: spoken ? (surfaceKind === 'practice' ? 60 : 50) : 320,
     temperature: spoken ? 0.25 : 0.35,
-    maxRetries: choice.provider === 'ollama' ? 0 : 1,
     abortSignal: request.signal,
-    onFinish: spoken ? undefined : async ({ text }) => {
+    onFinish: spoken ? undefined : async ({ text }: { text: string }) => {
       if (!text.trim()) return;
       try {
         await saveCompanionTurn(userId, latestUserMessage, text, turnContext);
@@ -318,6 +331,12 @@ export async function POST(request: NextRequest) {
         console.error('Failed to persist Mila companion turn', error);
       }
     },
+  };
+
+  const result = await streamText({
+    model: choice.model,
+    maxRetries: choice.provider === 'ollama' ? 0 : 1,
+    ...generationOptions,
   });
 
   if (spoken) {
@@ -342,8 +361,8 @@ export async function POST(request: NextRequest) {
         };
         let buffer = '';
         let failedClosed = false;
-        try {
-          for await (const delta of result.textStream) {
+        const consume = async (source: { textStream: AsyncIterable<string> }) => {
+          for await (const delta of source.textStream) {
             buffer += delta;
             const { complete, rest } = splitCompleteSentences(buffer);
             buffer = rest;
@@ -356,12 +375,34 @@ export async function POST(request: NextRequest) {
             }
             if (failedClosed) break;
           }
+          // Tail runs only when the stream completed without throwing.
           if (!failedClosed && buffer.trim()) {
             if (voiceReplyHasUnsupportedEvidence(buffer)) failedClosed = true;
             else emit(sanitizeVoiceReply(buffer));
           }
+        };
+        try {
+          await consume(result);
         } catch (error) {
-          if (!request.signal.aborted) console.error('Voice reply stream failed', error);
+          // An external brain can die before a single word arrives. Fall back
+          // to the local model once, transparently — degraded is acceptable,
+          // a dead turn is not. (Headers already sent name the first choice.)
+          if (!request.signal.aborted && !emitted && choice.runtime === 'external') {
+            console.error('External voice model failed before first sentence; retrying locally', error);
+            buffer = '';
+            failedClosed = false;
+            try {
+              const fallback = await chooseModel('voice', false);
+              if (fallback && fallback.runtime !== 'external') {
+                const retry = await streamText({ model: fallback.model, maxRetries: 0, ...generationOptions });
+                await consume(retry);
+              }
+            } catch (retryError) {
+              if (!request.signal.aborted) console.error('Local fallback voice stream failed', retryError);
+            }
+          } else if (!request.signal.aborted) {
+            console.error('Voice reply stream failed', error);
+          }
         }
         // An unsupported claim with nothing spoken yet → speak the safe line.
         // With clean sentences already spoken → stop silently at the claim.
