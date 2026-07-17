@@ -1,31 +1,37 @@
 'use client';
 
-// The "hear the accents" showcase — a self-contained warm-paper slider that
-// cycles three accents, echoing the landing coach-demo language (sample word,
-// IPA, waveform, clarity). Auto-advances, pauses on hover. Lives on the
-// dashboard for now; drop <ShowcaseSlider/> anywhere once the landing settles.
+// "How Mila hears every accent" — the first surface built in the design
+// language (DESIGN.md): serif for the spoken word, monospace for everything
+// measured; Signal's red route-line turns syllables into stations (the
+// mispronounced one flagged like a missed stop); Broadcast's VU meter is the
+// voice reading. Atelier (warm paper) in light, Studio (console) in dark.
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/lib/i18n-provider';
 
 type Slide = {
-  kick: string;
-  city: string;
+  accent: string;
+  line: string;
   word: string;
   ipa: string;
   clarity: number;
-  chips: [string, boolean][];
+  syl: [string, boolean][]; // [label, clean?]
+  focus: string;
+  tip: string;
+  tipRu: string;
 };
 
 const SLIDES: Slide[] = [
-  { kick: 'UK · Received Pronunciation', city: 'London', word: 'comfortable', ipa: '/ˈkʌm.fə.tə.bəl/', clarity: 92, chips: [['com', true], ['fort', false], ['a', true], ['ble', true]] },
-  { kick: 'US · General American', city: 'New York', word: 'schedule', ipa: '/ˈskedʒ.uːl/', clarity: 88, chips: [['sche', true], ['du', false], ['le', true]] },
-  { kick: 'IN · Indian English', city: 'Mumbai', word: 'particular', ipa: '/pərˈtɪk.jə.lər/', clarity: 95, chips: [['par', true], ['tic', true], ['u', true], ['lar', true]] },
+  { accent: 'Received Pronunciation', line: 'London', word: 'comfortable', ipa: 'ˈkʌm · f · tə · bəl', clarity: 92, syl: [['com', true], ['fort', false], ['a', true], ['ble', true]], focus: '/f/', tip: 'peaking — soften', tipRu: 'на пике — мягче' },
+  { accent: 'General American', line: 'New York', word: 'schedule', ipa: 'ˈskedʒ · uːl', clarity: 88, syl: [['sche', true], ['du', false], ['le', true]], focus: '/dʒ/', tip: 'hard — lighten it', tipRu: 'жёстко — легче' },
+  { accent: 'Indian English', line: 'Mumbai', word: 'particular', ipa: 'pər · ˈtɪk · jə · lər', clarity: 95, syl: [['par', true], ['tic', true], ['u', true], ['lar', true]], focus: 'clean', tip: 'clean — hold it', tipRu: 'чисто — держи' },
 ];
 
-// Deterministic waveform heights so SSR and client render identically.
-function bars(seed: number): number[] {
-  return Array.from({ length: 26 }, (_, i) => 9 + Math.round(27 * Math.abs(Math.sin(seed * 1.7 + i * 0.6))));
+// Deterministic VU heights (SSR-stable). Colour is decided from height so the
+// meter reads like a real one: green safe, amber warm, red peak.
+function vu(seed: number): number[] {
+  return Array.from({ length: 12 }, (_, i) => 24 + Math.round(74 * Math.abs(Math.sin(seed * 1.3 + i * 0.55))));
 }
+const vuColor = (h: number) => (h >= 88 ? '#e5352b' : h >= 62 ? '#c99a2e' : '#7a9a4a');
 
 export default function ShowcaseSlider() {
   const { lang } = useI18n();
@@ -33,17 +39,15 @@ export default function ShowcaseSlider() {
   const paused = useRef(false);
 
   useEffect(() => {
-    const t = setInterval(() => {
-      if (!paused.current) setIdx((i) => (i + 1) % SLIDES.length);
-    }, 4200);
+    const t = setInterval(() => { if (!paused.current) setIdx((i) => (i + 1) % SLIDES.length); }, 4600);
     return () => clearInterval(t);
   }, []);
 
   const heading = lang === 'ru' ? 'Как Mila слышит акценты' : 'How Mila hears every accent';
 
   return (
-    <section style={{ margin: '28px 0 8px' }}>
-      <p style={{ fontFamily: "var(--font-display,'Manrope'),sans-serif", fontWeight: 700, fontSize: '1.05rem', color: 'var(--surface-text)', margin: '0 0 12px' }}>{heading}</p>
+    <section className="mila-showcase-sec">
+      <p className="mila-showcase__heading">{heading}</p>
       <div
         className="mila-showcase"
         onMouseEnter={() => { paused.current = true; }}
@@ -51,38 +55,43 @@ export default function ShowcaseSlider() {
       >
         <div className="mila-showcase__grain" aria-hidden />
         <div className="mila-showcase__track" style={{ transform: `translateX(-${idx * 100}%)` }}>
-          {SLIDES.map((s, i) => (
-            <div className="mila-showcase__slide" key={s.city}>
-              <div>
-                <p className="mila-showcase__kick">{s.kick}</p>
-                <h3 className="mila-showcase__city">{s.city}</h3>
-                <p className="mila-showcase__word">{s.word}</p>
-                <p className="mila-showcase__ipa">{s.ipa}</p>
-                <div className="mila-showcase__chips">
-                  {s.chips.map(([label, good], k) => (
-                    <span key={k} className={`mila-showcase__chip${good ? ' is-good' : ''}`}>{label}</span>
+          {SLIDES.map((s, i) => {
+            const hub = s.syl.findIndex(([, ok]) => !ok);
+            return (
+              <div className="mila-showcase__slide" key={s.line}>
+                <div className="mila-showcase__top">
+                  <span className="mila-showcase__kick">{s.line} · {s.accent} — {s.focus}</span>
+                  <span className="mila-showcase__live"><i />{lang === 'ru' ? 'Слушаю' : 'Listening'}</span>
+                </div>
+                <div className="mila-showcase__word">{s.word}</div>
+                <div className="mila-showcase__ipa">{s.ipa}</div>
+                <div className="mila-showcase__route">
+                  {s.syl.map(([label, ok], k) => (
+                    <span key={k} className={`mila-showcase__stop${!ok ? ' is-hub' : ''}${hub >= 0 && k > hub ? ' is-after' : ''}`}>{label}</span>
                   ))}
                 </div>
-                <div className="mila-showcase__wave" aria-hidden>
-                  {bars(i + 1).map((h, k) => (<i key={k} style={{ height: h }} />))}
+                <div className="mila-showcase__vu">
+                  <div className="mila-showcase__vu-graph">
+                    <div className="mila-showcase__vu-bars" aria-hidden>
+                      {vu(i + 1).map((h, k) => (<i key={k} style={{ height: `${h}%`, background: vuColor(h) }} />))}
+                    </div>
+                    <div className="mila-showcase__vu-cap">
+                      <span>−20 vu</span>
+                      <span>{s.focus === 'clean' ? (lang === 'ru' ? s.tipRu : s.tip) : `${s.focus} ${lang === 'ru' ? s.tipRu : s.tip}`}</span>
+                      <span>+3</span>
+                    </div>
+                  </div>
+                  <div className="mila-showcase__score"><b>{s.clarity}</b><span>{lang === 'ru' ? 'чёткость' : 'clarity'}</span></div>
                 </div>
               </div>
-              <div className="mila-showcase__ring" style={{ ['--p' as string]: `${s.clarity * 3.6}deg` }}>
-                <div><b>{s.clarity}</b><span>{lang === 'ru' ? 'чёткость' : 'clarity'}</span></div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
       <div className="mila-showcase__ctl">
         <div className="mila-showcase__dots">
           {SLIDES.map((s, i) => (
-            <button
-              key={s.city}
-              className={`mila-showcase__dot${i === idx ? ' is-on' : ''}`}
-              aria-label={`${s.city} (${i + 1})`}
-              onClick={() => setIdx(i)}
-            />
+            <button key={s.line} className={`mila-showcase__dot${i === idx ? ' is-on' : ''}`} aria-label={`${s.line} (${i + 1})`} onClick={() => setIdx(i)} />
           ))}
         </div>
         <div className="mila-showcase__nav">
