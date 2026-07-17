@@ -3511,3 +3511,102 @@ html .mila-surface--front .mila-guide__guest button {
     bottom: auto;
   }
 }
+
+/* ── Persistent bottom navigation (the rim) ──────────────────────────────────
+   The five core rooms, one tap apart from anywhere. Mounted in the layout
+   under RouteSurface, so the welcome/focus overrides below re-theme it. */
+.mila-tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 60;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgba(12, 10, 14, 0.86);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  backdrop-filter: blur(20px) saturate(1.1);
+}
+.mila-tabbar__inner {
+  width: min(600px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+.mila-tabbar__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 9px 4px calc(9px + max(0px, env(safe-area-inset-bottom) * 0));
+  min-height: 56px;
+  color: #8a8a92;
+  text-decoration: none;
+  transition: color 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.mila-tabbar__icon { display: grid; place-items: center; height: 24px; }
+.mila-tabbar__icon .mila-icon { stroke: currentColor; fill: none; }
+.mila-tabbar__label { font-size: 10.5px; font-weight: 650; letter-spacing: 0.01em; }
+.mila-tabbar__tab.is-active { color: #ff9bb0; }
+.mila-tabbar__tab.is-active .mila-tabbar__icon { filter: drop-shadow(0 0 9px rgba(255, 155, 176, 0.45)); }
+.mila-tabbar__tab:not(.is-active):hover { color: #c7c7cf; }
+
+/* Welcome (light) room */
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar {
+  background: rgba(255, 250, 252, 0.94);
+  border-top-color: rgba(120, 40, 70, 0.12);
+}
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab { color: #8b7f86; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab:not(.is-active):hover { color: #4a3a42; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab.is-active { color: #b83866; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab.is-active .mila-tabbar__icon { filter: drop-shadow(0 0 8px rgba(184, 56, 102, 0.28)); }
+
+/* Content clearance — reserve space so nothing hides behind the bar. */
+body[data-bottom-nav] .app-main,
+body[data-bottom-nav] main,
+body[data-bottom-nav] .phonetics-page,
+body[data-bottom-nav] .practice-page {
+  padding-bottom: calc(74px + env(safe-area-inset-bottom));
+}
+/* The floating Mila bot sits above the bar, not under it. */
+body[data-bottom-nav] .mila-guide__fab,
+body[data-bottom-nav] .mila-guide__launcher {
+  bottom: calc(74px + env(safe-area-inset-bottom));
+}
+
+/* ── Accent showcase slider (ShowcaseSlider.tsx) ──────────────────────────
+   Fully self-contained: its own warm-brown grain on soft-light (tooth without
+   the grey wash), independent of the card system's geometry. */
+.mila-showcase{position:relative;overflow:hidden;border-radius:16px;border:1px solid rgba(150,54,82,.16);
+  background:
+    radial-gradient(130% 90% at 12% 6%,#fffaf1 0%,rgba(255,250,241,0) 52%),
+    radial-gradient(120% 120% at 100% 100%,#f6e2c8 0%,rgba(246,226,200,0) 46%),
+    linear-gradient(155deg,#fdf3e4 0%,#fbebd6 100%);
+  box-shadow:0 20px 46px rgba(120,50,40,.14),0 3px 10px rgba(120,50,40,.09),inset 0 1px 0 rgba(255,255,255,.95);}
+.mila-showcase__grain{position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;opacity:.85;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='170'%20height='170'%3E%3Cfilter%20id='sg'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%200.42%200%200%200%200%200.24%200%200%200%200%200.12%200%200%200%200.7%200'/%3E%3C/filter%3E%3Crect%20width='170'%20height='170'%20filter='url(%23sg)'/%3E%3C/svg%3E");}
+.mila-showcase__track{display:flex;transition:transform .55s cubic-bezier(.5,0,.2,1);}
+.mila-showcase__slide{min-width:100%;box-sizing:border-box;padding:28px 30px;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center;}
+.mila-showcase__kick{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:#c02a5e;margin:0 0 8px;}
+.mila-showcase__kick::before{content:"";width:15px;height:2px;border-radius:2px;background:linear-gradient(90deg,#ff8ab0,#c02a5e);}
+.mila-showcase__city{font-family:var(--font-display,'Manrope'),serif;font-size:30px;line-height:1;color:#2a1a10;margin:0;letter-spacing:-.01em;}
+.mila-showcase__word{font-family:var(--font-display,'Manrope'),serif;font-size:38px;color:#241610;margin:14px 0 2px;letter-spacing:-.01em;}
+.mila-showcase__ipa{font-size:15px;color:#8a5a3e;margin:0 0 13px;font-weight:500;}
+.mila-showcase__chips{display:flex;gap:6px;flex-wrap:wrap;}
+.mila-showcase__chip{font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;background:rgba(224,48,104,.15);color:#b0234f;}
+.mila-showcase__chip.is-good{background:rgba(11,143,104,.16);color:#0a7d5c;}
+.mila-showcase__wave{display:flex;align-items:flex-end;gap:3px;height:34px;margin-top:16px;}
+.mila-showcase__wave i{width:3px;border-radius:2px;background:linear-gradient(180deg,#ff7aa8,#c02a5e);}
+.mila-showcase__ring{width:94px;height:94px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(from -90deg,#0eb37f var(--p),rgba(11,143,104,.16) 0);box-shadow:0 6px 16px rgba(11,143,104,.18);}
+.mila-showcase__ring>div{width:74px;height:74px;border-radius:50%;background:linear-gradient(155deg,#fdf3e4,#fbebd6);display:grid;place-content:center;text-align:center;}
+.mila-showcase__ring b{font-family:var(--font-display,'Manrope'),serif;font-size:26px;color:#0a7d5c;line-height:1;}
+.mila-showcase__ring span{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#a06a3e;}
+.mila-showcase__ctl{display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding:0 4px;}
+.mila-showcase__dots{display:flex;gap:7px;}
+.mila-showcase__dot{width:8px;height:8px;border-radius:50%;border:none;padding:0;cursor:pointer;background:rgba(150,54,82,.26);transition:all .3s;}
+.mila-showcase__dot.is-on{background:linear-gradient(90deg,#ff8ab0,#c02a5e);width:22px;border-radius:4px;}
+.mila-showcase__nav{display:flex;gap:8px;}
+.mila-showcase__nav button{width:34px;height:34px;border-radius:50%;border:1px solid rgba(192,42,94,.28);background:#fff;color:#c02a5e;cursor:pointer;font-size:15px;display:grid;place-items:center;transition:all .2s;box-shadow:0 2px 6px rgba(120,50,40,.1);}
+.mila-showcase__nav button:hover{background:linear-gradient(135deg,#e0447a,#b02350);color:#fff;border-color:transparent;}
+@media (max-width:640px){.mila-showcase__slide{grid-template-columns:1fr;gap:14px}.mila-showcase__ring{justify-self:start}}
