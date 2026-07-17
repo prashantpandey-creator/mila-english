@@ -21,12 +21,13 @@ No local screenshot counts. No "LIVE" claim without both.**
 | App-wide headings | globals `h1,h2` now use Yeseva One (loaded at layout level, not just landing) | `421fd86` | in-bundle |
 | Voice/Piper TTS | `/api/tts` serves real WAV | prior | 200 + RIFF WAV |
 | Inner-app shell | `AppShell`/`AppHeader`/`AppMain`, safe-area nav, pink-noir focus rooms | `e40a155` | live |
+| iOS reviewer surfaces | Bilingual `/privacy`, `/support`, and permanent authenticated account/guest deletion | `18d5811` (2026-07-17) | deploy run `29580794980` green; both pages 200 with [privacy](docs/app-store-assets/1.0/live-reviewer-proof/privacy.png) and [support](docs/app-store-assets/1.0/live-reviewer-proof/support.png) screenshots; disposable guest deletion 200 then profile 401 |
 
 ## LOCAL / UNPUSHED
 
-- `codex/mila-ios-app`: native iOS 1.0 source, signed local IPA, App Store
-  metadata/screenshots, public privacy/support pages, and permanent deletion.
-  Nothing in this line is a production claim until the deploy witness is added.
+- No unpushed product code. The Apple Distribution IPA remains local only
+  because App Store Connect is waiting for an interactive Apple ID sign-in and
+  app-record creation before validation/upload.
 
 ## OWED (asked, NOT done — do not claim these)
 1. **"Make the flow intuitive."** The information architecture / navigation flow
@@ -101,7 +102,9 @@ evidence. The app-specific procedure is in
 - [x] Five 6.9-inch screenshots captured at `1320×2868` from the passing UI
   journey in `docs/app-store-assets/1.0/screenshots-6.9-inch/`.
 - [ ] Microphone, transcription, chat, TTS, and deletion verified on physical iPhone.
-- [ ] Public privacy and support URLs deployed and rechecked.
+- [x] Public privacy and support URLs deployed and rechecked with live screenshots.
+- [x] Production deletion verified with a disposable guest: delete 200, then
+  profile 401 using the same session.
 - [x] Apple bundle ID created.
 - [ ] App Store app record created.
 - [x] Release archive exported as an Apple Distribution-signed IPA.
@@ -113,6 +116,8 @@ evidence. The app-specific procedure is in
 
 ### Apple release identifiers
 
+- Production merge commit: `18d5811aa556322f2ff094262c2b264a351fe28b`
+- Production deployment run: `29580794980` (success)
 - Bundle ID resource ID: `54MZM2T7K9`
 - Apple app ID: pending
 - App Store version ID: pending
