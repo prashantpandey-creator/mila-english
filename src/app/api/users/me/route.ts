@@ -55,7 +55,7 @@ export async function DELETE(request: NextRequest) {
     await tx.lesson.deleteMany({ where: { createdByUserId: userId } })
     await tx.progress.deleteMany({ where: { userId } })
     await tx.user.delete({ where: { id: userId } })
-  })
+  });
 
   (await cookies()).delete('token')
   return NextResponse.json({ deleted: true })
