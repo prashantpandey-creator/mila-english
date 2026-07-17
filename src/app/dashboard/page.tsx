@@ -13,6 +13,7 @@ import { Card, IconTile } from '@/components/ui/Card';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import LearningJourneyCard from '@/components/LearningJourneyCard';
 import ShowcaseSlider from '@/components/ShowcaseSlider';
+import Image from 'next/image';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
@@ -111,13 +112,9 @@ export default function DashboardPage() {
               <div aria-hidden style={{position:'relative',width:76,height:76,flexShrink:0}}>
                 <span className="mila-hero-halo" style={{position:'absolute',inset:-7,borderRadius:'50%',
                   background:`conic-gradient(from 0deg, ${C.voice}00, ${C.voice}55, ${C.venus}55, ${C.voice}00)`,filter:'blur(6px)'}}/>
-                <span className="mila-hero-orb" style={{position:'absolute',inset:0,borderRadius:'50%',
-                  background:`radial-gradient(circle at 32% 30%, ${C.venusBright} 0%, ${C.venus} 34%, #7a2547 62%, #1a0a12 100%)`,
-                  boxShadow:'0 0 34px rgba(242,139,173,0.35), inset 0 0 18px rgba(255,189,208,0.5)'}}/>
-                <span style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
-                  {[13,21,16,10].map((h,i)=>(
-                    <i key={i} className="mila-hero-bar" style={{width:3,height:h,borderRadius:2,background:'rgba(255,255,255,0.92)',animationDelay:`${i*-0.22}s`}}/>
-                  ))}
+                <span className="mila-hero-orb" style={{position:'absolute',inset:0,display:'grid',placeItems:'center'}}>
+                  <Image src="/mascot/mila-mascot.png" alt="Mila" width={1254} height={1254}
+                    style={{width:'100%',height:'100%',objectFit:'contain',filter:'drop-shadow(0 6px 12px rgba(0,15,28,0.35))'}}/>
                 </span>
               </div>
               <div style={{minWidth:0}}>
