@@ -12,6 +12,7 @@ import LeaderboardCard from '@/components/LeaderboardCard';
 import { Card, IconTile } from '@/components/ui/Card';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import LearningJourneyCard from '@/components/LearningJourneyCard';
+import ShowcaseSlider from '@/components/ShowcaseSlider';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
@@ -151,6 +152,8 @@ export default function DashboardPage() {
             </div>
           </div>
         </section>
+
+        <ShowcaseSlider />
 
         {/* AI Assessment Banner (If pending) */}
         {user?.level === 'pending' && (
