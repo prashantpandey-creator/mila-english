@@ -196,7 +196,7 @@ export default function DashboardPage() {
             {kind:'level' as const,ru:'Определить уровень',en:'Level check',ruSub:'Короткая голосовая проверка',enSub:'A short voice check',href:'/assessment'},
             {kind:'listening' as const,ru:'Аудирование',en:'Listening',ruSub:'Слушай, различай и повторяй',enSub:'Hear, notice and repeat',href:'/listen'},
             {kind:'vocabulary' as const,ru:'Новые слова',en:'New words',ruSub:'Личные сохранённые повторения',enSub:'Personal saved reviews',href:'/vocabulary'},
-            {kind:'tutor' as const,ru:'Мила-наставница',en:'Talk with Mila',ruSub:'Живая голосовая практика',enSub:'Calm, live voice practice',href:'/darshan'},
+            {kind:'tutor' as const,ru:'Мила-наставница',en:'AI tutor',ruSub:'Текстовый чат с Милой',enSub:'Text chat with Mila',href:'/chat'},
             {kind:'grammar' as const,ru:'Грамматика',en:'Grammar',ruSub:'Практика без сухих правил',enSub:'Patterns without dry rules',href:'/grammar'},
           ].map((item)=>(
             <LearningJourneyCard
