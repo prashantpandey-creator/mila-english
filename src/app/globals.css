@@ -30,11 +30,12 @@ body {
   min-height: 100vh;
 }
 
-/* Display type — contemporary, geometric, and fully Cyrillic-capable. */
+/* Display type — the front door's Yeseva One carries every room's headings
+   (Direction A, uniform across the site). Full Cyrillic. */
 h1, h2 {
-  font-family: var(--font-display, 'Manrope'), var(--font-sans, 'Manrope'), system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.035em;
+  font-family: var(--lp-font-serif, 'Yeseva One'), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 /* ── Living footage backdrop (Atmosphere component) ── */
@@ -3410,3 +3411,16 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__textchip 
   .dashboard-page__header .dashboard-page__avatar { display: none !important; }
   .dashboard-page__header .theme-toggle { display: none; }
 }
+
+/* ── Direction A (Figma el5eMD7Zet42R9Heupfstv, board 2:2 — chosen 2026-07-17):
+   the front door's city is VIVID in the hero and hands off to solid paper
+   below the fold (the .lp::before pixel-stop scrim in landing.css). These
+   overrides sit at end-of-file so they win the cascade over the earlier
+   .atmosphere--welcome grade (equal specificity, later order). ── */
+.atmosphere--welcome video,
+.atmosphere--welcome img {
+  filter: saturate(1.02) contrast(1.04) brightness(0.98) blur(0.4px);
+  transform: scale(1.015);
+}
+.atmosphere--welcome video.is-on,
+.atmosphere--welcome img.is-on { opacity: 0.8; }

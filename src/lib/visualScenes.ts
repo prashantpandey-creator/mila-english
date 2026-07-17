@@ -84,14 +84,15 @@ const ROUTE_SCENES: Record<'nature' | 'study' | 'social' | 'club', VisualScene[]
   // café windows, night skylines, silk — the world the modern learner is
   // heading toward. The garden scene stays defined above for future rooms.
   social: [MILA_STUDIO],
+  // Front door = the CITY in real color. The cafe/phone people clips are out
+  // (owner directive 2026-07-17: wrong faces for the market, and beige-washed);
+  // woman-coffee retired to its topic scene. woman-silk stays: highest-grade
+  // clip in the library (1080p60) and on-palette.
   club: [
-    legacyScene('woman-cafe-laptop', 'brand'),
     legacyScene('city-night-bokeh', 'place'),
-    legacyScene('woman-city-phone', 'brand'),
-    legacyScene('woman-coffee', 'brand', '55% center'),
     legacyScene('us-manhattan', 'place'),
-    legacyScene('uk-bigben-night', 'place'),
     legacyScene('woman-silk', 'brand'),
+    legacyScene('uk-bigben-night', 'place'),
   ],
 };
 
