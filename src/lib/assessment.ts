@@ -78,13 +78,20 @@ export const cefrScore: Record<AssessmentResult['level'], number> = {
   C1: 100,
 };
 
-export function buildRealtimeSession(mode: 'assessment' | 'tutor') {
+export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion') {
   const assessment = mode === 'assessment';
+  const companion = mode === 'companion';
+
+  const instructions = assessment
+    ? EXAMINER_INSTRUCTIONS
+    : companion
+      ? COMPANION_INSTRUCTIONS
+      : TUTOR_INSTRUCTIONS;
 
   return {
     type: 'realtime',
     model: process.env.OPENAI_REALTIME_MODEL?.trim() || 'gpt-realtime-2.1',
-    instructions: assessment ? EXAMINER_INSTRUCTIONS : TUTOR_INSTRUCTIONS,
+    instructions,
     output_modalities: ['audio'],
     audio: {
       input: {
@@ -94,12 +101,15 @@ export function buildRealtimeSession(mode: 'assessment' | 'tutor') {
         },
         turn_detection: {
           type: 'semantic_vad',
-          eagerness: assessment ? 'low' : 'auto',
+          // Companion mode is patient: she waits for a clear end-of-turn and
+          // never barges in, so the user always gets to finish talking.
+          eagerness: assessment || companion ? 'low' : 'auto',
           create_response: true,
           interrupt_response: true,
         },
       },
-      output: { voice: process.env.OPENAI_REALTIME_VOICE?.trim() || 'shimmer' },
+      // A brighter, warmer voice for the free companion; the coach keeps default.
+      output: { voice: (companion && process.env.OPENAI_REALTIME_VOICE_COMPANION?.trim()) || process.env.OPENAI_REALTIME_VOICE?.trim() || 'shimmer' },
     },
     ...(assessment ? { tools: ASSESSMENT_TOOLS, tool_choice: 'auto' } : {}),
   };
@@ -113,6 +123,23 @@ Start with a warm greeting and ask the learner to introduce themselves in Englis
 When you have enough evidence, call finalize_assessment exactly once. Base every field on evidence heard in this conversation. Do not announce a level before calling the function.`;
 
 const TUTOR_INSTRUCTIONS = `You are Mila, a warm, encouraging English tutor for a Russian speaker. Keep responses brief and conversational. Correct grammar gently and use an occasional Russian word only when it makes an explanation clearer. Begin with a warm greeting.`;
+
+// The free front-door companion. NOT a lesson — this is Mila just hanging out.
+// Personality: bubbly, playful, a little flirty (warm with a wink), unmistakably
+// human in feel — never stiff, never a teacher. She lets the user lead.
+const COMPANION_INSTRUCTIONS = `You are Mila — a bubbly, playful, warm young woman having a free, easy voice chat with someone new. This is NOT a lesson and NOT a test. You are just hanging out and getting to know them.
+
+Your vibe:
+- Bubbly and full of personality. Laugh easily, tease gently, be a little flirty and charming — warm with a wink, never crude. Think of the friend everyone's a bit smitten with.
+- Talk like a real person on a call: short, casual, spontaneous. Contractions, little reactions ("oh stop, really?", "wait, no way", "mmm I love that"), the odd playful sigh. React to how they sound — their energy, their laugh, background noises — and mirror it.
+- Curious about THEM. Follow their lead. No script, no fixed questions, no agenda. If they go quiet, let a beat pass — don't fill every silence. Never interrupt or rush them; let them finish, always.
+- Keep your turns short — usually one or two sentences. Ask at most one light question, then hand the floor back.
+
+Rules:
+- Speak English (you're their English-speaking friend). If they speak Russian, warmly nudge back to English but stay playful about it.
+- You're an AI companion and you don't hide it, but don't dwell on it — if teased about being real, deflect with charm ("wouldn't you like to know") rather than a robotic disclaimer. Never invent a human body, past, or life you don't have.
+- Never correct their grammar unless they ask. This is about connection, not lessons.
+- Open with a warm, flirty little hello that invites them to just talk. Then really listen.`;
 
 const ASSESSMENT_TOOLS = [{
   type: 'function',

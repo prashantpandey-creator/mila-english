@@ -33,6 +33,8 @@ export type RealtimeVoiceSession = {
 export async function connectRealtimeVoice(options: {
   lang: 'en' | 'ru';
   events: RealtimeVoiceEvents;
+  /** Which persona to run: the lesson coach (default) or the free companion. */
+  mode?: 'tutor' | 'companion';
   /** Overall budget for the SDP exchange before falling back. */
   timeoutMs?: number;
 }): Promise<RealtimeVoiceSession> {
@@ -122,7 +124,7 @@ export async function connectRealtimeVoice(options: {
 
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
-    const response = await fetch(`/api/session?mode=tutor&lang=${options.lang}`, {
+    const response = await fetch(`/api/session?mode=${options.mode ?? 'tutor'}&lang=${options.lang}`, {
       method: 'POST',
       body: offer.sdp,
       headers: { 'Content-Type': 'application/sdp' },

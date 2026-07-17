@@ -11,8 +11,13 @@ function errorResponse(message: string, status: number, code: string) {
 }
 
 export async function POST(req: Request) {
+  const rawMode = new URL(req.url).searchParams.get('mode');
+  const mode = rawMode === 'assessment' ? 'assessment' : rawMode === 'companion' ? 'companion' : 'tutor';
+
   const user = await authenticate(new Request(req.url, { headers: req.headers }) as any);
-  if (!user) {
+  // The free front-door companion is open to guests; the coach and the
+  // assessment still require a signed-in learner.
+  if (!user && mode !== 'companion') {
     return errorResponse('You must be logged in to start a voice session.', 401, 'UNAUTHORIZED');
   }
 
@@ -32,13 +37,17 @@ export async function POST(req: Request) {
     return errorResponse('The WebRTC SDP offer is invalid.', 400, 'INVALID_SDP');
   }
 
-  const mode = new URL(req.url).searchParams.get('mode') === 'assessment' ? 'assessment' : 'tutor';
   const form = new FormData();
   form.set('sdp', sdp);
   form.set('session', JSON.stringify(buildRealtimeSession(mode)));
 
+  // A stable-enough identity for OpenAI safety: the learner when signed in,
+  // otherwise the guest device id, otherwise a coarse request fingerprint.
+  const identity = user?.sub
+    || req.headers.get('x-device-id')
+    || createHash('sha256').update(`guest:${req.headers.get('user-agent') || ''}`).digest('hex').slice(0, 24);
   const safetyIdentifier = createHash('sha256')
-    .update(`mila-realtime:${user.sub}`)
+    .update(`mila-realtime:${identity}`)
     .digest('hex');
 
   try {

@@ -39,6 +39,9 @@ export default function VoicePage() {
   const [answer, setAnswer] = useState("");
   const [invI, setInvI] = useState(0);
   const [orbSize, setOrbSize] = useState(320);
+  // Free front-door companion (?free=1): the playful, guest-open general chat,
+  // not the lesson coach. Read once on mount.
+  const [freeMode] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("free") === "1");
 
   const transcriptionRef = useRef<TranscriptionSession | null>(null);
   const realtimeRef = useRef<RealtimeVoiceSession | null>(null);
@@ -293,6 +296,7 @@ export default function VoicePage() {
   const startRealtimeVoice = useCallback(async () => {
     const session = await connectRealtimeVoice({
       lang: lang === "ru" ? "ru" : "en",
+      mode: freeMode ? "companion" : "tutor",
       events: {
         onListening: () => {
           if (!activeRef.current || engineRef.current !== "realtime") return;
@@ -316,6 +320,9 @@ export default function VoicePage() {
           setAnswer(fullText);
         },
         onTurnComplete: ({ user, assistant }) => {
+          // Free guests aren't signed in and keep no history; only the
+          // logged-in coach persists turns to the shared companion memory.
+          if (freeMode) return;
           // Voice Mila and text Mila share one memory: persist the spoken turn.
           void fetch("/api/chat/history", {
             method: "POST",
@@ -346,7 +353,7 @@ export default function VoicePage() {
     setIsConnected(true);
     setVoiceError("");
     setPhase("listening");
-  }, [lang, scheduleListening]);
+  }, [lang, scheduleListening, freeMode]);
 
   const connectToVoice = async () => {
     if (isConnecting) return;

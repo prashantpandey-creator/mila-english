@@ -130,6 +130,8 @@ export default function HomePage() {
   };
 
   const startCta = () => router.push(isLoggedIn ? '/dashboard' : '/register');
+  // The free front-door conversation: guest-open, playful companion Mila. No wall.
+  const startFreeTalk = () => router.push('/darshan?free=1');
   const openDoor = (href: string) => router.push(isLoggedIn ? href : '/register');
 
   const selectDemo = (key: DemoKey) => {
@@ -312,6 +314,35 @@ export default function HomePage() {
       </header>
 
       <main id="lp-main">
+        {/* ── Introducing Mila — the free front-door conversation ── */}
+        <section className="lp-intro" aria-label={T('Познакомьтесь с Милой', 'Meet Mila')}>
+          <div className="lp-intro__glow" aria-hidden />
+          <div className="lp-shell lp-intro__inner">
+            <span className="lp-intro__eyebrow">{T('Знакомьтесь — Мила', 'Introducing Mila')}</span>
+            <h1 className="lp-intro__title">
+              {lang === 'ru'
+                ? <>Просто поговори с <em>Милой.</em></>
+                : <>Just talk to <em>Mila.</em></>}
+            </h1>
+            <p className="lp-intro__lede">
+              {T(
+                'Живой голосовой разговор с твоей AI-подругой — тёплой, весёлой, настоящей. Без урока, без вопросов по списку. Нажми и говори — она слушает.',
+                'A live voice chat with your AI girl — warm, playful, real. No lesson, no scripted questions. Tap and talk — she listens.',
+              )}
+            </p>
+            <button className="lp-intro__cta" onClick={startFreeTalk}>
+              <span className="lp-intro__pulse" aria-hidden><i /><i /><i /></span>
+              {T('Начать разговор с Милой', 'Start a conversation with Mila now')}
+              <Icon name="arrow" size={19} />
+            </button>
+            <div className="lp-intro__assure">
+              <span><Icon name="check" size={13} />{T('Бесплатно', 'Free')}</span>
+              <span><Icon name="check" size={13} />{T('Без регистрации', 'No sign-up')}</span>
+              <span><Icon name="voice" size={13} />{T('Просто голосом', 'Just your voice')}</span>
+            </div>
+          </div>
+        </section>
+
         {/* ── Hero ── */}
         <section className="lp-hero">
           <div className="lp-shell lp-hero__stage">
