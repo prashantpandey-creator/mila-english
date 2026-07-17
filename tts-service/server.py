@@ -16,32 +16,55 @@ from piper import PiperVoice
 
 MODEL_PATH = os.environ.get("TTS_MODEL_PATH", "/models/amy/en_US-amy-medium.onnx")
 CONFIG_PATH = os.environ.get("TTS_CONFIG_PATH", MODEL_PATH + ".json")
+# Russian neural voice (irina, female — matches Mila) alongside English. Both
+# self-hosted, so a Russian learner gets a real voice with no outbound request
+# and no VPN — the browser-TTS fallback is no longer the Russian path.
+RU_MODEL_PATH = os.environ.get("TTS_RU_MODEL_PATH", "/models/irina/ru_RU-irina-medium.onnx")
+RU_CONFIG_PATH = os.environ.get("TTS_RU_CONFIG_PATH", RU_MODEL_PATH + ".json")
 MAX_CHARS = int(os.environ.get("TTS_MAX_CHARS", "1200"))
 
 voice = PiperVoice.load(MODEL_PATH, CONFIG_PATH)
+
+# The Russian voice is best-effort: if its model is missing the service still
+# serves English (Russian then falls back to the browser, as before).
+ru_voice = None
+try:
+    ru_voice = PiperVoice.load(RU_MODEL_PATH, RU_CONFIG_PATH)
+except Exception:  # noqa: BLE001 — degrade to English-only, never fail to boot
+    ru_voice = None
+
 app = FastAPI()
 
 
 class SpeakRequest(BaseModel):
     text: str
-    # lang is accepted for forward-compat; this voice is English-only. Russian
-    # text is handled by the caller's browser-TTS fallback, not here.
+    # 'ru'/'ru-RU' picks the Russian voice; anything else uses English.
     lang: str | None = None
 
 
-def synth_wav(text: str) -> bytes:
+def pick_voice(lang: str | None) -> PiperVoice:
+    if ru_voice is not None and (lang or "").lower().startswith("ru"):
+        return ru_voice
+    return voice
+
+
+def synth_wav(text: str, selected: PiperVoice) -> bytes:
     """Render text to a 16-bit PCM WAV in memory. Piper's synthesize_wav writes
     frames (and the WAV header) into a wave.Wave_write; we hand it a BytesIO so
     nothing touches disk."""
     buf = io.BytesIO()
     with wave.open(buf, "wb") as wav:
-        voice.synthesize_wav(text, wav)
+        selected.synthesize_wav(text, wav)
     return buf.getvalue()
 
 
 @app.get("/health")
 def health():
-    return {"ok": True, "voice": os.path.basename(MODEL_PATH)}
+    return {
+        "ok": True,
+        "voice": os.path.basename(MODEL_PATH),
+        "ru_voice": os.path.basename(RU_MODEL_PATH) if ru_voice is not None else None,
+    }
 
 
 @app.post("/tts")
@@ -52,7 +75,7 @@ def tts(req: SpeakRequest):
     if len(text) > MAX_CHARS:
         text = text[:MAX_CHARS]
     try:
-        audio = synth_wav(text)
+        audio = synth_wav(text, pick_voice(req.lang))
     except Exception as exc:  # noqa: BLE001 — surface a clean 500, caller falls back
         raise HTTPException(status_code=500, detail=f"synthesis failed: {exc}") from exc
     return Response(

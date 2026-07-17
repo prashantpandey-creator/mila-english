@@ -12,11 +12,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 # from the Hugging Face CDN. Production synthesis therefore makes no outbound
 # request. curl (not huggingface_hub) keeps the image lean.
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /models/amy && \
+    mkdir -p /models/amy /models/irina && \
     base="https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium" && \
     curl -fsSL "$base/en_US-amy-medium.onnx" -o /models/amy/en_US-amy-medium.onnx && \
     curl -fsSL "$base/en_US-amy-medium.onnx.json" -o /models/amy/en_US-amy-medium.onnx.json && \
-    test -s /models/amy/en_US-amy-medium.onnx
+    test -s /models/amy/en_US-amy-medium.onnx && \
+    rubase="https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/irina/medium" && \
+    curl -fsSL "$rubase/ru_RU-irina-medium.onnx" -o /models/irina/ru_RU-irina-medium.onnx && \
+    curl -fsSL "$rubase/ru_RU-irina-medium.onnx.json" -o /models/irina/ru_RU-irina-medium.onnx.json && \
+    test -s /models/irina/ru_RU-irina-medium.onnx
 
 COPY server.py ./
 EXPOSE 8002

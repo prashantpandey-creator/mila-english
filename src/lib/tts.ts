@@ -60,14 +60,21 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
 // blocked route, Russian text, a device with no English voice on the box — falls
 // straight through to the browser path, which stays the resilient fallback.
 
-/** Decide whether Piper should handle this utterance. Pure + tested: Piper's
- *  amy is English-only, so we take English locales and reject predominantly
- *  Cyrillic text (a Russian string mis-tagged en-US must never be forced through
- *  an English voice). Everything else is the browser's job. */
+/** Decide whether Piper should handle this utterance. The self-hosted service
+ *  now carries TWO neural voices — English (amy) and Russian (irina) — so we
+ *  route both to Piper and let the actual spoken locale pick the voice. Any
+ *  other language stays the browser's job. Russia-safe: both voices are
+ *  self-hosted, no outbound TTS request. */
 export function shouldUsePiper(text: string, lang: string): boolean {
   if (!text.trim()) return false;
-  if (!lang.toLowerCase().startsWith('en')) return false;
-  return spokenLocaleForText(text, lang) !== 'ru-RU';
+  // Cyrillic content always maps to the Russian voice (irina), even when a
+  // Russian line is mis-tagged en-US — content wins.
+  if (spokenLocaleForText(text, lang) === 'ru-RU') return true;
+  // Otherwise only English routes to Piper (amy); French, German, etc. keep
+  // the browser voice — the locale classifier only knows en/ru, so we must
+  // gate other languages by their tag, not by content.
+  const l = lang.toLowerCase();
+  return l.startsWith('en') || l.startsWith('ru');
 }
 
 // A new spoken line supersedes whatever Piper clip is playing. We keep a single
@@ -83,7 +90,7 @@ function stopPiper(): void {
 /** Fetch a synthesized WAV for the text; null on any failure so the caller
  *  can fall back to the browser voice. Never throws. Fail-fast ceiling keeps
  *  a hung service from producing silence. */
-async function fetchPiperClip(text: string): Promise<Blob | null> {
+async function fetchPiperClip(text: string, lang = 'en-US'): Promise<Blob | null> {
   if (typeof window === 'undefined' || typeof fetch === 'undefined') return null;
   try {
     const ctrl = new AbortController();
@@ -93,7 +100,8 @@ async function fetchPiperClip(text: string): Promise<Blob | null> {
       res = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ text }),
+        // The service picks amy (en) or irina (ru) from lang.
+        body: JSON.stringify({ text, lang: spokenLocaleForText(text, lang) }),
         signal: ctrl.signal,
       });
     } finally {
@@ -131,8 +139,8 @@ async function playPiperClip(blob: Blob, onPlayStart?: () => void): Promise<bool
 }
 
 /** Fetch and play in one step — the one-shot ttsSpeak path. */
-async function speakViaPiper(text: string): Promise<boolean> {
-  const blob = await fetchPiperClip(text);
+async function speakViaPiper(text: string, lang = 'en-US'): Promise<boolean> {
+  const blob = await fetchPiperClip(text, lang);
   if (!blob) return false;
   return playPiperClip(blob);
 }
@@ -145,7 +153,7 @@ export async function ttsSpeak(text: string, lang = 'en-US', rate = 0.85): Promi
   window.speechSynthesis?.cancel();
   stopPiper();
   // Human voice first; on any failure, fall through to the browser path below.
-  if (shouldUsePiper(text, lang) && (await speakViaPiper(text))) return;
+  if (shouldUsePiper(text, lang) && (await speakViaPiper(text, lang))) return;
   return ttsSpeakBrowser(text, lang, rate);
 }
 
@@ -158,15 +166,14 @@ export const MASCOT_PITCH = 1.2;
 // ── Instant fillers ──────────────────────────────────────────────────────────
 // Backchannels must sound within a breath of end-of-turn; a live Piper fetch
 // (~1.5s on prod) would defeat their purpose. Voice surfaces pre-cache the
-// fixed pool once; a cached filler plays instantly in the good voice, and
-// anything uncached (all Russian — Piper's amy is English-only) uses the
-// browser voice immediately rather than waiting.
+// fixed pool once; a cached filler plays instantly in the good voice.
+// English and Russian fillers both cache now (both have a self-hosted voice).
 const _fillerClips = new Map<string, Blob>();
 
 export async function prefetchFillerClips(texts: string[]): Promise<void> {
   await Promise.all(texts.map(async (text) => {
-    if (_fillerClips.has(text) || !shouldUsePiper(text, 'en-US')) return;
-    const blob = await fetchPiperClip(text);
+    if (_fillerClips.has(text) || !shouldUsePiper(text, spokenLocaleForText(text, 'en-US'))) return;
+    const blob = await fetchPiperClip(text, spokenLocaleForText(text, 'en-US'));
     if (blob) _fillerClips.set(text, blob);
   }));
 }
@@ -358,7 +365,7 @@ export async function createStreamingTtsSession(
   const enqueue = (text: string) => {
     if (!text || cancelled) return;
     const lang = spokenLocaleForText(text, fallbackLang);
-    const clip = shouldUsePiper(text, lang) ? fetchPiperClip(text) : null;
+    const clip = shouldUsePiper(text, lang) ? fetchPiperClip(text, lang) : null;
     queue.push({ text, clip });
     speakNext();
   };

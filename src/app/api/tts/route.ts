@@ -14,9 +14,11 @@ const MAX_CHARS = 1200;
 
 export async function POST(req: NextRequest) {
   let text = '';
+  let lang = '';
   try {
     const body = await req.json();
     text = typeof body?.text === 'string' ? body.text : '';
+    lang = typeof body?.lang === 'string' ? body.lang : '';
   } catch {
     return NextResponse.json({ error: 'invalid json' }, { status: 400 });
   }
@@ -28,7 +30,8 @@ export async function POST(req: NextRequest) {
     const r = await fetch(`${TTS_URL}/tts`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text }),
+      // lang selects amy (en) or irina (ru) inside the service.
+      body: JSON.stringify({ text, lang }),
     });
     if (!r.ok || !r.body) {
       return NextResponse.json({ error: 'tts service unavailable' }, { status: 502 });

@@ -13,11 +13,12 @@ async function main() {
   assert.strictEqual(shouldUsePiper('Say the word again.', 'en-GB'), true, 'en-GB English → Piper');
   assert.strictEqual(shouldUsePiper('Repeat after me.', 'en-IN'), true, 'en-IN English → Piper');
 
-  // Russian is amy's blind spot — must fall through to the browser voice.
-  assert.strictEqual(shouldUsePiper('Теперь попробуем ещё раз.', 'ru-RU'), false, 'ru-RU → browser');
+  // Russian now has its own self-hosted voice (irina) — routes to Piper.
+  assert.strictEqual(shouldUsePiper('Теперь попробуем ещё раз.', 'ru-RU'), true, 'ru-RU → Piper (irina)');
 
-  // A Russian string mis-tagged as English must still be rejected (content wins).
-  assert.strictEqual(shouldUsePiper('Привет, как дела сегодня утром?', 'en-US'), false, 'Cyrillic under en-US → browser');
+  // Content wins over tag: Cyrillic under an en-US tag still routes to the
+  // Russian voice (spokenLocaleForText detects the Cyrillic).
+  assert.strictEqual(shouldUsePiper('Привет, как дела сегодня утром?', 'en-US'), true, 'Cyrillic under en-US → Piper (ru voice)');
 
   // Non-English locales never take the English voice.
   assert.strictEqual(shouldUsePiper('Bonjour tout le monde', 'fr-FR'), false, 'fr-FR → browser');
