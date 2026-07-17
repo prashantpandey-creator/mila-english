@@ -3,11 +3,12 @@
 // chunks, ambience media, mascot art, Google Fonts). Pages and /api/* are never
 // intercepted — they always hit the network, so a new deploy is visible on the
 // next load and no stale HTML can pin users to an old build.
-const CACHE = 'mila-static-v1'
+const CACHE = 'mila-static-v2'
 
 const CACHEABLE = [
   /^\/_next\/static\//,          // content-hashed build chunks — immutable
   /^\/ambience\//,               // backdrop stills + clips
+  /^\/visuals\//,                // versioned commissioned campaign artwork
   /^\/mascot\//,                 // mascot art
   /^\/audio\//,                  // baked accent phrases
 ]
