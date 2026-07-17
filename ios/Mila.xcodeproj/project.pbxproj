@@ -1,0 +1,555 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06A9E7CF220B9D62A025079C /* MilaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9C67D2ECF2EED3562E45F9 /* MilaApp.swift */; };
+		25A9A1500E9435E4CD6D56DF /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD08455DAE1826058C259381 /* HomeView.swift */; };
+		303AC9C81A550B1A71A921CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CD94AE8B2E2570895B0978CE /* InfoPlist.strings */; };
+		3B29E24911F512E9ACAA18C1 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F750A3564C74658B9B495C7B /* RootView.swift */; };
+		48D9D8041C8447C73CB30B41 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6851F578627A50D41C5F707C /* ProgressView.swift */; };
+		4C38F81F4B0D67621831889C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55EF50ADC570369E3FAB398 /* SettingsView.swift */; };
+		5E285A6DCBC7E6D6DF6E330D /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E52AC22CE1DA276972B448 /* NetworkMonitor.swift */; };
+		60A2C7497FE5C15C5BDDBB84 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A6520A93483358081117DA8 /* Assets.xcassets */; };
+		6C9DD379395B8BEACB3E339D /* WebModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF931871EC762E8F86947C91 /* WebModuleView.swift */; };
+		6FE52274C68C91C71F9DE585 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E2AE3A0EBEE9CB2D8073CC /* SessionStore.swift */; };
+		7EA7A6E08128FE8000657084 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D7D86F1D62BC74EAD38B282E /* PrivacyInfo.xcprivacy */; };
+		84EEC9784FBA8C8CD88B239F /* LearnView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FFE84F023C49CBF8F7F8A2 /* LearnView.swift */; };
+		A09C3CE006D8C6DCEE5E5EAB /* MilaAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE18AEE4B70861097077C88 /* MilaAPI.swift */; };
+		A11AE6B316EF5009C3971E13 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FDFEBB100478A3808F202854 /* InfoPlist.strings */; };
+		AC6F46CA362877251C613898 /* MilaTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A030EA647F069B19E11B7BF /* MilaTheme.swift */; };
+		B2C8CAA28F55E14E845F7F25 /* MilaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8389B8EDBAE5962E1CEB1BBD /* MilaUITests.swift */; };
+		BAA871EC20CBC2FE0DFE9F5C /* MilaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B97A4EF88AFBBE12A8499 /* MilaModels.swift */; };
+		E4BF54AAAA157475ADC4BC22 /* SpeakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A67AB97233B4A7E7EE01A5C /* SpeakView.swift */; };
+		E705FA7E8BF7556DCF92FCB9 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F05CFB27FB049FD5154DD /* ChatView.swift */; };
+		EE7F15C1D81241FFC5900E86 /* VoicePracticeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B255A6D4B564542DAAF83A88 /* VoicePracticeModel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F83D3E79D30BC81662CF6142 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 67915754A1F54D8A0CE249AE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 09DB56134C76A790968CFE8F;
+			remoteInfo = Mila;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		2A67AB97233B4A7E7EE01A5C /* SpeakView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakView.swift; sourceTree = "<group>"; };
+		47E52AC22CE1DA276972B448 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		47E98CF8932BDE320606A586 /* MilaUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MilaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4EE18AEE4B70861097077C88 /* MilaAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilaAPI.swift; sourceTree = "<group>"; };
+		553B97A4EF88AFBBE12A8499 /* MilaModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilaModels.swift; sourceTree = "<group>"; };
+		5A6520A93483358081117DA8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5C4F05CFB27FB049FD5154DD /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		6851F578627A50D41C5F707C /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
+		7A030EA647F069B19E11B7BF /* MilaTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilaTheme.swift; sourceTree = "<group>"; };
+		8389B8EDBAE5962E1CEB1BBD /* MilaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilaUITests.swift; sourceTree = "<group>"; };
+		AB9C67D2ECF2EED3562E45F9 /* MilaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilaApp.swift; sourceTree = "<group>"; };
+		B255A6D4B564542DAAF83A88 /* VoicePracticeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicePracticeModel.swift; sourceTree = "<group>"; };
+		B55EF50ADC570369E3FAB398 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		BD08455DAE1826058C259381 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C244FE458A7DCA7BDCAB0B49 /* Mila.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Mila.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD94AE8B2E2570895B0978CE /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = InfoPlist.strings; sourceTree = "<group>"; };
+		D5E2AE3A0EBEE9CB2D8073CC /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		D7D86F1D62BC74EAD38B282E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		EF931871EC762E8F86947C91 /* WebModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebModuleView.swift; sourceTree = "<group>"; };
+		F750A3564C74658B9B495C7B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		F8FFE84F023C49CBF8F7F8A2 /* LearnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnView.swift; sourceTree = "<group>"; };
+		FDFEBB100478A3808F202854 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = InfoPlist.strings; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1BDFD12D5E7CC441443550F7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				553B97A4EF88AFBBE12A8499 /* MilaModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		2A7A5262DE9A7F882C4DEB05 /* MilaUITests */ = {
+			isa = PBXGroup;
+			children = (
+				8389B8EDBAE5962E1CEB1BBD /* MilaUITests.swift */,
+			);
+			path = MilaUITests;
+			sourceTree = "<group>";
+		};
+		46EA350882501C871E3C62F3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C244FE458A7DCA7BDCAB0B49 /* Mila.app */,
+				47E98CF8932BDE320606A586 /* MilaUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4D6C76F884581085C90CB999 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5C4F05CFB27FB049FD5154DD /* ChatView.swift */,
+				BD08455DAE1826058C259381 /* HomeView.swift */,
+				F8FFE84F023C49CBF8F7F8A2 /* LearnView.swift */,
+				6851F578627A50D41C5F707C /* ProgressView.swift */,
+				F750A3564C74658B9B495C7B /* RootView.swift */,
+				B55EF50ADC570369E3FAB398 /* SettingsView.swift */,
+				2A67AB97233B4A7E7EE01A5C /* SpeakView.swift */,
+				EF931871EC762E8F86947C91 /* WebModuleView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		79AC33CA1EE9AF24240D77A7 /* Mila */ = {
+			isa = PBXGroup;
+			children = (
+				8A9E6C991F815E63FC9BCB39 /* App */,
+				1BDFD12D5E7CC441443550F7 /* Models */,
+				A366AFD080541D66AFD56647 /* Networking */,
+				D23EA9787B51FA5DDA151599 /* Resources */,
+				E9AADFEB7525BE29C55BDA27 /* Services */,
+				4D6C76F884581085C90CB999 /* Views */,
+			);
+			path = Mila;
+			sourceTree = "<group>";
+		};
+		8A9E6C991F815E63FC9BCB39 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				AB9C67D2ECF2EED3562E45F9 /* MilaApp.swift */,
+				7A030EA647F069B19E11B7BF /* MilaTheme.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		8FD0960E0729F7101B7C45BA = {
+			isa = PBXGroup;
+			children = (
+				79AC33CA1EE9AF24240D77A7 /* Mila */,
+				2A7A5262DE9A7F882C4DEB05 /* MilaUITests */,
+				46EA350882501C871E3C62F3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A366AFD080541D66AFD56647 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				4EE18AEE4B70861097077C88 /* MilaAPI.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		C48037E43E89916DDF294CAF /* ru.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				CD94AE8B2E2570895B0978CE /* InfoPlist.strings */,
+			);
+			path = ru.lproj;
+			sourceTree = "<group>";
+		};
+		D23EA9787B51FA5DDA151599 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5A6520A93483358081117DA8 /* Assets.xcassets */,
+				D7D86F1D62BC74EAD38B282E /* PrivacyInfo.xcprivacy */,
+				E8FCCDE9FB7D12A5CAA5E4EE /* en.lproj */,
+				C48037E43E89916DDF294CAF /* ru.lproj */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		E8FCCDE9FB7D12A5CAA5E4EE /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FDFEBB100478A3808F202854 /* InfoPlist.strings */,
+			);
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
+		E9AADFEB7525BE29C55BDA27 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				47E52AC22CE1DA276972B448 /* NetworkMonitor.swift */,
+				D5E2AE3A0EBEE9CB2D8073CC /* SessionStore.swift */,
+				B255A6D4B564542DAAF83A88 /* VoicePracticeModel.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		09DB56134C76A790968CFE8F /* Mila */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F935AC95950F291AD6661F20 /* Build configuration list for PBXNativeTarget "Mila" */;
+			buildPhases = (
+				123056585088252B223F0F85 /* Sources */,
+				E80680EA722CFC6B8C0E4B08 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Mila;
+			packageProductDependencies = (
+			);
+			productName = Mila;
+			productReference = C244FE458A7DCA7BDCAB0B49 /* Mila.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E3A8CD8842D0006A5D855839 /* MilaUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC59DC19FF190D80256B38F2 /* Build configuration list for PBXNativeTarget "MilaUITests" */;
+			buildPhases = (
+				8D09B1B3D556E9C6E37FEFCF /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C73392142FEA38F4851F227B /* PBXTargetDependency */,
+			);
+			name = MilaUITests;
+			packageProductDependencies = (
+			);
+			productName = MilaUITests;
+			productReference = 47E98CF8932BDE320606A586 /* MilaUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		67915754A1F54D8A0CE249AE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					09DB56134C76A790968CFE8F = {
+						DevelopmentTeam = 8U3RHGA83G;
+						ProvisioningStyle = Automatic;
+					};
+					E3A8CD8842D0006A5D855839 = {
+						DevelopmentTeam = 8U3RHGA83G;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 09DB56134C76A790968CFE8F;
+					};
+				};
+			};
+			buildConfigurationList = 57BAF7EE236AD952977B2622 /* Build configuration list for PBXProject "Mila" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 8FD0960E0729F7101B7C45BA;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 46EA350882501C871E3C62F3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				09DB56134C76A790968CFE8F /* Mila */,
+				E3A8CD8842D0006A5D855839 /* MilaUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E80680EA722CFC6B8C0E4B08 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60A2C7497FE5C15C5BDDBB84 /* Assets.xcassets in Resources */,
+				A11AE6B316EF5009C3971E13 /* InfoPlist.strings in Resources */,
+				303AC9C81A550B1A71A921CF /* InfoPlist.strings in Resources */,
+				7EA7A6E08128FE8000657084 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		123056585088252B223F0F85 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E705FA7E8BF7556DCF92FCB9 /* ChatView.swift in Sources */,
+				25A9A1500E9435E4CD6D56DF /* HomeView.swift in Sources */,
+				84EEC9784FBA8C8CD88B239F /* LearnView.swift in Sources */,
+				A09C3CE006D8C6DCEE5E5EAB /* MilaAPI.swift in Sources */,
+				06A9E7CF220B9D62A025079C /* MilaApp.swift in Sources */,
+				BAA871EC20CBC2FE0DFE9F5C /* MilaModels.swift in Sources */,
+				AC6F46CA362877251C613898 /* MilaTheme.swift in Sources */,
+				5E285A6DCBC7E6D6DF6E330D /* NetworkMonitor.swift in Sources */,
+				48D9D8041C8447C73CB30B41 /* ProgressView.swift in Sources */,
+				3B29E24911F512E9ACAA18C1 /* RootView.swift in Sources */,
+				6FE52274C68C91C71F9DE585 /* SessionStore.swift in Sources */,
+				4C38F81F4B0D67621831889C /* SettingsView.swift in Sources */,
+				E4BF54AAAA157475ADC4BC22 /* SpeakView.swift in Sources */,
+				EE7F15C1D81241FFC5900E86 /* VoicePracticeModel.swift in Sources */,
+				6C9DD379395B8BEACB3E339D /* WebModuleView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D09B1B3D556E9C6E37FEFCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B2C8CAA28F55E14E845F7F25 /* MilaUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C73392142FEA38F4851F227B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 09DB56134C76A790968CFE8F /* Mila */;
+			targetProxy = F83D3E79D30BC81662CF6142 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0432272B08D0968C72F73165 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Mila/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.purangpt.mila;
+				PRODUCT_NAME = Mila;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		126FF15AFE7EB45B500845FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 8U3RHGA83G;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		4CDC3D754F2AEE04A52F24BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.purangpt.mila.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Mila;
+			};
+			name = Release;
+		};
+		673C81E5E717DA59D4D73619 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.purangpt.mila.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Mila;
+			};
+			name = Debug;
+		};
+		86A3BEB2CE0E7578537EDEDD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Mila/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.purangpt.mila;
+				PRODUCT_NAME = Mila;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		D627518655DFE575B9404C21 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 8U3RHGA83G;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		57BAF7EE236AD952977B2622 /* Build configuration list for PBXProject "Mila" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				126FF15AFE7EB45B500845FB /* Debug */,
+				D627518655DFE575B9404C21 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AC59DC19FF190D80256B38F2 /* Build configuration list for PBXNativeTarget "MilaUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				673C81E5E717DA59D4D73619 /* Debug */,
+				4CDC3D754F2AEE04A52F24BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F935AC95950F291AD6661F20 /* Build configuration list for PBXNativeTarget "Mila" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0432272B08D0968C72F73165 /* Debug */,
+				86A3BEB2CE0E7578537EDEDD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 67915754A1F54D8A0CE249AE /* Project object */;
+}
