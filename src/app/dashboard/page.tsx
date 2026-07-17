@@ -81,6 +81,77 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Flagship: the live conversation is the front door, never a secondary tool. */}
+        <style>{`
+          .mila-hero-card {
+            transition: transform .18s ease, box-shadow .18s ease;
+            background: linear-gradient(150deg, rgba(242,139,173,.16), rgba(5,11,8,.9) 46%, rgba(106,220,245,.12));
+          }
+          html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-hero-card {
+            background: linear-gradient(150deg, rgba(242,139,173,.22), rgba(255,250,252,.96) 46%, rgba(106,220,245,.16));
+          }
+          .mila-hero-card:active { transform: scale(.988); }
+          @media (prefers-reduced-motion: no-preference) {
+            .mila-hero-orb { animation: milaHeroBreathe 4.5s ease-in-out infinite; }
+            .mila-hero-halo { animation: milaHeroSpin 9s linear infinite; }
+            .mila-hero-bar { animation: milaHeroWave 1.35s ease-in-out infinite; }
+            .mila-hero-dot { animation: milaHeroBreathe 2.2s ease-in-out infinite; }
+          }
+          @keyframes milaHeroBreathe { 0%,100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.05); opacity: 1; } }
+          @keyframes milaHeroSpin { to { transform: rotate(360deg); } }
+          @keyframes milaHeroWave { 0%,100% { transform: scaleY(.4); } 50% { transform: scaleY(1); } }
+        `}</style>
+        <section aria-label={lang==='ru'?'Поговорить с Милой':'Talk with Mila'} style={{marginBottom:24}}>
+          <div className="mila-hero-card" onClick={()=>router.push('/darshan')}
+            style={{position:'relative',overflow:'hidden',cursor:'pointer',borderRadius:22,padding:20,
+              border:'1px solid rgba(242,139,173,0.32)',
+              boxShadow:'0 18px 44px rgba(242,139,173,0.14), var(--surface-card-shadow, 0 2px 10px rgba(0,0,0,0.5))'}}>
+            <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:16}}>
+              <div aria-hidden style={{position:'relative',width:76,height:76,flexShrink:0}}>
+                <span className="mila-hero-halo" style={{position:'absolute',inset:-7,borderRadius:'50%',
+                  background:`conic-gradient(from 0deg, ${C.voice}00, ${C.voice}55, ${C.venus}55, ${C.voice}00)`,filter:'blur(6px)'}}/>
+                <span className="mila-hero-orb" style={{position:'absolute',inset:0,borderRadius:'50%',
+                  background:`radial-gradient(circle at 32% 30%, ${C.venusBright} 0%, ${C.venus} 34%, #7a2547 62%, #1a0a12 100%)`,
+                  boxShadow:'0 0 34px rgba(242,139,173,0.35), inset 0 0 18px rgba(255,189,208,0.5)'}}/>
+                <span style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
+                  {[13,21,16,10].map((h,i)=>(
+                    <i key={i} className="mila-hero-bar" style={{width:3,height:h,borderRadius:2,background:'rgba(255,255,255,0.92)',animationDelay:`${i*-0.22}s`}}/>
+                  ))}
+                </span>
+              </div>
+              <div style={{minWidth:0}}>
+                <div style={{display:'flex',alignItems:'center',gap:7,fontSize:'0.68rem',fontWeight:800,letterSpacing:1.6,color:'var(--voice-readable,var(--voice))',textTransform:'uppercase',marginBottom:5}}>
+                  <span className="mila-hero-dot" style={{width:7,height:7,borderRadius:'50%',background:'var(--voice-readable,var(--voice))',boxShadow:'0 0 10px var(--voice-readable,var(--voice))'}}/>
+                  {lang==='ru'?'Живой голос':'Live voice'}
+                </div>
+                <div style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:800,fontSize:'1.45rem',letterSpacing:'-0.03em',color:C.dark,lineHeight:1.15}}>
+                  {lang==='ru'?'Поговори с Милой':'Talk with Mila'}
+                </div>
+                <p style={{margin:'6px 0 0',fontSize:'0.86rem',lineHeight:1.5,color:C.warm}}>
+                  {lang==='ru'
+                    ? 'Живой голосовой диалог. Просто начни говорить — Мила услышит и ответит.'
+                    : 'A live voice conversation. Just start speaking—Mila listens and answers aloud.'}
+                </p>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:10}}>
+              <button type="button" onClick={(e)=>{e.stopPropagation();router.push('/darshan');}}
+                style={{flex:1.4,padding:'13px 16px',borderRadius:14,border:'none',
+                  background:`linear-gradient(135deg,${C.mercuryBright},${C.mercury})`,color:'#032018',
+                  fontWeight:800,fontSize:'0.95rem',cursor:'pointer',boxShadow:'0 10px 30px rgba(36,211,154,0.25)',
+                  display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+                <MilaIcon name="voice" size={18}/>{lang==='ru'?'Начать разговор':'Start talking'}
+              </button>
+              <button type="button" onClick={(e)=>{e.stopPropagation();router.push('/chat');}}
+                style={{flex:1,padding:'13px 16px',borderRadius:14,border:'1.5px solid rgba(242,139,173,0.4)',
+                  background:'rgba(242,139,173,0.08)',color:'var(--venus-readable,var(--venus-bright))',fontWeight:700,fontSize:'0.9rem',cursor:'pointer',
+                  display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
+                <MilaIcon name="tutor" size={17}/>{lang==='ru'?'Текстом':'Text chat'}
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* AI Assessment Banner (If pending) */}
         {user?.level === 'pending' && (
           <Card hover={false} padding="24px" style={{ marginBottom: 24 }}>
