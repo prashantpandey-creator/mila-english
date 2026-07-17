@@ -1,0 +1,60 @@
+name: Mila
+
+options:
+  bundleIdPrefix: com.purangpt
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: 8U3RHGA83G
+    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: 1.0
+    CURRENT_PROJECT_VERSION: 1
+    SWIFT_VERSION: 5.0
+    IPHONEOS_DEPLOYMENT_TARGET: 16.0
+
+targets:
+  Mila:
+    type: application
+    platform: iOS
+    sources:
+      - path: Mila/App
+      - path: Mila/Models
+      - path: Mila/Networking
+      - path: Mila/Services
+      - path: Mila/Views
+      - path: Mila/Resources/Assets.xcassets
+      - path: Mila/Resources/PrivacyInfo.xcprivacy
+      - path: Mila/Resources/en.lproj/InfoPlist.strings
+        buildPhase: resources
+      - path: Mila/Resources/ru.lproj/InfoPlist.strings
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.purangpt.mila
+        PRODUCT_NAME: Mila
+        INFOPLIST_FILE: Mila/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        SUPPORTS_MACCATALYST: NO
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+    scheme:
+      testTargets:
+        - MilaUITests
+      gatherCoverageData: false
+  MilaUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: MilaUITests
+    dependencies:
+      - target: Mila
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.purangpt.mila.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Mila

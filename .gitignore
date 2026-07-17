@@ -10,6 +10,12 @@ MILA_*AGREEMENT*.txt
 mary-*.txt
 output/
 tmp/
+ios/build/
+ios/*.xcarchive
+ios/export/
+ios/*.ipa
+*.xcuserstate
+xcuserdata/
 # Private business/legal artifacts — contain real names, emails, equity terms. Never commit.
 NEXT_STEPS.md
 scripts/generate_mila_agreement*.py
