@@ -6,6 +6,7 @@ import { SceneProvider } from '@/lib/scene'
 import Atmosphere from '@/components/Atmosphere'
 import PwaRegister from '@/components/PwaRegister'
 import MilaGuide from '@/components/MilaGuide'
+import BottomNav from '@/components/BottomNav'
 import RouteSurface from '@/components/RouteSurface'
 
 const displayFont = Onest({
@@ -64,6 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <RouteSurface>
               <div className="animate-in">{children}</div>
               <MilaGuide />
+              <BottomNav />
             </RouteSurface>
           </I18nProvider>
         </SceneProvider>

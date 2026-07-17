@@ -3511,3 +3511,65 @@ html .mila-surface--front .mila-guide__guest button {
     bottom: auto;
   }
 }
+
+/* ── Persistent bottom navigation (the rim) ──────────────────────────────────
+   The five core rooms, one tap apart from anywhere. Mounted in the layout
+   under RouteSurface, so the welcome/focus overrides below re-theme it. */
+.mila-tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 60;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgba(12, 10, 14, 0.86);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  backdrop-filter: blur(20px) saturate(1.1);
+}
+.mila-tabbar__inner {
+  width: min(600px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+.mila-tabbar__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 9px 4px calc(9px + max(0px, env(safe-area-inset-bottom) * 0));
+  min-height: 56px;
+  color: #8a8a92;
+  text-decoration: none;
+  transition: color 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.mila-tabbar__icon { display: grid; place-items: center; height: 24px; }
+.mila-tabbar__icon .mila-icon { stroke: currentColor; fill: none; }
+.mila-tabbar__label { font-size: 10.5px; font-weight: 650; letter-spacing: 0.01em; }
+.mila-tabbar__tab.is-active { color: #ff9bb0; }
+.mila-tabbar__tab.is-active .mila-tabbar__icon { filter: drop-shadow(0 0 9px rgba(255, 155, 176, 0.45)); }
+.mila-tabbar__tab:not(.is-active):hover { color: #c7c7cf; }
+
+/* Welcome (light) room */
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar {
+  background: rgba(255, 250, 252, 0.94);
+  border-top-color: rgba(120, 40, 70, 0.12);
+}
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab { color: #8b7f86; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab:not(.is-active):hover { color: #4a3a42; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab.is-active { color: #b83866; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab.is-active .mila-tabbar__icon { filter: drop-shadow(0 0 8px rgba(184, 56, 102, 0.28)); }
+
+/* Content clearance — reserve space so nothing hides behind the bar. */
+body[data-bottom-nav] .app-main,
+body[data-bottom-nav] main,
+body[data-bottom-nav] .phonetics-page,
+body[data-bottom-nav] .practice-page {
+  padding-bottom: calc(74px + env(safe-area-inset-bottom));
+}
+/* The floating Mila bot sits above the bar, not under it. */
+body[data-bottom-nav] .mila-guide__fab,
+body[data-bottom-nav] .mila-guide__launcher {
+  bottom: calc(74px + env(safe-area-inset-bottom));
+}
