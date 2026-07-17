@@ -3532,6 +3532,7 @@ html .mila-surface--front .mila-guide__guest button {
   grid-template-columns: repeat(5, 1fr);
 }
 .mila-tabbar__tab {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3544,12 +3545,14 @@ html .mila-surface--front .mila-guide__guest button {
   transition: color 0.16s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.mila-tabbar__icon { display: grid; place-items: center; height: 24px; }
+.mila-tabbar__icon { display: grid; place-items: center; min-width: 44px; height: 30px; border-radius: 999px; transition: background 0.18s ease, transform 0.18s ease; }
 .mila-tabbar__icon .mila-icon { stroke: currentColor; fill: none; }
 .mila-tabbar__label { font-size: 10.5px; font-weight: 650; letter-spacing: 0.01em; }
 .mila-tabbar__tab.is-active { color: #ff9bb0; }
-.mila-tabbar__tab.is-active .mila-tabbar__icon { filter: drop-shadow(0 0 9px rgba(255, 155, 176, 0.45)); }
+.mila-tabbar__tab.is-active .mila-tabbar__icon { background: rgba(255, 155, 176, 0.16); }
 .mila-tabbar__tab:not(.is-active):hover { color: #c7c7cf; }
+.mila-tabbar__tab:active { transform: scale(0.93); }
+.mila-tabbar__tab:active .mila-tabbar__icon { transform: scale(0.92); }
 
 /* Welcome (light) room */
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar {
@@ -3559,7 +3562,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar {
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab { color: #8b7f86; }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab:not(.is-active):hover { color: #4a3a42; }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab.is-active { color: #b83866; }
-html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab.is-active .mila-tabbar__icon { filter: drop-shadow(0 0 8px rgba(184, 56, 102, 0.28)); }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-tabbar__tab.is-active .mila-tabbar__icon { background: rgba(184, 56, 102, 0.11); }
 
 /* Content clearance — reserve space so nothing hides behind the bar. */
 body[data-bottom-nav] .app-main,
