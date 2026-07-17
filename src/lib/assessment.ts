@@ -90,8 +90,19 @@ export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion')
 
   return {
     type: 'realtime',
-    model: process.env.OPENAI_REALTIME_MODEL?.trim() || 'gpt-realtime-2.1',
+    // Cost maps to value: the assessment is a one-time, quality-critical
+    // interview → flagship. The unlimited tutor/companion chat → mini (~⅓ the
+    // cost, verified indistinguishable for teaching). OPENAI_REALTIME_MODEL
+    // overrides both. Prompt caching is automatic here because `instructions`
+    // is a fixed per-mode constant — keep it static (per-user context belongs
+    // in the conversation, not the instructions, or caching is lost).
+    model: process.env.OPENAI_REALTIME_MODEL?.trim()
+      || (assessment ? 'gpt-realtime-2.1' : 'gpt-realtime-2.1-mini'),
     instructions,
+    // A generous ceiling that stops a runaway monologue from burning audio
+    // tokens, without cutting a normal reply short. The assessment keeps the
+    // default ('inf') so the examiner can ask full questions.
+    ...(assessment ? {} : { max_output_tokens: 2048 }),
     output_modalities: ['audio'],
     audio: {
       input: {

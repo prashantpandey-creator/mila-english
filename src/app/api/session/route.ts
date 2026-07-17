@@ -10,6 +10,32 @@ function errorResponse(message: string, status: number, code: string) {
   return NextResponse.json({ error: message, code }, { status });
 }
 
+// ── Cost floor: per-identity rate limit ─────────────────────────────────────
+// Realtime audio is billed per minute; a runaway client (or abuse) could open
+// unbounded sessions. This caps NEW sessions per identity per hour so cost can
+// never scale faster than real use. In-memory (per instance) — resets on
+// deploy, which is fine for an abuse ceiling. Tune via VOICE_REALTIME_MAX_PER_HOUR.
+const RATE_WINDOW_MS = 60 * 60 * 1000;
+const RATE_MAX = Math.max(1, Number(process.env.VOICE_REALTIME_MAX_PER_HOUR || 20));
+const recentCalls = new Map<string, number[]>();
+
+function rateLimited(identity: string): boolean {
+  const now = Date.now();
+  const hits = (recentCalls.get(identity) || []).filter((t) => now - t < RATE_WINDOW_MS);
+  if (hits.length >= RATE_MAX) {
+    recentCalls.set(identity, hits);
+    return true;
+  }
+  hits.push(now);
+  recentCalls.set(identity, hits);
+  if (recentCalls.size > 5000) {
+    for (const [key, times] of recentCalls) {
+      if (times.every((t) => now - t >= RATE_WINDOW_MS)) recentCalls.delete(key);
+    }
+  }
+  return false;
+}
+
 export async function POST(req: Request) {
   const rawMode = new URL(req.url).searchParams.get('mode');
   const mode = rawMode === 'assessment' ? 'assessment' : rawMode === 'companion' ? 'companion' : 'tutor';
@@ -27,6 +53,17 @@ export async function POST(req: Request) {
     return errorResponse('Voice assessment is not configured yet.', 503, 'OPENAI_NOT_CONFIGURED');
   }
 
+  // The identity that both the rate limit and OpenAI safety key key off of:
+  // the learner when signed in, otherwise the guest device id, otherwise a
+  // coarse request fingerprint.
+  const identity = user?.sub
+    || req.headers.get('x-device-id')
+    || createHash('sha256').update(`guest:${req.headers.get('user-agent') || ''}`).digest('hex').slice(0, 24);
+
+  if (rateLimited(identity)) {
+    return errorResponse('Too many voice sessions in a short time. Please wait a moment and try again.', 429, 'RATE_LIMITED');
+  }
+
   const contentType = req.headers.get('content-type') || '';
   if (!contentType.includes('application/sdp')) {
     return errorResponse('Expected a WebRTC SDP offer.', 415, 'INVALID_CONTENT_TYPE');
@@ -41,11 +78,6 @@ export async function POST(req: Request) {
   form.set('sdp', sdp);
   form.set('session', JSON.stringify(buildRealtimeSession(mode)));
 
-  // A stable-enough identity for OpenAI safety: the learner when signed in,
-  // otherwise the guest device id, otherwise a coarse request fingerprint.
-  const identity = user?.sub
-    || req.headers.get('x-device-id')
-    || createHash('sha256').update(`guest:${req.headers.get('user-agent') || ''}`).digest('hex').slice(0, 24);
   const safetyIdentifier = createHash('sha256')
     .update(`mila-realtime:${identity}`)
     .digest('hex');
