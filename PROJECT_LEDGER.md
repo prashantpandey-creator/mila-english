@@ -23,8 +23,10 @@ No local screenshot counts. No "LIVE" claim without both.**
 | Inner-app shell | `AppShell`/`AppHeader`/`AppMain`, safe-area nav, pink-noir focus rooms | `e40a155` | live |
 
 ## LOCAL / UNPUSHED
-(none currently — worktree `/tmp/mila-uni-wt` merged & pushed as `421fd86`;
-remove it once confirmed.)
+
+- `codex/mila-ios-app`: native iOS 1.0 source, signed local IPA, App Store
+  metadata/screenshots, public privacy/support pages, and permanent deletion.
+  Nothing in this line is a production claim until the deploy witness is added.
 
 ## OWED (asked, NOT done — do not claim these)
 1. **"Make the flow intuitive."** The information architecture / navigation flow
@@ -57,3 +59,67 @@ workflow too, same commit.
   push` before guest/login flows work locally, or they 500.
 - **Concurrent sessions** push to this repo. `git fetch` + rebase onto
   `origin/main` before every push; never force.
+
+---
+
+## 2026-07-17 — Mila native iOS 1.0 release
+
+This section records Apple release claims with identifiers and verification
+evidence. The app-specific procedure is in
+[`docs/IOS_APP_STORE_RELEASE_RUNBOOK.md`](docs/IOS_APP_STORE_RELEASE_RUNBOOK.md).
+
+### Release manifest
+
+- App Store name: `Mila: English Speaking`
+- Display name: `Mila`
+- Bundle ID: `com.purangpt.mila`
+- Version/build: `1.0 (1)`
+- Apple team: `8U3RHGA83G`
+- Platform: iPhone, iOS 16+
+- Production origin: `https://mila.purangpt.com`
+- Privacy URL: `https://mila.purangpt.com/privacy`
+- Support URL: `https://mila.purangpt.com/support`
+
+### Product evidence
+
+- Native SwiftUI Home, Learn, Speak, Chat, Progress, and Account surfaces.
+- Account-free isolated guest bootstrap.
+- Native microphone recording to Mila private transcription, controlled tutor
+  reply, and neural TTS playback.
+- Native offline phrases, native lesson/vocabulary reading, and learner progress.
+- In-app permanent deletion for registered accounts and guest data.
+- Deep web modules are limited to the complete level check, listening, grammar,
+  privacy, and support flows.
+
+### Verification status
+
+- [x] Clean iOS simulator compile with Xcode 26.6 / iOS 26.5 SDK.
+- [x] Native runtime verified on iPhone 17 Pro Max simulator (iOS 26.5):
+  Home, Learn, Speak, Progress, guest bootstrap, and live private tutor journey.
+- [x] Production guest, profile, vocabulary, progress, private transcription,
+  streamed tutor, and WAV TTS endpoints verified from the release client path.
+- [x] Five 6.9-inch screenshots captured at `1320×2868` from the passing UI
+  journey in `docs/app-store-assets/1.0/screenshots-6.9-inch/`.
+- [ ] Microphone, transcription, chat, TTS, and deletion verified on physical iPhone.
+- [ ] Public privacy and support URLs deployed and rechecked.
+- [x] Apple bundle ID created.
+- [ ] App Store app record created.
+- [x] Release archive exported as an Apple Distribution-signed IPA.
+- [ ] `altool` validation passed (currently awaiting the App Store app record).
+- [ ] Build uploaded and processing completed.
+- [ ] App Privacy published.
+- [ ] Review submission state `WAITING_FOR_REVIEW`.
+- [ ] App Store version state `WAITING_FOR_REVIEW`.
+
+### Apple release identifiers
+
+- Bundle ID resource ID: `54MZM2T7K9`
+- Apple app ID: pending
+- App Store version ID: pending
+- Build ID: pending
+- Upload/delivery ID: pending
+- Review submission ID: pending
+- Submitted UTC: pending
+
+The release is not complete until the two final `WAITING_FOR_REVIEW` checks are
+witnessed above.
