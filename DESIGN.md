@@ -23,45 +23,48 @@
 6. **Lock the winner into the system** so it stops getting swapped for cheap
    defaults by the next hand.
 
-## The language (owner correction, 2026-07-18)
+## The language (owner correction, 2026-07-19)
 
-Mila has one bright visual identity from the first page through the learning
-product. It should feel authored, feminine without becoming childish, calm
-without becoming generic, and creative without becoming noisy. There is no
-second dark room and no route-specific colour story.
+Mila has one **Electric Paper** identity from the first page through the
+learning product. It should feel authored, warm without relying on a literal
+woman's face, strong without becoming cyberpunk, and creative without becoming
+noisy. There is no second dark room and no route-specific colour story.
 
 | Role | Canonical value |
 |---|---|
-| Ground | cool white `#fffdfd` |
+| Ground | cool white `#fffcfe` |
 | Panel | white `#ffffff` |
-| Raised / quiet surface | blush `#fff7fa` |
-| Strong blush band | `#fff1f5` |
-| Ink | berry-black `#2f1b24` |
-| Muted ink | `#75606a` |
-| Border | rose hairline `#efd6df` |
-| Interaction signal | rose `#b63d68`; deep action `#8d2d50`; bright motion mark `#dc6d92` |
+| Raised / quiet surface | electric blush `#fff4fa` |
+| Strong blush band | `#ffe8f3` |
+| Ink | berry-black `#26131f` |
+| Muted ink | `#65535f` |
+| Border | electric hairline `#f0c7da`; strong line `#e58bb5` |
+| Interaction signal | accessible magenta `#d9006c`; deep action `#a40050`; decorative flare `#ff2d95`; plum plate `#75003f` |
 
 - **Type.** Yeseva One (`--font-display`) carries the wordmark and rare
   editorial phrases. Manrope (`--font-sans`) carries product headings,
   interface, and body copy. IBM Plex Mono (`--font-mono`) is reserved for IPA,
   phonemes, scores, levels, and system labels. Do not add a route-specific font.
 - **One signal.** Clickable, active, listening, speaking, correct, incorrect,
-  measured, and progress states all use the rose family. Meaning comes from
+  measured, and progress states all use the magenta family. Meaning comes from
   icon, label, motion, shape, and opacity—not cyan/green/gold/purple switches.
-- **Depth.** Use solid white/blush surfaces, rose hairlines, and restrained
-  berry-tinted shadows. Translucent white is allowed only for sticky chrome
-  where the layer relationship must remain visible.
+- **Depth.** Use solid white/blush surfaces, electric hairlines, and restrained
+  plum offset plates. The primary voice action and feature imagery may carry a
+  soft electric halo. Translucent white is allowed only for sticky chrome where
+  the layer relationship must remain visible.
 - **Voice.** Mila's voice state is made legible through a label, waveform,
   concentric ring rhythm, and motion. It remains on white and blush; a black
   room is not required for focus.
-- **Editorial character.** The front door is a commissioned mixed-media collage
-  with real negative space. Across the product, character comes from scale,
-  typography, tactile edges, and asymmetrical rhythm—not stock travel cards,
-  flags, device props, glass thumbnails, or decorative technology clichés.
+- **Editorial character.** The front door is a commissioned faceless
+  ribbon-and-resin voice sculpture with real negative space. The city editions
+  crop one connected abstract rhythm panorama. Across the product, character
+  comes from scale, hard shadow, tactile edges, and asymmetrical rhythm—not
+  faces, stock travel cards, flags, devices, glass thumbnails, or tech clichés.
 
-**Banned:** secondary semantic hues, per-category colour coding, black route
-surfaces, coloured glass, glow, gradient orbs, device-driven palette switching,
-generic country/flag cards, and low-resolution photos behind learning workspaces.
+**Banned:** dusty rose, mauve, secondary semantic hues, per-category colour
+coding, black route surfaces, coloured glass, indiscriminate neon glow, gradient
+orbs, device-driven palette switching, face-led heroes, generic country/flag
+cards, and low-resolution photos behind learning workspaces.
 
 ## Built so far
 
@@ -71,7 +74,7 @@ generic country/flag cards, and low-resolution photos behind learning workspaces
 - `src/components/RouteSurface.tsx` makes the palette deterministic. `/`,
   `/start`, pricing, ordinary learning, and immersive voice all use the same
   light atelier.
-- Voice motion is functional feedback. It uses rose rings, a precise core mark,
+- Voice motion is functional feedback. It uses magenta rings, a precise core mark,
   and state labels on white; it does not introduce another palette.
 - The dashboard is a **conversation stage**, not a widget directory. Mila's
   live voice action owns the visual hierarchy, text chat is the clear second

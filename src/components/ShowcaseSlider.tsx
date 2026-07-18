@@ -2,7 +2,7 @@
 
 // "How Mila hears every accent" — the first surface built in the design
 // language (DESIGN.md): serif for the spoken word, monospace for everything
-// measured. Route stops and the VU meter share Mila's single rose signal;
+// measured. Route stops and the VU meter share Mila's single electric signal;
 // amplitude and status are expressed through scale, weight, and opacity.
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/lib/i18n-provider';

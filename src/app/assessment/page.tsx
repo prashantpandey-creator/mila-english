@@ -19,7 +19,7 @@ import { C } from '@/lib/theme';
 import type { AssessmentResult } from '@/lib/assessment';
 
 type Phase = 'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'finalizing' | 'error';
-const SIGNAL = '#b63d68';
+const SIGNAL = '#d9006c';
 
 export default function AssessmentVoice() {
   const { lang } = useI18n();

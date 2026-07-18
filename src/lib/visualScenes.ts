@@ -10,15 +10,15 @@ export type VisualScene = {
   grade?: VisualSceneGrade;
 };
 
-// Commissioned front-door artwork: an airy mixed-media portrait about finding
-// your own voice. It deliberately avoids the generic language-app shorthand
-// of headphones, chairs, laptops, flags, and tourist landmarks.
+// Commissioned front-door artwork: a faceless electric-paper voice sculpture.
+// The previous portrait remains in public/visuals/v3 as a backup, while this
+// active v4 pair gives desktop and mobile their own deliberate composition.
 export const MILA_ATELIER: VisualScene = {
-  id: 'mila-boho-editorial-v1',
-  stillDesktop: '/visuals/v3/mila-boho-editorial-desktop-v1.webp',
-  stillMobile: '/visuals/v3/mila-boho-editorial-desktop-v1.webp',
+  id: 'mila-electric-paper-v2',
+  stillDesktop: '/visuals/v4/mila-electric-voice-desktop-v1.webp',
+  stillMobile: '/visuals/v4/mila-electric-voice-mobile-v1.webp',
   focusDesktop: 'center center',
-  focusMobile: '76% center',
+  focusMobile: 'center 31%',
   grade: 'brand',
 };
 

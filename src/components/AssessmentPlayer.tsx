@@ -4,8 +4,8 @@
 import { useState } from 'react';
 import { C } from '@/lib/theme';
 
-const SIGNAL = '#b63d68';
-const SIGNAL_SOFT = 'rgba(182,61,104,0.12)';
+const SIGNAL = '#d9006c';
+const SIGNAL_SOFT = 'rgba(217,0,108,0.12)';
 const SIGNAL_INK = '#ffffff';
 
 const QUESTIONS = [
@@ -26,7 +26,7 @@ export default function AssessmentPlayer() {
           <button key={o} onClick={()=>setPicked(o)}
             style={{padding:'10px',borderRadius:10,cursor:'pointer',fontSize:'0.9rem',
               border:picked===o?`2px solid ${SIGNAL}`:'1.5px solid var(--mila-line, rgba(47,27,36,0.14))',
-              background:picked===o?SIGNAL_SOFT:'var(--mila-raised, #fff7fa)',color:C.dark}}>
+              background:picked===o?SIGNAL_SOFT:'var(--mila-raised, #fff4fa)',color:C.dark}}>
             {o}
           </button>
         ))}

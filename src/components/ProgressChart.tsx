@@ -4,7 +4,7 @@
 import { C } from '@/lib/theme';
 import { Card } from '@/components/ui/Card';
 
-const SIGNAL = '#b63d68';
+const SIGNAL = '#d9006c';
 
 export default function ProgressChart({ lang }: { lang: 'ru'|'en' }) {
   const days = lang==='ru' ? ['П','В','С','Ч','П','С','В'] : ['M','T','W','T','F','S','S'];

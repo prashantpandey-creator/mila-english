@@ -3,7 +3,7 @@
 
 import { C } from '@/lib/theme';
 
-const SIGNAL = '#b63d68';
+const SIGNAL = '#d9006c';
 
 export default function ProgressRing({ percent, label, color = SIGNAL }: { percent: number; label: string; color?: string }) {
   const r = 40, circ = 2 * Math.PI * r;
