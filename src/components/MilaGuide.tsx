@@ -47,7 +47,7 @@ const PAGE_LABELS: Record<string, { en: string; ru: string }> = {
   '/darshan': { en: 'Voice room', ru: 'Голосовая комната' },
 }
 
-const COMPANION_INTEGRATED_ROUTES = ['/assessment', '/chat', '/listen', '/phonetics', '/practice', '/darshan', '/pila', '/login', '/register']
+const COMPANION_INTEGRATED_ROUTES = ['/assessment', '/chat', '/listen', '/phonetics', '/practice', '/darshan', '/pia', '/login', '/register']
 
 function pageKey(pathname: string) {
   if (pathname.startsWith('/lessons/')) return '/lessons'

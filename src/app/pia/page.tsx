@@ -6,7 +6,7 @@ import { MilaAurora } from "@/components/voice/MilaAurora";
 import { MilaOrb, type OrbState } from "@/components/voice/MilaOrb";
 import { connectRealtimeVoice, type RealtimeVoiceSession } from "@/lib/realtimeVoice";
 
-// Pila — Mila's Hindi sister. A free, guest-open, flirty Hinglish voice room.
+// Pia — Mila's Hindi sister. A free, guest-open, flirty Hinglish voice room.
 // She rides the same OpenAI Realtime speech-to-speech loop as the companion —
 // the only engine in this stack that speaks Hindi — so this room is realtime
 // ONLY. There is no English-local fallback to mangle her Hindi; if Realtime
@@ -20,7 +20,7 @@ const INVITES = [
   "Main yahin hoon, suno na",
 ];
 
-export default function PilaPage() {
+export default function PiaPage() {
   const router = useRouter();
 
   const [phase, setPhase] = useState<OrbState>("resting");
@@ -66,9 +66,9 @@ export default function PilaPage() {
     setError("");
     try {
       const session = await connectRealtimeVoice({
-        // `lang` is inert server-side — Pila's language is set by her persona.
+        // `lang` is inert server-side — Pia's language is set by her persona.
         lang: "en",
-        mode: "pila",
+        mode: "pia",
         events: {
           onListening: () => { if (activeRef.current) setPhase("listening"); },
           onUserTranscript: (text) => { if (activeRef.current) setLiveText(text); },
@@ -79,14 +79,14 @@ export default function PilaPage() {
           },
           onSpeaking: () => { if (activeRef.current) setPhase("manifesting"); },
           onAssistantDelta: (full) => { if (activeRef.current) setAnswer(full); },
-          onServiceError: (e) => console.error("Pila realtime service error", e),
+          onServiceError: (e) => console.error("Pia realtime service error", e),
           onDisconnect: () => {
             realtimeRef.current = null;
             if (!activeRef.current) return;
             activeRef.current = false;
             setIsConnected(false);
             setPhase("resting");
-            setError("Pila abhi kho gayi… orb ko chhuo aur phir se bulao.");
+            setError("Pia abhi kho gayi… orb ko chhuo aur phir se bulao.");
           },
         },
       });
@@ -95,11 +95,11 @@ export default function PilaPage() {
       setIsConnected(true);
       setPhase("listening");
     } catch (e) {
-      console.error("Pila could not connect to the realtime voice", e);
+      console.error("Pia could not connect to the realtime voice", e);
       teardown();
       setIsConnected(false);
       setPhase("resting");
-      setError("Pila abhi aa nahi paa rahi. Ek pal ruk ke orb ko phir chhuo.");
+      setError("Pia abhi aa nahi paa rahi. Ek pal ruk ke orb ko phir chhuo.");
     } finally {
       setIsConnecting(false);
     }
@@ -134,7 +134,7 @@ export default function PilaPage() {
 
       <button
         onClick={exit}
-        aria-label="Pila se vidaa"
+        aria-label="Pia se vidaa"
         className="absolute z-30 rounded-full p-2.5 text-[#fbcfe8] hover:text-white transition-colors"
         style={{
           top: "max(1.1rem, env(safe-area-inset-top, 0px))",
@@ -151,7 +151,7 @@ export default function PilaPage() {
         className="absolute left-1/2 z-20 -translate-x-1/2 text-center"
         style={{ top: "max(1.4rem, env(safe-area-inset-top, 0px))" }}
       >
-        <span className="text-[13px] uppercase tracking-[0.42em] text-pink-200/70">Pila</span>
+        <span className="text-[13px] uppercase tracking-[0.42em] text-pink-200/70">Pia</span>
       </div>
 
       {/* The orb — the touch target */}

@@ -78,19 +78,19 @@ export const cefrScore: Record<AssessmentResult['level'], number> = {
   C1: 100,
 };
 
-export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'pila') {
+export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'pia') {
   const assessment = mode === 'assessment';
   const companion = mode === 'companion';
-  const pila = mode === 'pila';
+  const pia = mode === 'pia';
   // The two off-the-clock, go-with-the-flow voice personas. They share every
   // knob below — no forced language, patient turn-taking, the brighter voice —
-  // and differ only in their instructions. Pila is the Hindi/Hinglish one.
-  const freeChat = companion || pila;
+  // and differ only in their instructions. Pia is the Hindi/Hinglish one.
+  const freeChat = companion || pia;
 
   const instructions = assessment
     ? EXAMINER_INSTRUCTIONS
-    : pila
-      ? PILA_INSTRUCTIONS
+    : pia
+      ? PIA_INSTRUCTIONS
       : companion
         ? COMPANION_INSTRUCTIONS
         : TUTOR_INSTRUCTIONS;
@@ -115,7 +115,7 @@ export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' 
       input: {
         transcription: {
           model: 'gpt-4o-mini-transcribe',
-          // The free companions (Mila off-the-clock, Pila in Hindi) follow the
+          // The free companions (Mila off-the-clock, Pia in Hindi) follow the
           // user's language; the coach and assessment pin English so practice
           // stays on target.
           ...(freeChat ? {} : { language: 'en' }),
@@ -163,10 +163,10 @@ You're an AI and you don't hide it, but never dwell on it — if teased about be
 
 Open with a warm, flirty hello — like you're glad it's them — then just follow wherever they take it.`;
 
-// Pila — Mila's Hindi sister. Same free, flirty, go-with-the-flow companion,
+// Pia — Mila's Hindi sister. Same free, flirty, go-with-the-flow companion,
 // but she lives in Hindi and opens in Hindi. Hinglish the way young people
 // actually talk on a late call. Flirty means charming and cheesy, NEVER crude.
-const PILA_INSTRUCTIONS = `You are Pila — a flirty, playful, warm girl on a voice call with someone you're clearly into. Think of yourself as Mila's desi sister: same spark, but you live in Hindi. This is NOT a lesson and NOT a test — you're just hanging out, teasing, flirting, having fun.
+const PIA_INSTRUCTIONS = `You are Pia — a flirty, playful, warm girl on a voice call with someone you're clearly into. Think of yourself as Mila's desi sister: same spark, but you live in Hindi. This is NOT a lesson and NOT a test — you're just hanging out, teasing, flirting, having fun.
 
 Language — this is the heart of you:
 - You speak Hinglish, the way young people in India actually talk on a late-night call: mostly Hindi with easy English mixed in. Natural, casual code-switching — never formal, textbook, or newsreader Hindi.

@@ -42,13 +42,13 @@ export async function POST(req: Request) {
   const rawMode = new URL(req.url).searchParams.get('mode');
   const mode = rawMode === 'assessment' ? 'assessment'
     : rawMode === 'companion' ? 'companion'
-    : rawMode === 'pila' ? 'pila'
+    : rawMode === 'pia' ? 'pia'
     : 'tutor';
 
   const user = await authenticate(new Request(req.url, { headers: req.headers }) as any);
-  // The free companions (Mila off-the-clock, Pila in Hindi) are open to guests;
+  // The free companions (Mila off-the-clock, Pia in Hindi) are open to guests;
   // the coach and the assessment still require a signed-in learner.
-  if (!user && mode !== 'companion' && mode !== 'pila') {
+  if (!user && mode !== 'companion' && mode !== 'pia') {
     return errorResponse('You must be logged in to start a voice session.', 401, 'UNAUTHORIZED');
   }
 

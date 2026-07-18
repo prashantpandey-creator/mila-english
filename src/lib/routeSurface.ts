@@ -9,7 +9,7 @@ const FOCUS_ROUTES = [
   '/practice',
   '/chat',
   '/darshan',
-  '/pila',
+  '/pia',
 ];
 
 /**
