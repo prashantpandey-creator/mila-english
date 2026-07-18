@@ -14,6 +14,7 @@ import {
   voiceEvidenceFallbackLine,
   voiceReplyHasUnsupportedEvidence,
   type CompanionLocale,
+  type LanguageMode,
 } from '@/lib/companion';
 import { splitCompleteSentences } from '@/lib/voiceTurn';
 import {
@@ -286,6 +287,21 @@ export async function POST(request: NextRequest) {
   const learningContext = currentLesson
     ? `Current lesson: ${currentLesson.titleEn} / ${currentLesson.titleRu}.\nVocabulary: ${currentLesson.words.join(', ')}.\nExamples:\n${builtinLessonContent(currentLesson)}`
     : undefined;
+  // Language-of-instruction axis (orthogonal to persona), matching the owner's
+  // rule: the general/front conversation is fun and neutral — mirror whatever
+  // language the learner uses, help only if asked. The CLASSROOM lives INSIDE
+  // lessons: there a beginner is taught in Russian (introduced simply), everyone
+  // else in English. An explicit client value (a future toggle) always wins.
+  const levelTag = (profile?.level || '').trim().toUpperCase();
+  const beginner = levelTag === '' || levelTag === 'PENDING' || levelTag === 'A1';
+  const inLesson = surfaceKind === 'practice' || Boolean(currentLesson);
+  const requestedLanguageMode = payload?.context?.languageMode;
+  const languageMode: LanguageMode =
+    requestedLanguageMode === 'english-first' || requestedLanguageMode === 'mirror' || requestedLanguageMode === 'native-first'
+      ? requestedLanguageMode
+      : inLesson
+        ? (beginner ? 'native-first' : 'english-first')
+        : 'mirror';
   const system = buildCompanionSystemPrompt({
     persona,
     pathname,
@@ -297,6 +313,7 @@ export async function POST(request: NextRequest) {
       .map((memory) => safeContextValue(memory.content, '', spoken ? 160 : 300))
       .filter(Boolean),
     learningContext,
+    languageMode,
   });
 
   const voiceExternalFirst = spoken && /^(?:1|true|yes)$/i.test(process.env.VOICE_EXTERNAL_FIRST || '');

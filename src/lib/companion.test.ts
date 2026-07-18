@@ -161,4 +161,67 @@ assert.strictEqual(
 );
 assert.strictEqual(sanitizeVoiceReply('**Use “went,” not “go.”**'), 'Use “went,” not “go.”');
 
+// Language axis: default (english-first) injects nothing — the strict classroom
+// prompt stays byte-for-byte unchanged.
+assert.doesNotMatch(prompt, /LANGUAGE:/);
+assert.doesNotMatch(voicePrompt, /LANGUAGE:/);
+
+const mirrorPrompt = buildCompanionSystemPrompt({
+  persona: 'You are Mila as the Friend.',
+  pathname: '/chat',
+  locale: 'en',
+  surface: 'full tutor chat',
+  learnerSummary: 'Learner: Anna; level: B1.',
+  recentSummary: 'No recorded lesson progress yet.',
+  memories: [],
+  languageMode: 'mirror',
+});
+assert.match(mirrorPrompt, /LANGUAGE:/);
+assert.match(mirrorPrompt, /reply in that same language/i);
+assert.match(mirrorPrompt, /roleplay a scene in any language/i);
+assert.match(mirrorPrompt, /flip roles/i);
+
+const nativePrompt = buildCompanionSystemPrompt({
+  persona: 'You are Mila as the Friend.',
+  pathname: '/chat',
+  locale: 'ru',
+  surface: 'full tutor chat',
+  learnerSummary: 'Learner: Guest; level: A1.',
+  recentSummary: 'No recorded lesson progress yet.',
+  memories: [],
+  languageMode: 'native-first',
+});
+assert.match(nativePrompt, /primarily in Russian/i);
+assert.match(nativePrompt, /introduce each new lesson or idea in simple Russian first/i);
+assert.match(nativePrompt, /small, safe doses/i);
+assert.match(nativePrompt, /never shame the learner for using Russian/i);
+
+// The axis reaches voice too: a native-first spoken prompt still carries VOICE OUTPUT.
+const nativeVoice = buildCompanionSystemPrompt({
+  persona: 'You are Mila as the Teacher.',
+  pathname: '/darshan',
+  locale: 'ru',
+  surface: 'Darshan voice conversation',
+  learnerSummary: 'Learner: Guest; level: A1.',
+  recentSummary: 'No recorded lesson progress yet.',
+  memories: [],
+  languageMode: 'native-first',
+});
+assert.match(nativeVoice, /primarily in Russian/i);
+assert.match(nativeVoice, /VOICE OUTPUT/);
+
+// Explicit english-first is identical to the default — no directive leaks in.
+const explicitEnglish = buildCompanionSystemPrompt({
+  persona: 'You are Mila as the Friend.',
+  pathname: '/chat',
+  locale: 'en',
+  surface: 'full tutor chat',
+  learnerSummary: 'Learner: Anna; level: B1.',
+  recentSummary: 'Travel English (complete, score 82).',
+  memories: ['The learner is preparing for a September interview.'],
+  learningContext: 'Current lesson: Interviews. Phrase: Tell me about yourself.',
+  languageMode: 'english-first',
+});
+assert.strictEqual(explicitEnglish, prompt);
+
 console.log('companion core: all assertions pass');

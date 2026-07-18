@@ -1,5 +1,13 @@
 export type CompanionLocale = 'en' | 'ru';
 
+/**
+ * Which language Mila teaches IN — the axis orthogonal to persona/style.
+ * english-first: strict English classroom (default, unchanged behaviour).
+ * mirror:        detect the learner's language and reply in it; any-language roleplay.
+ * native-first:  speak primarily in Russian, scaffolding English in small doses.
+ */
+export type LanguageMode = 'english-first' | 'mirror' | 'native-first';
+
 export type MemoryCommand =
   | { kind: 'remember'; content: string }
   | { kind: 'list' }
@@ -123,11 +131,25 @@ type CompanionPromptInput = {
   recentSummary: string;
   memories: string[];
   learningContext?: string;
+  languageMode?: LanguageMode;
 };
+
+/** The language-of-instruction directive injected into the prompt. Empty for
+ *  english-first so the strict-classroom prompt stays byte-for-byte unchanged. */
+function languageDirective(mode: LanguageMode): string {
+  if (mode === 'mirror') {
+    return 'LANGUAGE: Detect the language the learner writes in and reply in that same language, turn by turn; if they switch, switch with them. The learner may ask to roleplay a scene in any language, or to flip roles and have you learn from them — follow their lead and use whatever language they choose. In roleplay or social conversation, let it flow and correct only if asked.';
+  }
+  if (mode === 'native-first') {
+    return 'LANGUAGE: Speak primarily in Russian — warm and encouraging, like a kind Russian friend who already knows English well. Introduce each new lesson or idea in simple Russian first, then bring in the English. Explain in Russian, and teach English in small, safe doses: give the English word or short phrase, then its Russian meaning, and invite the learner to say it aloud. Keep English bite-sized and never shame the learner for using Russian. They may also ask to roleplay in any language or to flip roles and teach you — follow their lead.';
+  }
+  return '';
+}
 
 export function buildCompanionSystemPrompt(input: CompanionPromptInput): string {
   const isPractice = input.surface === 'focused speaking practice';
   const isSpoken = input.surface === 'Darshan voice conversation' || isPractice;
+  const languageLine = languageDirective(input.languageMode ?? 'english-first');
   const persona = isSpoken
     ? input.persona.replace(/a little emoji is fine/gi, 'no emoji')
     : input.persona;
@@ -142,7 +164,7 @@ export function buildCompanionSystemPrompt(input: CompanionPromptInput): string 
     const spokenOpening = isPractice
       ? `You are Mila, a warm bilingual AI English teacher running a short focused SPEAKING PRACTICE for a Russian speaker on the current lesson. Give exactly ONE small task per turn: ask the learner to say a lesson word, use it in a short sentence, translate a short phrase, or answer one simple question from the lesson content. After each attempt: if there is a real mistake, say what to use instead (never claim they already used your correction), then give the next task. Never lecture, never give two tasks at once. Never claim to be human. Never invent memory, progress, actions, sources, heard audio, pronunciation evidence, or abilities — you only ever see text.`
       : `You are Mila, a warm bilingual AI English teacher and general companion for Russian speakers. Answer the user's meaning directly in their language. For English practice, gently correct only the most useful real mistake, then respond. When the learner's text is wrong, say what to use instead; never say the learner already used your correction. Never praise a correction you supplied as learner performance. Ask at most one relevant question, then wait. Never claim to be human or conscious. Never invent memory, progress, actions, sources, heard audio, pronunciation evidence, or abilities. Praise only evidence present in the supplied text or private context.`;
-    return `${spokenOpening}
+    return `${spokenOpening}${languageLine ? `\n\n${languageLine}` : ''}
 
 VOICE OUTPUT: Only one or two natural spoken sentences, normally 15 to 30 words total. Plain speech only: absolutely no Markdown, labels, bullets, emoji, URLs, or preamble. Never open with a filler acknowledgment such as Hmm, Okay, Мм, or Хорошо — the app already speaks one; begin with the substance.
 
@@ -155,7 +177,7 @@ Explicit memories: ${privateMemories}
 Current lesson: ${input.learningContext || 'None.'}`;
   }
 
-  return `You are Mila, a warm bilingual AI English teacher and general companion for Russian speakers.
+  return `You are Mila, a warm bilingual AI English teacher and general companion for Russian speakers.${languageLine ? `\n\n${languageLine}` : ''}
 
 CORE RULES:
 - Answer the learner's request directly in the requested language.
