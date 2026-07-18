@@ -37,6 +37,14 @@ jobs:
             echo "=== ollama models on disk ==="
             docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama list || true
             docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama list || true
+            echo "=== compose drift: live container config vs repo ==="
+            docker inspect -f 'mila-llm       created={{.Created}} mem={{.HostConfig.Memory}} memswap={{.HostConfig.MemorySwap}} cpus={{.HostConfig.NanoCpus}} confighash={{index .Config.Labels "com.docker.compose.config-hash"}}' mila-llm || true
+            docker inspect -f 'mila-voice-llm created={{.Created}} mem={{.HostConfig.Memory}} memswap={{.HostConfig.MemorySwap}} cpus={{.HostConfig.NanoCpus}} confighash={{index .Config.Labels "com.docker.compose.config-hash"}}' mila-voice-llm || true
+            ls -la /root/mila/docker-compose.override.yml 2>/dev/null && cat /root/mila/docker-compose.override.yml || echo "no docker-compose.override.yml"
+            ls /root/mila/*.yml /root/mila/*.yaml 2>/dev/null
+            cd /root/mila && git log --oneline -1 && git status --short | head -5
+            echo "=== non-secret model config lines from .env ==="
+            grep -E '^(LOCAL_LLM_MODEL|LOCAL_VOICE_LLM_MODEL|OLLAMA_|LOCAL_LLM_REASONING|ALLOW_EXTERNAL_CHAT_FALLBACK)' /root/mila/.env || echo "(none set — defaults in use)"
             echo "=== kernel OOM kills (last 24h) ==="
             dmesg -T 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' | tail -25 || true
             journalctl -k --since '24 hours ago' 2>/dev/null | grep -i 'oom' | tail -25 || true
