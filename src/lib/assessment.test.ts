@@ -22,6 +22,18 @@ assert.strictEqual(buildRealtimeSession('tutor').model, 'gpt-realtime-2.1-mini',
 assert.strictEqual(buildRealtimeSession('companion').model, 'gpt-realtime-2.1-mini', 'companion → mini');
 assert.strictEqual(buildRealtimeSession('tutor').max_output_tokens, 2048, 'chat → output cap');
 
+// The examiner asks one question per turn and understands a Russian fallback,
+// while the coach stays pinned to English. (Owner's original ask, re-landed.)
+const examiner = buildRealtimeSession('assessment');
+assert.ok(!('language' in examiner.audio.input.transcription), 'examiner auto-detects (understands Russian)');
+assert.match(examiner.instructions, /one question at a time/i);
+assert.match(examiner.instructions, /never stack/i);
+assert.match(examiner.instructions, /understand Russian/i);
+assert.match(examiner.instructions, /priority/i);
+assert.strictEqual(buildRealtimeSession('tutor').audio.input.transcription.language, 'en', 'coach still pins English');
+assert.ok(!('language' in buildRealtimeSession('companion').audio.input.transcription), 'free companion auto-detects');
+assert.ok(!('language' in buildRealtimeSession('pia').audio.input.transcription), 'Pia auto-detects');
+
 assert.deepStrictEqual(assessmentResultSchema.parse({
   level: 'B1',
   weaknesses: 'Past-tense control needs practice.',
