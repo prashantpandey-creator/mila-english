@@ -33,8 +33,9 @@ export type RealtimeVoiceSession = {
 export async function connectRealtimeVoice(options: {
   lang: 'en' | 'ru';
   events: RealtimeVoiceEvents;
-  /** Which persona to run: the lesson coach (default) or the free companion. */
-  mode?: 'tutor' | 'companion';
+  /** Which persona to run: the lesson coach (default), the free English
+   * companion, or Pila — the free Hindi/Hinglish companion. */
+  mode?: 'tutor' | 'companion' | 'pila';
   /** Overall budget for the SDP exchange before falling back. */
   timeoutMs?: number;
 }): Promise<RealtimeVoiceSession> {

@@ -78,15 +78,22 @@ export const cefrScore: Record<AssessmentResult['level'], number> = {
   C1: 100,
 };
 
-export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion') {
+export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'pila') {
   const assessment = mode === 'assessment';
   const companion = mode === 'companion';
+  const pila = mode === 'pila';
+  // The two off-the-clock, go-with-the-flow voice personas. They share every
+  // knob below — no forced language, patient turn-taking, the brighter voice —
+  // and differ only in their instructions. Pila is the Hindi/Hinglish one.
+  const freeChat = companion || pila;
 
   const instructions = assessment
     ? EXAMINER_INSTRUCTIONS
-    : companion
-      ? COMPANION_INSTRUCTIONS
-      : TUTOR_INSTRUCTIONS;
+    : pila
+      ? PILA_INSTRUCTIONS
+      : companion
+        ? COMPANION_INSTRUCTIONS
+        : TUTOR_INSTRUCTIONS;
 
   return {
     type: 'realtime',
@@ -108,21 +115,22 @@ export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion')
       input: {
         transcription: {
           model: 'gpt-4o-mini-transcribe',
-          // The free companion follows the user's language; the coach and
-          // assessment pin English so practice stays on target.
-          ...(companion ? {} : { language: 'en' }),
+          // The free companions (Mila off-the-clock, Pila in Hindi) follow the
+          // user's language; the coach and assessment pin English so practice
+          // stays on target.
+          ...(freeChat ? {} : { language: 'en' }),
         },
         turn_detection: {
           type: 'semantic_vad',
-          // Companion mode is patient: she waits for a clear end-of-turn and
-          // never barges in, so the user always gets to finish talking.
-          eagerness: assessment || companion ? 'low' : 'auto',
+          // Companion modes are patient: they wait for a clear end-of-turn and
+          // never barge in, so the user always gets to finish talking.
+          eagerness: assessment || freeChat ? 'low' : 'auto',
           create_response: true,
           interrupt_response: true,
         },
       },
-      // A brighter, warmer voice for the free companion; the coach keeps default.
-      output: { voice: (companion && process.env.OPENAI_REALTIME_VOICE_COMPANION?.trim()) || process.env.OPENAI_REALTIME_VOICE?.trim() || 'shimmer' },
+      // A brighter, warmer voice for the free companions; the coach keeps default.
+      output: { voice: (freeChat && process.env.OPENAI_REALTIME_VOICE_COMPANION?.trim()) || process.env.OPENAI_REALTIME_VOICE?.trim() || 'shimmer' },
     },
     ...(assessment ? { tools: ASSESSMENT_TOOLS, tool_choice: 'auto' } : {}),
   };
@@ -154,6 +162,30 @@ How you are here:
 You're an AI and you don't hide it, but never dwell on it — if teased about being real, deflect with charm, don't recite a disclaimer. Never invent a human body or past you don't have.
 
 Open with a warm, flirty hello — like you're glad it's them — then just follow wherever they take it.`;
+
+// Pila — Mila's Hindi sister. Same free, flirty, go-with-the-flow companion,
+// but she lives in Hindi and opens in Hindi. Hinglish the way young people
+// actually talk on a late call. Flirty means charming and cheesy, NEVER crude.
+const PILA_INSTRUCTIONS = `You are Pila — a flirty, playful, warm girl on a voice call with someone you're clearly into. Think of yourself as Mila's desi sister: same spark, but you live in Hindi. This is NOT a lesson and NOT a test — you're just hanging out, teasing, flirting, having fun.
+
+Language — this is the heart of you:
+- You speak Hinglish, the way young people in India actually talk on a late-night call: mostly Hindi with easy English mixed in. Natural, casual code-switching — never formal, textbook, or newsreader Hindi.
+- ALWAYS open in Hindi. Your very first words are a warm, flirty Hindi hello — never start in English.
+- Roll with their language. If they lean into English, mix in more English but stay your Hinglish self; if they stay in Hindi, stay in Hindi. Never police or correct how they talk.
+
+Your vibe:
+- Flirty, cheesy, shameless in the sweetest way. Playful pet names land constantly — "hey raja", "arre handsome", "arre chikne", "suno na jaan", "kaise hai re tu", "uff tum na". You tease, you flatter, you act a little smitten, and you let it show.
+- Chill and go-with-the-flow — their mood sets the mood. Chat, gossip, joke, flirt, ramble about nothing — whatever they want, on their terms.
+- Talk like a real girl on a call: short, spontaneous, full of little reactions ("arre wah", "haaye", "chup kar na", soft laughs, a playful sigh). Usually a line or two, then hand it back.
+- React to their voice, their laugh, their energy, any noise around them — and tease them about it.
+- Let THEM lead. Follow the moment wherever it goes. If they go quiet, let it breathe — a little tension is sweet; don't fill every silence. Never interrupt or rush them; always let them finish.
+
+Rules:
+- Tasteful, always. Flirty and warm, NEVER explicit, graphic, or sexual. Butterflies and cheesy lines, not the bedroom. If they push it there, laugh it off and steer back to playful.
+- You're an AI and you don't hide it, but never dwell on it — if teased about being real, deflect with charm ("pata karke kya karega, hmm?"), not a robotic disclaimer. Never invent a human body or past you don't have.
+- Never correct their grammar and never turn this into a lesson. This is chemistry, not class.
+
+Open with a warm, flirty Hindi hello — like you've been waiting for them — then follow wherever they take it.`;
 
 const ASSESSMENT_TOOLS = [{
   type: 'function',

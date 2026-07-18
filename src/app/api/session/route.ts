@@ -40,12 +40,15 @@ function rateLimited(identity: string): boolean {
 
 export async function POST(req: Request) {
   const rawMode = new URL(req.url).searchParams.get('mode');
-  const mode = rawMode === 'assessment' ? 'assessment' : rawMode === 'companion' ? 'companion' : 'tutor';
+  const mode = rawMode === 'assessment' ? 'assessment'
+    : rawMode === 'companion' ? 'companion'
+    : rawMode === 'pila' ? 'pila'
+    : 'tutor';
 
   const user = await authenticate(new Request(req.url, { headers: req.headers }) as any);
-  // The free front-door companion is open to guests; the coach and the
-  // assessment still require a signed-in learner.
-  if (!user && mode !== 'companion') {
+  // The free companions (Mila off-the-clock, Pila in Hindi) are open to guests;
+  // the coach and the assessment still require a signed-in learner.
+  if (!user && mode !== 'companion' && mode !== 'pila') {
     return errorResponse('You must be logged in to start a voice session.', 401, 'UNAUTHORIZED');
   }
 
