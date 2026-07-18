@@ -22,6 +22,7 @@ No local screenshot counts. No "LIVE" claim without both.**
 | Voice/Piper TTS | `/api/tts` serves real WAV | prior | 200 + RIFF WAV |
 | Inner-app shell | `AppShell`/`AppHeader`/`AppMain`, safe-area nav, pink-noir focus rooms | `e40a155` | live |
 | iOS reviewer surfaces | Bilingual `/privacy`, `/support`, and permanent authenticated account/guest deletion | `18d5811` (2026-07-17) | deploy run `29580794980` green; both pages 200 with [privacy](docs/app-store-assets/1.0/live-reviewer-proof/privacy.png) and [support](docs/app-store-assets/1.0/live-reviewer-proof/support.png) screenshots; disposable guest deletion 200 then profile 401 |
+| `/pila` — Hindi/Hinglish companion | **Pila**, Mila's flirty Hindi sister: guest-open voice room, opens in Hindi, cheesy pet names. Rides the **OpenAI Realtime** path (same as the English companion — the only Hindi-capable engine here), `mode=pila` in `buildRealtimeSession`. **No new container.** Realtime-only room (no en/ru-local fallback). | `3450b0d` (2026-07-18) | deploy run `29623988302` green; live `mila.purangpt.com/pila` 200 with `Pila`/`Chhuo`/`Baat shuru`/`sun rahi hoon` in bundle; live screenshot verified. **NOT yet verified: the spoken Hindi audio itself (needs a mic tap on prod).** |
 
 ## LOCAL / UNPUSHED
 
