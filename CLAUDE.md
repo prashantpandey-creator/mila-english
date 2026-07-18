@@ -49,9 +49,12 @@ service must also be added to the workflow's up/health lists in the same commit.
   across every surface or use coloured glass and gradient orbs.
 - **Front-door art:** `src/lib/visualScenes.ts` points to the commissioned
   faceless electric-paper voice sculpture in `public/visuals/v4/`, with separate
-  desktop/mobile compositions. The prior woman portrait remains untouched in
-  `public/visuals/v3/` as backup only. City cards crop one connected abstract
-  rhythm strip rather than literal destination photography. **Never use faces,
+  desktop/mobile compositions. A matching graphite pair in `public/visuals/v5/`
+  provides one original, once-per-session pencil-to-electric entrance; it never
+  loops, blocks interaction, or runs under Reduced Motion / Save Data. The prior
+  woman portrait remains untouched in `public/visuals/v3/` as backup only. City
+  cards crop one connected abstract rhythm strip rather than literal destination
+  photography. **Never use faces,
   headphones, chairs, desks, devices, classrooms, flags, landmark postcards,
   generic country photos, or stock-learning scenes in the active hero.**
 - **One identity:** `src/lib/routeSurface.ts` resolves every route to the same
