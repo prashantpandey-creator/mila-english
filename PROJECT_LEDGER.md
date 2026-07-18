@@ -22,7 +22,7 @@ No local screenshot counts. No "LIVE" claim without both.**
 | Voice/Piper TTS | `/api/tts` serves real WAV | prior | 200 + RIFF WAV |
 | Inner-app shell | `AppShell`/`AppHeader`/`AppMain`, safe-area nav, pink-noir focus rooms | `e40a155` | live |
 | iOS reviewer surfaces | Bilingual `/privacy`, `/support`, and permanent authenticated account/guest deletion | `18d5811` (2026-07-17) | deploy run `29580794980` green; both pages 200 with [privacy](docs/app-store-assets/1.0/live-reviewer-proof/privacy.png) and [support](docs/app-store-assets/1.0/live-reviewer-proof/support.png) screenshots; disposable guest deletion 200 then profile 401 |
-| `/pia` — Hindi/Hinglish companion | **Pia** (renamed from Pila, `6f35e4a`), Mila's flirty Hindi sister: guest-open voice room, opens in Hindi, cheesy pet names. Rides the **OpenAI Realtime** path (same as the English companion — the only Hindi-capable engine here), `mode=pia` in `buildRealtimeSession`. **No new container.** Realtime-only room (no en/ru-local fallback). | `3450b0d` + rename `6f35e4a` (2026-07-18) | rename went live via run `29624973946` (its own run `29624900849` was superseded/cancelled); live `/pia` 200 with `Pia`/`Baat shuru` in bundle, **`/pila` is now 404**. **NOT yet verified: the spoken Hindi audio itself (needs a mic tap on prod).** |
+| `/pia` — Hindi/Hinglish companion | **Pia** (renamed from Pila, `6f35e4a`), Mila's flirty Hindi sister: guest-open voice room, opens in Hindi, cheesy pet names. Rides the **OpenAI Realtime** path (same as the English companion — the only Hindi-capable engine here), `mode=pia` in `buildRealtimeSession`. **No new container.** Realtime-only room (no en/ru-local fallback). | `3450b0d` + rename `6f35e4a` (2026-07-18) | rename went live via run `29624973946`; then host-split `c728a1d` landed and is serving: **on `mila.purangpt.com`, `/pia` now 307-redirects to `/` and `/pila` 404s** (verified live). Pia is reachable only once `pia.purangpt.com` DNS + Caddy vhost exist — **owner/server-side, still pending**. **NOT yet verified: the spoken Hindi audio itself (needs a mic tap on prod).** |
 | Voice examiner: one question per turn + understands Russian | The level-check EXAMINER no longer bundles 3–5 questions into one turn (`EXAMINER_INSTRUCTIONS`: "Ask ONE question at a time… never stack") and its ASR is no longer English-locked — assessment transcription auto-detects so a learner's Russian fallback is understood, while the interview is still conducted and measured in English. Coach stays English-pinned; companions already auto-detected. Guarded by `src/lib/assessment.test.ts` assertions so a concurrent reset can't silently wipe it again (that happened once). | `6504e73` (2026-07-18) | deploy run `29624973946` green — run log shows the box at `HEAD is now at 6504e73` and the final in-container `localhost:3000` check 200; `npx tsc --noEmit` clean and all `assessment.test.ts` assertions pass at that commit; live `/assessment` 200 with screenshot; unauthenticated `POST /api/session?mode=assessment` correctly 401-gates. (Instructions are server-side config sent to OpenAI Realtime — they never appear in the client bundle, so bundle-grep does not apply to this change.) |
 
 ## LOCAL / UNPUSHED
@@ -43,6 +43,22 @@ No local screenshot counts. No "LIVE" claim without both.**
 ---
 
 ## Deploy (the only path to "live")
+
+**⚠️ PIPELINE RED as of 2026-07-18 ~01:41 UTC — every deploy currently FAILS at
+Ollama model warm-up, and this needs an owner/SSH decision, not more reruns.**
+Four consecutive runs (`29625359609`, `29625405695` + 2 reruns) died at
+`Ollama chat warm-up status 500` / `Ollama voice warm-up status 500`. Pattern:
+whichever resident model loads second evicts/fails the other — run 3 warmed the
+20b chat model then the 4b voice model 500'd; run 4 (90s later) had chat 500
+again. The box can no longer reliably hold BOTH `keep_alive:-1` models through
+warm-up (likely RAM ceiling; disk-full not ruled out — can't tell from outside).
+**The site itself stays UP through these failures** — the app container swaps
+and serves before the script dies in the warm-up tail (verified: `/` 200,
+`/assessment` 200, new `f12024a`/`c728a1d` behavior live). Consequence: a red
+run no longer means your code isn't live, and a green run is impossible until
+the capacity question is settled (drop `keep_alive:-1`, smaller model, more
+RAM/swap, or stop hard-failing on warm-up). Check where the run died before
+diagnosing your own change.
 
 Push to `main` → `.github/workflows/deploy.yml` SSHes to Mumbai
 (`209.182.233.163`), `git reset --hard origin/main`, rebuilds compose. ~2–4 min.
