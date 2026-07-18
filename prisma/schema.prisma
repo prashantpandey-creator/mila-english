@@ -35,6 +35,15 @@ model User {
   GeneratedLessons  Lesson[]          @relation("LessonCreator")
   CompanionThreads  CompanionThread[]
   CompanionMemories CompanionMemory[]
+  // ── Subscription (the money axis) — read via src/lib/subscription.ts;
+  // written only by the payment/webhook + admin-grant layer. ──
+  plan               String    @default("free") // "free" | "pro"
+  planStatus         String    @default("active") // active | canceled | past_due | expired
+  planRenewsAt       DateTime? // current period end; null = no expiry (lifetime / manual)
+  planProvider       String? // stripe | razorpay | yookassa | apple | google | manual
+  planCustomerId     String? // provider customer id
+  planSubscriptionId String? // provider subscription id
+  planUpdatedAt      DateTime?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }

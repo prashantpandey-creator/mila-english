@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { authenticate } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { resolvePlan, isPaid } from '@/lib/subscription'
 
 export async function GET(request: NextRequest) {
   const user = await authenticate(request)
@@ -19,10 +20,18 @@ export async function GET(request: NextRequest) {
       streakDays: true,
       learnerProfile: true,
       learnerProfileAt: true,
+      plan: true,
+      planStatus: true,
+      planRenewsAt: true,
     },
   })
   if (!profile) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  return NextResponse.json(profile)
+  // Surface a resolved subscription block the UI can trust (raw fields kept too).
+  const state = resolvePlan(profile)
+  return NextResponse.json({
+    ...profile,
+    subscription: { plan: state.plan, active: state.active, isPaid: isPaid(state), renewsAt: state.renewsAt },
+  })
 }
 
 export async function DELETE(request: NextRequest) {

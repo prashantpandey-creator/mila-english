@@ -2,6 +2,8 @@ import { createHash } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { authenticate } from '@/lib/auth';
 import { buildRealtimeSession } from '@/lib/assessment';
+import { getUserPlan } from '@/lib/subscriptionStore';
+import { FEATURES, planUnlocks, resolvePlan } from '@/lib/subscription';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -62,6 +64,18 @@ export async function POST(req: Request) {
 
   if (rateLimited(identity)) {
     return errorResponse('Too many voice sessions in a short time. Please wait a moment and try again.', 429, 'RATE_LIMITED');
+  }
+
+  // Paid gate for the premium realtime voice — OFF by default so the voice
+  // stays a free acquisition hook pre-launch. Flip VOICE_REALTIME_PAID_ONLY=1
+  // to require an active subscription (the assessment stays open either way, so
+  // onboarding is never paywalled). Guests are always free-tier.
+  if (/^(?:1|true|yes)$/i.test(process.env.VOICE_REALTIME_PAID_ONLY || '') && mode !== 'assessment') {
+    const userId = Number(user?.sub);
+    const plan = Number.isSafeInteger(userId) && userId > 0 ? await getUserPlan(userId) : resolvePlan({});
+    if (!planUnlocks(plan, FEATURES.REALTIME_VOICE)) {
+      return errorResponse('The live voice is a Pro feature. Upgrade to talk with Mila by voice.', 402, 'VOICE_PAID_FEATURE');
+    }
   }
 
   const contentType = req.headers.get('content-type') || '';
