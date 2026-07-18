@@ -1,0 +1,47 @@
+name: Diagnose Mumbai box
+# Read-only vitals for the Mumbai VPS, runnable when nobody has interactive
+# SSH at hand. Uses the same deploy key/secret as deploy.yml and touches
+# nothing: no restarts, no writes, no model loads.
+on:
+  workflow_dispatch:
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read-only box vitals via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 209.182.233.163
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 10m
+          script: |
+            echo "=== host ==="
+            hostname; uptime; nproc
+            echo "=== memory (MB) ==="
+            free -m
+            echo "=== swap ==="
+            swapon --show || echo "no swap configured"
+            echo "=== disk ==="
+            df -h
+            echo "=== docker disk ==="
+            docker system df
+            echo "=== containers ==="
+            docker ps -a --format 'table {{.Names}}\t{{.Status}}'
+            echo "=== per-container memory/cpu ==="
+            docker stats --no-stream
+            echo "=== ollama ps: mila-llm (chat) ==="
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama ps || true
+            echo "=== ollama ps: mila-voice-llm ==="
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama ps || true
+            echo "=== ollama models on disk ==="
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama list || true
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama list || true
+            echo "=== kernel OOM kills (last 24h) ==="
+            dmesg -T 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' | tail -25 || true
+            journalctl -k --since '24 hours ago' 2>/dev/null | grep -i 'oom' | tail -25 || true
+            echo "=== mila-llm recent logs ==="
+            docker logs --tail 60 mila-llm 2>&1 | tail -60
+            echo "=== mila-voice-llm recent logs ==="
+            docker logs --tail 60 mila-voice-llm 2>&1 | tail -60
+            echo "=== done (read-only) ==="
