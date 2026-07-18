@@ -50,6 +50,13 @@ backgrounds behind the workspace.
 
 ## Built so far
 
-- `src/components/ShowcaseSlider.tsx` + `.mila-showcase` in `globals.css` — the
-  first surface in the language (dashboard). Reference implementation; copy its
-  shape. Roll out from here.
+- `src/app/inner-theme.css` is the app-wide implementation. It owns the shared
+  Atelier/Studio tokens, shell, cards, controls, lesson tools, assessment,
+  chat, auth, legal pages, assistant furniture, and mobile navigation.
+- `src/components/RouteSurface.tsx` deliberately separates marketing from the
+  learning product. `/` keeps its cinematic poster and `/start` keeps its dark
+  conversion/pricing room; every other route receives the unified app system.
+- Immersive voice rooms use the Studio palette and signal red for a live state.
+  Their reactive WebGL presence is functional feedback, not decorative glow.
+- `src/components/ShowcaseSlider.tsx` + `.mila-showcase` remain the reference
+  composition for Atelier dashboard content.

@@ -73,12 +73,12 @@ void main() {
   vec2 st = (v_uv - 0.5) * 2.0;
   float t = u_t, lv = u_lv;
 
-  // Mila Colors
-  vec3 cWhite  = vec3(1.0, 0.98, 0.98);
-  vec3 cPink   = vec3(0.925, 0.282, 0.6); // #ec4899
-  vec3 cPurple = vec3(0.654, 0.345, 0.968); // #a78bfa
-  vec3 cBlue   = vec3(0.231, 0.51, 0.964); // #3b82f6
-  vec3 cViolet = vec3(0.545, 0.361, 0.965);
+  // The same Studio palette used by every focused learning surface.
+  vec3 cWhite  = vec3(0.925, 0.918, 0.894);
+  vec3 cPink   = vec3(0.95, 0.23, 0.18);
+  vec3 cPurple = vec3(0.55, 0.42, 0.32);
+  vec3 cBlue   = vec3(0.35, 0.38, 0.42);
+  vec3 cViolet = vec3(0.75, 0.72, 0.66);
 
   float n1 = fbm(vec3(st * 2.6, t * 0.16));
   float n2 = fbm(vec3(st * 3.0 + n1 * 0.5, t * 0.12 + 4.0));
@@ -182,10 +182,10 @@ void main() {
   glow *= ring;
   
   float h = fract(v_seed * 0.61);
-  vec3 pink = vec3(0.925, 0.282, 0.6);
-  vec3 purple = vec3(0.654, 0.345, 0.968);
-  vec3 blue = vec3(0.231, 0.51, 0.964);
-  vec3 white = vec3(1.0, 0.95, 0.95);
+  vec3 pink = vec3(0.95, 0.23, 0.18);
+  vec3 purple = vec3(0.55, 0.42, 0.32);
+  vec3 blue = vec3(0.35, 0.38, 0.42);
+  vec3 white = vec3(0.925, 0.918, 0.894);
   
   vec3 col = mix(purple, blue, smoothstep(0.0, 0.34, h));
   col = mix(col, pink, smoothstep(0.34, 0.68, h));
@@ -464,14 +464,14 @@ export function MilaBindu({
       <svg viewBox="0 0 320 320" width={size} height={size} className={className} role="img" aria-label={ariaLabel} style={{ display: "block", overflow: "visible" }}>
         <defs>
           <radialGradient id={halo}>
-            <stop offset="0%" stopColor="#ec4899" stopOpacity="0.45" />
-            <stop offset="55%" stopColor="#8b5cf6" stopOpacity="0.12" />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+            <stop offset="0%" stopColor="#ff5a4d" stopOpacity="0.35" />
+            <stop offset="55%" stopColor="#8b909b" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="#8b909b" stopOpacity="0" />
           </radialGradient>
           <radialGradient id={core}>
             <stop offset="0%" stopColor="#000000" />
-            <stop offset="40%" stopColor="#f472b6" />
-            <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
+            <stop offset="40%" stopColor="#eceae4" />
+            <stop offset="100%" stopColor="#ff5a4d" stopOpacity="0" />
           </radialGradient>
         </defs>
         <style>{`
@@ -482,9 +482,9 @@ export function MilaBindu({
         `}</style>
         <g className={`bindu-breathe-${id}`}>
           <circle cx="160" cy="160" r="150" fill={`url(#${halo})`} />
-          <circle cx="160" cy="160" r="118" fill="none" stroke="#ec4899" strokeWidth={1.4} opacity="0.5" />
-          <circle cx="160" cy="160" r="90" fill="none" stroke="#db2777" strokeWidth={1} opacity="0.4" />
-          <circle cx="160" cy="160" r="58" fill="none" stroke="#7e92b8" strokeWidth={0.8} opacity="0.32" />
+          <circle cx="160" cy="160" r="118" fill="none" stroke="#ff5a4d" strokeWidth={1.4} opacity="0.5" />
+          <circle cx="160" cy="160" r="90" fill="none" stroke="#c5a47a" strokeWidth={1} opacity="0.4" />
+          <circle cx="160" cy="160" r="58" fill="none" stroke="#8b909b" strokeWidth={0.8} opacity="0.32" />
           <circle cx="160" cy="160" r="46" fill={`url(#${core})`} opacity="0.7" />
           <circle cx="160" cy="160" r="13" fill="#000000" />
         </g>

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Caveat, Manrope, Onest, Yeseva_One, Lora, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
+import './inner-theme.css'
 import { I18nProvider } from '@/lib/i18n-provider'
 import { SceneProvider } from '@/lib/scene'
 import Atmosphere from '@/components/Atmosphere'

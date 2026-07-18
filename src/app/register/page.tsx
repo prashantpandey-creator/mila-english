@@ -2,7 +2,7 @@
 'use client';
 import { useState, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
-import AuthBloom from '@/components/AuthBloom';
+import Image from 'next/image';
 import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 
@@ -64,7 +64,9 @@ export default function RegisterPage() {
       <main className="welcome-auth__main">
         <div className="welcome-auth__card">
           <div className="welcome-auth__intro">
-            <div className="welcome-auth__bloom" aria-hidden="true"><AuthBloom /></div>
+            <div className="welcome-auth__bloom" aria-hidden="true">
+              <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} priority />
+            </div>
             <h1 className="welcome-auth__title">{t('register_title')}</h1>
             <p className="welcome-auth__subtitle">{t('register_subtitle')}</p>
           </div>

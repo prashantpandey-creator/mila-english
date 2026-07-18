@@ -5,8 +5,8 @@ import type { BinduState } from "./MilaBindu";
 
 // ─── Reactive living void ───────────────────────────────────────────────
 //
-// A full-field WebGL2 background for Voice Darshan: a deep, domain-warped aurora
-// of indigo / violet / pink over true OLED black, with a fine drifting starfield.
+// A full-field WebGL2 background for the Studio voice room: graphite, warm
+// paper, and Mila's single signal red over near-black.
 
 const VS_SRC = /*glsl*/ `#version 300 es
 in vec2 a_pos;
@@ -31,38 +31,38 @@ float fbm(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ s += a *
 void main(){
   vec2 uv = v_uv; vec2 c = uv - 0.5; c.x *= u_res.x / u_res.y;
   float r = length(c); float ang = atan(c.y, c.x);
-  vec3 base = vec3(0.005, 0.005, 0.015);
+  vec3 base = vec3(0.047, 0.051, 0.067);
   vec2 q = c * 2.2;
   float warp = fbm(q * 1.3 + vec2(u_t * 0.03, u_t * 0.02));
   float aNear = pow(fbm(q + vec2(warp * 1.2 - u_t * 0.02, warp * 0.8 + u_t * 0.015)), 1.7);
   float aFar = pow(fbm(q * 0.55 + vec2(u_t * 0.008, -u_t * 0.011) + warp * 0.4), 2.0);
   float aur = aNear * 0.72 + aFar * 0.55;
   
-  // Mila Colors
-  vec3 purple = vec3(0.25, 0.05, 0.45);
-  vec3 indigo = vec3(0.05, 0.11, 0.35);
-  vec3 pink = vec3(0.4, 0.1, 0.3);
-  vec3 activePink = vec3(0.8, 0.2, 0.5);
+  // Studio palette: graphite, warm neutral, and one live signal.
+  vec3 purple = vec3(0.22, 0.24, 0.28);
+  vec3 indigo = vec3(0.10, 0.11, 0.13);
+  vec3 pink = vec3(0.38, 0.25, 0.18);
+  vec3 activePink = vec3(0.95, 0.23, 0.18);
 
   vec3 hue = mix(indigo, purple, 0.5 + 0.5 * sin(u_t * 0.05 + c.x * 1.5));
   hue = mix(hue, pink, 0.38 * (0.5 + 0.5 * sin(u_t * 0.04 + c.y * 1.2)));
   hue = mix(hue, activePink, u_warm * 0.6);
   
-  float field = aur * (0.10 + 0.15 * u_lv);
+  float field = aur * (0.035 + 0.09 * u_lv);
   vec3 col = base + hue * field;
   
   float halo = exp(-r * (2.8 - 1.1 * u_lv)) * (0.04 + 0.16 * u_lv);
-  col += vec3(0.2, 0.05, 0.25) * halo;
+  col += vec3(0.35, 0.16, 0.12) * halo;
   
   float rays = (0.5 + 0.5 * sin(ang * 14.0 + u_t * 0.12)) * (0.5 + 0.5 * sin(ang * 5.0 - u_t * 0.07)) * exp(-r * 1.7) * u_warm * 0.16;
-  col += vec3(0.5, 0.15, 0.4) * rays;
+  col += vec3(0.95, 0.23, 0.18) * rays;
   
   float shim = (0.5 + 0.5 * sin(r * 24.0 - u_t * 0.35)) * smoothstep(0.25, 0.85, r) * 0.022 * (0.4 + 0.6 * u_lv);
-  col += mix(vec3(0.16, 0.12, 0.36), vec3(0.35, 0.15, 0.45), u_warm) * shim;
+  col += mix(vec3(0.22, 0.24, 0.28), vec3(0.55, 0.32, 0.24), u_warm) * shim;
   
   vec2 mg = uv * u_res * 0.6; mg.y += u_t * 6.0; float sd = h2(floor(mg));
   float tw = step(0.9986, sd) * (0.5 + 0.5 * sin(u_t * 1.6 + sd * 80.0));
-  col += vec3(0.8, 0.7, 0.9) * tw * 0.5;
+  col += vec3(0.925, 0.918, 0.894) * tw * 0.35;
   col *= mix(0.38, 1.0, smoothstep(1.18, 0.10, r));
   o = vec4(col, 1.0);
 }`;

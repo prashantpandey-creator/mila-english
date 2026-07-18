@@ -135,7 +135,7 @@ export default function PiaPage() {
       <button
         onClick={exit}
         aria-label="Pia se vidaa"
-        className="absolute z-30 rounded-full p-2.5 text-[#fbcfe8] hover:text-white transition-colors"
+        className="voice-exit absolute z-30 p-2.5 transition-colors"
         style={{
           top: "max(1.1rem, env(safe-area-inset-top, 0px))",
           right: "max(1.1rem, env(safe-area-inset-right, 0px))",
