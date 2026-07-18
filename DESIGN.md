@@ -60,6 +60,12 @@ noisy. There is no second dark room and no route-specific colour story.
   crop one connected abstract rhythm panorama. Across the product, character
   comes from scale, hard shadow, tactile edges, and asymmetrical rhythm—not
   faces, stock travel cards, flags, devices, glass thumbnails, or tech clichés.
+- **Graphite entrance.** On a learner's first homepage view in a browser
+  session, Mila's waveform develops the faceless sculpture from an original
+  graphite drawing into electric material. It runs once, settles permanently
+  into colour, stops immediately on interaction, and is skipped for Reduced
+  Motion or Save Data. It never copies characters, footage, or narrative from
+  another work and never becomes a persistent background loop.
 
 **Banned:** dusty rose, mauve, secondary semantic hues, per-category colour
 coding, black route surfaces, coloured glass, indiscriminate neon glow, gradient
