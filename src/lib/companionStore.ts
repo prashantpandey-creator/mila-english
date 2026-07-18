@@ -4,6 +4,8 @@ const PRIMARY_THREAD_KEY = 'primary';
 const MAX_STORED_MESSAGES = 80;
 const MAX_MEMORIES = 20;
 
+export type CompanionHistoryScope = 'all' | 'conversation' | 'practice';
+
 export type CompanionTurnContext = {
   pathname: string;
   locale: 'en' | 'ru';
@@ -18,7 +20,23 @@ async function getOrCreatePrimaryThread(userId: number) {
   });
 }
 
-export async function listCompanionMessages(userId: number, limit = 20) {
+function messageMatchesScope(
+  message: { surface: string | null; pathname: string | null },
+  scope: CompanionHistoryScope,
+  pathname?: string,
+) {
+  if (scope === 'all') return true;
+  const focusedPractice = message.surface === 'focused speaking practice';
+  if (scope === 'conversation') return !focusedPractice;
+  return focusedPractice && (!pathname || !message.pathname || message.pathname === pathname);
+}
+
+export async function listCompanionMessages(
+  userId: number,
+  limit = 20,
+  scope: CompanionHistoryScope = 'all',
+  pathname?: string,
+) {
   const thread = await prisma.companionThread.findUnique({
     where: { userId_key: { userId, key: PRIMARY_THREAD_KEY } },
     select: { id: true },
@@ -28,9 +46,11 @@ export async function listCompanionMessages(userId: number, limit = 20) {
   const messages = await prisma.companionMessage.findMany({
     where: { threadId: thread.id },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-    take: Math.max(1, Math.min(limit, MAX_STORED_MESSAGES)),
+    // A scoped request may need to look past newer messages from another room.
+    take: scope === 'all' ? Math.max(1, Math.min(limit, MAX_STORED_MESSAGES)) : MAX_STORED_MESSAGES,
   });
-  return messages.reverse();
+  const scoped = messages.reverse().filter((message) => messageMatchesScope(message, scope, pathname));
+  return scoped.slice(-Math.max(1, Math.min(limit, MAX_STORED_MESSAGES)));
 }
 
 export async function saveCompanionTurn(

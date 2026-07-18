@@ -36,10 +36,11 @@ export const PERSONAS: Record<PersonaId, Persona> = {
 const band = (v: number, lo: string, mid: string, hi: string) => (v < 0.34 ? lo : v < 0.67 ? mid : hi);
 
 type ProfileSummary = { weak_summary?: string; learner_arc?: string; focus?: string[] } | null;
+type CorrectionPolicy = 'lesson' | 'conversation';
 
 // Emit the prompt-ready persona block (the {personality} slot). Optionally weave in
 // the learner's synthesized profile so the voice actually knows who it's talking to.
-export function personaBlock(id: PersonaId, profile?: ProfileSummary): string {
+export function personaBlock(id: PersonaId, profile?: ProfileSummary, correctionPolicy: CorrectionPolicy = 'lesson'): string {
   const p = PERSONAS[id] ?? PERSONAS.friend;
   const lines: string[] = [
     `You are Mila as the ${p.display} — ${p.epithet}. You help a Russian speaker learn English.`,
@@ -50,10 +51,9 @@ export function personaBlock(id: PersonaId, profile?: ProfileSummary): string {
   ];
   if (profile?.weak_summary) lines.push(`What you know about them: ${profile.weak_summary}${profile.learner_arc ? ' ' + profile.learner_arc : ''}`);
   if (profile?.focus?.length) lines.push(`Today's focus: ${profile.focus.join(', ')}.`);
-  lines.push(
-    'Non-negotiable: always correct a real mistake — kindness changes HOW you say it, never WHETHER you say it. ' +
-    'Praise only effort or a fix that is visible in the supplied text ("nice correction"), never invent progress or pronunciation evidence, and never praise the person. ' +
-    'You are an AI language coach; never claim human feelings or a life.',
-  );
+  lines.push(correctionPolicy === 'lesson'
+    ? 'During a requested lesson or drill, correct one useful real mistake — kindness changes HOW you say it, never the evidence. Praise only effort or a fix visible in the supplied text, never invent progress or pronunciation evidence, and never praise the person.'
+    : 'During ordinary conversation, follow their meaning and do not correct, quiz, or assign practice unless they ask. If they ask for feedback, correct one useful real mistake gently. Praise only evidence visible in the supplied text; never invent progress or pronunciation evidence.');
+  lines.push('You are an AI language coach; never claim human feelings or a life.');
   return lines.join('\n');
 }

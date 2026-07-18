@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/auth';
-import { clearCompanionConversation, listCompanionMessages } from '@/lib/companionStore';
+import { clearCompanionConversation, listCompanionMessages, type CompanionHistoryScope } from '@/lib/companionStore';
 
 function authenticatedUserId(user: { sub: string } | null): number | null {
   if (!user) return null;
@@ -14,7 +14,11 @@ export async function GET(request: NextRequest) {
 
   const requestedLimit = Number(request.nextUrl.searchParams.get('limit') || 20);
   const limit = Number.isFinite(requestedLimit) ? Math.max(1, Math.min(Math.floor(requestedLimit), 80)) : 20;
-  const messages = await listCompanionMessages(userId, limit);
+  const requestedScope = request.nextUrl.searchParams.get('scope');
+  const scope: CompanionHistoryScope = requestedScope === 'conversation' || requestedScope === 'practice'
+    ? requestedScope
+    : 'all';
+  const messages = await listCompanionMessages(userId, limit, scope);
 
   return NextResponse.json({
     messages: messages.map((message) => ({
