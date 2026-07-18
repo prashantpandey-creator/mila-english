@@ -1,7 +1,6 @@
 // @ts-nocheck
 'use client';
 
-import { C } from '@/lib/theme';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import { Card } from '@/components/ui/Card';
 
@@ -10,24 +9,21 @@ export default function LessonList({ lessons, onSelect }: {
   onSelect: (id: number | string) => void;
 }) {
   return (
-    <div className="lesson-stack" style={{display:'flex',flexDirection:'column',gap:10}}>
+    <div className="lesson-stack">
       {lessons.map(l=>(
-        <Card className="lesson-card" key={l.id} onClick={()=>onSelect(l.id)} padding="16px 20px"
-          style={{width:'100%',display:'flex',alignItems:'center',gap:14,font:'inherit',textAlign:'left',color:'inherit',appearance:'none'}}>
-          <div style={{width:44,height:44,borderRadius:14,background:C.jupiterL,color:'var(--jupiter-readable, var(--jupiter))',
-            border:'1px solid color-mix(in srgb, var(--jupiter-readable, var(--jupiter)) 18%, transparent)',
-            display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><MilaIcon name={l.icon} size={23}/></div>
-          <div style={{flex:1}}>
-            <div style={{fontWeight:700,fontSize:'1rem',color:C.dark}}>{l.title}</div>
-            <div style={{fontSize:'0.85rem',color:C.warm}}>{l.sub}</div>
-            <div style={{display:'flex',gap:8,marginTop:4}}>
-              <span style={{fontSize:'0.75rem',color:C.warm,display:'inline-flex',alignItems:'center',gap:4}}><MilaIcon name="time" size={12}/>{l.time}</span>
-              <span aria-label={`Difficulty ${l.diffNum} of 3`} style={{display:'inline-flex',alignItems:'center',gap:3}}>
-                {[1,2,3].map(level=><i key={level} style={{width:7,height:7,borderRadius:'50%',border:`1px solid ${level<=l.diffNum?'var(--mercury-readable, var(--mercury))':C.line}`,background:level<=l.diffNum?'var(--mercury-readable, var(--mercury))':'var(--surface-control, transparent)'}}/>)}
+        <Card className="lesson-card" key={l.id} onClick={()=>onSelect(l.id)} padding="0">
+          <div className="lesson-card__icon"><MilaIcon name={l.icon} size={23}/></div>
+          <div className="lesson-card__copy">
+            <div className="lesson-card__title">{l.title}</div>
+            <div className="lesson-card__subtitle">{l.sub}</div>
+            <div className="lesson-card__meta">
+              <span><MilaIcon name="time" size={12}/>{l.time}</span>
+              <span className="lesson-card__difficulty" aria-label={`Difficulty ${l.diffNum} of 3`}>
+                {[1,2,3].map(level=><i className={level<=l.diffNum?'is-filled':''} key={level}/>)}
               </span>
             </div>
           </div>
-          <div style={{color:'var(--jupiter-readable, var(--jupiter))'}}><MilaIcon name="arrow" size={19}/></div>
+          <MilaIcon name="arrow" size={19}/>
         </Card>
       ))}
     </div>

@@ -25,6 +25,10 @@ export default function AchievementsPage() {
         actions={<><LangToggle/><ThemeToggle/></>}
       />
       <AppMain width="compact" className="achievements-page__main">
+        <div className="product-intro">
+          <p className="product-intro__kicker">{lang==='ru'?'Твои маленькие победы':'Your small wins'}</p>
+          <p className="product-intro__copy">{lang==='ru'?'Здесь остаются моменты, когда английский стал чуть легче.':'A record of the moments when English became a little easier.'}</p>
+        </div>
         <StreakBadge days={data.streakDays} lang={lang}/>
         <BadgeGrid badges={badges}/>
       </AppMain>

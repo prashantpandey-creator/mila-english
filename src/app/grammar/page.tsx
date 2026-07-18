@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/Card';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import MilaIcon from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
-import { C } from '@/lib/theme';
 
 const QUESTIONS = [
   { sentence: 'She ___ from home.', options: ['works', 'work'], answer: 'works', ru: 'С he/she/it в настоящем времени добавляем -s.' },
@@ -65,29 +64,32 @@ export default function GrammarPage() {
         actions={<LangToggle/>}
       />
       <AppMain width="compact" className="grammar-page__main">
-        <p style={{color:C.warm,margin:'0 0 20px'}}>{lang==='ru'?'Пять коротких примеров — без сухой теории.':'Five short examples, without dry theory.'}</p>
+        <div className="product-intro">
+          <p className="product-intro__kicker">{lang==='ru'?'Грамматика на слух':'Grammar by instinct'}</p>
+          <p className="product-intro__copy">{lang==='ru'?'Пять коротких примеров — без сухой теории.':'Five short examples, without dry theory.'}</p>
+        </div>
 
         {!done ? <>
-          <div style={{display:'flex',gap:5,marginBottom:18}}>{QUESTIONS.map((_,i)=><div key={i} style={{flex:1,height:5,borderRadius:4,background:i<=index?C.mercury:'rgba(255,255,255,0.12)'}}/>)}</div>
-          <Card hover={false} padding="24px" style={{marginBottom:14}}>
-            <div style={{fontSize:'0.78rem',color:C.warm,marginBottom:10}}>{index+1} / {QUESTIONS.length}</div>
-            <div style={{fontSize:'1.45rem',fontWeight:750,color:C.dark,marginBottom:20}}>{question.sentence}</div>
-            <div style={{display:'grid',gap:10}}>{question.options.map(option=>{
+          <div className="quiz-progress" aria-label={`${index+1} / ${QUESTIONS.length}`}>{QUESTIONS.map((_,i)=><div key={i} className={i<=index?'is-filled':''}/>)}</div>
+          <Card hover={false} padding="0" className="quiz-card">
+            <div className="quiz-card__count">{String(index+1).padStart(2,'0')} / {String(QUESTIONS.length).padStart(2,'0')}</div>
+            <div className="quiz-card__question">{question.sentence}</div>
+            <div className="quiz-card__options">{question.options.map(option=>{
               const isRight=selected && option===question.answer;
               const isWrong=selected===option && option!==question.answer;
-              return <button key={option} onClick={()=>choose(option)} disabled={Boolean(selected)} style={{padding:'14px',borderRadius:13,border:`1.5px solid ${isRight?C.mercury:isWrong?C.rose:'rgba(255,255,255,0.14)'}`,background:isRight?C.mercuryL:isWrong?C.roseL:'rgba(255,255,255,0.05)',color:C.dark,fontSize:'1rem',fontWeight:700,cursor:selected?'default':'pointer',textAlign:'left',display:'flex',alignItems:'center',gap:7}}>{isRight?<MilaIcon name="practice" size={17}/>:isWrong?<MilaIcon name="target" size={17}/>:null}{option}</button>;
+              return <button className={`quiz-option${isRight?' is-correct':''}${isWrong?' is-wrong':''}`} key={option} onClick={()=>choose(option)} disabled={Boolean(selected)}>{isRight?<MilaIcon name="practice" size={17}/>:isWrong?<MilaIcon name="target" size={17}/>:null}<span>{option}</span></button>;
             })}</div>
           </Card>
-          {selected && <Card hover={false} padding="16px" style={{marginBottom:14,border:`1px solid ${selected===question.answer?C.mercury:C.rose}`}}>
-            <div style={{fontWeight:750,color:selected===question.answer?C.mercury:C.rose,marginBottom:4}}>{selected===question.answer?(lang==='ru'?'Отлично — звучит естественно.':'Exactly — that sounds natural.'):(lang==='ru'?'Хорошая попытка. Посмотри на подсказку.':'Good try. Use this clue.')}</div>
-            <div style={{color:C.warm,lineHeight:1.5}}>{lang==='ru'?question.ru:`Correct: “${question.answer}”. ${question.ru}`}</div>
+          {selected && <Card hover={false} padding="0" className={`quiz-feedback ${selected===question.answer?'is-correct':'is-wrong'}`}>
+            <div className="quiz-feedback__title">{selected===question.answer?(lang==='ru'?'Отлично — звучит естественно.':'Exactly — that sounds natural.'):(lang==='ru'?'Хорошая попытка. Посмотри на подсказку.':'Good try. Use this clue.')}</div>
+            <div className="quiz-feedback__copy">{lang==='ru'?question.ru:`Correct: “${question.answer}”. ${question.ru}`}</div>
           </Card>}
-          <button onClick={advance} disabled={!selected} style={{width:'100%',padding:'15px',borderRadius:14,border:'none',background:selected?C.mercury:'rgba(255,255,255,0.08)',color:selected?C.white:C.warm,fontWeight:800,cursor:selected?'pointer':'default'}}>{index===QUESTIONS.length-1?(lang==='ru'?'Показать результат':'See result'):(lang==='ru'?'Продолжить →':'Continue →')}</button>
-        </> : <Card hover={false} padding="28px" style={{textAlign:'center'}}>
-          <div style={{width:68,height:68,display:'grid',placeItems:'center',margin:'0 auto',borderRadius:19,color:score>=80?C.jupiter:C.mercury,background:score>=80?C.jupiterL:C.mercuryL}}><MilaIcon name={score>=80?'trophy':'sparkle'} size={32}/></div>
-          <h2 style={{color:C.dark,margin:'10px 0 5px'}}>{lang==='ru'?'Практика завершена':'Practice complete'}</h2>
-          <p style={{color:C.jupiter,margin:'0 0 22px',fontWeight:700}}>{lang==='ru'?`Верно: ${correct} из ${QUESTIONS.length} · ${score}%`:`Correct: ${correct} of ${QUESTIONS.length} · ${score}%`}</p>
-          <div style={{display:'flex',gap:10}}><button onClick={restart} style={{flex:1,padding:13,borderRadius:12,border:'1px solid rgba(255,255,255,.14)',background:'transparent',color:C.warm,fontWeight:700,cursor:'pointer'}}>{lang==='ru'?'Ещё раз':'Again'}</button><button onClick={()=>router.push('/dashboard')} style={{flex:1,padding:13,borderRadius:12,border:'none',background:C.mercury,color:C.white,fontWeight:800,cursor:'pointer'}}>{lang==='ru'?'Готово':'Done'}</button></div>
+          <button onClick={advance} disabled={!selected} className="product-button product-button--primary product-button--full">{index===QUESTIONS.length-1?(lang==='ru'?'Показать результат':'See result'):(lang==='ru'?'Продолжить →':'Continue →')}</button>
+        </> : <Card hover={false} padding="0" className="quiz-complete">
+          <div className="quiz-complete__icon"><MilaIcon name={score>=80?'trophy':'sparkle'} size={32}/></div>
+          <h2>{lang==='ru'?'Практика завершена':'Practice complete'}</h2>
+          <p>{lang==='ru'?`Верно: ${correct} из ${QUESTIONS.length} · ${score}%`:`Correct: ${correct} of ${QUESTIONS.length} · ${score}%`}</p>
+          <div className="product-actions"><button onClick={restart} className="product-button product-button--secondary">{lang==='ru'?'Ещё раз':'Again'}</button><button onClick={()=>router.push('/dashboard')} className="product-button product-button--primary">{lang==='ru'?'Готово':'Done'}</button></div>
         </Card>}
       </AppMain>
     </AppShell>

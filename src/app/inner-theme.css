@@ -8,33 +8,33 @@
    direction; the signed-in product no longer inherits those campaign styles. */
 
 .mila-surface--app {
-  --mila-paper: #f3ede0;
-  --mila-panel: #f8f3e8;
-  --mila-raised: #fffaf0;
-  --mila-line: #cabfa6;
-  --mila-line-strong: #a99c83;
-  --mila-ink: #1c1611;
-  --mila-muted: #6b6152;
-  --mila-subtle: #8a7f6a;
-  --mila-action: #7c2d2d;
-  --mila-action-deep: #501c1c;
-  --mila-action-ink: #fffaf1;
-  --mila-action-soft: rgba(124, 45, 45, .09);
-  --mila-audio: #4f6269;
-  --mila-audio-soft: rgba(79, 98, 105, .1);
-  --mila-measure: #8a5a3e;
-  --mila-measure-deep: #503321;
-  --mila-measure-soft: rgba(138, 90, 62, .1);
-  --mila-companion: #9b465b;
-  --mila-companion-deep: #5b1932;
-  --mila-companion-ink: #260c16;
-  --mila-companion-soft: rgba(155, 70, 91, .1);
+  --mila-paper: #f8f4ee;
+  --mila-panel: #fffaf5;
+  --mila-raised: #fffdf9;
+  --mila-line: #d9cec2;
+  --mila-line-strong: #b9aa9d;
+  --mila-ink: #241d19;
+  --mila-muted: #746861;
+  --mila-subtle: #94867d;
+  --mila-action: #c94f5b;
+  --mila-action-deep: #963640;
+  --mila-action-ink: #fffaf7;
+  --mila-action-soft: rgba(201, 79, 91, .09);
+  --mila-audio: #49636a;
+  --mila-audio-soft: rgba(73, 99, 106, .1);
+  --mila-measure: #916c4c;
+  --mila-measure-deep: #62472f;
+  --mila-measure-soft: rgba(145, 108, 76, .1);
+  --mila-companion: #b95573;
+  --mila-companion-deep: #85344f;
+  --mila-companion-ink: #2a0f19;
+  --mila-companion-soft: rgba(185, 85, 115, .1);
   --mila-danger: #b42318;
   --mila-danger-soft: rgba(180, 35, 24, .09);
   --mila-signal: #e5352b;
-  --mila-radius: 8px;
-  --mila-radius-sm: 5px;
-  --mila-shadow: 0 1px 1px rgba(52, 39, 27, .04), 0 8px 24px rgba(52, 39, 27, .055);
+  --mila-radius: 12px;
+  --mila-radius-sm: 8px;
+  --mila-shadow: 0 1px 1px rgba(52, 39, 27, .035), 0 14px 36px rgba(52, 39, 27, .055);
 
   --surface-page: var(--mila-paper);
   --surface-text: var(--mila-ink);
@@ -885,4 +885,353 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
   .mila-surface--app *,
   .mila-surface--app *::before,
   .mila-surface--app *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* ── Uniform route furniture ──────────────────────────────────────────────
+   Every non-campaign screen now uses the same editorial anatomy. These are
+   structural components, not route-specific colour patches: intro, section,
+   metric, action, feedback and empty-state furniture are shared everywhere. */
+.mila-surface--app .app-main:not(.dashboard-conversation__main) {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom));
+}
+.mila-surface--app .app-header__inner { width: min(1120px, calc(100% - 40px)); }
+.mila-surface--app .app-header__mark {
+  border-color: var(--mila-action);
+  color: var(--mila-action);
+}
+.mila-surface--app .app-header__heading h1 { font-size: 15px !important; }
+.mila-surface--app .app-header__eyebrow { color: var(--mila-action) !important; }
+.mila-surface--app .mila-card {
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius);
+  color: var(--mila-ink);
+  background: var(--mila-panel);
+  box-shadow: var(--mila-shadow);
+  transition: transform .18s ease, border-color .18s ease, background-color .18s ease;
+}
+.mila-surface--app .mila-icon-tile {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius-sm);
+  color: var(--mila-action);
+  background: transparent;
+  font-size: 1.35rem;
+}
+
+.mila-surface--app .product-intro { margin: 0 0 24px; }
+.mila-surface--app .product-intro--centered { text-align: center; }
+.mila-surface--app .product-intro__kicker {
+  margin: 0 0 7px;
+  color: var(--mila-action);
+  font: 500 10px/1.3 var(--font-mono), monospace;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.mila-surface--app .product-intro__copy {
+  max-width: 55ch;
+  margin: 0;
+  color: var(--mila-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.mila-surface--app .product-intro--centered .product-intro__copy { margin-inline: auto; }
+.mila-surface--app .product-section {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius);
+  background: var(--mila-panel);
+  box-shadow: var(--mila-shadow);
+}
+.mila-surface--app .product-section__title {
+  margin: 0 0 3px;
+  color: var(--mila-ink);
+  font: 600 17px/1.3 var(--font-serif), Georgia, serif;
+}
+.mila-surface--app .product-section__copy { margin: 0 0 16px; color: var(--mila-muted); font-size: 12px; line-height: 1.5; }
+.mila-surface--app .product-actions { display: flex; justify-content: center; gap: 9px; }
+.mila-surface--app .product-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 17px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius-sm);
+  color: var(--mila-ink);
+  background: transparent;
+  box-shadow: none;
+  font: 700 13px/1.25 var(--font-sans), sans-serif;
+  cursor: pointer;
+  transition: transform .16s ease, border-color .16s ease, background-color .16s ease;
+}
+.mila-surface--app .product-button:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--mila-line-strong); }
+.mila-surface--app .product-button:disabled { cursor: default; opacity: .45; }
+.mila-surface--app .product-button--primary { border-color: var(--mila-action); color: var(--mila-action-ink); background: var(--mila-action); }
+.mila-surface--app .product-button--primary:hover:not(:disabled) { border-color: var(--mila-action-deep); background: var(--mila-action-deep); }
+.mila-surface--app .product-button--secondary { color: var(--mila-muted); background: var(--mila-raised); }
+.mila-surface--app .product-button--audio { border-color: var(--mila-audio); color: var(--mila-audio); background: var(--mila-audio-soft); }
+.mila-surface--app .product-button--full { width: 100%; }
+.mila-surface--app .product-status { margin: 16px 0; color: var(--mila-muted); font-size: 13px; text-align: center; }
+.mila-surface--app .product-feedback {
+  margin-top: 9px;
+  padding: 11px 13px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius-sm);
+  color: var(--mila-muted);
+  background: var(--mila-raised);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+.mila-surface--app .product-feedback.is-error { border-color: var(--mila-danger); color: var(--mila-danger); background: var(--mila-danger-soft); }
+.mila-surface--app .product-empty { padding: 40px 18px; color: var(--mila-muted); text-align: center; }
+.mila-surface--app .product-empty__icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 13px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius);
+  color: var(--mila-action);
+  background: var(--mila-action-soft);
+}
+.mila-surface--app .product-empty p { max-width: 48ch; margin: 0 auto 20px; line-height: 1.65; }
+
+/* Lesson library. */
+.mila-surface--app .lesson-generator { margin-bottom: 18px; }
+.mila-surface--app .lesson-generator__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  color: var(--mila-action);
+  font: 500 10px/1.2 var(--font-mono), monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.mila-surface--app .lesson-generator__control { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px !important; }
+.mila-surface--app .lesson-generator__input { min-width: 0; min-height: 46px; padding: 0 13px; outline: none; font-size: 13px; }
+.mila-surface--app .lesson-generator__button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 17px; font-size: 12px; font-weight: 750; cursor: pointer; }
+.mila-surface--app .lesson-generator__button:disabled { cursor: default; opacity: .42; }
+.mila-surface--app .category-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.mila-surface--app .category-filter__button { min-height: 38px; padding: 0 13px; font-size: 12px; font-weight: 650; cursor: pointer; }
+.mila-surface--app .lesson-stack { display: grid; gap: 8px; }
+.mila-surface--app .lesson-card {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 16px !important;
+  appearance: none;
+  color: var(--mila-ink);
+  font: inherit;
+  text-align: left;
+}
+.mila-surface--app .lesson-card__icon { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--mila-line); border-radius: var(--mila-radius-sm); color: var(--mila-action); }
+.mila-surface--app .lesson-card__copy { min-width: 0; }
+.mila-surface--app .lesson-card__title { color: var(--mila-ink); font: 600 16px/1.25 var(--font-serif), Georgia, serif; }
+.mila-surface--app .lesson-card__subtitle { margin-top: 2px; color: var(--mila-muted); font-size: 12px; line-height: 1.4; }
+.mila-surface--app .lesson-card__meta { display: flex; align-items: center; gap: 10px; margin-top: 6px; color: var(--mila-subtle); font: 500 10px/1.2 var(--font-mono), monospace; text-transform: uppercase; }
+.mila-surface--app .lesson-card__meta > span { display: inline-flex; align-items: center; gap: 4px; }
+.mila-surface--app .lesson-card__difficulty i { width: 6px; height: 6px; border: 1px solid var(--mila-line-strong); border-radius: 50%; }
+.mila-surface--app .lesson-card__difficulty i.is-filled { border-color: var(--mila-action); background: var(--mila-action); }
+.mila-surface--app .lesson-card > .mila-icon { justify-self: end; color: var(--mila-subtle); }
+
+/* Grammar exercise. */
+.mila-surface--app .quiz-progress { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 12px; }
+.mila-surface--app .quiz-progress > div { height: 3px; background: var(--mila-line); }
+.mila-surface--app .quiz-progress > div.is-filled { background: var(--mila-action); }
+.mila-surface--app .quiz-card { margin-bottom: 10px; padding: 24px !important; }
+.mila-surface--app .quiz-card__count { margin-bottom: 15px; color: var(--mila-subtle); font: 500 10px/1.2 var(--font-mono), monospace; letter-spacing: .08em; }
+.mila-surface--app .quiz-card__question { margin-bottom: 23px; color: var(--mila-ink); font: 500 clamp(1.55rem, 5vw, 2rem)/1.25 var(--font-serif), Georgia, serif; letter-spacing: -.025em; }
+.mila-surface--app .quiz-card__options { display: grid; gap: 8px; }
+.mila-surface--app .quiz-option { min-height: 50px; display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--mila-line); border-radius: var(--mila-radius-sm); color: var(--mila-ink); background: var(--mila-raised); font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
+.mila-surface--app .quiz-option:hover:not(:disabled) { border-color: var(--mila-line-strong); }
+.mila-surface--app .quiz-option:disabled { cursor: default; }
+.mila-surface--app .quiz-option.is-correct { border-color: var(--mila-audio); color: var(--mila-audio); background: var(--mila-audio-soft); }
+.mila-surface--app .quiz-option.is-wrong { border-color: var(--mila-danger); color: var(--mila-danger); background: var(--mila-danger-soft); }
+.mila-surface--app .quiz-feedback { margin-bottom: 10px; padding: 15px 16px !important; box-shadow: none !important; }
+.mila-surface--app .quiz-feedback.is-correct { border-left: 3px solid var(--mila-audio) !important; }
+.mila-surface--app .quiz-feedback.is-wrong { border-left: 3px solid var(--mila-danger) !important; }
+.mila-surface--app .quiz-feedback__title { color: var(--mila-ink); font-weight: 750; }
+.mila-surface--app .quiz-feedback__copy { margin-top: 4px; color: var(--mila-muted); font-size: 12px; line-height: 1.55; }
+.mila-surface--app .quiz-complete { padding: 32px 28px !important; text-align: center; }
+.mila-surface--app .quiz-complete__icon { width: 64px; height: 64px; display: grid; place-items: center; margin: 0 auto 13px; border: 1px solid var(--mila-line); border-radius: 50%; color: var(--mila-action); background: var(--mila-action-soft); }
+.mila-surface--app .quiz-complete h2 { margin: 0; font-size: 26px; }
+.mila-surface--app .quiz-complete p { margin: 7px 0 22px; color: var(--mila-measure); font-weight: 700; }
+
+/* Vocabulary and review. */
+.mila-surface--app .vocabulary-page__main { justify-content: flex-start; text-align: center; }
+.mila-surface--app .word-card { width: 100%; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 14px; padding: 28px !important; overflow: hidden; user-select: none; appearance: none; text-align: center; }
+.mila-surface--app .word-card::before { content: 'MILA · WORD'; align-self: stretch; margin-bottom: auto; color: var(--mila-subtle); font: 500 9px/1.2 var(--font-mono), monospace; letter-spacing: .13em; text-align: left; }
+.mila-surface--app .word-card__word { margin: auto 0 8px; color: var(--mila-ink); font: 500 clamp(2.3rem, 9vw, 4rem)/1 var(--font-serif), Georgia, serif; letter-spacing: -.04em; }
+.mila-surface--app .word-card.is-flipped .word-card__word { font-size: 1.35rem; color: var(--mila-muted); letter-spacing: 0; }
+.mila-surface--app .word-card__phonetic { color: var(--mila-action); font: 500 13px/1.3 var(--font-mono), monospace; }
+.mila-surface--app .word-card.is-flipped .word-card__phonetic { color: var(--mila-audio); }
+.mila-surface--app .word-card__hint { align-self: stretch; margin-top: auto; color: var(--mila-subtle); font-size: 11px; }
+.mila-surface--app .vocabulary-page__timer { width: 100%; margin-bottom: 12px; }
+.mila-surface--app .vocabulary-page__listen { margin-bottom: 16px; }
+.mila-surface--app .vocabulary-page__review { width: 100%; }
+.mila-surface--app .vocabulary-page__review[data-busy="true"] { opacity: .5; pointer-events: none; }
+.mila-surface--app .word-review__progress { margin-bottom: 8px; color: var(--mila-muted); font: 500 11px/1.2 var(--font-mono), monospace; text-align: left; }
+.mila-surface--app .word-review__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mila-surface--app .word-review__actions .product-button { width: 100%; }
+
+/* Progress and achievements. */
+.mila-surface--app .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+.mila-surface--app .metric-card { padding: 14px 8px !important; text-align: center; box-shadow: none !important; }
+.mila-surface--app .metric-card__icon { width: 30px; height: 26px; display: grid; place-items: center; margin: 0 auto 3px; color: var(--mila-action); }
+.mila-surface--app .metric-card__value { color: var(--mila-ink); font: 500 1.65rem/1.1 var(--font-serif), Georgia, serif; }
+.mila-surface--app .metric-card__label { margin-top: 3px; color: var(--mila-subtle); font: 500 9px/1.2 var(--font-mono), monospace; letter-spacing: .04em; text-transform: uppercase; }
+.mila-surface--app .progress-page__rings { display: flex; justify-content: center; gap: 28px; margin-top: 22px; }
+.mila-surface--app .sound-row { display: flex; align-items: center; gap: 11px; padding: 8px 0; border-bottom: 1px solid var(--mila-line); }
+.mila-surface--app .sound-row:last-of-type { border-bottom: 0; }
+.mila-surface--app .sound-row__phoneme { min-width: 38px; height: 34px; display: grid; place-items: center; padding: 0 8px; border: 1px solid var(--mila-line); border-radius: var(--mila-radius-sm); color: var(--mila-audio); background: var(--mila-audio-soft); font: 500 13px/1 var(--font-mono), monospace; }
+.mila-surface--app .sound-row__copy { min-width: 0; flex: 1; }
+.mila-surface--app .sound-row__title { color: var(--mila-ink); font-size: 12px; font-weight: 700; }
+.mila-surface--app .sound-row__title span { color: var(--mila-muted); font-weight: 500; }
+.mila-surface--app .sound-row__track { height: 4px; margin-top: 6px; overflow: hidden; background: var(--surface-track); }
+.mila-surface--app .sound-row__track > div { height: 100%; background: var(--mila-action); transition: width .4s ease; }
+.mila-surface--app .recent-lesson { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--mila-line); }
+.mila-surface--app .recent-lesson:last-child { border-bottom: 0; padding-bottom: 0; }
+.mila-surface--app .recent-lesson__title { color: var(--mila-ink); font: 600 14px/1.3 var(--font-serif), Georgia, serif; }
+.mila-surface--app .recent-lesson__category { margin-top: 2px; color: var(--mila-muted); font-size: 11px; }
+.mila-surface--app .recent-lesson__score { font: 500 13px/1 var(--font-mono), monospace; }
+.mila-surface--app .recent-lesson__score.is-good { color: var(--mila-audio); }
+.mila-surface--app .recent-lesson__score.is-low { color: var(--mila-danger); }
+.mila-surface--app .streak-card-v2 { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; padding: 18px 20px; border: 1px solid var(--mila-line); border-radius: var(--mila-radius); background: var(--mila-panel); box-shadow: var(--mila-shadow); }
+.mila-surface--app .streak-card-v2::before { background: var(--mila-action); }
+.mila-surface--app .streak-card-v2__icon { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--mila-line); border-radius: 50%; color: var(--mila-action); background: var(--mila-action-soft); }
+.mila-surface--app .streak-card-v2__title { color: var(--mila-ink); font: 600 17px/1.2 var(--font-serif), Georgia, serif; }
+.mila-surface--app .streak-card-v2__copy { margin-top: 4px; color: var(--mila-muted); font-size: 12px; }
+.mila-surface--app .badge-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.mila-surface--app .badge-tile { min-height: 145px; display: flex; flex-direction: column; align-items: center; padding: 18px 12px; border: 1px solid var(--mila-line); border-radius: var(--mila-radius); background: var(--mila-panel); text-align: center; }
+.mila-surface--app .badge-tile.is-locked { opacity: .58; background: transparent; }
+.mila-surface--app .badge-tile__icon { width: 42px; height: 42px; display: grid; place-items: center; margin-bottom: 10px; border: 1px solid var(--mila-line); border-radius: 50%; color: var(--mila-action); background: var(--mila-action-soft); }
+.mila-surface--app .badge-tile.is-locked .badge-tile__icon { color: var(--mila-subtle); background: transparent; }
+.mila-surface--app .badge-tile__title { color: var(--mila-ink); font: 600 14px/1.25 var(--font-serif), Georgia, serif; }
+.mila-surface--app .badge-tile__copy { margin-top: 5px; color: var(--mila-muted); font-size: 10px; line-height: 1.45; }
+
+/* Listening and assessment now sit on the exact same furniture. */
+.mila-surface--app .listen-page__phrase,
+.mila-surface--app .listen-page__result,
+.mila-surface--app .listen-page__recap { padding: 21px !important; }
+.mila-surface--app .listen-page__phrase-text { font-size: clamp(1.5rem, 5vw, 2rem); }
+.mila-surface--app .listen-page__mic { border-radius: 50% !important; }
+.mila-surface--app .assessment-page__main { justify-content: flex-start; padding-top: clamp(42px, 7vw, 72px); }
+.mila-surface--app .assessment-page__choices { padding: 22px; border: 1px solid var(--mila-line); border-radius: var(--mila-radius); background: var(--mila-panel); box-shadow: var(--mila-shadow); }
+
+/* Pronunciation is a warm study bench; active recording still uses Studio. */
+.mila-surface--app .phonetics-page__main > div:first-child > span {
+  border-color: var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-action) !important;
+  background: var(--mila-action-soft) !important;
+}
+.mila-surface--app .phonetics-page__main label input {
+  border-color: var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-ink) !important;
+  background: var(--mila-raised) !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .phonetics-page__main label input:focus { border-color: var(--mila-action) !important; }
+.mila-surface--app .phonetics-page__main label + div > button {
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-ink) !important;
+  background: var(--mila-panel) !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .phonetics-page__main label + div > button[aria-pressed="true"] {
+  border-color: var(--mila-audio) !important;
+  background: var(--mila-audio-soft) !important;
+}
+.mila-surface--app .phonetics-page__main label + div > button[aria-pressed="true"] > span:first-child { color: var(--mila-audio) !important; }
+.mila-surface--app .phonetics-page__main > section { gap: 10px !important; }
+.mila-surface--app .phonetics-page__main > section .focus-card { padding: 20px !important; }
+.mila-surface--app .phonetics-page__main > section button,
+.mila-surface--app .phonetics-page__main > button {
+  border-radius: var(--mila-radius-sm) !important;
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+/* The companion is contained by the same viewport rail on every route. */
+.mila-surface--app .mila-guide__panel {
+  max-width: min(390px, calc(100vw - 24px));
+  max-height: min(680px, calc(100dvh - 108px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  overflow: hidden;
+}
+
+/* One navigation object on phone and desktop. */
+.mila-surface--app .mila-tabbar__inner { max-width: 620px; }
+.mila-surface--app .mila-tabbar__tab { min-height: 62px; }
+.mila-surface--app .mila-tabbar__tab.is-active::before { content: ''; position: absolute; top: 0; width: 28px; border-top: 2px solid var(--mila-signal); }
+.mila-surface--app .mila-tabbar__tab { position: relative; }
+
+@media (max-width: 640px) {
+  .mila-surface--app .app-header__inner { width: calc(100% - 24px); }
+  .mila-surface--app .app-header__identity { gap: 8px; }
+  .mila-surface--app .app-header__mark { width: 32px; height: 32px; }
+  .mila-surface--app .app-header__heading { padding-left: 9px; }
+  .mila-surface--app .app-header__heading h1 { max-width: 32vw; font-size: 12px !important; }
+  .mila-surface--app .app-main:not(.dashboard-conversation__main) { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+  .mila-surface--app .product-intro { margin-bottom: 18px; }
+  .mila-surface--app .product-section { padding: 16px; }
+  .mila-surface--app .product-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .mila-surface--app .lesson-generator__control { grid-template-columns: 1fr; }
+  .mila-surface--app .lesson-generator__button { min-height: 44px; }
+  .mila-surface--app .category-filter { flex-wrap: nowrap; margin-right: -14px; padding-right: 14px; overflow-x: auto; scrollbar-width: none; }
+  .mila-surface--app .category-filter::-webkit-scrollbar { display: none; }
+  .mila-surface--app .lesson-card { grid-template-columns: 40px minmax(0, 1fr) 18px; gap: 11px; padding: 13px 12px !important; }
+  .mila-surface--app .lesson-card__icon { width: 38px; height: 38px; }
+  .mila-surface--app .lesson-card__title { font-size: 15px; }
+  .mila-surface--app .quiz-card { padding: 20px 17px !important; }
+  .mila-surface--app .metric-grid { grid-template-columns: 1fr 1fr; }
+  .mila-surface--app .metric-card { text-align: left; display: grid; grid-template-columns: 30px 1fr; column-gap: 8px; align-items: center; }
+  .mila-surface--app .metric-card__icon { grid-row: 1 / 3; margin: 0; }
+  .mila-surface--app .metric-card__value { font-size: 1.45rem; }
+  .mila-surface--app .metric-card__label { margin: 0; }
+  .mila-surface--app .progress-page__rings { gap: 14px; }
+  .mila-surface--app .badge-grid { grid-template-columns: 1fr 1fr; }
+  .mila-surface--app .badge-tile { min-height: 138px; }
+  .mila-surface--app .word-card { min-height: 220px; padding: 22px !important; }
+  body[data-bottom-nav] .mila-surface--app .mila-guide {
+    right: max(10px, env(safe-area-inset-right)) !important;
+    bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+    width: 52px !important;
+    height: 52px !important;
+  }
+  body[data-bottom-nav] .mila-surface--app .mila-guide__launcher {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 16px !important;
+  }
+  body[data-bottom-nav] .mila-surface--app .mila-guide__launcher > img { width: 58px !important; height: 58px !important; }
+  body[data-bottom-nav] .mila-surface--app .mila-guide__textchip {
+    right: -4px !important;
+    bottom: -4px !important;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+  }
+  body[data-bottom-nav] .mila-surface--app .mila-guide__nudge { right: 70px !important; width: min(220px, calc(100vw - 92px)) !important; }
+  .mila-surface--app .mila-guide__panel {
+    right: 8px !important;
+    bottom: calc(78px + env(safe-area-inset-bottom)) !important;
+    left: 8px !important;
+    width: auto !important;
+    max-width: none;
+    height: min(68dvh, 600px) !important;
+    max-height: calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
 }

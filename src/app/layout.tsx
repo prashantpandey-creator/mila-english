@@ -68,7 +68,7 @@ export const viewport: Viewport = {
 // Runs before first paint so a night visitor never sees a blush flash: the
 // welcome room's light CSS is gated on html[data-mila-theme]. Preference key
 // mirrors mila_lang; absent/invalid means follow the device.
-const themeInitScript = `(function(){try{var p=localStorage.getItem('mila_theme');var d=p==='dark'||(p!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.milaTheme=d?'dark':'light';}catch(e){document.documentElement.dataset.milaTheme='light';}})();`;
+const themeInitScript = `(function(){try{var p=localStorage.getItem('mila_theme');var d=p==='dark'||(p==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.milaTheme=d?'dark':'light';}catch(e){document.documentElement.dataset.milaTheme='light';}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
