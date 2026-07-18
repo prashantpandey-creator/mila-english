@@ -3,7 +3,7 @@
 
 import { C } from '@/lib/theme';
 
-const SIGNAL = '#b63d68';
+const SIGNAL = '#d9006c';
 
 export default function SkillProgressBar({ label, val }: { label: string; val: number; color: string }) {
   return (

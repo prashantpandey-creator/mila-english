@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import LangToggle from '@/components/LangToggle';
 import MilaIcon, { MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
@@ -214,9 +215,9 @@ export default function HomePage() {
   ];
 
   const cities = [
-    { code: 'LDN', edition: '01', name: T('Лондон', 'London'), note: T('Точный · сдержанный · музыкальный', 'Precise · restrained · musical'), phrase: 'Mind the rhythm' },
-    { code: 'NYC', edition: '02', name: T('Нью-Йорк', 'New York'), note: T('Прямой · быстрый · живой', 'Direct · quick · alive'), phrase: 'Make it yours' },
-    { code: 'BOM', edition: '03', name: T('Мумбаи', 'Mumbai'), note: T('Тёплый · гибкий · выразительный', 'Warm · fluid · expressive'), phrase: 'Speak with colour' },
+    { code: 'LDN', edition: '01', artPosition: '15% center', name: T('Лондон', 'London'), note: T('Точный · сдержанный · музыкальный', 'Precise · restrained · musical'), phrase: 'Mind the rhythm' },
+    { code: 'NYC', edition: '02', artPosition: '50% center', name: T('Нью-Йорк', 'New York'), note: T('Прямой · быстрый · живой', 'Direct · quick · alive'), phrase: 'Make it yours' },
+    { code: 'BOM', edition: '03', artPosition: '85% center', name: T('Мумбаи', 'Mumbai'), note: T('Тёплый · гибкий · выразительный', 'Warm · fluid · expressive'), phrase: 'Speak with colour' },
   ];
 
   const homeRows = [
@@ -485,14 +486,25 @@ export default function HomePage() {
               {cities.map((city) => (
                 <Reveal key={city.code}>
                   <figure className="lp-city" style={{ margin: 0 }}>
-                    <div className="lp-city__edition"><span>{city.edition}</span><small>MILA VOICE EDITION</small></div>
-                    <div className="lp-city__signal" aria-hidden><i /><i /><i /><i /><i /></div>
-                    <blockquote>{city.phrase}</blockquote>
-                    <figcaption>
-                      <span>{city.code}</span>
-                      <strong>{city.name}</strong>
-                      <small>{city.note}</small>
-                    </figcaption>
+                    <div className="lp-city__art" aria-hidden>
+                      <Image
+                        src="/visuals/v4/mila-city-rhythms-strip-v1.webp"
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 84vw, (max-width: 1024px) 42vw, 360px"
+                        loading="lazy"
+                        style={{ objectPosition: city.artPosition }}
+                      />
+                    </div>
+                    <div className="lp-city__body">
+                      <div className="lp-city__edition"><span>{city.edition}</span><small>MILA VOICE EDITION</small></div>
+                      <blockquote>{city.phrase}</blockquote>
+                      <figcaption>
+                        <span>{city.code}</span>
+                        <strong>{city.name}</strong>
+                        <small>{city.note}</small>
+                      </figcaption>
+                    </div>
                   </figure>
                 </Reveal>
               ))}

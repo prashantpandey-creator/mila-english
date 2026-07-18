@@ -3,8 +3,8 @@
 
 import { C } from '@/lib/theme';
 
-const SIGNAL = '#b63d68';
-const SIGNAL_SOFT = 'rgba(182,61,104,0.12)';
+const SIGNAL = '#d9006c';
+const SIGNAL_SOFT = 'rgba(217,0,108,0.12)';
 
 const SOUNDS = [
   { ipa: '/θ/', ex: 'think' }, { ipa: '/ð/', ex: 'this' }, { ipa: '/w/', ex: 'world' },

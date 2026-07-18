@@ -9,8 +9,8 @@ import type { AssessmentResult } from '@/lib/assessment'
 import { C } from '@/lib/theme'
 import MilaIcon from '@/components/ui/MilaIcon'
 
-const SIGNAL = '#b63d68'
-const SIGNAL_SOFT = 'rgba(182,61,104,0.12)'
+const SIGNAL = '#d9006c'
+const SIGNAL_SOFT = 'rgba(217,0,108,0.12)'
 const SIGNAL_INK = '#ffffff'
 
 type CalibrationPrompt = {
@@ -213,6 +213,6 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
           : <><MilaIcon name="voice" size={17}/>{lang==='ru'?'Начать запись':'Start recording'}</>}
       </button>}
     </div>
-    <p style={{fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #75606a)',margin:'14px auto 0',maxWidth:450}}>{lang==='ru'?'Аудио отправляется только на сервер Mila, обрабатывается локальными моделями и удаляется сразу после запроса. Внешний AI-провайдер не используется.':'Audio goes only to Mila, is processed by local models, and is deleted immediately after the request. No external AI provider is used.'}</p>
+    <p style={{fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #65535f)',margin:'14px auto 0',maxWidth:450}}>{lang==='ru'?'Аудио отправляется только на сервер Mila, обрабатывается локальными моделями и удаляется сразу после запроса. Внешний AI-провайдер не используется.':'Audio goes only to Mila, is processed by local models, and is deleted immediately after the request. No external AI provider is used.'}</p>
   </div>
 }

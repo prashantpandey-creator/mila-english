@@ -2,35 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Mila's single brand language: true white, cool blush, and one rose signal. */
+/* Mila's Electric Paper language: white daylight, hot pigment, berry depth. */
 :root {
-  --noir: #2f1b24; --noir-2: #3b222e; --noir-3: #492a38;
-  --ivory: #ffffff; --stone: #75606a;
-  --mila-brand: #b63d68; --mila-brand-deep: #8d2d50;
-  --mila-brand-bright: #dc6d92;
-  --mila-brand-soft: rgba(182,61,104,.1); --mila-brand-line: rgba(182,61,104,.24);
+  --noir: #26131f; --noir-2: #3b222e; --noir-3: #492a38;
+  --ivory: #ffffff; --stone: #65535f;
+  --mila-paper: #fffcfe; --mila-panel: #ffffff; --mila-raised: #fff4fa; --mila-band: #ffe8f3;
+  --mila-ink: #26131f; --mila-muted: #65535f; --mila-line: #f0c7da; --mila-line-strong: #e58bb5;
+  --mila-brand: #d9006c; --mila-brand-deep: #a40050;
+  --mila-brand-bright: #ff2d95;
+  --mila-brand-plate: #75003f;
+  --mila-brand-soft: rgba(217,0,108,.1); --mila-brand-line: rgba(217,0,108,.24);
   --mercury: var(--mila-brand); --mercury-bright: var(--mila-brand-bright); --mercury-soft: var(--mila-brand-soft);
-  --venus: var(--mila-brand); --venus-bright: var(--mila-brand-bright); --venus-deep: var(--mila-brand-deep); --venus-ink: #2f1b24; --venus-soft: var(--mila-brand-soft);
+  --venus: var(--mila-brand); --venus-bright: var(--mila-brand-bright); --venus-deep: var(--mila-brand-deep); --venus-ink: #26131f; --venus-soft: var(--mila-brand-soft);
   --voice: var(--mila-brand); --voice-bright: var(--mila-brand-bright); --voice-soft: var(--mila-brand-soft);
   --jupiter: var(--mila-brand); --jupiter-bright: var(--mila-brand-bright); --jupiter-soft: var(--mila-brand-soft);
   --gold: var(--mila-brand); --gold-soft: var(--mila-brand-soft);
   --danger: var(--mila-brand-deep); --danger-soft: var(--mila-brand-soft);
   --rose: var(--mila-brand); --rose-soft: var(--mila-brand-soft);
   --sage: var(--mila-brand); --sage-soft: var(--mila-brand-soft);
-  --glass: rgba(255,255,255,.94); --line: rgba(182,61,104,.16);
+  --glass: rgba(255,255,255,.94); --line: rgba(217,0,108,.16);
   --lp-font-serif: var(--font-display);
   --lp-font-accent: var(--font-sans);
   --font-serif: var(--font-display);
 }
 
-html { background: #fffdfd; color-scheme: light; }
+html { background: #fffcfe; color-scheme: light; }
 
 body {
   /* The front-door artwork remains visible through the transparent body. The
      html canvas is white, so SSR, overscroll, and slow hydration never flash
      the retired black theme. */
   background: transparent;
-  color: #2f1b24;
+  color: #26131f;
   font-family: var(--font-sans, 'Manrope'), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
@@ -91,8 +94,8 @@ h1, h2 {
 .atmosphere--motion video.is-on { opacity: .88; }
 .atmosphere--motion::after {
   background:
-    radial-gradient(900px 720px at 82% 18%, rgba(201,79,91,.035), transparent 64%),
-    radial-gradient(700px 560px at 92% 68%, rgba(201,79,91,.02), transparent 68%),
+    radial-gradient(900px 720px at 82% 18%, rgba(217,0,108,.035), transparent 64%),
+    radial-gradient(700px 560px at 92% 68%, rgba(217,0,108,.02), transparent 68%),
     linear-gradient(180deg, rgba(0,0,0,.26) 0%, rgba(0,0,0,.52) 58%, rgba(0,0,0,.88) 100%);
 }
 
@@ -108,15 +111,15 @@ h1, h2 {
   content: ''; position: absolute; inset: 0;
   background:
     radial-gradient(1200px 800px at 85% -10%, rgba(255,255,255,.025), transparent 62%),
-    radial-gradient(1000px 700px at -10% 25%, rgba(201,79,91,.022), transparent 58%),
+    radial-gradient(1000px 700px at -10% 25%, rgba(217,0,108,.022), transparent 58%),
     linear-gradient(180deg, rgba(0,0,0,.64) 0%, rgba(0,0,0,.78) 50%, rgba(0,0,0,.94) 100%);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
 .atmosphere--brand::after {
   background:
-    radial-gradient(900px 640px at 78% 34%, rgba(201,79,91,.035), transparent 66%),
-    radial-gradient(580px 500px at 82% 36%, rgba(201,79,91,.025), transparent 62%),
+    radial-gradient(900px 640px at 78% 34%, rgba(217,0,108,.035), transparent 66%),
+    radial-gradient(580px 500px at 82% 36%, rgba(217,0,108,.025), transparent 62%),
     linear-gradient(180deg,rgba(0,0,0,.24),rgba(0,0,0,.48) 60%,rgba(0,0,0,.84));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -1414,8 +1417,8 @@ h1, h2 {
 
 /* Legacy rules below still provide structural fallbacks. The document canvas
    itself stays on Mila's light palette so no route can flash black. */
-html { background: #fffdfd; }
-body { color: #2f1b24; }
+html { background: #fffcfe; }
+body { color: #26131f; }
 
 /* ── Learning journeys — one authored symbol and card language ────────── */
 .mila-icon { display: block; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
@@ -1981,7 +1984,7 @@ body { color: #2f1b24; }
 
 /* ── One-room Mila: compatibility selectors resolve to the light atelier ── */
 html[data-mila-surface="welcome"],
-html[data-mila-surface="focus"] { background: #fffdfd; }
+html[data-mila-surface="focus"] { background: #fffcfe; }
 
 .mila-surface {
   min-height: 100vh;
@@ -1989,36 +1992,36 @@ html[data-mila-surface="focus"] { background: #fffdfd; }
   transition: background-color .32s ease,color .24s ease;
 }
 .mila-surface--focus {
-  --surface-page: #fffdfd;
-  --surface-text: #2f1b24;
-  --surface-muted: #75606a;
+  --surface-page: #fffcfe;
+  --surface-text: #26131f;
+  --surface-muted: #65535f;
   --surface-card: var(--mila-paper-grain), #ffffff;
   --surface-nav: rgba(255,255,255,.96);
-  --surface-line: #efd6df;
-  --surface-control: #fff7fa;
-  --surface-control-line: #efd6df;
+  --surface-line: #f0c7da;
+  --surface-control: #fff4fa;
+  --surface-control-line: #f0c7da;
   --surface-control-shadow: 0 1px 3px rgba(47,27,36,.05);
   --surface-track: rgba(47,27,36,.08);
-  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(94,35,61,.055);
-  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(94,35,61,.08);
-  --surface-card-line-hover: rgba(182,61,104,.3);
-  --surface-icon-tile: rgba(182,61,104,.1);
+  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(117,0,63,.055);
+  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(117,0,63,.08);
+  --surface-card-line-hover: rgba(217,0,108,.3);
+  --surface-icon-tile: rgba(217,0,108,.1);
 }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome {
   --surface-page: rgba(255,253,253,.98);
-  --surface-text: #2f1b24;
-  --surface-muted: #75606a;
+  --surface-text: #26131f;
+  --surface-muted: #65535f;
   --surface-card: var(--mila-paper-grain), rgba(255,255,255,.98);
   --surface-nav: rgba(255,255,255,.94);
-  --surface-line: #efd6df;
+  --surface-line: #f0c7da;
   --surface-control: rgba(255,247,250,.9);
   --surface-control-line: #e3becb;
-  --surface-control-shadow: 0 1px 3px rgba(94,35,61,.05);
+  --surface-control-shadow: 0 1px 3px rgba(117,0,63,.05);
   --surface-track: rgba(47,27,36,.08);
-  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(94,35,61,.055);
-  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(94,35,61,.08);
-  --surface-card-line-hover: rgba(182,61,104,.3);
-  --surface-icon-tile: rgba(182,61,104,.1);
+  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(117,0,63,.055);
+  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(117,0,63,.08);
+  --surface-card-line-hover: rgba(217,0,108,.3);
+  --surface-icon-tile: rgba(217,0,108,.1);
   --venus-readable: var(--mila-brand);
   --mercury-readable: var(--mila-brand);
   --voice-readable: var(--mila-brand);
@@ -2028,13 +2031,13 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome {
 }
 .mila-surface--front { background: transparent; }
 
-.atmosphere--focus { background: #fffdfd; }
+.atmosphere--focus { background: #fffcfe; }
 .atmosphere--focus::after {
   background:
-    radial-gradient(980px 720px at 82% 8%,rgba(182,61,104,.1),transparent 62%),
+    radial-gradient(980px 720px at 82% 8%,rgba(217,0,108,.1),transparent 62%),
     linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,244,248,.92));
 }
-html:not([data-mila-theme="dark"]) .atmosphere--welcome { background: #fffdfd; }
+html:not([data-mila-theme="dark"]) .atmosphere--welcome { background: #fffcfe; }
 html:not([data-mila-theme="dark"]) .atmosphere--welcome video,
 html:not([data-mila-theme="dark"]) .atmosphere--welcome img {
   filter: saturate(.86) contrast(.96) brightness(1.05) blur(.2px);
@@ -2105,7 +2108,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-page {
   --landing-gold-bright: var(--venus-readable);
   --landing-coral: var(--venus);
   --landing-mint: var(--mercury-readable);
-  --landing-bg: #fff8fa;
+  --landing-bg: #fff4fa;
   color: var(--landing-ink);
   background: transparent;
 }
@@ -2130,7 +2133,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-signin {
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-hero::before {
   background:
     linear-gradient(90deg,rgba(255,248,250,.995) 0%,rgba(255,248,250,.96) 43%,rgba(255,248,250,.57) 71%,rgba(255,248,250,.18) 100%),
-    linear-gradient(0deg,#fff8fa 0%,transparent 26%);
+    linear-gradient(0deg,#fff4fa 0%,transparent 26%);
 }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-hero::after { background: linear-gradient(90deg,transparent,rgba(168,61,100,.24),rgba(8,120,91,.18),transparent); }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-hero__glow {
@@ -2185,7 +2188,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-trust__inner 
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-trust__inner p { color: #756a73; }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-trust__inner strong { color: var(--landing-ink); }
 
-html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-story { background: #fff8fa; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-story { background: #fff4fa; }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .session-story__intro h2,
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-section__heading h2,
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-cta h2,
@@ -2221,7 +2224,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .story-plan-row strong
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .story-phrase span,
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .story-plan-row { background: rgba(255,255,255,.05); }
 
-html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-section--rooms { background: linear-gradient(180deg,#fff2f6,#fff8fa); }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-section--rooms { background: linear-gradient(180deg,#fff2f6,#fff4fa); }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .room-card {
   --room-readable: var(--mercury-readable);
   border-color: rgba(93,46,66,.12);
@@ -2257,7 +2260,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .room-swipehint { colo
 
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-cta {
   border-color: rgba(93,46,66,.1);
-  background: linear-gradient(145deg,#fff8fa 0%,#ffedf3 52%,#effbf6 100%);
+  background: linear-gradient(145deg,#fff4fa 0%,#ffedf3 52%,#effbf6 100%);
 }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-cta__orb {
   display: block;
@@ -2283,7 +2286,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__launcher 
   background: linear-gradient(145deg,rgba(255,255,255,.98),rgba(255,240,244,.98));
   box-shadow: 0 18px 46px rgba(93,46,66,.18),0 0 28px rgba(242,139,173,.1),inset 0 1px 0 #fff;
 }
-html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__state { border-color: #fff8fa; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__state { border-color: #fff4fa; }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__nudge,
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__panel {
   border-color: rgba(93,46,66,.14);
@@ -2345,7 +2348,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__guest but
 
 @media (max-width: 940px) {
   html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-hero::before {
-    background: linear-gradient(180deg,rgba(255,248,250,.82) 0%,rgba(255,248,250,.78) 38%,rgba(255,248,250,.95) 76%,#fff8fa 100%);
+    background: linear-gradient(180deg,rgba(255,248,250,.82) 0%,rgba(255,248,250,.78) 38%,rgba(255,248,250,.95) 76%,#fff4fa 100%);
   }
 }
 
@@ -2355,7 +2358,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__guest but
   html:not([data-mila-theme="dark"]) .mila-surface--welcome { --surface-card: var(--mila-paper-grain), rgba(250,247,240,.96); }
   html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-nav { background: rgba(255,250,252,.94); }
   html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-hero::before {
-    background: linear-gradient(180deg,rgba(255,248,250,.76) 0%,rgba(255,248,250,.82) 34%,rgba(255,248,250,.97) 72%,#fff8fa 100%);
+    background: linear-gradient(180deg,rgba(255,248,250,.76) 0%,rgba(255,248,250,.82) 34%,rgba(255,248,250,.97) 72%,#fff4fa 100%);
   }
   html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-hero__lede { color: #554a51; }
   html:not([data-mila-theme="dark"]) .mila-surface--welcome .landing-trust__inner > div { border-color: rgba(93,46,66,.1); }
@@ -2445,7 +2448,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .lesson-card {
   box-shadow: none !important;
 }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .lesson-card + .lesson-card { border-top: 1px solid rgba(93,46,66,.075) !important; }
-html:not([data-mila-theme="dark"]) .mila-surface--welcome .lesson-card:hover { transform: none !important; background: #fff8fa !important; }
+html:not([data-mila-theme="dark"]) .mila-surface--welcome .lesson-card:hover { transform: none !important; background: #fff4fa !important; }
 
 /* Landing method: one editorial process sheet with compact focus insets. */
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .session-story__steps {
@@ -2603,7 +2606,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .room-visual {
   min-height: 188px;
   border: 0;
   border-radius: 16px;
-  background: #fff5f8;
+  background: #fff4fa;
   box-shadow: none;
 }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .room-card[data-room="pronunciation"] .room-visual { background: #f3fbfd; }
@@ -2712,22 +2715,22 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .journey-stack {
   .theme-toggle button { padding: 6px 8px; font-size: 0.7rem; }
 }
 
-html[data-mila-theme="dark"][data-mila-surface="welcome"] { background: #fffdfd; }
+html[data-mila-theme="dark"][data-mila-surface="welcome"] { background: #fffcfe; }
 html[data-mila-theme="dark"] .mila-surface--welcome {
-  --surface-page: #fffdfd;
-  --surface-text: #2f1b24;
-  --surface-muted: #75606a;
+  --surface-page: #fffcfe;
+  --surface-text: #26131f;
+  --surface-muted: #65535f;
   --surface-card: var(--mila-paper-grain), #ffffff;
   --surface-nav: rgba(255,255,255,.96);
-  --surface-line: #efd6df;
-  --surface-control: #fff7fa;
-  --surface-control-line: #efd6df;
+  --surface-line: #f0c7da;
+  --surface-control: #fff4fa;
+  --surface-control-line: #f0c7da;
   --surface-control-shadow: 0 1px 3px rgba(47,27,36,.05);
   --surface-track: rgba(47,27,36,.08);
-  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(94,35,61,.055);
-  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(94,35,61,.08);
-  --surface-card-line-hover: rgba(182,61,104,.3);
-  --surface-icon-tile: rgba(182,61,104,.1);
+  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(117,0,63,.055);
+  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(117,0,63,.08);
+  --surface-card-line-hover: rgba(217,0,108,.3);
+  --surface-icon-tile: rgba(217,0,108,.1);
   --venus-readable: var(--mila-brand);
   --mercury-readable: var(--mila-brand);
   --voice-readable: var(--mila-brand);
@@ -2737,12 +2740,12 @@ html[data-mila-theme="dark"] .mila-surface--welcome {
 html[data-mila-theme="dark"] .mila-surface--welcome .journey-stack {
   background: var(--mila-paper-grain), #ffffff;
   background-blend-mode: multiply;
-  border-color: #efd6df;
+  border-color: #f0c7da;
 }
-html[data-mila-theme="dark"] .atmosphere--welcome { background: #fffdfd; }
+html[data-mila-theme="dark"] .atmosphere--welcome { background: #fffcfe; }
 html[data-mila-theme="dark"] .atmosphere--welcome::after {
   background:
-    radial-gradient(980px 720px at 82% 8%,rgba(182,61,104,.1),transparent 62%),
+    radial-gradient(980px 720px at 82% 8%,rgba(217,0,108,.1),transparent 62%),
     linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,244,248,.92));
 }
 
@@ -3243,8 +3246,8 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome {
 @media (hover:hover) and (pointer:fine) {
   .mila-card--hover:hover {
     transform: translateY(-1px);
-    border-color: var(--surface-card-line-hover,rgba(182,61,104,.3)) !important;
-    box-shadow: var(--surface-card-shadow-hover,0 16px 38px rgba(94,35,61,.1)) !important;
+    border-color: var(--surface-card-line-hover,rgba(217,0,108,.3)) !important;
+    box-shadow: var(--surface-card-shadow-hover,0 16px 38px rgba(117,0,63,.1)) !important;
   }
 }
 
@@ -3427,7 +3430,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-guide__textchip 
    Let it read as a real scene; the landing hero owns its contrast scrims. */
 html .atmosphere.atmosphere--front video,
 html .atmosphere.atmosphere--front img {
-  filter: saturate(0.98) contrast(1.01) brightness(1.06) blur(0);
+  filter: saturate(1.08) contrast(1.02) brightness(1.04) blur(0);
   transform: scale(1.005);
 }
 html .atmosphere.atmosphere--front video.is-on,
@@ -3442,78 +3445,78 @@ html .mila-surface--welcome.mila-surface--front { background: transparent; }
 /* The welcome companion belongs to the warm room even when the learner has
    chosen the dark focus theme for lessons. */
 html .mila-surface--front .mila-guide__launcher {
-  border-color: #efd6df;
+  border-color: #f0c7da;
   background: #ffffff;
-  box-shadow: 0 18px 46px rgba(94,35,61,.14),inset 0 1px 0 #fff;
+  box-shadow: 0 18px 46px rgba(117,0,63,.14),inset 0 1px 0 #fff;
 }
-html .mila-surface--front .mila-guide__state { border-color: #ffffff; background: #b63d68; box-shadow: none; }
+html .mila-surface--front .mila-guide__state { border-color: #ffffff; background: #d9006c; box-shadow: none; }
 html .mila-surface--front .mila-guide__textchip {
-  border-color: #efd6df;
-  color: #b63d68;
+  border-color: #f0c7da;
+  color: #d9006c;
   background: #ffffff;
-  box-shadow: 0 8px 20px rgba(94,35,61,.1);
+  box-shadow: 0 8px 20px rgba(117,0,63,.1);
 }
 html .mila-surface--front .mila-guide__nudge,
 html .mila-surface--front .mila-guide__panel {
-  border-color: #efd6df;
-  color: #2f1b24;
+  border-color: #f0c7da;
+  color: #26131f;
   background: rgba(255,255,255,.985);
-  box-shadow: 0 28px 84px rgba(94,35,61,.16),inset 0 1px 0 #fff;
+  box-shadow: 0 28px 84px rgba(117,0,63,.16),inset 0 1px 0 #fff;
 }
-html .mila-surface--front .mila-guide__header { border-color: #efd6df; background: #fff7fa; }
-html .mila-surface--front .mila-guide__portrait { border-color: #efd6df; background: #ffffff; }
-html .mila-surface--front .mila-guide__portrait > i { border-color: #fff7fa; background: #b63d68; box-shadow: none; }
-html .mila-surface--front .mila-guide__identity strong { color: #2f1b24; }
+html .mila-surface--front .mila-guide__header { border-color: #f0c7da; background: #fff4fa; }
+html .mila-surface--front .mila-guide__portrait { border-color: #f0c7da; background: #ffffff; }
+html .mila-surface--front .mila-guide__portrait > i { border-color: #fff4fa; background: #d9006c; box-shadow: none; }
+html .mila-surface--front .mila-guide__identity strong { color: #26131f; }
 html .mila-surface--front .mila-guide__identity span,
 html .mila-surface--front .mila-guide__page,
-html .mila-surface--front .mila-guide__nudge span { color: #75606a; }
-html .mila-surface--front .mila-guide__page { border-color: #efd6df; background: #ffffff; }
-html .mila-surface--front .mila-guide__close { color: #75606a; }
+html .mila-surface--front .mila-guide__nudge span { color: #65535f; }
+html .mila-surface--front .mila-guide__page { border-color: #f0c7da; background: #ffffff; }
+html .mila-surface--front .mila-guide__close { color: #65535f; }
 html .mila-surface--front .mila-guide__welcome,
 html .mila-surface--front .mila-guide__message.is-assistant,
 html .mila-surface--front .mila-guide__working {
-  border-color: #efd6df;
-  color: #2f1b24;
-  background: #fff7fa;
-  box-shadow: inset 3px 0 0 #b63d68;
+  border-color: #f0c7da;
+  color: #26131f;
+  background: #fff4fa;
+  box-shadow: inset 3px 0 0 #d9006c;
 }
 html .mila-surface--front .mila-guide__welcome p,
-html .mila-surface--front .mila-guide__message.is-assistant p { color: #2f1b24; }
+html .mila-surface--front .mila-guide__message.is-assistant p { color: #26131f; }
 html .mila-surface--front .mila-guide__welcome small,
-html .mila-surface--front .mila-guide__guest p { color: #75606a; }
+html .mila-surface--front .mila-guide__guest p { color: #65535f; }
 html .mila-surface--front .mila-guide__actions button {
-  border-color: #efd6df;
-  color: #75606a;
+  border-color: #f0c7da;
+  color: #65535f;
   background: #ffffff;
 }
 html .mila-surface--front .mila-guide__actions button span,
-html .mila-surface--front .mila-guide__actions button .mila-icon { color: #b63d68; }
-html .mila-surface--front .mila-guide__composer { border-color: #efd6df; background: #ffffff; }
-html .mila-surface--front .mila-guide__composer input { color: #2f1b24; }
-html .mila-surface--front .mila-guide__mic { color: #b63d68; background: rgba(182,61,104,.1); }
+html .mila-surface--front .mila-guide__actions button .mila-icon { color: #d9006c; }
+html .mila-surface--front .mila-guide__composer { border-color: #f0c7da; background: #ffffff; }
+html .mila-surface--front .mila-guide__composer input { color: #26131f; }
+html .mila-surface--front .mila-guide__mic { color: #d9006c; background: rgba(217,0,108,.1); }
 html .mila-surface--front .mila-guide__mic:hover:not(:disabled),
-html .mila-surface--front .mila-guide__mic.is-listening { color: #ffffff; background: #b63d68; box-shadow: none; }
+html .mila-surface--front .mila-guide__mic.is-listening { color: #ffffff; background: #d9006c; box-shadow: none; }
 html .mila-surface--front .mila-guide__message.is-user,
 html .mila-surface--front .mila-guide__send,
 html .mila-surface--front .mila-guide__guest button:first-child {
   color: #ffffff;
-  background: #b63d68;
+  background: #d9006c;
   box-shadow: none;
 }
 html .mila-surface--front .mila-guide__guest button {
-  border-color: #efd6df;
-  color: #75606a;
+  border-color: #f0c7da;
+  color: #65535f;
   background: #ffffff;
 }
 html .mila-surface--front .mila-guide[data-state] .mila-guide__identity span i,
-html .mila-surface--front .mila-guide[data-state] .mila-guide__state { background: #b63d68; box-shadow: none; }
+html .mila-surface--front .mila-guide[data-state] .mila-guide__state { background: #d9006c; box-shadow: none; }
 html .mila-surface--front .mila-guide[data-state="listening"] .mila-guide__launcher,
 html .mila-surface--front .mila-guide[data-voice="1"] .mila-guide__launcher {
-  border-color: #dc6d92;
-  box-shadow: 0 0 0 8px rgba(182,61,104,.1),0 18px 46px rgba(94,35,61,.14);
+  border-color: #ff2d95;
+  box-shadow: 0 0 0 8px rgba(217,0,108,.1),0 18px 46px rgba(117,0,63,.14);
 }
-html .mila-surface--front .mila-guide__launcher::before { background: rgba(182,61,104,.1); }
-html .mila-surface--front .mila-guide__orbit i { border-color: rgba(182,61,104,.28); }
+html .mila-surface--front .mila-guide__launcher::before { background: rgba(217,0,108,.1); }
+html .mila-surface--front .mila-guide__orbit i { border-color: rgba(217,0,108,.28); }
 
 /* ── Persistent bottom navigation (the rim) ──────────────────────────────────
    The five core rooms, one tap apart from anywhere. Mounted in the layout
@@ -3592,34 +3595,34 @@ body[data-bottom-nav] .mila-guide__launcher {
 .mila-showcase__slide{min-width:100%;box-sizing:border-box;padding:26px 30px;}
 .mila-showcase__top{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #cabfa6;padding-bottom:11px;}
 .mila-showcase__kick{font-family:var(--font-mono),monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#8a5a3e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.mila-showcase__live{flex-shrink:0;font-family:var(--font-mono),monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#963640;display:inline-flex;align-items:center;gap:6px;}
-.mila-showcase__live i{width:7px;height:7px;border-radius:50%;background:#963640;box-shadow:0 0 8px rgba(229,53,43,.5);}
+.mila-showcase__live{flex-shrink:0;font-family:var(--font-mono),monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#d9006c;display:inline-flex;align-items:center;gap:6px;}
+.mila-showcase__live i{width:7px;height:7px;border-radius:50%;background:#d9006c;box-shadow:0 0 8px rgba(229,53,43,.5);}
 .mila-showcase__word{position:relative;font-family:var(--font-serif),Georgia,serif;font-weight:500;font-size:clamp(38px,8.5vw,54px);line-height:1.03;letter-spacing:-.02em;color:#1c1611;margin:16px 0 3px;}
-.mila-showcase__ipa{position:relative;font-family:var(--font-mono),monospace;font-size:15px;color:#963640;margin:0 0 18px;letter-spacing:.02em;}
+.mila-showcase__ipa{position:relative;font-family:var(--font-mono),monospace;font-size:15px;color:#d9006c;margin:0 0 18px;letter-spacing:.02em;}
 .mila-showcase__route{position:relative;display:flex;align-items:center;margin-bottom:20px;}
 .mila-showcase__stop{position:relative;flex:1;text-align:center;font-family:var(--font-mono),monospace;font-size:12px;color:#6b6152;padding-top:19px;}
 .mila-showcase__stop::before{content:"";position:absolute;top:5px;left:0;right:0;height:3px;background:#cabfa6;}
 .mila-showcase__stop:first-child::before{left:50%}.mila-showcase__stop:last-child::before{right:50%}
 .mila-showcase__stop::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:#f3ede0;border:3px solid #1c1611;}
-.mila-showcase__stop.is-hub{color:#963640;font-weight:700;}
-.mila-showcase__stop.is-hub::after{border-color:#963640;width:16px;height:16px;top:-2px;}
-.mila-showcase__stop.is-hub::before,.mila-showcase__stop.is-after::before{background:#963640;}
+.mila-showcase__stop.is-hub{color:#d9006c;font-weight:700;}
+.mila-showcase__stop.is-hub::after{border-color:#d9006c;width:16px;height:16px;top:-2px;}
+.mila-showcase__stop.is-hub::before,.mila-showcase__stop.is-after::before{background:#d9006c;}
 .mila-showcase__vu{position:relative;display:flex;align-items:flex-end;gap:16px;border-top:1px solid #cabfa6;padding-top:14px;}
 .mila-showcase__vu-graph{flex:1;min-width:0;}
 .mila-showcase__vu-bars{display:flex;align-items:flex-end;gap:2px;height:30px;}
 .mila-showcase__vu-bars i{flex:1;border-radius:1px;}
 .mila-showcase__vu-cap{display:flex;justify-content:space-between;gap:10px;font-family:var(--font-mono),monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#8a7f6a;margin-top:6px;}
-.mila-showcase__vu-cap span:nth-child(2){color:#963640;}
+.mila-showcase__vu-cap span:nth-child(2){color:#d9006c;}
 .mila-showcase__score{flex-shrink:0;text-align:right;font-family:var(--font-mono),monospace;}
 .mila-showcase__score b{font-size:26px;color:#1c1611;font-weight:400;}
 .mila-showcase__score span{display:block;font-size:9px;letter-spacing:.1em;color:#8a7f6a;text-transform:uppercase;}
 .mila-showcase__ctl{display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding:0 2px;}
 .mila-showcase__dots{display:flex;gap:7px;}
 .mila-showcase__dot{width:8px;height:8px;border-radius:50%;border:none;padding:0;cursor:pointer;background:rgba(150,54,82,.26);transition:all .3s;}
-.mila-showcase__dot.is-on{background:#963640;width:22px;border-radius:4px;}
+.mila-showcase__dot.is-on{background:#d9006c;width:22px;border-radius:4px;}
 .mila-showcase__nav{display:flex;gap:8px;}
 .mila-showcase__nav button{width:34px;height:34px;border-radius:50%;border:1px solid #cabfa6;background:#f3ede0;color:#1c1611;cursor:pointer;font-size:15px;display:grid;place-items:center;transition:all .2s;}
-.mila-showcase__nav button:hover{background:#963640;color:#f3ede0;border-color:#963640;}
+.mila-showcase__nav button:hover{background:#d9006c;color:#f3ede0;border-color:#d9006c;}
 /* STUDIO — the dark twin: near-black console, same system, one signal red */
 html[data-mila-theme="dark"] .mila-showcase{background:#0c0d11;border-color:#24262e;}
 html[data-mila-theme="dark"] .mila-showcase__heading{color:#6f7480;}
@@ -3648,13 +3651,13 @@ html[data-mila-theme="dark"] .mila-showcase__nav button:hover{background:#e46a73
 /* Marketing and pricing use the same companion as the learning product.
    Motion communicates listening/thinking/speaking; colour never changes role. */
 html .mila-surface--marketing .mila-guide {
-  --guide-paper: #fff7fa;
+  --guide-paper: #fff4fa;
   --guide-panel: #ffffff;
-  --guide-ink: #2f1b24;
-  --guide-muted: #75606a;
-  --guide-line: #efd6df;
-  --guide-accent: #b63d68;
-  --guide-accent-deep: #8d2d50;
+  --guide-ink: #26131f;
+  --guide-muted: #65535f;
+  --guide-line: #f0c7da;
+  --guide-accent: #d9006c;
+  --guide-accent-deep: #a40050;
   color: var(--guide-ink);
 }
 html .mila-surface--marketing .mila-guide__launcher {
@@ -3662,9 +3665,9 @@ html .mila-surface--marketing .mila-guide__launcher {
   border: 1px solid var(--guide-line) !important;
   border-radius: 16px !important;
   background: var(--guide-panel) !important;
-  box-shadow: 0 14px 36px rgba(94,35,61,.14) !important;
+  box-shadow: 0 14px 36px rgba(117,0,63,.14) !important;
 }
-html .mila-surface--marketing .mila-guide__launcher:hover { border-color: var(--guide-accent) !important; box-shadow: 0 16px 40px rgba(94,35,61,.16) !important; }
+html .mila-surface--marketing .mila-guide__launcher:hover { border-color: var(--guide-accent) !important; box-shadow: 0 16px 40px rgba(117,0,63,.16) !important; }
 html .mila-surface--marketing .mila-guide__launcher:focus-visible { outline-color: var(--guide-accent); }
 html .mila-surface--marketing .mila-guide__launcher::before { display: none; }
 html .mila-surface--marketing .mila-guide__orbit { display: none; }
@@ -3678,7 +3681,7 @@ html .mila-surface--marketing .mila-guide__portrait > i {
   box-shadow: none !important;
 }
 html .mila-surface--marketing .mila-guide[data-state] .mila-guide__launcher,
-html .mila-surface--marketing .mila-guide[data-voice="1"] .mila-guide__launcher { border-color: var(--guide-accent) !important; box-shadow: 0 14px 36px rgba(94,35,61,.14) !important; }
+html .mila-surface--marketing .mila-guide[data-voice="1"] .mila-guide__launcher { border-color: var(--guide-accent) !important; box-shadow: 0 14px 36px rgba(117,0,63,.14) !important; }
 html .mila-surface--marketing .mila-guide__textchip,
 html .mila-surface--marketing .mila-guide__voicechip {
   border: 1px solid var(--guide-accent) !important;
@@ -3692,7 +3695,7 @@ html .mila-surface--marketing :is(.mila-guide__panel,.mila-guide__nudge,.mila-gu
   border-radius: 14px !important;
   color: var(--guide-ink) !important;
   background: var(--guide-panel) !important;
-  box-shadow: 0 20px 58px rgba(94,35,61,.16) !important;
+  box-shadow: 0 20px 58px rgba(117,0,63,.16) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
@@ -3713,7 +3716,7 @@ html .mila-surface--marketing .mila-guide__send,
 html .mila-surface--marketing .mila-guide__guest button:first-child { color: var(--guide-paper) !important; background: var(--guide-accent) !important; box-shadow: none !important; }
 html .mila-surface--marketing .mila-guide__composer { border-color: var(--guide-line) !important; background: var(--guide-panel) !important; box-shadow: none !important; }
 html .mila-surface--marketing .mila-guide__composer input { color: var(--guide-ink) !important; }
-html .mila-surface--marketing .mila-guide__mic { color: var(--guide-accent-deep) !important; background: rgba(182,61,104,.1) !important; }
+html .mila-surface--marketing .mila-guide__mic { color: var(--guide-accent-deep) !important; background: rgba(217,0,108,.1) !important; }
 html .mila-surface--marketing .mila-guide__messages { scrollbar-color: var(--guide-line) transparent; }
 html .mila-surface--marketing .mila-guide__messages::-webkit-scrollbar-thumb { border-radius: 999px; background: var(--guide-line); }
 html .mila-surface--marketing .mila-guide__message > button,
@@ -3722,7 +3725,7 @@ html .mila-surface--marketing .mila-guide__message > button:hover,
 html .mila-surface--marketing .mila-guide__close:hover,
 html .mila-surface--marketing .mila-guide__chips button:hover {
   color: var(--guide-accent) !important;
-  background: rgba(182,61,104,.09) !important;
+  background: rgba(217,0,108,.09) !important;
 }
 html .mila-surface--marketing .mila-guide__error {
   border-color: var(--guide-line) !important;
@@ -3736,110 +3739,110 @@ html .mila-surface--marketing .mila-guide__error {
    atelier: white paper, cool blush, berry action, and deep plum ink. This is
    deliberately last so a stale saved `dark` preference cannot revive the
    retired cyan, emerald, gold, beige, or black primitives. */
-::selection { color: #ffffff; background: #a52552; }
+::selection { color: #ffffff; background: #d9006c; }
 
 .card,
 .glass,
 .glass-card {
-  color: #2f1b24;
-  border-color: #efd6df;
+  color: #26131f;
+  border-color: #f0c7da;
   background: #ffffff;
   background-image: none;
-  box-shadow: 0 1px 2px rgba(47,27,36,.025), 0 12px 32px rgba(94,35,61,.07);
+  box-shadow: 0 1px 2px rgba(47,27,36,.025), 0 12px 32px rgba(117,0,63,.07);
 }
 .card:hover,
 .glass-card:hover {
-  border-color: rgba(182,61,104,.34);
-  box-shadow: 0 2px 4px rgba(47,27,36,.035), 0 16px 38px rgba(94,35,61,.1);
+  border-color: rgba(217,0,108,.34);
+  box-shadow: 0 2px 4px rgba(47,27,36,.035), 0 16px 38px rgba(117,0,63,.1);
 }
 
 .btn-primary {
   color: #ffffff;
-  border: 1px solid #a52552;
-  background: #a52552;
+  border: 1px solid #d9006c;
+  background: #d9006c;
   background-image: none;
-  box-shadow: 0 9px 24px rgba(141,45,80,.2);
+  box-shadow: 0 9px 24px rgba(164,0,80,.2);
 }
 .btn-primary:hover {
   color: #ffffff;
-  border-color: #8d2d50;
-  background: #8d2d50;
-  box-shadow: 0 12px 30px rgba(141,45,80,.24);
+  border-color: #a40050;
+  background: #a40050;
+  box-shadow: 0 12px 30px rgba(164,0,80,.24);
 }
 .btn-primary:focus-visible,
 .lang-toggle button:focus-visible,
 .mila-showcase button:focus-visible,
 .mila-tabbar__tab:focus-visible {
-  outline: 2px solid #b63d68;
+  outline: 2px solid #d9006c;
   outline-offset: 3px;
 }
 
 .lang-toggle {
-  border-color: #efd6df;
-  background: #fff7fa;
+  border-color: #f0c7da;
+  background: #fff4fa;
 }
-.lang-toggle button { color: #75606a; }
+.lang-toggle button { color: #65535f; }
 .lang-toggle button.active,
 .landing-nav .lang-toggle button.active {
   color: #ffffff;
-  background: #a52552;
+  background: #d9006c;
   background-image: none;
   box-shadow: none;
 }
 .streak-card {
-  border-color: #efd6df;
-  background: #fff7fa;
+  border-color: #f0c7da;
+  background: #fff4fa;
   background-image: none;
 }
 .gradient-text {
-  background-image: linear-gradient(120deg, #8d2d50, #b63d68 52%, #dc6d92);
+  background-image: linear-gradient(120deg, #a40050, #d9006c 52%, #ff2d95);
 }
 .hairline {
-  background: linear-gradient(90deg, transparent, rgba(182,61,104,.42), transparent);
+  background: linear-gradient(90deg, transparent, rgba(217,0,108,.42), transparent);
 }
 
 html .mila-tabbar,
 html[data-mila-theme="dark"] .mila-tabbar {
-  border-top-color: #efd6df;
+  border-top-color: #f0c7da;
   background: rgba(255,255,255,.95);
-  box-shadow: 0 -8px 28px rgba(94,35,61,.06);
+  box-shadow: 0 -8px 28px rgba(117,0,63,.06);
 }
 html .mila-tabbar__tab,
-html[data-mila-theme="dark"] .mila-tabbar__tab { color: #75606a; }
+html[data-mila-theme="dark"] .mila-tabbar__tab { color: #65535f; }
 html .mila-tabbar__tab:not(.is-active):hover,
-html[data-mila-theme="dark"] .mila-tabbar__tab:not(.is-active):hover { color: #2f1b24; }
+html[data-mila-theme="dark"] .mila-tabbar__tab:not(.is-active):hover { color: #26131f; }
 html .mila-tabbar__tab.is-active,
-html[data-mila-theme="dark"] .mila-tabbar__tab.is-active { color: #8d2d50; }
+html[data-mila-theme="dark"] .mila-tabbar__tab.is-active { color: #a40050; }
 html .mila-tabbar__tab.is-active .mila-tabbar__icon,
 html[data-mila-theme="dark"] .mila-tabbar__tab.is-active .mila-tabbar__icon {
-  color: #a52552;
-  background: #fff1f5;
+  color: #d9006c;
+  background: #ffe8f3;
 }
 
 html .mila-showcase,
 html[data-mila-theme="dark"] .mila-showcase {
-  border-color: #efd6df;
+  border-color: #f0c7da;
   background: #ffffff;
-  box-shadow: 0 16px 44px rgba(94,35,61,.08);
+  box-shadow: 0 16px 44px rgba(117,0,63,.08);
 }
 html .mila-showcase__grain,
 html[data-mila-theme="dark"] .mila-showcase__grain {
   opacity: .18;
   mix-blend-mode: multiply;
-  background-image: repeating-linear-gradient(105deg, rgba(182,61,104,.09) 0 1px, transparent 1px 6px);
+  background-image: repeating-linear-gradient(105deg, rgba(217,0,108,.09) 0 1px, transparent 1px 6px);
 }
 html .mila-showcase__heading,
 html[data-mila-theme="dark"] .mila-showcase__heading,
 html .mila-showcase__vu-cap,
 html[data-mila-theme="dark"] .mila-showcase__vu-cap,
 html .mila-showcase__score span,
-html[data-mila-theme="dark"] .mila-showcase__score span { color: #75606a; }
+html[data-mila-theme="dark"] .mila-showcase__score span { color: #65535f; }
 html .mila-showcase__top,
 html[data-mila-theme="dark"] .mila-showcase__top,
 html .mila-showcase__vu,
-html[data-mila-theme="dark"] .mila-showcase__vu { border-color: #efd6df; }
+html[data-mila-theme="dark"] .mila-showcase__vu { border-color: #f0c7da; }
 html .mila-showcase__kick,
-html[data-mila-theme="dark"] .mila-showcase__kick { color: #75606a; }
+html[data-mila-theme="dark"] .mila-showcase__kick { color: #65535f; }
 html .mila-showcase__live,
 html[data-mila-theme="dark"] .mila-showcase__live,
 html .mila-showcase__ipa,
@@ -3847,44 +3850,44 @@ html[data-mila-theme="dark"] .mila-showcase__ipa,
 html .mila-showcase__stop.is-hub,
 html[data-mila-theme="dark"] .mila-showcase__stop.is-hub,
 html .mila-showcase__vu-cap span:nth-child(2),
-html[data-mila-theme="dark"] .mila-showcase__vu-cap span:nth-child(2) { color: #a52552; }
+html[data-mila-theme="dark"] .mila-showcase__vu-cap span:nth-child(2) { color: #d9006c; }
 html .mila-showcase__live i,
 html[data-mila-theme="dark"] .mila-showcase__live i {
-  background: #b63d68;
-  box-shadow: 0 0 0 5px rgba(182,61,104,.1);
+  background: #d9006c;
+  box-shadow: 0 0 0 5px rgba(217,0,108,.1);
 }
 html .mila-showcase__word,
 html[data-mila-theme="dark"] .mila-showcase__word,
 html .mila-showcase__score b,
-html[data-mila-theme="dark"] .mila-showcase__score b { color: #2f1b24; }
+html[data-mila-theme="dark"] .mila-showcase__score b { color: #26131f; }
 html .mila-showcase__stop,
-html[data-mila-theme="dark"] .mila-showcase__stop { color: #75606a; }
+html[data-mila-theme="dark"] .mila-showcase__stop { color: #65535f; }
 html .mila-showcase__stop::before,
-html[data-mila-theme="dark"] .mila-showcase__stop::before { background: #efd6df; }
+html[data-mila-theme="dark"] .mila-showcase__stop::before { background: #f0c7da; }
 html .mila-showcase__stop::after,
 html[data-mila-theme="dark"] .mila-showcase__stop::after {
-  border-color: #2f1b24;
+  border-color: #26131f;
   background: #ffffff;
 }
 html .mila-showcase__stop.is-hub::after,
-html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::after { border-color: #a52552; }
+html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::after { border-color: #d9006c; }
 html .mila-showcase__stop.is-hub::before,
 html .mila-showcase__stop.is-after::before,
 html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::before,
-html[data-mila-theme="dark"] .mila-showcase__stop.is-after::before { background: #b63d68; }
+html[data-mila-theme="dark"] .mila-showcase__stop.is-after::before { background: #d9006c; }
 html .mila-showcase__dot,
-html[data-mila-theme="dark"] .mila-showcase__dot { background: rgba(182,61,104,.2); }
+html[data-mila-theme="dark"] .mila-showcase__dot { background: rgba(217,0,108,.2); }
 html .mila-showcase__dot.is-on,
-html[data-mila-theme="dark"] .mila-showcase__dot.is-on { background: #b63d68; }
+html[data-mila-theme="dark"] .mila-showcase__dot.is-on { background: #d9006c; }
 html .mila-showcase__nav button,
 html[data-mila-theme="dark"] .mila-showcase__nav button {
-  color: #2f1b24;
-  border-color: #efd6df;
+  color: #26131f;
+  border-color: #f0c7da;
   background: #ffffff;
 }
 html .mila-showcase__nav button:hover,
 html[data-mila-theme="dark"] .mila-showcase__nav button:hover {
   color: #ffffff;
-  border-color: #a52552;
-  background: #a52552;
+  border-color: #d9006c;
+  background: #d9006c;
 }

@@ -466,14 +466,14 @@ export function MilaBindu({
       <svg viewBox="0 0 320 320" width={size} height={size} className={className} role="img" aria-label={ariaLabel} style={{ display: "block", overflow: "visible" }}>
         <defs>
           <radialGradient id={halo}>
-            <stop offset="0%" stopColor="#b63d68" stopOpacity="0.34" />
+            <stop offset="0%" stopColor="#d9006c" stopOpacity="0.34" />
             <stop offset="55%" stopColor="#f2c4ce" stopOpacity="0.18" />
             <stop offset="100%" stopColor="#f2c4ce" stopOpacity="0" />
           </radialGradient>
           <radialGradient id={core}>
-            <stop offset="0%" stopColor="#8d2d50" />
+            <stop offset="0%" stopColor="#a40050" />
             <stop offset="40%" stopColor="#ffffff" />
-            <stop offset="100%" stopColor="#b63d68" stopOpacity="0" />
+            <stop offset="100%" stopColor="#d9006c" stopOpacity="0" />
           </radialGradient>
         </defs>
         <style>{`
@@ -484,11 +484,11 @@ export function MilaBindu({
         `}</style>
         <g className={`bindu-breathe-${id}`}>
           <circle cx="160" cy="160" r="150" fill={`url(#${halo})`} />
-          <circle cx="160" cy="160" r="118" fill="none" stroke="#b63d68" strokeWidth={1.4} opacity="0.5" />
+          <circle cx="160" cy="160" r="118" fill="none" stroke="#d9006c" strokeWidth={1.4} opacity="0.5" />
           <circle cx="160" cy="160" r="90" fill="none" stroke="#e98fa5" strokeWidth={1} opacity="0.46" />
           <circle cx="160" cy="160" r="58" fill="none" stroke="#f2c4ce" strokeWidth={0.8} opacity="0.58" />
           <circle cx="160" cy="160" r="46" fill={`url(#${core})`} opacity="0.7" />
-          <circle cx="160" cy="160" r="13" fill="#8d2d50" />
+          <circle cx="160" cy="160" r="13" fill="#a40050" />
         </g>
       </svg>
     );

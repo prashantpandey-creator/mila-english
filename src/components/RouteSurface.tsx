@@ -15,7 +15,7 @@ export default function RouteSurface({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.milaTheme = 'light';
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    if (meta) meta.content = '#fffdfd';
+    if (meta) meta.content = '#fffcfe';
   }, [pathname, surface]);
 
   useEffect(() => {

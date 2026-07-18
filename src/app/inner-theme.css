@@ -1,24 +1,24 @@
 /* ── Mila product system ────────────────────────────────────────────────────
-   One visual language, one colour signal:
-   true white and cool blush for the product, with one rose interaction family.
+   One Electric Paper language, one colour signal:
+   true white and cool blush for the product, with electric-magenta action.
    Voice rooms stay in the same light atelier and express state through motion,
    shape, and explicit language instead of changing colour systems. */
 
 .mila-surface--app {
-  --mila-paper: #fffdfd;
+  --mila-paper: #fffcfe;
   --mila-panel: #ffffff;
-  --mila-raised: #fff7fa;
-  --mila-line: #efd6df;
-  --mila-line-strong: #d9aebb;
-  --mila-ink: #2f1b24;
-  --mila-muted: #75606a;
-  --mila-subtle: #75606a;
-  --mila-accent: #dc6d92;
-  --mila-action: #b63d68;
-  --mila-action-deep: #8d2d50;
+  --mila-raised: #fff4fa;
+  --mila-line: #f0c7da;
+  --mila-line-strong: #e58bb5;
+  --mila-ink: #26131f;
+  --mila-muted: #65535f;
+  --mila-subtle: #65535f;
+  --mila-accent: #ff2d95;
+  --mila-action: #d9006c;
+  --mila-action-deep: #a40050;
   --mila-action-ink: #ffffff;
-  --mila-action-soft: rgba(182, 61, 104, .1);
-  /* Compatibility channels intentionally collapse to the same rose family. */
+  --mila-action-soft: rgba(217,0,108, .1);
+  /* Compatibility channels intentionally collapse to the same magenta family. */
   --mila-audio: var(--mila-action);
   --mila-audio-soft: var(--mila-action-soft);
   --mila-measure: var(--mila-action);
@@ -33,7 +33,7 @@
   --mila-signal: var(--mila-action);
   --mila-radius: 12px;
   --mila-radius-sm: 8px;
-  --mila-shadow: 0 1px 1px rgba(47, 27, 36, .03), 0 14px 36px rgba(94, 35, 61, .06);
+  --mila-shadow: 0 1px 0 rgba(38,19,31,.04), 0 18px 48px rgba(117,0,63,.10);
 
   --surface-page: var(--mila-paper);
   --surface-text: var(--mila-ink);
@@ -46,7 +46,7 @@
   --surface-control-shadow: none;
   --surface-track: rgba(47, 27, 36, .1);
   --surface-card-shadow: var(--mila-shadow);
-  --surface-card-shadow-hover: 0 10px 28px rgba(94, 35, 61, .1);
+  --surface-card-shadow-hover: 0 5px 0 rgba(217,0,108,.08), 0 26px 64px rgba(117,0,63,.16);
   --surface-card-line-hover: var(--mila-line-strong);
   --surface-icon-tile: var(--mila-action-soft);
   --focus-inset: rgba(47, 27, 36, .035);
@@ -69,9 +69,9 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .72 0 0 0 0 .25 0 0 0 0 .43 0 0 0 .022 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
 }
 
-html[data-mila-app="app"] { background: #fffdfd; }
-html[data-mila-app="app"][data-mila-surface="focus"] { background: #fffdfd; }
-html[data-mila-app="app"][data-mila-surface="welcome"] { background: #fffdfd; }
+html[data-mila-app="app"] { background: #fffcfe; }
+html[data-mila-app="app"][data-mila-surface="focus"] { background: #fffcfe; }
+html[data-mila-app="app"][data-mila-surface="welcome"] { background: #fffcfe; }
 html[data-mila-app="app"] .atmosphere { display: none; }
 
 .mila-surface--app,
@@ -154,15 +154,15 @@ html[data-mila-app="app"] .atmosphere { display: none; }
 }
 .mila-surface--app .mila-card--hover:hover,
 .mila-surface--app .journey-card:hover {
-  transform: translateY(-1px);
+  transform: translateY(-3px);
   border-color: var(--mila-line-strong) !important;
   background: var(--mila-raised) !important;
-  box-shadow: var(--mila-shadow) !important;
+  box-shadow: var(--surface-card-shadow-hover) !important;
 }
 .mila-surface--app .mila-card--interactive:focus-visible,
 .mila-surface--app .journey-card:focus-visible,
 .mila-surface--app button:focus-visible {
-  outline: 2px solid var(--mila-signal) !important;
+  outline: 3px solid var(--mila-signal) !important;
   outline-offset: 3px;
 }
 .mila-surface--app .journey-stack { gap: 8px; background: transparent !important; }
@@ -314,7 +314,18 @@ html[data-mila-app="app"] .atmosphere { display: none; }
 }
 .mila-surface--app .conversation-action:hover { transform: translateY(-2px); border-color: var(--mila-line-strong); background: var(--mila-panel); }
 .mila-surface--app .conversation-action--voice { border-color: var(--mila-action); color: var(--mila-action-ink); background: var(--mila-action); }
-.mila-surface--app .conversation-action--voice:hover { border-color: var(--mila-action-deep); background: var(--mila-action-deep); }
+.mila-surface--app .conversation-action--voice {
+  background: linear-gradient(135deg, var(--mila-action), var(--mila-action-deep));
+  box-shadow: 0 5px 0 #75003f, 0 18px 42px rgba(117,0,63,.22);
+  transform: translateY(-2px);
+}
+.mila-surface--app .conversation-action--voice:hover {
+  border-color: var(--mila-action);
+  background: linear-gradient(135deg, #e60073, var(--mila-action-deep));
+  box-shadow: 0 7px 0 #75003f, 0 24px 52px rgba(117,0,63,.28);
+  transform: translateY(-4px);
+}
+.mila-surface--app .conversation-action--voice:active { box-shadow: 0 2px 0 #75003f, 0 10px 24px rgba(117,0,63,.18); transform: translateY(1px); }
 .mila-surface--app .conversation-action__icon {
   display: grid;
   place-items: center;
@@ -744,8 +755,8 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   height: 18px;
   border: 3px solid #ffffff;
   border-radius: 50%;
-  background: var(--mila-action, #b63d68);
-  box-shadow: 0 0 0 8px rgba(182, 61, 104, .11), 0 12px 34px rgba(141, 45, 80, .2);
+  background: var(--mila-action, #d9006c);
+  box-shadow: 0 0 0 8px rgba(217,0,108, .11), 0 12px 34px rgba(164,0,80, .2);
   transform: translate(-50%, -50%);
   animation: milaCoreBreathe 4.2s ease-in-out infinite;
 }
@@ -758,11 +769,11 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   border-radius: 50%;
   transform: translate(-50%, -50%);
 }
-.mila-orb-coremark::before { width: 48px; height: 48px; border: 1px solid rgba(182, 61, 104, .34); }
-.mila-orb-coremark::after { width: 76px; height: 76px; border: 1px dashed rgba(182, 61, 104, .22); animation: milaCoreOrbit 14s linear infinite; }
+.mila-orb-coremark::before { width: 48px; height: 48px; border: 1px solid rgba(217,0,108, .34); }
+.mila-orb-coremark::after { width: 76px; height: 76px; border: 1px dashed rgba(217,0,108, .22); animation: milaCoreOrbit 14s linear infinite; }
 .mila-orb-shell[data-orb-state='listening'] .mila-orb-coremark { animation-duration: 1.25s; }
 .mila-orb-shell[data-orb-state='thinking'] .mila-orb-coremark::after { animation-duration: 2.8s; }
-.mila-orb-shell[data-orb-state='manifesting'] .mila-orb-coremark { box-shadow: 0 0 0 12px rgba(182, 61, 104, .13), 0 16px 42px rgba(141, 45, 80, .24); }
+.mila-orb-shell[data-orb-state='manifesting'] .mila-orb-coremark { box-shadow: 0 0 0 12px rgba(217,0,108, .13), 0 16px 42px rgba(164,0,80, .24); }
 @keyframes milaCoreBreathe { 50% { transform: translate(-50%, -50%) scale(.82); opacity: .72; } }
 @keyframes milaCoreOrbit { to { transform: translate(-50%, -50%) rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
@@ -856,7 +867,7 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 .mila-surface--app .voice-stage {
   color: var(--mila-ink);
   background:
-    radial-gradient(circle at 50% 39%, rgba(182, 61, 104, .1), transparent 28%),
+    radial-gradient(circle at 50% 39%, rgba(217,0,108, .1), transparent 28%),
     linear-gradient(180deg, var(--mila-panel), var(--mila-paper)) !important;
 }
 .mila-surface--app .voice-orb {
@@ -870,7 +881,7 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   position: absolute;
   inset: 10%;
   z-index: -1;
-  border: 1px solid rgba(182, 61, 104, .24);
+  border: 1px solid rgba(217,0,108, .24);
   border-radius: 50%;
   background: rgba(255, 255, 255, .58);
   pointer-events: none;
@@ -883,14 +894,14 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   animation: milaVoiceThink 5s linear infinite;
 }
 .mila-surface--app .voice-stage[data-phase="manifesting"] .voice-orb::after {
-  box-shadow: 0 0 0 10px rgba(182, 61, 104, .06), 0 0 0 22px rgba(182, 61, 104, .035);
+  box-shadow: 0 0 0 10px rgba(217,0,108, .06), 0 0 0 22px rgba(217,0,108, .035);
 }
 .mila-surface--app .voice-orb:focus-visible { outline: 2px solid var(--mila-action) !important; outline-offset: 8px; }
 .mila-surface--app .voice-ripplewrap { position: absolute; inset: 7%; z-index: -1; border-radius: 50%; pointer-events: none; }
 .mila-surface--app .voice-ripple {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(182, 61, 104, .48);
+  border: 1px solid rgba(217,0,108, .48);
   border-radius: 50%;
   opacity: 0;
   animation: milaVoiceInvite 2.8s ease-out infinite;
@@ -963,20 +974,20 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 }
 .mila-surface--app .voice-exit:hover { border-color: var(--mila-line-strong); color: var(--mila-ink); background: var(--mila-raised); }
 .mila-surface--app .voice-name { color: var(--mila-action); }
-.mila-surface--app .voice-connecting { border-color: rgba(182, 61, 104, .52); border-top-color: transparent; }
+.mila-surface--app .voice-connecting { border-color: rgba(217,0,108, .52); border-top-color: transparent; }
 .mila-surface--app .voice-status { font-weight: 700; }
 .mila-surface--app :is(.voice-status--listening, .voice-status--thinking, .voice-status--speaking) { color: var(--mila-action); }
 .mila-surface--app .voice-status--thinking { font-style: italic; }
 .mila-surface--app .voice-status--resting { color: var(--mila-muted); }
 .mila-surface--app .voice-error {
   padding: 9px 12px;
-  border: 1px solid rgba(182, 61, 104, .22);
+  border: 1px solid rgba(217,0,108, .22);
   border-radius: var(--mila-radius-sm);
   color: var(--mila-action-deep);
   background: rgba(255, 255, 255, .9);
 }
 .mila-surface--app :is(.voice-invoke, .voice-q) { color: var(--mila-muted) !important; font-family: var(--font-mono), monospace; letter-spacing: .08em; }
-.mila-surface--app .voice-ripple { border-color: rgba(182, 61, 104, .48) !important; }
+.mila-surface--app .voice-ripple { border-color: rgba(217,0,108, .48) !important; }
 .mila-surface--app .voice-a { color: var(--mila-ink) !important; text-shadow: none !important; }
 .mila-surface--app .voice-ascrim {
   background: rgba(255, 253, 253, .95) !important;
@@ -986,7 +997,7 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 .mila-surface--app .practice-room { color: var(--mila-ink); background: var(--mila-paper); }
 .mila-surface--app .practice-room__veil {
   background:
-    radial-gradient(circle at 50% 44%, rgba(182, 61, 104, .1), transparent 34%),
+    radial-gradient(circle at 50% 44%, rgba(217,0,108, .1), transparent 34%),
     linear-gradient(180deg, rgba(255, 247, 250, .28), rgba(255, 253, 253, .74)) !important;
 }
 .mila-surface--app .practice-header__eyebrow { color: var(--mila-action); font-family: var(--font-mono), monospace; font-weight: 500; }

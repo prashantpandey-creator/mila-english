@@ -96,9 +96,9 @@ export default function PwaRegister() {
         position: 'fixed', left: '50%', bottom: 88, transform: 'translateX(-50%)',
         zIndex: 60, display: 'flex', alignItems: 'center', gap: 10,
         maxWidth: 'min(92vw, 420px)', padding: '10px 12px 10px 16px',
-        background: 'var(--mila-panel, #ffffff)', border: '1px solid var(--mila-line, #efd6df)',
+        background: 'var(--mila-panel, #ffffff)', border: '1px solid var(--mila-line, #f0c7da)',
         borderRadius: 14, boxShadow: '0 10px 34px rgba(111,42,53,0.14)',
-        color: 'var(--mila-ink, #2f1b24)', fontSize: '0.85rem', lineHeight: 1.45,
+        color: 'var(--mila-ink, #26131f)', fontSize: '0.85rem', lineHeight: 1.45,
       }}
     >
       <span style={{ flex: 1 }}>
@@ -111,7 +111,7 @@ export default function PwaRegister() {
           onClick={install}
           style={{
             flexShrink: 0, padding: '8px 14px', borderRadius: 10, border: 'none',
-            background: 'var(--mila-action, #b63d68)', color: 'var(--mila-action-ink, #ffffff)',
+            background: 'var(--mila-action, #d9006c)', color: 'var(--mila-action-ink, #ffffff)',
             fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer',
           }}
         >
@@ -123,8 +123,8 @@ export default function PwaRegister() {
         aria-label={ru ? 'Скрыть' : 'Dismiss'}
         style={{
           flexShrink: 0, width: 28, height: 28, borderRadius: 8,
-          border: '1px solid var(--mila-line, #efd6df)', background: 'transparent',
-          color: 'var(--mila-muted, #75606a)', fontSize: '0.9rem', cursor: 'pointer', lineHeight: 1,
+          border: '1px solid var(--mila-line, #f0c7da)', background: 'transparent',
+          color: 'var(--mila-muted, #65535f)', fontSize: '0.9rem', cursor: 'pointer', lineHeight: 1,
         }}
       >
         ×

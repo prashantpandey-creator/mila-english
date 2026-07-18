@@ -6,7 +6,7 @@ import type { BinduState } from "./MilaBindu";
 // ─── Reactive living void ───────────────────────────────────────────────
 //
 // A full-field WebGL2 background for Mila's light voice atelier: warm ivory,
-// translucent blush, and the same rose signal used everywhere else.
+// translucent paper, and the same electric signal used everywhere else.
 
 const VS_SRC = /*glsl*/ `#version 300 es
 in vec2 a_pos;

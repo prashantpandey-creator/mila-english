@@ -11,13 +11,13 @@ import { C } from '@/lib/theme';
 import { ACCENTS, playPhrase, hasRealVoice, startListening, missedSound } from '@/lib/speech';
 import { PHRASES, PACKS, SOUND_INFO } from '@/lib/phrases';
 
-const SIGNAL = '#b63d68';
-const SIGNAL_SOFT = 'rgba(182,61,104,0.12)';
+const SIGNAL = '#d9006c';
+const SIGNAL_SOFT = 'rgba(217,0,108,0.12)';
 
 const VERDICT = {
-  good:  { fg: SIGNAL, bg: 'rgba(182,61,104,0.16)' },
+  good:  { fg: SIGNAL, bg: 'rgba(217,0,108,0.16)' },
   close: { fg: SIGNAL, bg: SIGNAL_SOFT },
-  miss:  { fg: SIGNAL, bg: 'rgba(182,61,104,0.07)' },
+  miss:  { fg: SIGNAL, bg: 'rgba(217,0,108,0.07)' },
 };
 
 const PACK_ICONS: Record<string, MilaIconName> = {
@@ -268,7 +268,7 @@ export default function ListenPage() {
             <div className="listen-page__tip">
               <MilaIcon name="sparkle" size={15}/><span>{result.tip}</span>
             </div>
-            <div style={{marginTop:8,fontSize:'0.8rem',color:'var(--mila-muted, #75606a)'}}>{phrase.ru}</div>
+            <div style={{marginTop:8,fontSize:'0.8rem',color:'var(--mila-muted, #65535f)'}}>{phrase.ru}</div>
           </section>
         )}
 
@@ -289,7 +289,7 @@ export default function ListenPage() {
           </button>
         </div>
         <div className="listen-page__mic-status" style={{
-          color:phase==='recording'||phase==='scoring'?SIGNAL:'var(--mila-muted, #75606a)',
+          color:phase==='recording'||phase==='scoring'?SIGNAL:'var(--mila-muted, #65535f)',
           fontWeight:(phase==='recording'||phase==='scoring')?700:400}} aria-live="polite">
           {phase==='recording'
             ? (lang==='ru'?'Слушаю… говори, потом нажми остановить':'Listening… speak, then tap stop')
@@ -316,7 +316,7 @@ export default function ListenPage() {
                   <div style={{flex:1}}>
                     <div style={{fontSize:'0.82rem',fontWeight:700,color:C.dark}}>
                       {lang==='ru'?`как в «${meta.ex}»`:`as in “${meta.ex}”`}
-                      <span style={{fontWeight:600,color:'var(--mila-muted, #75606a)'}}> · {info.count}×</span>
+                      <span style={{fontWeight:600,color:'var(--mila-muted, #65535f)'}}> · {info.count}×</span>
                     </div>
                     <div style={{fontSize:'0.76rem',color:C.warm,lineHeight:1.4,marginTop:1}}>{lang==='ru'?meta.ru:meta.en}</div>
                   </div>

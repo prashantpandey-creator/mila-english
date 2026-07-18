@@ -6,8 +6,8 @@ import type { AssessmentResult } from '@/lib/assessment';
 import { C } from '@/lib/theme';
 import MilaIcon from '@/components/ui/MilaIcon';
 
-const SIGNAL = '#b63d68';
-const SIGNAL_SOFT = 'rgba(182,61,104,0.12)';
+const SIGNAL = '#d9006c';
+const SIGNAL_SOFT = 'rgba(217,0,108,0.12)';
 const SIGNAL_INK = '#ffffff';
 
 type Props = {
@@ -74,7 +74,7 @@ export default function ReliableAssessment({ lang, busy, error, onComplete, onCa
                 onClick={() => choose(optionIndex)}
                 style={{padding:'12px 14px',borderRadius:11,textAlign:'left',cursor:busy?'default':'pointer',fontSize:'0.92rem',lineHeight:1.4,
                   border:active?`1.5px solid ${SIGNAL}`:'1px solid var(--mila-line, rgba(47,27,36,.13))',
-                  background:active?SIGNAL_SOFT:'var(--focus-inset, var(--mila-raised, #fff7fa))',color:C.dark}}>
+                  background:active?SIGNAL_SOFT:'var(--focus-inset, var(--mila-raised, #fff4fa))',color:C.dark}}>
                 <span style={{display:'inline-grid',placeItems:'center',width:23,height:23,borderRadius:'50%',marginRight:10,
                   border:active?`1px solid ${SIGNAL}`:'1px solid var(--mila-line, rgba(47,27,36,.2))',color:active?SIGNAL:C.warm,fontSize:'0.72rem'}}>
                   {String.fromCharCode(65 + optionIndex)}
@@ -92,7 +92,7 @@ export default function ReliableAssessment({ lang, busy, error, onComplete, onCa
         <button type="button" disabled={!Number.isInteger(selected) || busy} onClick={advance}
           style={{width:'100%',marginTop:18,padding:'12px 16px',borderRadius:11,border:'none',fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',gap:7,
             background:Number.isInteger(selected)&&!busy?SIGNAL:'var(--mila-line, rgba(47,27,36,.11))',
-            color:Number.isInteger(selected)&&!busy?SIGNAL_INK:'var(--mila-muted, #75606a)',cursor:Number.isInteger(selected)&&!busy?'pointer':'default'}}>
+            color:Number.isInteger(selected)&&!busy?SIGNAL_INK:'var(--mila-muted, #65535f)',cursor:Number.isInteger(selected)&&!busy?'pointer':'default'}}>
           {busy
             ? (lang === 'ru' ? 'Сохраняю результат…' : 'Saving result…')
             : index === RELIABLE_ASSESSMENT_QUESTIONS.length - 1
@@ -102,7 +102,7 @@ export default function ReliableAssessment({ lang, busy, error, onComplete, onCa
         </button>
       </div>
 
-      <p style={{margin:'15px auto 0',fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #75606a)',maxWidth:440,textAlign:'center'}}>
+      <p style={{margin:'15px auto 0',fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #65535f)',maxWidth:440,textAlign:'center'}}>
         {lang === 'ru'
           ? 'Не обращается к внешнему ИИ. Ответы остаются в браузере; на сервер Mila отправляется только итог.'
           : 'No external AI calls. Answers stay in the browser; only the final result is saved to Mila.'}

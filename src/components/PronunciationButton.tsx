@@ -6,8 +6,8 @@ import { C } from '@/lib/theme';
 import { ttsSpeak } from '@/lib/tts';
 import MilaIcon from '@/components/ui/MilaIcon';
 
-const SIGNAL = '#b63d68';
-const SIGNAL_SOFT = 'rgba(182,61,104,0.12)';
+const SIGNAL = '#d9006c';
+const SIGNAL_SOFT = 'rgba(217,0,108,0.12)';
 
 export default function PronunciationButton({ word, size = 52 }: { word: string; size?: number }) {
   const [playing, setPlaying] = useState(false);
@@ -29,7 +29,7 @@ export default function PronunciationButton({ word, size = 52 }: { word: string;
           background:SIGNAL_SOFT,
           display:'grid',placeItems:'center',margin:'0 auto',padding:0,
           transition:'background 0.2s,border-color .2s,color .2s,box-shadow .2s',opacity:playing?0.78:1,
-          boxShadow:playing?'0 0 0 5px rgba(182,61,104,.12)':'none'}}>
+          boxShadow:playing?'0 0 0 5px rgba(217,0,108,.12)':'none'}}>
         <MilaIcon name="volume" size={20}/>
       </button>
     </div>
