@@ -1,6 +1,8 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon'
+import { C } from '@/lib/theme'
 
 export type JourneyKind = Extract<MilaIconName, 'level' | 'listening' | 'vocabulary' | 'tutor' | 'grammar'>
 
@@ -20,6 +22,11 @@ export default function LearningJourneyCard({
       type="button"
       className="journey-card"
       data-kind={kind}
+      style={{
+        '--journey-tone': C.venus,
+        '--journey-glow': C.venusL,
+        '--icon-accent': C.venus,
+      } as CSSProperties}
       onClick={onClick}
       aria-label={`${title}. ${subtitle}`}
     >

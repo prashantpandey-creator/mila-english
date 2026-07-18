@@ -172,7 +172,7 @@ export default function DashboardPage() {
           <div className="conversation-stage__presence" aria-hidden="true">
             <div className="conversation-stage__portrait">
               <Image
-                src="/mascot/mila-mascot.png"
+                src="/mascot/mila-mascot-rose.png"
                 alt=""
                 width={1254}
                 height={1254}

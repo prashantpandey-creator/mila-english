@@ -8,9 +8,10 @@ import ProgressSummary from '@/components/ProgressSummary';
 import ProgressRing from '@/components/ProgressRing';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import { useI18n } from '@/lib/i18n-provider';
-import { C } from '@/lib/theme';
 import { SOUND_INFO } from '@/lib/phrases';
 import MilaIcon from '@/components/ui/MilaIcon';
+
+const SIGNAL = '#c94f5b';
 
 export default function ProgressPage() {
   const {t,lang}=useI18n(); const router=useRouter();
@@ -24,10 +25,10 @@ export default function ProgressPage() {
 
   const minutes = data ? Math.round(data.totalTimeSeconds/60) : null;
   const stats=[
-    {icon:'lesson' as const,l:lang==='ru'?'Уроков':'Lessons',v:data?.completedLessons ?? '…',c:C.jupiter},
-    {icon:'target' as const,l:lang==='ru'?'Ср. балл':'Avg score',v:data?(data.avgScore||0):'…',c:C.jupiter},
-    {icon:'time' as const,l:lang==='ru'?'Минут':'Minutes',v:minutes ?? '…',c:C.mercury},
-    {icon:'streak' as const,l:lang==='ru'?'Дней подряд':'Day streak',v:me?.streakDays ?? '…',c:C.jupiter},
+    {icon:'lesson' as const,l:lang==='ru'?'Уроков':'Lessons',v:data?.completedLessons ?? '…',c:SIGNAL},
+    {icon:'target' as const,l:lang==='ru'?'Ср. балл':'Avg score',v:data?(data.avgScore||0):'…',c:SIGNAL},
+    {icon:'time' as const,l:lang==='ru'?'Минут':'Minutes',v:minutes ?? '…',c:SIGNAL},
+    {icon:'streak' as const,l:lang==='ru'?'Дней подряд':'Day streak',v:me?.streakDays ?? '…',c:SIGNAL},
   ];
 
   const weak = Array.isArray(data?.weakPhonemes) ? data.weakPhonemes.filter((p:any)=>p.attempts>0) : [];
@@ -50,8 +51,8 @@ export default function ProgressPage() {
 
         {data && (
           <div className="progress-page__rings">
-            <ProgressRing percent={Math.min(data.avgScore||0,100)} label={lang==='ru'?'Средний балл':'Average score'} color={C.jupiter}/>
-            <ProgressRing percent={Math.min((data.completedLessons||0)*10,100)} label={lang==='ru'?'До след. уровня':'To next level'} color={C.mercury}/>
+            <ProgressRing percent={Math.min(data.avgScore||0,100)} label={lang==='ru'?'Средний балл':'Average score'} color={SIGNAL}/>
+            <ProgressRing percent={Math.min((data.completedLessons||0)*10,100)} label={lang==='ru'?'До след. уровня':'To next level'} color={SIGNAL}/>
           </div>
         )}
 
@@ -82,7 +83,7 @@ export default function ProgressPage() {
               );
             })}
             <button onClick={()=>router.push('/listen')}
-              className="product-button product-button--audio product-button--full">
+              className="product-button product-button--primary product-button--full">
               <MilaIcon name="voice" size={17}/>{lang==='ru'?'Тренировать сейчас':'Drill them now'}
             </button>
           </section>
@@ -100,7 +101,7 @@ export default function ProgressPage() {
                   <div className="recent-lesson__title">{r.lessonTitle || (lang==='ru'?'Урок':'Lesson')}</div>
                   <div className="recent-lesson__category">{r.category || ''}</div>
                 </div>
-                <span className={`recent-lesson__score ${r.score>=55?'is-good':'is-low'}`}>
+                <span className="recent-lesson__score">
                   {r.score != null ? r.score : (r.completed ? '✓' : '—')}
                 </span>
               </div>
@@ -116,7 +117,7 @@ export default function ProgressPage() {
               {lang==='ru'?'Пока нет данных. Пройди урок или потренируй произношение — статистика появится здесь.':'No data yet. Complete a lesson or practice pronunciation — your stats will grow here.'}
             </p>
             <div className="product-actions">
-              <button onClick={()=>router.push('/listen')} className="product-button product-button--audio"><MilaIcon name="voice" size={17}/>{lang==='ru'?'Произношение':'Pronunciation'}</button>
+              <button onClick={()=>router.push('/listen')} className="product-button product-button--primary"><MilaIcon name="voice" size={17}/>{lang==='ru'?'Произношение':'Pronunciation'}</button>
               <button onClick={()=>router.push('/lessons')} className="product-button product-button--primary"><MilaIcon name="lessons" size={17}/>{lang==='ru'?'Уроки':'Lessons'}</button>
             </div>
           </div>

@@ -47,7 +47,7 @@ const PAGE_LABELS: Record<string, { en: string; ru: string }> = {
   '/darshan': { en: 'Voice room', ru: 'Голосовая комната' },
 }
 
-const COMPANION_INTEGRATED_ROUTES = ['/assessment', '/chat', '/listen', '/phonetics', '/practice', '/darshan', '/pia', '/login', '/register']
+const COMPANION_INTEGRATED_ROUTES = ['/assessment', '/chat', '/listen', '/phonetics', '/practice', '/voice-lab', '/darshan', '/pia', '/login', '/register', '/privacy', '/support']
 
 function pageKey(pathname: string) {
   if (pathname.startsWith('/lessons/')) return '/lessons'
@@ -655,7 +655,7 @@ export default function MilaGuide() {
         <section id="mila-guide-text-panel" className="mila-guide__panel" data-mila-surface="text-chat" role="dialog" aria-modal="false" aria-label={lang === 'ru' ? 'Чат с Милой' : 'Chat with Mila'}>
           <header className="mila-guide__header">
             <div className="mila-guide__portrait" aria-hidden>
-              <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} priority />
+              <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
               <i />
             </div>
             <div className="mila-guide__identity">
@@ -800,7 +800,7 @@ export default function MilaGuide() {
             : (lang === 'ru' ? 'Один клик — говорить · двойной — писать' : 'Click to talk · double-click to type')}
       >
         <span className="mila-guide__orbit" aria-hidden><i /><i /></span>
-        <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} priority />
+        <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
         <span className="mila-guide__state" aria-hidden />
       </button>
 

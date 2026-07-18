@@ -7,15 +7,15 @@ import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 
 const welcomeTheme = {
-  '--auth-ink': '#4a2a39',
-  '--auth-muted': '#806b75',
-  '--auth-pink': '#e77fa5',
-  '--auth-pink-deep': '#c85c87',
-  '--auth-pink-soft': '#fbe5ee',
-  '--auth-cream': '#fffaf7',
-  '--auth-line': 'rgba(190, 91, 130, 0.18)',
-  '--auth-shadow': 'rgba(116, 57, 82, 0.16)',
-  '--auth-danger': '#b94464',
+  '--auth-ink': '#241d19',
+  '--auth-muted': '#746861',
+  '--auth-pink': '#c94f5b',
+  '--auth-pink-deep': '#963640',
+  '--auth-pink-soft': 'rgba(201, 79, 91, 0.10)',
+  '--auth-cream': '#fffaf5',
+  '--auth-line': '#d9cec2',
+  '--auth-shadow': 'rgba(36, 29, 25, 0.14)',
+  '--auth-danger': '#963640',
 } as CSSProperties;
 
 export default function LoginPage() {
@@ -66,7 +66,7 @@ export default function LoginPage() {
         <div className="welcome-auth__card">
           <div className="welcome-auth__intro">
             <div className="welcome-auth__bloom" aria-hidden="true">
-              <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} priority />
+              <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
             </div>
             <h1 className="welcome-auth__title">{t('login_title')}</h1>
             <p className="welcome-auth__subtitle">{t('login_subtitle')}</p>
@@ -246,6 +246,13 @@ export default function LoginPage() {
           border-color: var(--auth-pink);
           background: #fff;
           box-shadow: 0 0 0 4px rgba(231, 127, 165, .13);
+        }
+        .welcome-auth__input:-webkit-autofill,
+        .welcome-auth__input:-webkit-autofill:hover,
+        .welcome-auth__input:-webkit-autofill:focus {
+          -webkit-text-fill-color: var(--auth-ink);
+          -webkit-box-shadow: 0 0 0 1000px var(--auth-cream) inset;
+          caret-color: var(--auth-ink);
         }
         .welcome-auth__error {
           padding: .75rem 1rem;

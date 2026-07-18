@@ -2,8 +2,8 @@
 
 // ── Mila conversion landing (/start) ────────────────────────────────────────
 // A focused, self-contained funnel for PAID traffic — deliberately separate
-// from the flagship cinematic landing at "/". Same brand (Yeseva One + Caveat,
-// terracotta), direct-response structure. No testimonials yet (a real, consented
+// from the flagship cinematic landing at "/". Same brand (Yeseva One + Manrope,
+// Mila rose), direct-response structure. No testimonials yet (a real, consented
 // set can be added later). Prices are owner-approved estimates (2026-07-18),
 // anchored to the "3 cups of coffee a month" framing / RU market — change the
 // `price` field on each plan to update them.

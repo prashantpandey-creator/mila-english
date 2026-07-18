@@ -180,33 +180,33 @@ export default function HomePage() {
     },
   ];
 
-  const doors: { icon: MilaIconName; kicker: string; title: string; copy: string; href: string; cls: string; start?: boolean; accent: [string, string, string] }[] = [
+  const doors: { icon: MilaIconName; kicker: string; title: string; copy: string; href: string; cls: string; start?: boolean }[] = [
     {
-      accent: ['#b3502c', 'rgba(179, 80, 44, 0.09)', 'rgba(179, 80, 44, 0.35)'], icon: 'level', cls: 'lp-door--lead', href: '/assessment', start: true,
+      icon: 'level', cls: 'lp-door--lead', href: '/assessment', start: true,
       kicker: T('Проверка уровня', 'Level check'),
       title: T('Пять минут голосом — и Mila знает, с чего начать', 'Five minutes of your voice — Mila knows where to begin'),
       copy: T('Прочитай фразу, ответь на четыре вопроса. Мила определит уровень и соберёт личный план. Есть режим без микрофона.', 'Read one phrase, answer four questions. Mila places your level and builds a personal plan. A no-microphone mode is included.'),
     },
     {
-      accent: ['#a83d64', 'rgba(168, 61, 100, 0.08)', 'rgba(168, 61, 100, 0.32)'], icon: 'tutor', cls: 'lp-door--main', href: '/darshan',
+      icon: 'tutor', cls: 'lp-door--main', href: '/darshan',
       kicker: T('Мила-наставница', 'Mila tutor'),
       title: T('Разговаривай с Милой вслух', 'Talk it through with Mila'),
       copy: T('Живой голосовой диалог в спокойном пространстве. Никакого судейства — только внимание.', 'Live voice conversation in a calm, private space. No judgement — only attention.'),
     },
     {
-      accent: ['#0c7895', 'rgba(12, 120, 149, 0.07)', 'rgba(12, 120, 149, 0.3)'], icon: 'listening', cls: 'lp-door--third', href: '/listen',
+      icon: 'listening', cls: 'lp-door--third', href: '/listen',
       kicker: T('Слушание', 'Listening'),
       title: T('Произношение по звукам', 'Pronunciation, sound by sound'),
       copy: T('Живые фразы, три акцента, разбор каждой фонемы.', 'Real phrases, three accents, every phoneme mapped.'),
     },
     {
-      accent: ['#a9720f', 'rgba(169, 114, 15, 0.09)', 'rgba(169, 114, 15, 0.34)'], icon: 'vocabulary', cls: 'lp-door--third', href: '/vocabulary',
+      icon: 'vocabulary', cls: 'lp-door--third', href: '/vocabulary',
       kicker: T('Новые слова', 'New words'),
       title: T('Словарь, который не забывается', 'Vocabulary that stays'),
       copy: T('Интервальные повторения возвращают слово точно в срок.', 'Spaced repetition brings each word back right on time.'),
     },
     {
-      accent: ['#5f7052', 'rgba(95, 112, 82, 0.09)', 'rgba(95, 112, 82, 0.32)'], icon: 'grammar', cls: 'lp-door--third', href: '/grammar',
+      icon: 'grammar', cls: 'lp-door--third', href: '/grammar',
       kicker: T('Грамматика', 'Grammar'),
       title: T('Правила через твои фразы', 'Rules through your own phrases'),
       copy: T('Грамматика объясняется на языке, которым ты уже говоришь.', 'Grammar explained through language you already use.'),
@@ -459,7 +459,6 @@ export default function HomePage() {
                 <button
                   key={door.href}
                   className={`lp-door ${door.cls}`}
-                  style={{ '--door-accent': door.accent[0], '--door-soft': door.accent[1], '--door-line': door.accent[2] } as React.CSSProperties}
                   onClick={() => openDoor(door.href)}
                 >
                   {door.start && <span className="lp-door__start">{T('Начни здесь', 'Start here')}</span>}

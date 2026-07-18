@@ -2,11 +2,11 @@
 
 // "How Mila hears every accent" — the first surface built in the design
 // language (DESIGN.md): serif for the spoken word, monospace for everything
-// measured; Signal's red route-line turns syllables into stations (the
-// mispronounced one flagged like a missed stop); Broadcast's VU meter is the
-// voice reading. Atelier (warm paper) in light, Studio (console) in dark.
+// measured. Route stops and the VU meter share Mila's single rose signal;
+// amplitude and status are expressed through scale, weight, and opacity.
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/lib/i18n-provider';
+import { C } from '@/lib/theme';
 
 type Slide = {
   accent: string;
@@ -26,12 +26,12 @@ const SLIDES: Slide[] = [
   { accent: 'Indian English', line: 'Mumbai', word: 'particular', ipa: 'pər · ˈtɪk · jə · lər', clarity: 95, syl: [['par', true], ['tic', true], ['u', true], ['lar', true]], focus: 'clean', tip: 'clean — hold it', tipRu: 'чисто — держи' },
 ];
 
-// Deterministic VU heights (SSR-stable). Colour is decided from height so the
-// meter reads like a real one: green safe, amber warm, red peak.
+// Deterministic VU heights (SSR-stable). A single hue plus opacity keeps the
+// meter legible without reintroducing traffic-light colour semantics.
 function vu(seed: number): number[] {
   return Array.from({ length: 12 }, (_, i) => 24 + Math.round(74 * Math.abs(Math.sin(seed * 1.3 + i * 0.55))));
 }
-const vuColor = (h: number) => (h >= 88 ? '#e5352b' : h >= 62 ? '#c99a2e' : '#7a9a4a');
+const vuOpacity = (h: number) => Math.min(1, 0.46 + h / 180);
 
 export default function ShowcaseSlider() {
   const { lang } = useI18n();
@@ -73,7 +73,7 @@ export default function ShowcaseSlider() {
                 <div className="mila-showcase__vu">
                   <div className="mila-showcase__vu-graph">
                     <div className="mila-showcase__vu-bars" aria-hidden>
-                      {vu(i + 1).map((h, k) => (<i key={k} style={{ height: `${h}%`, background: vuColor(h) }} />))}
+                      {vu(i + 1).map((h, k) => (<i key={k} style={{ height: `${h}%`, background: C.venus, opacity: vuOpacity(h) }} />))}
                     </div>
                     <div className="mila-showcase__vu-cap">
                       <span>−20 vu</span>

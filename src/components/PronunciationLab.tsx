@@ -10,6 +10,10 @@ import { ACCENTS, startListening, type Assessment, type Session } from '@/lib/sp
 import { ttsSpeak } from '@/lib/tts'
 import { C } from '@/lib/theme'
 
+const SIGNAL = '#c94f5b'
+const SIGNAL_SOFT = 'rgba(201,79,91,0.12)'
+const SIGNAL_INK = '#fffaf7'
+
 type Sound = {
   ipa: string
   word: string
@@ -52,12 +56,12 @@ function recordingMessage(problem: unknown, lang: 'ru'|'en') {
 function MouthMap({ sound }: { sound: Sound }) {
   const tongue = sound.tongue === 'teeth' ? 'M42 69 Q68 47 108 61' : sound.tongue === 'low' ? 'M35 72 Q74 83 119 69' : sound.tongue === 'ridge' ? 'M39 72 Q71 48 111 55' : 'M42 72 Q82 60 115 45'
   return <svg role="img" aria-label={`Mouth position for ${sound.ipa}`} width="100%" height="150" viewBox="0 0 160 120" style={{display:'block'}}>
-    <path d="M18 58 Q25 17 79 16 Q138 16 145 58 Q137 102 80 104 Q25 101 18 58Z" fill="rgba(255,255,255,.025)" stroke="rgba(255,255,255,.22)" strokeWidth="2"/>
-    <path d="M27 54 Q78 36 136 53" fill="none" stroke="rgba(247,247,248,.66)" strokeWidth="5" strokeLinecap="round"/>
-    <path d={tongue} fill="none" stroke={C.jupiter} strokeWidth="10" strokeLinecap="round"/>
-    {sound.tongue === 'teeth' && <path d="M78 48 L80 69" stroke={C.voice} strokeWidth="5" strokeLinecap="round"/>}
-    <path d="M80 75 C101 77 125 70 147 60" fill="none" stroke={C.voice} strokeWidth="2" strokeDasharray="4 5"/>
-    <circle cx="149" cy="59" r="3" fill={C.voice}/>
+    <path d="M18 58 Q25 17 79 16 Q138 16 145 58 Q137 102 80 104 Q25 101 18 58Z" fill="var(--mila-raised, #fffdf9)" stroke="var(--mila-line, rgba(36,29,25,.18))" strokeWidth="2"/>
+    <path d="M27 54 Q78 36 136 53" fill="none" stroke="var(--mila-muted, #746861)" strokeWidth="5" strokeLinecap="round"/>
+    <path d={tongue} fill="none" stroke={SIGNAL} strokeWidth="10" strokeLinecap="round"/>
+    {sound.tongue === 'teeth' && <path d="M78 48 L80 69" stroke={SIGNAL} strokeWidth="5" strokeLinecap="round"/>}
+    <path d="M80 75 C101 77 125 70 147 60" fill="none" stroke={SIGNAL} strokeWidth="2" strokeDasharray="4 5"/>
+    <circle cx="149" cy="59" r="3" fill={SIGNAL}/>
   </svg>
 }
 
@@ -113,31 +117,31 @@ export default function PronunciationLab() {
       actions={<LangToggle/>}
     />
     <AppMain width="work" className="phonetics-page__main">
-      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}><span style={{width:44,height:44,borderRadius:14,display:'grid',placeItems:'center',color:C.voice,background:C.voiceL,border:'1px solid rgba(106,220,245,.25)'}}><MilaIcon name="pronunciation" size={23}/></span><div><div style={{fontSize:'.72rem',fontWeight:800,letterSpacing:1.4,textTransform:'uppercase',color:C.jupiter}}>{lang==='ru'?'Лаборатория звуков':'Sound laboratory'}</div><h1 style={{fontSize:'clamp(1.65rem,5vw,2.25rem)',margin:2,color:C.dark}}>{lang==='ru'?'Произношение без догадок':'Pronunciation without guesswork'}</h1></div></div>
+      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}><span style={{width:44,height:44,borderRadius:14,display:'grid',placeItems:'center',color:SIGNAL,background:SIGNAL_SOFT,border:`1px solid ${SIGNAL}`}}><MilaIcon name="pronunciation" size={23}/></span><div><div style={{fontSize:'.72rem',fontWeight:800,letterSpacing:1.4,textTransform:'uppercase',color:SIGNAL}}>{lang==='ru'?'Лаборатория звуков':'Sound laboratory'}</div><h1 style={{fontSize:'clamp(1.65rem,5vw,2.25rem)',margin:2,color:C.dark}}>{lang==='ru'?'Произношение без догадок':'Pronunciation without guesswork'}</h1></div></div>
       <p style={{color:C.warm,lineHeight:1.6,margin:'12px 0 22px',maxWidth:620}}>{lang==='ru'?'Выбери сложный звук, посмотри положение языка, послушай фразу и получи мягкую оценку своей записи.':'Choose a difficult sound, see the tongue position, hear a phrase, and get gentle feedback on your recording.'}</p>
 
-      <label style={{display:'block',marginBottom:16}}><span style={{display:'block',fontSize:'.76rem',fontWeight:750,color:C.warm,marginBottom:7}}>{lang==='ru'?'Найти звук или слово':'Find a sound or word'}</span><input value={query} onChange={event=>search(event.target.value)} placeholder={lang==='ru'?'Например: th, world, /æ/':'For example: th, world, /æ/'} style={{width:'100%',boxSizing:'border-box',padding:'12px 14px',borderRadius:13,border:`1px solid ${C.line}`,background:'rgba(8,8,9,.78)',color:C.dark,outline:'none',fontSize:'.95rem'}}/></label>
+      <label style={{display:'block',marginBottom:16}}><span style={{display:'block',fontSize:'.76rem',fontWeight:750,color:C.warm,marginBottom:7}}>{lang==='ru'?'Найти звук или слово':'Find a sound or word'}</span><input value={query} onChange={event=>search(event.target.value)} placeholder={lang==='ru'?'Например: th, world, /æ/':'For example: th, world, /æ/'} style={{width:'100%',boxSizing:'border-box',padding:'12px 14px',borderRadius:13,border:`1px solid ${C.line}`,background:'var(--mila-raised, #fffdf9)',color:C.dark,outline:'none',fontSize:'.95rem'}}/></label>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:9,marginBottom:18}}>
-        {filtered.map(({item,index})=><button type="button" key={item.ipa} onClick={()=>chooseSound(index)} aria-pressed={active===index} style={{padding:'12px 8px',borderRadius:14,border:active===index?`1.5px solid ${C.voice}`:`1px solid ${C.line}`,background:active===index?C.voiceL:'rgba(8,8,9,.78)',color:C.dark,cursor:'pointer',textAlign:'center'}}><span style={{display:'block',fontSize:'1.22rem',fontWeight:800,color:active===index?C.voice:C.dark}}>{item.ipa}</span><span style={{display:'block',fontSize:'.75rem',color:C.warm,marginTop:3}}>{item.word}</span></button>)}
+        {filtered.map(({item,index})=><button type="button" key={item.ipa} onClick={()=>chooseSound(index)} aria-pressed={active===index} style={{padding:'12px 8px',borderRadius:14,border:active===index?`1.5px solid ${SIGNAL}`:`1px solid ${C.line}`,background:active===index?SIGNAL_SOFT:'var(--mila-raised, #fffdf9)',color:C.dark,cursor:'pointer',textAlign:'center'}}><span style={{display:'block',fontSize:'1.22rem',fontWeight:800,color:active===index?SIGNAL:C.dark}}>{item.ipa}</span><span style={{display:'block',fontSize:'.75rem',color:C.warm,marginTop:3}}>{item.word}</span></button>)}
       </div>
-      {!filtered.length && <div style={{padding:16,borderRadius:14,background:'rgba(8,8,9,.78)',color:C.warm,marginBottom:18}}>{lang==='ru'?'Такого звука пока нет. Попробуй слово из списка.':'That sound is not in the lab yet. Try one of the listed words.'}</div>}
+      {!filtered.length && <div style={{padding:16,borderRadius:14,background:'var(--mila-raised, #fffdf9)',color:C.warm,marginBottom:18}}>{lang==='ru'?'Такого звука пока нет. Попробуй слово из списка.':'That sound is not in the lab yet. Try one of the listed words.'}</div>}
 
       <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(280px,100%),1fr))',gap:12,marginBottom:14}}>
         <div className="focus-card" style={{padding:'20px'}}>
-          <div style={{display:'flex',alignItems:'baseline',gap:10}}><strong style={{fontSize:'2rem',color:C.voice}}>{sound.ipa}</strong><span style={{fontSize:'1.05rem',fontWeight:750,color:C.dark}}>{lang==='ru'?sound.titleRu:sound.titleEn}</span></div>
+          <div style={{display:'flex',alignItems:'baseline',gap:10}}><strong style={{fontSize:'2rem',color:SIGNAL}}>{sound.ipa}</strong><span style={{fontSize:'1.05rem',fontWeight:750,color:C.dark}}>{lang==='ru'?sound.titleRu:sound.titleEn}</span></div>
           <MouthMap sound={sound}/>
-          {[{n:'1',ru:sound.mouthRu,en:sound.mouthEn},{n:'2',ru:sound.airRu,en:sound.airEn},{n:'3',ru:sound.voiceRu,en:sound.voiceEn}].map(step=><div key={step.n} style={{display:'grid',gridTemplateColumns:'26px 1fr',gap:9,alignItems:'start',marginTop:9,color:C.warm,fontSize:'.86rem',lineHeight:1.45}}><span style={{width:24,height:24,borderRadius:8,display:'grid',placeItems:'center',background:C.jupiterL,color:C.jupiter,fontWeight:800,fontSize:'.72rem'}}>{step.n}</span><span>{lang==='ru'?step.ru:step.en}</span></div>)}
+          {[{n:'1',ru:sound.mouthRu,en:sound.mouthEn},{n:'2',ru:sound.airRu,en:sound.airEn},{n:'3',ru:sound.voiceRu,en:sound.voiceEn}].map(step=><div key={step.n} style={{display:'grid',gridTemplateColumns:'26px 1fr',gap:9,alignItems:'start',marginTop:9,color:C.warm,fontSize:'.86rem',lineHeight:1.45}}><span style={{width:24,height:24,borderRadius:8,display:'grid',placeItems:'center',background:SIGNAL_SOFT,color:SIGNAL,fontWeight:800,fontSize:'.72rem'}}>{step.n}</span><span>{lang==='ru'?step.ru:step.en}</span></div>)}
         </div>
         <div className="focus-card" style={{padding:'20px'}}>
-          <div style={{fontSize:'.72rem',fontWeight:800,letterSpacing:1.2,textTransform:'uppercase',color:C.jupiter}}>{lang==='ru'?'Фраза для практики':'Practice phrase'}</div>
+          <div style={{fontSize:'.72rem',fontWeight:800,letterSpacing:1.2,textTransform:'uppercase',color:SIGNAL}}>{lang==='ru'?'Фраза для практики':'Practice phrase'}</div>
           <div style={{fontSize:'1.3rem',lineHeight:1.4,fontWeight:750,color:C.dark,margin:'14px 0 5px'}}>{sound.phrase}</div><div style={{fontSize:'.82rem',color:C.warm}}>{lang==='ru'?`Фокус: ${sound.ipa} в слове “${sound.word}”`:`Focus: ${sound.ipa} in “${sound.word}”`}</div>
-          <button type="button" onClick={listen} disabled={playing||phase==='recording'||phase==='scoring'} style={{width:'100%',marginTop:16,padding:12,borderRadius:12,border:`1px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:750,cursor:'pointer'}}><MilaIcon name="volume" size={17} style={{display:'inline-block',verticalAlign:'middle',marginRight:7}}/>{playing?(lang==='ru'?'Звучит…':'Playing…'):(lang==='ru'?'Послушать фразу':'Hear the phrase')}</button>
-          {result && <div style={{marginTop:14,padding:14,borderRadius:13,background:C.jupiterL,border:'1px solid rgba(242,199,92,.24)'}}><div style={{display:'flex',alignItems:'center',gap:10}}><strong style={{fontSize:'1.5rem',color:C.jupiter}}>{result.score}</strong><span style={{fontWeight:750,color:C.dark}}>{result.score>=80?(lang==='ru'?'Ясно и уверенно':'Clear and confident'):result.score>=55?(lang==='ru'?'Хорошая основа':'A good foundation'):(lang==='ru'?'Полезная отправная точка':'A useful starting point')}</span></div><p style={{fontSize:'.82rem',lineHeight:1.45,color:C.warm,margin:'8px 0 0',display:'flex',alignItems:'flex-start',gap:6}}><MilaIcon name="sparkle" size={15} style={{flex:'0 0 auto',marginTop:2}}/><span>{result.tip}</span></p></div>}
-          {message && <div role="alert" style={{marginTop:14,padding:12,borderRadius:12,background:C.roseL,color:C.rose,fontSize:'.84rem',lineHeight:1.45}}>{message}</div>}
-          <button type="button" onClick={record} disabled={phase==='scoring'} style={{width:'100%',marginTop:14,padding:14,borderRadius:13,border:`1px solid ${phase==='scoring'?C.mercury:C.voice}`,background:phase==='recording'?C.voice:phase==='scoring'?C.mercuryL:C.voiceL,color:phase==='recording'?'#021418':phase==='scoring'?C.mercury:C.voice,fontWeight:800,cursor:phase==='scoring'?'default':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>{phase==='recording'?<><span style={{width:13,height:13,borderRadius:3,background:'currentColor'}} aria-hidden/>{lang==='ru'?'Закончить запись':'Stop recording'}</>:phase==='scoring'?<><MilaIcon name="sparkle" size={17}/>{lang==='ru'?'Оцениваю':'Scoring'}</>:<><MilaIcon name="voice" size={17}/>{result?(lang==='ru'?'Записать ещё раз':'Record again'):(lang==='ru'?'Записать себя':'Record yourself')}</>}</button>
+          <button type="button" onClick={listen} disabled={playing||phase==='recording'||phase==='scoring'} style={{width:'100%',marginTop:16,padding:12,borderRadius:12,border:`1px solid ${SIGNAL}`,background:SIGNAL_SOFT,color:SIGNAL,fontWeight:750,cursor:'pointer'}}><MilaIcon name="volume" size={17} style={{display:'inline-block',verticalAlign:'middle',marginRight:7}}/>{playing?(lang==='ru'?'Звучит…':'Playing…'):(lang==='ru'?'Послушать фразу':'Hear the phrase')}</button>
+          {result && <div style={{marginTop:14,padding:14,borderRadius:13,background:SIGNAL_SOFT,border:`1px solid ${SIGNAL}`}}><div style={{display:'flex',alignItems:'center',gap:10}}><strong style={{fontSize:'1.5rem',color:SIGNAL}}>{result.score}</strong><span style={{fontWeight:750,color:C.dark}}>{result.score>=80?(lang==='ru'?'Ясно и уверенно':'Clear and confident'):result.score>=55?(lang==='ru'?'Хорошая основа':'A good foundation'):(lang==='ru'?'Полезная отправная точка':'A useful starting point')}</span></div><p style={{fontSize:'.82rem',lineHeight:1.45,color:C.warm,margin:'8px 0 0',display:'flex',alignItems:'flex-start',gap:6}}><MilaIcon name="sparkle" size={15} style={{flex:'0 0 auto',marginTop:2}}/><span>{result.tip}</span></p></div>}
+          {message && <div role="alert" style={{marginTop:14,padding:12,borderRadius:12,background:SIGNAL_SOFT,color:SIGNAL,fontSize:'.84rem',lineHeight:1.45}}>{message}</div>}
+          <button type="button" onClick={record} disabled={phase==='scoring'} style={{width:'100%',marginTop:14,padding:14,borderRadius:13,border:`1px solid ${SIGNAL}`,background:phase==='recording'?SIGNAL:SIGNAL_SOFT,color:phase==='recording'?SIGNAL_INK:SIGNAL,fontWeight:800,cursor:phase==='scoring'?'default':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>{phase==='recording'?<><span style={{width:13,height:13,borderRadius:3,background:'currentColor'}} aria-hidden/>{lang==='ru'?'Закончить запись':'Stop recording'}</>:phase==='scoring'?<><MilaIcon name="sparkle" size={17}/>{lang==='ru'?'Оцениваю':'Scoring'}</>:<><MilaIcon name="voice" size={17}/>{result?(lang==='ru'?'Записать ещё раз':'Record again'):(lang==='ru'?'Записать себя':'Record yourself')}</>}</button>
         </div>
       </section>
-      <button type="button" onClick={()=>router.push('/listen')} style={{width:'100%',padding:14,borderRadius:14,border:`1px solid ${C.mercury}`,background:C.mercuryL,color:C.mercury,fontWeight:750,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>{lang==='ru'?'Перейти к фразам и акцентам':'Continue to phrases and accents'}<MilaIcon name="arrow" size={17}/></button>
+      <button type="button" onClick={()=>router.push('/listen')} style={{width:'100%',padding:14,borderRadius:14,border:`1px solid ${SIGNAL}`,background:SIGNAL_SOFT,color:SIGNAL,fontWeight:750,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>{lang==='ru'?'Перейти к фразам и акцентам':'Continue to phrases and accents'}<MilaIcon name="arrow" size={17}/></button>
     </AppMain>
   </AppShell>
 }

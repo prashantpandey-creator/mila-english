@@ -23,41 +23,46 @@
 6. **Lock the winner into the system** so it stops getting swapped for cheap
    defaults by the next hand.
 
-## The language (chosen 2026-07-18)
+## The language (owner correction, 2026-07-18)
 
-Two modes of one system. Monospace threads both, so IPA and phonemes are native
-in either.
+Mila has one visual identity from the first page through the learning product.
+Dark is a neutral context, never another brand or another signal system.
 
-| | **Atelier — light** | **Studio — dark** |
-|---|---|---|
-| Ground | warm paper `#f3ede0` | near-black console `#0c0d11` |
-| Borders | hairline `#cabfa6` | hairline `#24262e` |
-| Ink | `#1c1611` | `#eceae4` |
-| Grain | warm-brown feTurbulence on `soft-light` (NEVER grey/`multiply` — that's the washed-out bug) | faint desaturated, `soft-light` |
+| Role | Canonical value |
+|---|---|
+| Ground | warm paper `#f8f4ee` |
+| Panel | ivory `#fffaf5` |
+| Ink | espresso `#241d19` |
+| Muted ink | `#746861` |
+| Border | hairline `#d9cec2` |
+| Interaction signal | rose `#c94f5b`; accessible light-surface action `#963640`; dark-canvas signal `#e46a73` |
+| Immersive canvas | neutral `#0c0d11`; rose remains the only colour signal |
 
-- **Type.** Serif (`--font-serif`, Lora) for the spoken **word** — warmth.
-  Monospace (`--font-mono`, IBM Plex Mono) for **everything measured** — IPA,
-  phonemes, VU, labels. Sans (`--font-sans`, Manrope) for body.
-- **Signal red `#e5352b`** (dark: `#ff5a4d`) — one accent, used for the *live*
-  state, the flagged syllable, the peak. Never decoration.
-- **Route-line** — syllables are stations on a line; the mispronounced one is
-  flagged red like a missed stop. (Harvested from world 3 "Signal".)
-- **VU meter** — the voice reading: green → amber → red by level, a plain-language
-  tip, clarity as a side gauge. (Harvested from world 4 "Broadcast".)
+- **Type.** Yeseva One (`--font-display`) carries brand and display headings.
+  Manrope (`--font-sans`) carries interface and body copy. IBM Plex Mono
+  (`--font-mono`) is reserved for IPA, phonemes, scores, levels, and system
+  labels. Do not add a route-specific font.
+- **One signal.** Clickable, active, listening, speaking, correct, incorrect,
+  measured, and progress states all use the rose family. Meaning comes from
+  icon, label, motion, shape, and opacity—not cyan/green/gold/purple switches.
+- **Depth.** Use solid neutral surfaces, hairlines, and restrained warm shadows.
+  Photo contrast may be dark; UI chrome must remain clearly Mila.
 
-**Banned:** pink, glass blur cards, glow, gradient orbs, low-res photo
-backgrounds behind the workspace.
+**Banned:** secondary semantic hues, per-category colour coding, coloured
+glass, glow, gradient orbs, device-driven palette switching, and low-resolution
+photos behind learning workspaces.
 
 ## Built so far
 
-- `src/app/inner-theme.css` is the app-wide implementation. It owns the shared
-  Atelier/Studio tokens, shell, cards, controls, lesson tools, assessment,
-  chat, auth, legal pages, assistant furniture, and mobile navigation.
-- `src/components/RouteSurface.tsx` deliberately separates marketing from the
-  learning product. `/` keeps its cinematic poster and `/start` keeps its dark
-  conversion/pricing room; every other route receives the unified app system.
-- Immersive voice rooms use the Studio palette and signal red for a live state.
-  Their reactive WebGL presence is functional feedback, not decorative glow.
+- `src/app/inner-theme.css` owns the shared warm-paper tokens, shell, cards,
+  controls, lesson tools, assessment, chat, auth, legal pages, assistant
+  furniture, and mobile navigation.
+- `src/components/RouteSurface.tsx` makes the palette deterministic. `/` keeps
+  its cinematic poster, `/start` uses the same warm system with a contained
+  dark pricing band, ordinary learning stays warm, and immersive voice alone
+  uses neutral dark.
+- Immersive voice motion is functional feedback. It uses neutral luminance and
+  the same rose signal; it does not introduce another palette.
 - The dashboard is a **conversation stage**, not a widget directory. Mila's
   live voice action owns the visual hierarchy, text chat is the clear second
   action, and lessons sit in a quieter supporting rail. `conversation-stage`

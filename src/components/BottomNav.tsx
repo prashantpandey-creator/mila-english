@@ -10,17 +10,17 @@ import { useI18n } from '@/lib/i18n-provider';
 // dashboard (hub-and-spoke, no rim). This bar keeps the five core rooms one
 // tap apart from anywhere in the app. Mounted once in the layout; it hides
 // itself on the marketing door, auth, and the immersive voice room.
-type Tab = { href: string; icon: MilaIconName | 'home'; ru: string; en: string };
+type Tab = { href: string; icon: MilaIconName | 'home'; ru: string; en: string; routes: string[] };
 
 const TABS: Tab[] = [
-  { href: '/dashboard', icon: 'home', ru: 'Главная', en: 'Home' },
-  { href: '/listen', icon: 'listening', ru: 'Слушать', en: 'Listen' },
-  { href: '/vocabulary', icon: 'vocabulary', ru: 'Слова', en: 'Words' },
-  { href: '/chat', icon: 'tutor', ru: 'Наставник', en: 'Tutor' },
-  { href: '/progress', icon: 'progress', ru: 'Прогресс', en: 'Progress' },
+  { href: '/dashboard', icon: 'home', ru: 'Главная', en: 'Home', routes: ['/dashboard'] },
+  { href: '/lessons', icon: 'lessons', ru: 'Учиться', en: 'Learn', routes: ['/lessons', '/listen', '/vocabulary', '/grammar', '/phonetics', '/assessment', '/achievements'] },
+  { href: '/darshan', icon: 'voice', ru: 'Говорить', en: 'Speak', routes: ['/darshan', '/voice-lab'] },
+  { href: '/chat', icon: 'conversation', ru: 'Чат', en: 'Chat', routes: ['/chat'] },
+  { href: '/progress', icon: 'progress', ru: 'Прогресс', en: 'Progress', routes: ['/progress'] },
 ];
 
-const HIDDEN = ['/', '/start', '/login', '/register', '/darshan', '/pia', '/practice', '/privacy', '/support'];
+const HIDDEN = ['/', '/start', '/login', '/register', '/darshan', '/pia', '/practice', '/voice-lab', '/privacy', '/support'];
 
 function HomeGlyph() {
   return (
@@ -54,7 +54,7 @@ export default function BottomNav() {
     <nav className="mila-tabbar" aria-label={lang === 'ru' ? 'Основная навигация' : 'Primary navigation'}>
       <div className="mila-tabbar__inner">
         {TABS.map((tab) => {
-          const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+          const active = tab.routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
           return (
             <Link
               key={tab.href}

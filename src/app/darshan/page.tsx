@@ -479,7 +479,7 @@ export default function VoicePage() {
         )}
 
         {isConnecting && (
-           <div className="absolute inset-0 rounded-full border-2 border-pink-500/50 border-t-transparent animate-spin z-20 pointer-events-none" style={{ width: orbSize, height: orbSize, left: '50%', top: '50%', marginLeft: -orbSize/2, marginTop: -orbSize/2 }}></div>
+           <div className="absolute inset-0 rounded-full border-2 border-[#e46a73]/50 border-t-transparent animate-spin z-20 pointer-events-none" style={{ width: orbSize, height: orbSize, left: '50%', top: '50%', marginLeft: -orbSize/2, marginTop: -orbSize/2 }}></div>
         )}
 
         <MilaOrb state={phase} size={orbSize} />
@@ -488,6 +488,7 @@ export default function VoicePage() {
       {/* The invitation the orb breathes at rest */}
       {(!isConnected && !isConnecting) && (
         <div className="voice-invoke" data-show={showInvocation ? "1" : "0"} aria-live="polite">
+          <strong>{lang === "ru" ? "Нажми, чтобы поговорить с Милой" : "Tap to talk with Mila"}</strong>
           <span key={invI} className="voice-invoke-line">{INVITES[invI % INVITES.length]}</span>
         </div>
       )}
@@ -520,20 +521,20 @@ export default function VoicePage() {
         >
           <p className="text-center text-[11px] tracking-[0.1em] uppercase mb-2 transition-colors duration-300">
             {phase === "listening" ? (
-              <span className="text-pink-400">● Hearing you</span>
+              <span className="text-[#e46a73]">● Hearing you</span>
             ) : phase === "thinking" ? (
-              <span className="text-purple-400">Reflecting…</span>
+              <span className="text-[#e46a73]/80">Reflecting…</span>
             ) : phase === "manifesting" ? (
-              <span className="text-pink-300">Speaking — tap to interrupt</span>
+              <span className="text-[#e46a73]">Speaking — tap to interrupt</span>
             ) : (
-              <span className="text-pink-200/50">Speak to start</span>
+              <span className="text-[#b9b0aa]">Speak to start</span>
             )}
           </p>
         </div>
       )}
 
       {voiceError && (
-        <p className="absolute bottom-[3%] left-1/2 z-20 w-[90%] max-w-md -translate-x-1/2 text-center text-xs text-rose-200" role="alert">
+        <p className="absolute bottom-[3%] left-1/2 z-20 w-[90%] max-w-md -translate-x-1/2 text-center text-xs text-[#e46a73]" role="alert">
           {voiceError}
         </p>
       )}

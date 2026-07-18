@@ -20,16 +20,26 @@ export default function Chat() {
     onFinish: () => announceCompanionHistoryUpdated(),
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesViewportRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [m, setM] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [clearError, setClearError] = useState(false);
   const { isHydrating, historyError } = useCompanionHistory({ limit: 40, setMessages });
+  const latestMessageContent = messages[messages.length - 1]?.content ?? '';
 
   useEffect(() => { setM(true); }, []);
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const viewport = messagesViewportRef.current;
+    if (!viewport) return;
+    const frame = window.requestAnimationFrame(() => {
+      viewport.scrollTo({
+        top: messages.length === 0 ? 0 : viewport.scrollHeight,
+        behavior: isLoading ? 'auto' : 'smooth',
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [isLoading, latestMessageContent, messages.length]);
 
   const clearConversation = async () => {
     if (isLoading || isClearing || messages.length === 0) return;
@@ -96,7 +106,7 @@ export default function Chat() {
         }
       />
 
-      <main className="chat-page__messages" aria-live="polite">
+      <main ref={messagesViewportRef} className="chat-page__messages" aria-live="polite">
         <div className="chat-page__stream">
         {isHydrating && messages.length === 0 && (
           <div className="chat-page__status">
@@ -107,7 +117,7 @@ export default function Chat() {
         {!isHydrating && messages.length === 0 && (
           <div className="chat-page__empty">
             <div className="chat-page__empty-presence" aria-hidden="true">
-              <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} priority />
+              <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
               <span />
             </div>
             <p className="chat-page__empty-kicker">{lang === 'ru' ? 'Мила здесь' : 'Mila is here'}</p>
@@ -133,7 +143,7 @@ export default function Chat() {
           <div key={m.id} className={`chat-page__row ${m.role === 'user' ? 'is-user' : 'is-assistant'}`}>
             {m.role !== 'user' ? (
               <span className="chat-page__mila-avatar" aria-label="Mila">
-                <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} />
+                <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} />
               </span>
             ) : null}
             <div className="chat-page__bubble">

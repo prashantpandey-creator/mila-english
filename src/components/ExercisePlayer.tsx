@@ -8,16 +8,16 @@ import { ttsSpeak } from '@/lib/tts';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 
 const VERDICT = {
-  good:  { fg: C.jupiter, bg: C.jupiterL },
-  close: { fg: C.mercury, bg: C.mercuryL },
-  miss:  { fg: C.rose, bg: C.roseL },
+  good:  { fg: C.venus, bg: C.venusL },
+  close: { fg: C.dark, bg: C.card },
+  miss:  { fg: C.venusDeep, bg: C.venusL },
 };
 
 /** A friendly onboarding card shown only on the first phrase */
 function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => void }) {
   return (
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:0,textAlign:'center'}}>
-      <div style={{width:64,height:64,display:'grid',placeItems:'center',marginBottom:14,borderRadius:18,color:C.voice,background:C.voiceL,border:`1px solid ${C.voice}`}}>
+      <div style={{width:64,height:64,display:'grid',placeItems:'center',marginBottom:14,borderRadius:18,color:C.venus,background:C.venusL,border:`1px solid ${C.venus}`}}>
         <MilaIcon name="voice" size={30}/>
       </div>
       <h2 style={{fontSize:'1.4rem',fontWeight:800,color:C.dark,margin:'0 0 8px'}}>
@@ -38,20 +38,20 @@ function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => voi
       ].map(s => (
         <div className="focus-card" key={s.en} style={{display:'flex',alignItems:'center',gap:12,width:'100%',maxWidth:340,
           padding:'12px 16px',marginBottom:8,textAlign:'left'}}>
-          <span style={{width:32,height:32,display:'grid',placeItems:'center',flex:'0 0 auto',borderRadius:9,color:C.mercury,background:C.mercuryL}}><MilaIcon name={s.icon} size={18}/></span>
+          <span style={{width:32,height:32,display:'grid',placeItems:'center',flex:'0 0 auto',borderRadius:9,color:C.venus,background:C.venusL}}><MilaIcon name={s.icon} size={18}/></span>
           <span style={{fontSize:'0.88rem',color:C.dark,fontWeight:500}}>{lang==='ru' ? s.ru : s.en}</span>
         </div>
       ))}
 
-      <div style={{marginTop:8,display:'flex',alignItems:'flex-start',gap:8,background:C.mercuryL,borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20,color:C.mercury,textAlign:'left'}}>
+      <div style={{marginTop:8,display:'flex',alignItems:'flex-start',gap:8,background:C.venusL,borderRadius:12,padding:'10px 16px',width:'100%',maxWidth:340,marginBottom:20,color:C.venusDeep,textAlign:'left'}}>
         <MilaIcon name="sparkle" size={16} style={{flex:'0 0 auto',marginTop:1}}/>
         <span style={{fontSize:'0.82rem',fontWeight:600}}>{lang==='ru' ? 'Говори ровно и чётко — модель слышит каждую фонему' : 'Speak clearly and steadily — the model hears every phoneme'}</span>
       </div>
 
       <button onClick={onStart}
         style={{width:'100%',maxWidth:340,padding:'16px',borderRadius:16,border:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:8,
-          background:`linear-gradient(135deg,${C.mercury},${C.mercuryBright})`,color:'#02140f',fontWeight:800,fontSize:'1.1rem',
-          cursor:'pointer',boxShadow:'0 6px 20px rgba(36,211,154,0.3)',letterSpacing:'0.01em'}}>
+          background:C.venus,color:C.venusInk,fontWeight:800,fontSize:'1.1rem',
+          cursor:'pointer',boxShadow:'0 6px 20px rgba(150,54,64,0.24)',letterSpacing:'0.01em'}}>
         {lang==='ru' ? 'Начать упражнение' : 'Start Exercise'} <MilaIcon name="arrow" size={18}/>
       </button>
     </div>
@@ -171,11 +171,10 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
 
   const ring = (score: number) => {
     const r = 24, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
-    const col = score >= 80 ? C.jupiter : score >= 55 ? C.mercury : C.rose;
     return (
       <svg width="58" height="58" viewBox="0 0 58 58" style={{flex:'0 0 auto'}}>
-        <circle cx="29" cy="29" r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="6"/>
-        <circle cx="29" cy="29" r={r} fill="none" stroke={col} strokeWidth="6" strokeLinecap="round"
+        <circle cx="29" cy="29" r={r} fill="none" stroke={C.line} strokeWidth="6"/>
+        <circle cx="29" cy="29" r={r} fill="none" stroke={C.venus} strokeWidth="6" strokeLinecap="round"
           strokeDasharray={circ} strokeDashoffset={off} transform="rotate(-90 29 29)" style={{transition:'stroke-dashoffset .5s'}}/>
         <text x="29" y="35" textAnchor="middle" fontSize="16" fontWeight="800" fill={C.dark}>{score}</text>
       </svg>
@@ -194,17 +193,17 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
     <div style={{textAlign:'center'}}>
       {/* Progress label + phrase counter */}
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-        <span style={{fontSize:'0.72rem',color:C.jupiter,fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>
+        <span style={{fontSize:'0.72rem',color:C.venus,fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>
           {lang==='ru' ? 'Произношение' : 'Speaking Exercise'}
         </span>
-        <span style={{fontSize:'0.72rem',color:C.mercury,fontWeight:700,background:C.mercuryL,borderRadius:20,padding:'2px 10px'}}>
+        <span style={{fontSize:'0.72rem',color:C.venusDeep,fontWeight:700,background:C.venusL,borderRadius:20,padding:'2px 10px'}}>
           {pos + 1} / {phrases.length}
         </span>
       </div>
 
       {/* ── Phrase Card ────────────────────────────────────────────────────── */}
       <div className="focus-card" style={{padding:'24px 20px',marginBottom:12}}>
-        <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,fontSize:'0.72rem',fontWeight:700,color:C.jupiter,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,fontSize:'0.72rem',fontWeight:700,color:C.venus,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>
           <MilaIcon name="target" size={15}/>{lang==='ru' ? 'Повтори эту фразу:' : 'Repeat this phrase:'}
         </div>
         <div style={{fontSize:'1.35rem',fontWeight:700,color:C.dark,lineHeight:1.35,marginBottom:6}}>{phrase.en}</div>
@@ -212,8 +211,8 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
         <button onClick={onListen} disabled={phase==='speaking' || phase==='recording'}
           style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,
             width:'100%',marginTop:16,padding:'10px 18px',borderRadius:12,
-            background:C.voiceL,border:`1px solid ${C.voice}`,
-            color:C.voice,fontWeight:700,cursor:(phase==='speaking'||phase==='recording')?'default':'pointer',fontSize:'0.9rem',opacity:(phase==='recording')?0.5:1}}>
+            background:C.venusL,border:`1px solid ${C.venus}`,
+            color:C.venusDeep,fontWeight:700,cursor:(phase==='speaking'||phase==='recording')?'default':'pointer',fontSize:'0.9rem',opacity:(phase==='recording')?0.5:1}}>
           <MilaIcon name="volume" size={17}/>{phase==='speaking' ? (lang==='ru'?'Воспроизведение...':'Playing...') : (lang==='ru'?'Послушать':'Hear it first')}
         </button>
       </div>
@@ -236,7 +235,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
                 {result.words.map((w:any,i:number) => (
-                  <span key={i} style={{fontSize:'0.78rem',fontWeight:600,color:VERDICT[w.verdict]?.fg || C.dark,background:VERDICT[w.verdict]?.bg || 'rgba(255,255,255,0.08)',padding:'2px 8px',borderRadius:6}}>
+                  <span key={i} style={{fontSize:'0.78rem',fontWeight:600,color:VERDICT[w.verdict]?.fg || C.dark,background:VERDICT[w.verdict]?.bg || C.card,padding:'2px 8px',borderRadius:6}}>
                     {w.word}
                   </span>
                 ))}
@@ -247,7 +246,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
             <div style={{display:'flex',flexWrap:'wrap',gap:3,marginTop:12}}>
               {result.words.flatMap((w:any) => w.phonemes||[]).map((p:any,i:number) => (
                 <span key={i} title={p.acc+'%'} style={{fontSize:'0.72rem',fontWeight:700,fontFamily:'ui-monospace,monospace',
-                  color:VERDICT[p.verdict]?.fg || C.dark,background:VERDICT[p.verdict]?.bg || 'rgba(255,255,255,0.08)',padding:'2px 6px',borderRadius:5}}>
+                  color:VERDICT[p.verdict]?.fg || C.dark,background:VERDICT[p.verdict]?.bg || C.card,padding:'2px 6px',borderRadius:5}}>
                   {p.ph}
                 </span>
               ))}
@@ -261,10 +260,10 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
 
       {/* ── Error Card ─────────────────────────────────────────────────────── */}
       {phase==='error' && (
-        <div style={{background:C.roseL,borderRadius:14,padding:'12px 16px',fontSize:'0.88rem',marginBottom:12,textAlign:'left'}}>
-          <div style={{color:C.rose,fontWeight:700,marginBottom:showMicTip?6:0}}>{errMsg}</div>
+        <div style={{background:C.venusL,borderRadius:14,padding:'12px 16px',fontSize:'0.88rem',marginBottom:12,textAlign:'left'}}>
+          <div style={{color:C.venusDeep,fontWeight:700,marginBottom:showMicTip?6:0}}>{errMsg}</div>
           {showMicTip && (
-            <div style={{display:'flex',alignItems:'flex-start',gap:6,fontSize:'0.8rem',color:'#c0392b',lineHeight:1.5}}>
+            <div style={{display:'flex',alignItems:'flex-start',gap:6,fontSize:'0.8rem',color:C.venusDeep,lineHeight:1.5}}>
               <MilaIcon name="target" size={15} style={{flex:'0 0 auto',marginTop:2}}/>
               <span>
               {lang==='ru'
@@ -283,9 +282,9 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
             <button onClick={onMic} disabled={micBusy}
               style={{width:72,height:72,borderRadius:'50%',border:'none',
                 cursor:micBusy?'default':'pointer',
-                background: phase==='recording' ? C.voice : phase==='scoring' ? C.mercury : C.voiceL,
-                color:phase==='recording'||phase==='scoring'?'#021418':C.voice,fontSize:'1.6rem',
-                boxShadow:`0 8px 24px ${phase==='scoring'?'rgba(36,211,154,.35)':'rgba(106,220,245,.35)'}`,
+                background: phase==='recording'||phase==='scoring' ? C.venus : C.venusL,
+                color:phase==='recording'||phase==='scoring'?C.venusInk:C.venusDeep,fontSize:'1.6rem',
+                boxShadow:'0 8px 24px rgba(150,54,64,.24)',
                 animation: phase==='recording' ? 'pulse 1.2s ease-in-out infinite' : 'none',
                 transition:'background 0.2s'}}>
               {phase==='recording'
@@ -293,7 +292,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
                 : <MilaIcon name={phase==='scoring'?'sparkle':'voice'} size={27}/>}
             </button>
             <div style={{fontSize:'0.82rem',fontWeight:600,color:
-              phase==='recording' ? C.voice : phase==='scoring' ? C.mercury : C.warm,
+              phase==='recording'||phase==='scoring' ? C.venus : C.warm,
               lineHeight:1.5,maxWidth:300}}>
               {phase==='recording'
                 ? (lang==='ru' ? 'Слушаю... Скажи фразу, потом нажми остановить' : 'Listening… say the phrase, then tap stop')
@@ -309,11 +308,11 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
         {hasResult && (
           <div style={{display:'flex',gap:10,width:'100%'}}>
             <button onClick={onMic} disabled={micBusy}
-              style={{flex:1,padding:'14px',borderRadius:16,border:`1.5px solid ${C.voice}`,background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+              style={{flex:1,padding:'14px',borderRadius:16,border:`1.5px solid ${C.venus}`,background:C.venusL,color:C.venusDeep,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
               <MilaIcon name="voice" size={17}/>{lang==='ru' ? 'Ещё раз' : 'Try again'}
             </button>
             <button onClick={next}
-              style={{flex:2,padding:'16px',borderRadius:16,border:'none',background:`linear-gradient(135deg,${C.mercury},${C.mercuryBright})`,color:'#02140f',fontWeight:800,fontSize:'1.05rem',cursor:'pointer',boxShadow:'0 6px 18px rgba(36,211,154,0.3)'}}>
+              style={{flex:2,padding:'16px',borderRadius:16,border:'none',background:C.venus,color:C.venusInk,fontWeight:800,fontSize:'1.05rem',cursor:'pointer',boxShadow:'0 6px 18px rgba(150,54,64,0.24)'}}>
               {pos >= phrases.length - 1 ? (lang==='ru' ? 'Завершить урок' : 'Complete lesson') : (lang==='ru' ? 'Продолжить →' : 'Continue →')}
             </button>
           </div>
