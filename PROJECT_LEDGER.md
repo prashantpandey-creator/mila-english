@@ -39,27 +39,42 @@ No local screenshot counts. No "LIVE" claim without both.**
 
 ## Deploy (the only path to "live")
 
-**⚠️ PIPELINE RED as of 2026-07-18 ~01:41 UTC — every deploy currently FAILS at
-Ollama model warm-up, and this needs an owner/SSH decision, not more reruns.**
-Four consecutive runs (`29625359609`, `29625405695` + 2 reruns) died at
-`Ollama chat warm-up status 500` / `Ollama voice warm-up status 500`. Pattern:
-whichever resident model loads second evicts/fails the other — run 3 warmed the
-20b chat model then the 4b voice model 500'd; run 4 (90s later) had chat 500
-again. The box can no longer reliably hold BOTH `keep_alive:-1` models through
-warm-up (likely RAM ceiling; disk-full not ruled out — can't tell from outside).
-**The site itself stays UP through these failures** — the app container swaps
-and serves before the script dies in the warm-up tail (verified: `/` 200,
-`/assessment` 200, new `f12024a`/`c728a1d` behavior live). Consequence: a red
-run no longer means your code isn't live, and a green run is impossible until
-the capacity question is settled (drop `keep_alive:-1`, smaller model, more
-RAM/swap, or stop hard-failing on warm-up). Check where the run died before
-diagnosing your own change.
+**Pipeline GREEN again (2026-07-18): the 01:19–02:00 UTC red streak is
+diagnosed and fixed. Read this before touching LLM memory settings.**
+Six straight deploys died at `Ollama … warm-up status 500` while the site
+served fine. Root cause — proven with the new read-only `diagnose.yml`
+workflow (runs `29625992299`, `29626140024`) — was NOT host RAM (31GiB total,
+23.6GiB available, no swap, disk 39%): an out-of-band `docker update`, never
+committed to git, had capped `mila-llm` at 6GiB/3cpu and `mila-voice-llm` at
+3GiB/2cpu — most plausibly an emergency brake applied right after the 01:19
+green run's HTTPS freeze window. gpt-oss:20b needs ~14GiB anon (Ollama 0.32
+loads with mmap off), so every load was a guaranteed cgroup OOM kill
+(`dmesg: CONSTRAINT_MEMCG … Killed process (llama-server) anon-rss ~6.2GiB`).
+That means prod local chat was hard-down under those caps, not merely deploys
+red. Compose never healed it because `docker update` is invisible to compose's
+config hash — five `up -d` runs left the strangled containers untouched.
+Fix shipped 2026-07-18: `docker-compose.prod.yml` now declares ALL LLM limits
+(chat 16g, voice 6g, memswap pinned) and the next deploy recreates both
+containers back to git truth; the workflow's warm-up + residency checks are
+retried and then become `::warning::` lines instead of hard failures (the
+same pattern the speech services already used), and every deploy now warns
+when live container limits drift from compose. **Green now means "the app is
+serving" — model-residency truth lives in the run-log tail; read it whenever
+local chat/voice latency matters.** If the LLMs ever need strangling again,
+edit the two `mem_limit` lines in `docker-compose.prod.yml` — in git — and
+deploys stay green while saying so.
 
 Push to `main` → `.github/workflows/deploy.yml` SSHes to Mumbai
 (`209.182.233.163`), `git reset --hard origin/main`, rebuilds compose. ~2–4 min.
 **The workflow starts containers BY EXPLICIT NAME** — adding a service to
 `docker-compose.prod.yml` is not enough; add it to the `up`/health lists in the
 workflow too, same commit.
+
+**Box vitals without SSH:** `.github/workflows/diagnose.yml`
+(workflow_dispatch) reads memory/disk/docker stats/`ollama ps`/OOM
+kills/compose-drift over the deploy key, strictly read-only. `gh workflow run
+diagnose.yml --ref main`, then read the run log. Local Macs have no key to the
+Mumbai box — this is the sanctioned door.
 
 ## Gotchas that have burned real time
 - **SWR stale doc:** `/` is statically prerendered, served

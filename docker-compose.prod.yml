@@ -78,9 +78,15 @@ services:
     restart: unless-stopped
     # GPT-OSS is capped at half of the 8-vCPU host so model warm-up and Chat
     # cannot starve the web origin or Darshan. The memory ceiling protects ASR.
+    # 2026-07-18: the 20b needs ~14GiB anon (Ollama 0.32 loads with mmap off).
+    # An out-of-band `docker update` to 6GiB made every load a cgroup OOM kill
+    # and turned six deploys red. These limits are the only sanctioned ones —
+    # if the box must be strangled, change them HERE in git; the deploy
+    # workflow warns when live containers drift from this file.
     cpus: 4.0
     cpu_shares: 256
     mem_limit: 16g
+    memswap_limit: 16g
     environment:
       - OLLAMA_HOST=0.0.0.0:11434
       - OLLAMA_CONTEXT_LENGTH=${OLLAMA_CONTEXT_LENGTH:-4096}
@@ -107,6 +113,12 @@ services:
     container_name: mila-voice-llm
     restart: unless-stopped
     cpu_shares: 1024
+    # qwen3:4b q4_K_M is ~2.5GiB loaded; 6g leaves KV-cache and runner headroom
+    # while guaranteeing the voice runtime can never squeeze the shared box.
+    # (It ran uncapped until 2026-07-18; an unrecorded 3GiB `docker update`
+    # then made loads a coin flip. Explicit is the only honest setting.)
+    mem_limit: 6g
+    memswap_limit: 6g
     environment:
       - OLLAMA_HOST=0.0.0.0:11434
       - OLLAMA_CONTEXT_LENGTH=4096
