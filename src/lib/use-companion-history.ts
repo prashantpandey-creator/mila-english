@@ -33,9 +33,11 @@ function normaliseMessages(payload: CompanionHistoryResponse): Message[] {
 
 export function useCompanionHistory({
   limit,
+  scope = 'conversation',
   setMessages,
 }: {
   limit: number
+  scope?: 'all' | 'conversation' | 'practice'
   setMessages: SetMessages
 }) {
   const setMessagesRef = useRef(setMessages)
@@ -53,7 +55,7 @@ export function useCompanionHistory({
     setHistoryError('')
 
     try {
-      const response = await fetch(`/api/chat/history?limit=${limit}`, {
+      const response = await fetch(`/api/chat/history?limit=${limit}&scope=${scope}`, {
         cache: 'no-store',
         credentials: 'same-origin',
       })
@@ -73,7 +75,7 @@ export function useCompanionHistory({
     } finally {
       if (requestId === requestIdRef.current) setIsHydrating(false)
     }
-  }, [limit])
+  }, [limit, scope])
 
   useEffect(() => {
     void refreshHistory()

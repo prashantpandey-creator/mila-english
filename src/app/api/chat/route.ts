@@ -10,6 +10,7 @@ import {
   isSensitiveMemory,
   ollamaHasModel,
   parseMemoryCommand,
+  requestsFreeConversation,
   sanitizeVoiceReply,
   voiceEvidenceFallbackLine,
   voiceReplyHasUnsupportedEvidence,
@@ -271,7 +272,7 @@ export async function POST(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
       take: 3,
     }),
-    listCompanionMessages(userId, spoken ? 4 : 18),
+    listCompanionMessages(userId, spoken ? 4 : 18, surfaceKind === 'practice' ? 'practice' : 'conversation', pathname),
     listCompanionMemories(userId),
   ]);
 
@@ -281,7 +282,6 @@ export async function POST(request: NextRequest) {
   const recentSummary = recentProgress.length
     ? recentProgress.map((item) => `${safeContextValue(item.Lesson.title, 'Lesson')} (${item.completed ? 'complete' : 'in progress'}, score ${item.score ?? 'not scored'})`).join('; ')
     : 'No recorded lesson progress yet.';
-  const persona = personaBlock(isPersonaId(profile?.tonePreference) ? profile.tonePreference : 'friend', learnerProfile);
   const lessonId = pathname.match(/^\/lessons\/([a-z0-9-]+)$/i)?.[1];
   const currentLesson = lessonId ? getBuiltinLesson(lessonId) : null;
   const learningContext = currentLesson
@@ -294,7 +294,13 @@ export async function POST(request: NextRequest) {
   // else in English. An explicit client value (a future toggle) always wins.
   const levelTag = (profile?.level || '').trim().toUpperCase();
   const beginner = levelTag === '' || levelTag === 'PENDING' || levelTag === 'A1';
-  const inLesson = surfaceKind === 'practice' || Boolean(currentLesson);
+  const freeConversationRequested = requestsFreeConversation(latestUserMessage);
+  const inLesson = (surfaceKind === 'practice' || Boolean(currentLesson)) && !freeConversationRequested;
+  const persona = personaBlock(
+    isPersonaId(profile?.tonePreference) ? profile.tonePreference : 'friend',
+    learnerProfile,
+    inLesson ? 'lesson' : 'conversation',
+  );
   const requestedLanguageMode = payload?.context?.languageMode;
   const languageMode: LanguageMode =
     requestedLanguageMode === 'english-first' || requestedLanguageMode === 'mirror' || requestedLanguageMode === 'native-first'
@@ -314,6 +320,7 @@ export async function POST(request: NextRequest) {
       .filter(Boolean),
     learningContext,
     languageMode,
+    freeConversationRequested,
   });
 
   const voiceExternalFirst = spoken && /^(?:1|true|yes)$/i.test(process.env.VOICE_EXTERNAL_FIRST || '');

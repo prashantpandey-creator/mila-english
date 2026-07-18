@@ -58,7 +58,8 @@ export default function DashboardPage() {
 
   if (!mounted) return null;
 
-  const firstName = user?.name?.trim().split(/\s+/)[0];
+  const firstNameCandidate = user?.name?.trim().split(/\s+/)[0];
+  const firstName = firstNameCandidate && !/^(?:guest|гость)$/iu.test(firstNameCandidate) ? firstNameCandidate : '';
   const practiceRoutes: Array<{
     icon: MilaIconName;
     labelEn: string;

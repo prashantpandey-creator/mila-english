@@ -63,3 +63,7 @@ backgrounds behind the workspace.
   action, and lessons sit in a quieter supporting rail. `conversation-stage`
   and `chat-page__empty-presence` are the reference compositions for carrying
   that hierarchy from the dashboard into the actual conversation surface.
+- The hierarchy is behavioral too: ordinary chat and the voice room are real
+  conversation by default. Drills belong to focused practice; a learner asking
+  to "just talk", stop correcting, or change topic overrides earlier lesson
+  context immediately.

@@ -6,6 +6,7 @@ import {
   isSensitiveMemory,
   ollamaHasModel,
   parseMemoryCommand,
+  requestsFreeConversation,
   sanitizeVoiceReply,
 } from './companion';
 
@@ -62,6 +63,10 @@ assert.deepStrictEqual(
 assert.deepStrictEqual(parseMemoryCommand('What do you remember about me?'), { kind: 'list' });
 assert.deepStrictEqual(parseMemoryCommand('Забудь всё, что ты обо мне помнишь.'), { kind: 'forget-all' });
 assert.strictEqual(parseMemoryCommand('Can you explain this grammar rule?'), null);
+assert.strictEqual(requestsFreeConversation("Let's just talk, I don't want to repeat lessons."), true);
+assert.strictEqual(requestsFreeConversation('Can we stop trying to make everything perfect?'), true);
+assert.strictEqual(requestsFreeConversation('Давай просто поговорим без упражнений.'), true);
+assert.strictEqual(requestsFreeConversation('Can we practise ordering coffee?'), false);
 
 assert.strictEqual(isSensitiveMemory('my password is hunter2'), true);
 assert.strictEqual(isSensitiveMemory('мой пин код 1234'), true);
@@ -180,6 +185,23 @@ assert.match(mirrorPrompt, /LANGUAGE:/);
 assert.match(mirrorPrompt, /reply in that same language/i);
 assert.match(mirrorPrompt, /roleplay a scene in any language/i);
 assert.match(mirrorPrompt, /flip roles/i);
+assert.match(mirrorPrompt, /defaults to genuine conversation/i);
+assert.match(mirrorPrompt, /do not start exercises/i);
+
+const justTalkPrompt = buildCompanionSystemPrompt({
+  persona: 'You are Mila as the Friend.',
+  pathname: '/chat',
+  locale: 'en',
+  surface: 'full tutor chat',
+  learnerSummary: 'Learner: Mary; level: B1.',
+  recentSummary: 'No recorded lesson progress yet.',
+  memories: [],
+  languageMode: 'mirror',
+  freeConversationRequested: true,
+});
+assert.match(justTalkPrompt, /CURRENT TURN OVERRIDE/);
+assert.match(justTalkPrompt, /overrides all earlier teaching context/i);
+assert.match(justTalkPrompt, /Do not correct, drill, ask for repetition/i);
 
 const nativePrompt = buildCompanionSystemPrompt({
   persona: 'You are Mila as the Friend.',
