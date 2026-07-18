@@ -1,7 +1,6 @@
-// Mila opens as a warm, calm room. Device-dark remains available through Auto,
-// but new visitors are not dropped into a heavy black product by default.
-// The focus studio is always dark and ignores this entirely — reading and
-// practice surfaces never sit on a bright field.
+// Legacy preference helpers retained for stored-setting compatibility. Route
+// surfaces no longer consume them: Mila's warm-light product room and neutral
+// dark voice studio are selected deterministically by RouteSurface.
 export type ThemePreference = 'system' | 'light' | 'dark';
 export type ResolvedTheme = 'light' | 'dark';
 

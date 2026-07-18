@@ -31,17 +31,22 @@ Push `main` → `.github/workflows/deploy.yml` (SSH to Mumbai, reset --hard,
 compose build). **Containers start BY NAME in the workflow** — a new compose
 service must also be added to the workflow's up/health lists in the same commit.
 
-## Design system (current — Direction A, chosen in Figma 2026-07-17)
-- **Type:** Yeseva One (display, `--lp-font-serif`) + Caveat (handwritten accents,
-  `--lp-font-accent`), loaded app-wide in `src/app/layout.tsx`. Both full Cyrillic.
-- **Palette (welcome/light rooms):** rose `#cf4f7d` / `#b83866`, blush paper
-  `#fff0f7`, espresso ink. Per-door accents via `--door-accent/soft/line`.
+## Design system (current — one Mila language, owner correction 2026-07-18)
+- **Type:** Yeseva One for brand/display, Manrope for interface/body, IBM Plex
+  Mono only for measured language such as IPA and levels. All support Cyrillic.
+- **Palette:** warm paper `#f8f4ee`, ivory panel `#fffaf5`, espresso ink
+  `#241d19`, muted ink `#746861`, hairline `#d9cec2`, and one rose family:
+  `#c94f5b` for marks, contrast-safe `#963640` for light-surface actions, and
+  `#e46a73` on dark canvases. No category or state gets another hue.
+- **Dark context:** the liked pricing band and immersive voice canvases may use
+  neutral near-black, but their only chromatic signal is the same rose family.
 - **Footage:** `src/lib/visualScenes.ts`. Front-door pool = night-city clips.
   **Never put reading-faces / café-people clips on the front door** (owner
   rejected — wrong signal for the Russia market). Frame-check every clip by eye
   (ffmpeg still) before using it.
-- **Two rooms:** `src/lib/routeSurface.ts` splits routes into `welcome` (light)
-  and `focus` (dark). Check both when styling.
+- **One identity:** `src/lib/routeSurface.ts` keeps marketing and ordinary learning pages on
+  warm paper. Only full-screen voice routes use the neutral dark canvas. Never
+  use device preference or a route-specific accent to recolour the product.
 
 ## Where things live
 - Front door: `src/app/page.tsx` + `src/app/landing.css` (`.lp-*` namespace).

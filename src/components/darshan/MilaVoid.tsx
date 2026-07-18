@@ -6,7 +6,7 @@ import type { BinduState } from "./MilaBindu";
 // ─── Reactive living void ───────────────────────────────────────────────
 //
 // A full-field WebGL2 background for the Studio voice room: graphite, warm
-// paper, and Mila's single signal red over near-black.
+// ivory, and Mila's single rose signal over near-black.
 
 const VS_SRC = /*glsl*/ `#version 300 es
 in vec2 a_pos;
@@ -39,26 +39,26 @@ void main(){
   float aur = aNear * 0.72 + aFar * 0.55;
   
   // Studio palette: graphite, warm neutral, and one live signal.
-  vec3 purple = vec3(0.22, 0.24, 0.28);
-  vec3 indigo = vec3(0.10, 0.11, 0.13);
-  vec3 pink = vec3(0.38, 0.25, 0.18);
-  vec3 activePink = vec3(0.95, 0.23, 0.18);
+  vec3 graphite = vec3(0.18, 0.19, 0.22);
+  vec3 shadow = vec3(0.10, 0.11, 0.13);
+  vec3 roseTint = vec3(0.30, 0.18, 0.20);
+  vec3 signal = vec3(0.894, 0.416, 0.451);
 
-  vec3 hue = mix(indigo, purple, 0.5 + 0.5 * sin(u_t * 0.05 + c.x * 1.5));
-  hue = mix(hue, pink, 0.38 * (0.5 + 0.5 * sin(u_t * 0.04 + c.y * 1.2)));
-  hue = mix(hue, activePink, u_warm * 0.6);
+  vec3 hue = mix(shadow, graphite, 0.5 + 0.5 * sin(u_t * 0.05 + c.x * 1.5));
+  hue = mix(hue, roseTint, 0.38 * (0.5 + 0.5 * sin(u_t * 0.04 + c.y * 1.2)));
+  hue = mix(hue, signal, u_warm * 0.6);
   
   float field = aur * (0.035 + 0.09 * u_lv);
   vec3 col = base + hue * field;
   
   float halo = exp(-r * (2.8 - 1.1 * u_lv)) * (0.04 + 0.16 * u_lv);
-  col += vec3(0.35, 0.16, 0.12) * halo;
+  col += vec3(0.36, 0.17, 0.20) * halo;
   
   float rays = (0.5 + 0.5 * sin(ang * 14.0 + u_t * 0.12)) * (0.5 + 0.5 * sin(ang * 5.0 - u_t * 0.07)) * exp(-r * 1.7) * u_warm * 0.16;
-  col += vec3(0.95, 0.23, 0.18) * rays;
+  col += signal * rays;
   
   float shim = (0.5 + 0.5 * sin(r * 24.0 - u_t * 0.35)) * smoothstep(0.25, 0.85, r) * 0.022 * (0.4 + 0.6 * u_lv);
-  col += mix(vec3(0.22, 0.24, 0.28), vec3(0.55, 0.32, 0.24), u_warm) * shim;
+  col += mix(graphite, roseTint, u_warm) * shim;
   
   vec2 mg = uv * u_res * 0.6; mg.y += u_t * 6.0; float sd = h2(floor(mg));
   float tw = step(0.9986, sd) * (0.5 + 0.5 * sin(u_t * 1.6 + sd * 80.0));

@@ -74,11 +74,11 @@ void main() {
   float t = u_t, lv = u_lv;
 
   // The same Studio palette used by every focused learning surface.
-  vec3 cWhite  = vec3(0.925, 0.918, 0.894);
-  vec3 cPink   = vec3(0.95, 0.23, 0.18);
-  vec3 cPurple = vec3(0.55, 0.42, 0.32);
-  vec3 cBlue   = vec3(0.35, 0.38, 0.42);
-  vec3 cViolet = vec3(0.75, 0.72, 0.66);
+  vec3 cIvory    = vec3(0.973, 0.957, 0.933);
+  vec3 cSignal   = vec3(0.894, 0.416, 0.451);
+  vec3 cGraphite = vec3(0.18, 0.19, 0.22);
+  vec3 cShadow   = vec3(0.07, 0.075, 0.09);
+  vec3 cPearl    = vec3(0.72, 0.69, 0.67);
 
   float n1 = fbm(vec3(st * 2.6, t * 0.16));
   float n2 = fbm(vec3(st * 3.0 + n1 * 0.5, t * 0.12 + 4.0));
@@ -122,29 +122,29 @@ void main() {
   float sturb = fbm(vec3(st * 3.0, t * 0.14));
   float arms = pow(0.5 + 0.5 * sin(spiralPhase), 6.0);
   float spiral = arms * smoothstep(0.30, 0.0, rr) * (0.7 + 0.5 * lv) * (0.7 + 0.4 * flicker) * (0.7 + 0.5 * sturb);
-  vec3 spiralHue = mix(cViolet, cPink, 0.5 + 0.5 * sin(spiralPhase * 0.5 + t * 0.3));
-  spiralHue = mix(spiralHue, cBlue, 0.28 * sturb);
+  vec3 spiralHue = mix(cPearl, cSignal, 0.5 + 0.5 * sin(spiralPhase * 0.5 + t * 0.3));
+  spiralHue = mix(spiralHue, cShadow, 0.28 * sturb);
 
   float gwave = sin(wd * 16.0 - t * (1.0 + 0.4 * wspeed));
   float gwenv = exp(-wd * 1.15) * smoothstep(0.05, 0.20, wd);
   float gcrest = max(gwave, 0.0) * gwenv * (0.7 + 0.5 * lv);
 
   float hueT = 0.5 + 0.5 * sin(t * 0.18 + n2 * 2.5);
-  vec3 surroundHue = mix(cPurple, vec3(0.05, 0.1, 0.3), hueT);
-  surroundHue = mix(surroundHue, cPink, 0.32 * (0.5 + 0.5 * sin(t * 0.11 + n1 * 2.0)));
+  vec3 surroundHue = mix(cGraphite, cShadow, hueT);
+  surroundHue = mix(surroundHue, cSignal, 0.32 * (0.5 + 0.5 * sin(t * 0.11 + n1 * 2.0)));
   float fineTex = fbm(vec3(st * 4.2 + 7.0, t * 0.10));
   float surroundField = smoothstep(1.18, 0.16, wd) * (0.08 + 0.12 * fineTex);
 
   vec3 col = surroundHue * surroundField * (0.7 + 0.5 * tide)
-    + core * cWhite
-    + corona * mix(cWhite, cPink, 0.5)
-    + inner * mix(cPink, cPurple, 0.35 + n1 * 0.2)
-    + outer * mix(cPurple, mix(cBlue, cViolet, 0.22), 0.30 + n2 * 0.25)
-    + bloom * mix(cBlue, cViolet, 0.62)
-    + aura * cViolet
-    + rings * mix(cPink, cViolet, 0.34)
+    + core * cIvory
+    + corona * mix(cIvory, cSignal, 0.5)
+    + inner * mix(cSignal, cGraphite, 0.35 + n1 * 0.2)
+    + outer * mix(cGraphite, mix(cShadow, cPearl, 0.22), 0.30 + n2 * 0.25)
+    + bloom * mix(cShadow, cPearl, 0.62)
+    + aura * cPearl
+    + rings * mix(cSignal, cPearl, 0.34)
     + spiral * spiralHue
-    + gcrest * mix(cViolet, cPink, 0.45) * 0.24;
+    + gcrest * mix(cPearl, cSignal, 0.45) * 0.24;
 
   col = clamp(col, 0.0, 1.0);
   float a = clamp(surroundField * 0.7 + core + corona * 0.8 + inner + outer * 0.7 + bloom + aura * 0.9 + rings + spiral + gcrest * 0.24, 0.0, 1.0);
@@ -182,14 +182,14 @@ void main() {
   glow *= ring;
   
   float h = fract(v_seed * 0.61);
-  vec3 pink = vec3(0.95, 0.23, 0.18);
-  vec3 purple = vec3(0.55, 0.42, 0.32);
-  vec3 blue = vec3(0.35, 0.38, 0.42);
-  vec3 white = vec3(0.925, 0.918, 0.894);
+  vec3 signal = vec3(0.894, 0.416, 0.451);
+  vec3 graphite = vec3(0.18, 0.19, 0.22);
+  vec3 shadow = vec3(0.07, 0.075, 0.09);
+  vec3 ivory = vec3(0.973, 0.957, 0.933);
   
-  vec3 col = mix(purple, blue, smoothstep(0.0, 0.34, h));
-  col = mix(col, pink, smoothstep(0.34, 0.68, h));
-  col = mix(col, white, smoothstep(0.68, 1.0, h));
+  vec3 col = mix(graphite, shadow, smoothstep(0.0, 0.34, h));
+  col = mix(col, signal, smoothstep(0.34, 0.68, h));
+  col = mix(col, ivory, smoothstep(0.68, 1.0, h));
   
   float a = glow * v_sw * 0.9;
   o = vec4(col * a, a);
@@ -464,14 +464,14 @@ export function MilaOrb({
       <svg viewBox="0 0 320 320" width={size} height={size} className={className} role="img" aria-label={ariaLabel} style={{ display: "block", overflow: "visible" }}>
         <defs>
           <radialGradient id={halo}>
-            <stop offset="0%" stopColor="#ff5a4d" stopOpacity="0.35" />
-            <stop offset="55%" stopColor="#8b909b" stopOpacity="0.1" />
-            <stop offset="100%" stopColor="#8b909b" stopOpacity="0" />
+            <stop offset="0%" stopColor="#e46a73" stopOpacity="0.35" />
+            <stop offset="55%" stopColor="#7f7b79" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="#7f7b79" stopOpacity="0" />
           </radialGradient>
           <radialGradient id={core}>
             <stop offset="0%" stopColor="#000000" />
             <stop offset="40%" stopColor="#eceae4" />
-            <stop offset="100%" stopColor="#ff5a4d" stopOpacity="0" />
+            <stop offset="100%" stopColor="#e46a73" stopOpacity="0" />
           </radialGradient>
         </defs>
         <style>{`
@@ -482,9 +482,9 @@ export function MilaOrb({
         `}</style>
         <g className={`orb-breathe-${id}`}>
           <circle cx="160" cy="160" r="150" fill={`url(#${halo})`} />
-          <circle cx="160" cy="160" r="118" fill="none" stroke="#ff5a4d" strokeWidth={1.4} opacity="0.5" />
-          <circle cx="160" cy="160" r="90" fill="none" stroke="#c5a47a" strokeWidth={1} opacity="0.4" />
-          <circle cx="160" cy="160" r="58" fill="none" stroke="#8b909b" strokeWidth={0.8} opacity="0.32" />
+          <circle cx="160" cy="160" r="118" fill="none" stroke="#e46a73" strokeWidth={1.4} opacity="0.5" />
+          <circle cx="160" cy="160" r="90" fill="none" stroke="#b9b0aa" strokeWidth={1} opacity="0.4" />
+          <circle cx="160" cy="160" r="58" fill="none" stroke="#7f7b79" strokeWidth={0.8} opacity="0.32" />
           <circle cx="160" cy="160" r="46" fill={`url(#${core})`} opacity="0.7" />
           <circle cx="160" cy="160" r="13" fill="#000000" />
         </g>

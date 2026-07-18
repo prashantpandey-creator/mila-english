@@ -12,10 +12,11 @@ assert.equal(resolveTheme(false, 'dark'), 'dark');
 assert.equal(resolveTheme(true, 'system'), 'dark');
 assert.equal(resolveTheme(false, 'system'), 'light');
 
-// No window (SSR/node) → system; system + light device = light, the same
-// default a no-JS or script-blocked visitor gets from the CSS :not() gate.
-assert.equal(getThemePreference(), 'system');
+// No window (SSR/node) → Mila's canonical warm-light room. This keeps the
+// first paint deterministic instead of allowing device settings to introduce
+// a competing palette before the route surface mounts.
+assert.equal(getThemePreference(), 'light');
 assert.equal(resolveTheme(false), 'light');
-assert.equal(resolveTheme(true), 'dark');
+assert.equal(resolveTheme(true), 'light');
 
 console.log('themePreference: all assertions passed');

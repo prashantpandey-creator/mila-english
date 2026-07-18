@@ -15,7 +15,7 @@ export default function StudyStreakCalendar({ lang }: { lang: 'ru'|'en' }) {
       </div>
       <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:5}}>
         {STUDIED.map((d,i)=>(
-          <div key={i} style={{aspectRatio:'1',borderRadius:5,background:d?C.jupiter:'rgba(255,255,255,0.08)',boxShadow:d?'0 0 10px rgba(242,199,92,.1)':'none'}}/>
+          <div key={i} style={{aspectRatio:'1',borderRadius:5,background:d?C.venus:'var(--surface-track, rgba(36,29,25,0.08))'}}/>
         ))}
       </div>
     </Card>

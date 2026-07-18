@@ -308,8 +308,8 @@ function PracticeRoom() {
             max(0.75rem, env(safe-area-inset-right, 0px))
             max(0.75rem, env(safe-area-inset-bottom, 0px))
             max(0.75rem, env(safe-area-inset-left, 0px));
-          color: var(--surface-text, #f7f8f5);
-          background: var(--surface-page, #020604);
+          color: var(--surface-text, #f8f4ee);
+          background: var(--surface-page, #0c0d11);
         }
 
         .practice-room__veil {
@@ -318,8 +318,8 @@ function PracticeRoom() {
           z-index: -1;
           pointer-events: none;
           background:
-            radial-gradient(circle at 50% 48%, rgba(242, 139, 173, 0.08), transparent 38%),
-            linear-gradient(180deg, rgba(2, 6, 4, 0.18), rgba(2, 6, 4, 0.68));
+            radial-gradient(circle at 50% 48%, rgba(228, 106, 115, 0.1), transparent 38%),
+            linear-gradient(180deg, rgba(12, 13, 17, 0.18), rgba(12, 13, 17, 0.72));
         }
 
         .practice-header {
@@ -347,24 +347,24 @@ function PracticeRoom() {
         }
 
         .practice-header__eyebrow {
-          color: var(--surface-text, #f7f8f5);
+          color: var(--surface-text, #f8f4ee);
           font-size: 0.72rem;
           font-weight: 700;
           letter-spacing: 0.16em;
           line-height: 1.35;
           text-transform: uppercase;
-          text-shadow: 0 1px 16px #020604;
+          text-shadow: 0 1px 16px #0c0d11;
         }
 
         .practice-header__title {
           margin-top: 0.3rem;
           overflow: hidden;
-          color: var(--surface-muted, #bdb1b8);
+          color: var(--surface-muted, #b9b0aa);
           font-size: clamp(0.84rem, 2.8vw, 1rem);
           font-weight: 500;
           line-height: 1.35;
           text-overflow: ellipsis;
-          text-shadow: 0 1px 16px #020604;
+          text-shadow: 0 1px 16px #0c0d11;
           white-space: nowrap;
         }
 
@@ -377,20 +377,20 @@ function PracticeRoom() {
           padding: 0;
           border: 1px solid rgba(255, 255, 255, 0.24);
           border-radius: 999px;
-          color: var(--surface-text, #f7f8f5);
-          background: var(--surface-card, #07100c);
+          color: var(--surface-text, #f8f4ee);
+          background: var(--surface-card, #14161b);
           cursor: pointer;
           transition: border-color 160ms ease, background 160ms ease;
         }
 
         .practice-header__exit:hover {
           border-color: rgba(255, 255, 255, 0.52);
-          background: var(--surface-raised, #0c1812);
+          background: var(--surface-raised, #1b1d23);
         }
 
         .practice-header__exit:focus-visible,
         .practice-orb__button:focus-visible {
-          outline: 3px solid var(--voice, #6adcf5);
+          outline: 3px solid var(--mila-action, #e46a73);
           outline-offset: 4px;
         }
 
@@ -425,16 +425,16 @@ function PracticeRoom() {
           margin-inline: auto;
           padding: 0.8rem clamp(1rem, 4vw, 1.4rem);
           box-sizing: border-box;
-          border: 1px solid var(--surface-line, rgba(154,242,211,.14));
+          border: 1px solid var(--surface-line, rgba(248,244,238,.14));
           border-radius: 1rem;
-          color: var(--surface-text, #f7f8f5);
-          background: var(--surface-card, #07100c);
+          color: var(--surface-text, #f8f4ee);
+          background: var(--surface-card, #14161b);
           box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
           text-align: center;
         }
 
         .practice-live__caption {
-          color: var(--surface-text, #f7f8f5);
+          color: var(--surface-text, #f8f4ee);
           font-size: clamp(0.9rem, 3vw, 1rem);
           font-weight: 500;
           line-height: 1.48;
@@ -442,7 +442,7 @@ function PracticeRoom() {
         }
 
         .practice-live__status {
-          color: var(--surface-muted, #bdb1b8);
+          color: var(--surface-muted, #b9b0aa);
           font-size: 0.72rem;
           font-weight: 700;
           letter-spacing: 0.1em;
@@ -454,27 +454,27 @@ function PracticeRoom() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          color: var(--voice-bright, #b7f2ff);
+          color: var(--mila-action, #e46a73);
         }
 
         .practice-live__status--listening i {
           width: 0.45rem;
           height: 0.45rem;
           border-radius: 50%;
-          background: var(--voice, #6adcf5);
-          box-shadow: 0 0 0 0.28rem rgba(106,220,245,.12);
+          background: var(--mila-action, #e46a73);
+          box-shadow: 0 0 0 0.28rem rgba(228,106,115,.14);
         }
 
         .practice-live__status--thinking {
-          color: var(--mercury-bright, #9af2d3);
+          color: var(--mila-action, #e46a73);
         }
 
         .practice-live__status--speaking {
-          color: var(--mercury-bright, #9af2d3);
+          color: var(--mila-action, #e46a73);
         }
 
         .practice-live__error {
-          color: var(--danger, #ff6b6b);
+          color: var(--mila-action, #e46a73);
           font-size: 0.8rem;
           font-weight: 600;
           line-height: 1.4;
@@ -482,7 +482,7 @@ function PracticeRoom() {
 
         :global(.practice-room__void) {
           z-index: -2;
-          background: var(--surface-page, #020604);
+          background: var(--surface-page, #0c0d11);
         }
 
         :global(.practice-orb__visual) {

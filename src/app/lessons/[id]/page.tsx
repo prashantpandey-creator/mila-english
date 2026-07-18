@@ -75,17 +75,17 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
 
   if (stage === 'read') return (
     <>
-      <div style={{display:'inline-flex',alignItems:'center',gap:6,background:C.jupiterL,color:C.jupiter,fontWeight:700,fontSize:'0.75rem',padding:'4px 12px',borderRadius:20,marginBottom:12}}><MilaIcon name="sparkle" size={14}/>{lang==='ru'?'Урок от ИИ':'AI-generated'}</div>
+      <div style={{display:'inline-flex',alignItems:'center',gap:6,background:C.venusL,color:C.venusDeep,fontWeight:700,fontSize:'0.75rem',padding:'4px 12px',borderRadius:20,marginBottom:12}}><MilaIcon name="sparkle" size={14}/>{lang==='ru'?'Урок от ИИ':'AI-generated'}</div>
       <h1 style={{fontSize:'1.5rem',fontWeight:800,color:C.dark,margin:'0 0 12px'}}>{lesson.title}</h1>
       <div className="focus-card" style={{padding:'20px 24px',color:C.dark,lineHeight:1.7,marginBottom:16,whiteSpace:'pre-wrap'}}>
         {lesson.content}
       </div>
       <button onClick={()=>onSpeak(lesson.content)}
-        style={{width:'100%',padding:'12px',borderRadius:12,border:'none',background:C.voiceL,color:C.voice,fontWeight:700,cursor:'pointer',marginBottom:10,display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
+        style={{width:'100%',padding:'12px',borderRadius:12,border:`1px solid ${C.venus}`,background:C.venusL,color:C.venusDeep,fontWeight:700,cursor:'pointer',marginBottom:10,display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
         <MilaIcon name="volume" size={17}/>{lang==='ru'?'Прослушать урок':'Hear it read aloud'}
       </button>
       <button onClick={()=>exercises.length ? setStage('quiz') : setStage('done')}
-        style={{width:'100%',padding:'15px',borderRadius:14,border:'none',background:C.mercury,color:C.white,fontWeight:800,fontSize:'1rem',cursor:'pointer'}}>
+        style={{width:'100%',padding:'15px',borderRadius:14,border:'none',background:C.venus,color:C.venusInk,fontWeight:800,fontSize:'1rem',cursor:'pointer'}}>
         {exercises.length ? (lang==='ru'?`Проверить себя (${exercises.length}) →`:`Test yourself (${exercises.length}) →`) : (lang==='ru'?'Завершить':'Finish')}
       </button>
     </>
@@ -96,8 +96,8 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
     return (
       <>
         <div style={{display:'flex',justifyContent:'space-between',marginBottom:14}}>
-          <span style={{fontSize:'0.75rem',fontWeight:700,color:C.jupiter,textTransform:'uppercase',letterSpacing:1}}>{lang==='ru'?'Вопрос':'Question'} {qi+1}/{exercises.length}</span>
-          <span style={{display:'flex',alignItems:'center',gap:5,fontSize:'0.75rem',fontWeight:700,color:C.jupiter}}><MilaIcon name="trophy" size={15}/>{points}</span>
+          <span style={{fontSize:'0.75rem',fontWeight:700,color:C.venus,textTransform:'uppercase',letterSpacing:1}}>{lang==='ru'?'Вопрос':'Question'} {qi+1}/{exercises.length}</span>
+          <span style={{display:'flex',alignItems:'center',gap:5,fontSize:'0.75rem',fontWeight:700,color:C.venus}}><MilaIcon name="trophy" size={15}/>{points}</span>
         </div>
         <div className="focus-card" style={{padding:'18px 20px',marginBottom:14}}>
           <div style={{fontWeight:700,color:C.dark,fontSize:'1.05rem'}}>{ex.question}</div>
@@ -106,8 +106,8 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
           {opts.map((o: string, i: number) => {
             const isPick = picked === o;
             const isRight = verdict && o.trim().toLowerCase() === String(verdict.correctAnswer).trim().toLowerCase();
-            const bg = !verdict ? 'rgba(255,255,255,0.06)' : isRight ? C.mercuryL : isPick ? C.roseL : 'rgba(255,255,255,0.06)';
-            const border = !verdict ? 'rgba(255,255,255,0.14)' : isRight ? C.mercury : isPick ? C.rose : 'rgba(255,255,255,0.14)';
+            const bg = !verdict ? C.card : isRight ? C.venusL : C.card;
+            const border = !verdict ? C.line : isRight ? C.venus : isPick ? C.venusDeep : C.line;
             return (
               <button key={i} onClick={()=>pick(o)} disabled={!!picked}
                 style={{padding:'13px 16px',borderRadius:12,border:`1.5px solid ${border}`,background:bg,
@@ -122,10 +122,10 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
         {verdict && (
           <>
             {!verdict.correct && verdict.hint && (
-              <div style={{marginTop:10,display:'flex',alignItems:'flex-start',gap:7,fontSize:'0.85rem',color:C.rose,background:C.roseL,borderRadius:10,padding:'10px 14px'}}><MilaIcon name="sparkle" size={16} style={{flex:'0 0 auto',marginTop:1}}/><span>{verdict.hint}</span></div>
+              <div style={{marginTop:10,display:'flex',alignItems:'flex-start',gap:7,fontSize:'0.85rem',color:C.venusDeep,background:C.venusL,borderRadius:10,padding:'10px 14px'}}><MilaIcon name="sparkle" size={16} style={{flex:'0 0 auto',marginTop:1}}/><span>{verdict.hint}</span></div>
             )}
             <button onClick={nextQ}
-              style={{width:'100%',marginTop:14,padding:'15px',borderRadius:14,border:'none',background:C.mercury,color:C.white,fontWeight:800,fontSize:'1rem',cursor:'pointer'}}>
+              style={{width:'100%',marginTop:14,padding:'15px',borderRadius:14,border:'none',background:C.venus,color:C.venusInk,fontWeight:800,fontSize:'1rem',cursor:'pointer'}}>
               {qi >= exercises.length-1 ? (lang==='ru'?'Результат →':'See result →') : (lang==='ru'?'Дальше →':'Next →')}
             </button>
           </>
@@ -137,15 +137,15 @@ function AiLessonPlayer({ lesson, lang, onSpeak, onExit }: any) {
   const pct = Math.round(100 * points / maxPoints);
   return (
     <div style={{textAlign:'center',padding:'30px 0'}}>
-      <div style={{width:72,height:72,margin:'0 auto 14px',display:'grid',placeItems:'center',borderRadius:20,color:pct>=80?C.jupiter:pct>=50?C.mercury:C.voice,background:pct>=80?C.jupiterL:pct>=50?C.mercuryL:C.voiceL}}><MilaIcon name={pct >= 80 ? 'trophy' : pct >= 50 ? 'sparkle' : 'target'} size={34}/></div>
+      <div style={{width:72,height:72,margin:'0 auto 14px',display:'grid',placeItems:'center',borderRadius:20,color:C.venus,background:C.venusL}}><MilaIcon name={pct >= 80 ? 'trophy' : pct >= 50 ? 'sparkle' : 'target'} size={34}/></div>
       <h2 style={{fontSize:'1.5rem',fontWeight:800,color:C.dark,margin:'0 0 6px'}}>
         {lang==='ru'?'Урок пройден!':'Lesson complete!'}
       </h2>
-      <p style={{color:exercises.length?C.jupiter:C.warm,marginBottom:20,fontWeight:exercises.length?700:400}}>
+      <p style={{color:exercises.length?C.venus:C.warm,marginBottom:20,fontWeight:exercises.length?700:400}}>
         {exercises.length ? `${lang==='ru'?'Счёт':'Score'}: ${points}/${maxPoints} (${pct}%)` : (lang==='ru'?'Материал изучен':'Material studied')}
       </p>
       <button onClick={onExit}
-        style={{width:'100%',padding:'15px',borderRadius:14,border:'none',background:C.mercury,color:C.white,fontWeight:800,fontSize:'1rem',cursor:'pointer'}}>
+        style={{width:'100%',padding:'15px',borderRadius:14,border:'none',background:C.venus,color:C.venusInk,fontWeight:800,fontSize:'1rem',cursor:'pointer'}}>
         {lang==='ru'?'← К урокам':'← Back to lessons'}
       </button>
     </div>
@@ -194,10 +194,10 @@ export default function LessonPage() {
         <AppMain width="work" className="lesson-player__main">
           {dbError ? (
             <div style={{textAlign:'center',padding:'40px 0'}}>
-              <div style={{width:58,height:58,display:'grid',placeItems:'center',margin:'0 auto 14px',borderRadius:17,color:C.rose,background:C.roseL}}><MilaIcon name="lesson" size={28}/></div>
+              <div style={{width:58,height:58,display:'grid',placeItems:'center',margin:'0 auto 14px',borderRadius:17,color:C.venus,background:C.venusL}}><MilaIcon name="lesson" size={28}/></div>
               <p style={{color:C.warm,marginBottom:16}}>{lang==='ru'?'Урок не нашёлся. Возможно, он ещё генерируется.':'Lesson not found — it may still be generating.'}</p>
               <button onClick={()=>router.push('/lessons')}
-                style={{padding:'12px 24px',borderRadius:12,border:'none',background:C.mercury,color:C.white,fontWeight:700,cursor:'pointer'}}>
+                style={{padding:'12px 24px',borderRadius:12,border:'none',background:C.venus,color:C.venusInk,fontWeight:700,cursor:'pointer'}}>
                 {lang==='ru'?'← К урокам':'← Back to lessons'}
               </button>
             </div>
@@ -224,7 +224,7 @@ export default function LessonPage() {
         {/* Progress bar */}
         <div style={{display:'flex',gap:4,marginBottom:20}}>
           {['words','phrases','practice'].map((s,i)=>(
-            <div key={s} style={{flex:1,height:4,borderRadius:2,background:step===s?C.mercury:i<['words','phrases','practice'].indexOf(step)?C.jupiter:'rgba(255,255,255,0.14)',transition:'all 0.3s'}}/>
+            <div key={s} style={{flex:1,height:4,borderRadius:2,background:step === s || i < ['words','phrases','practice'].indexOf(step) ? C.venus : C.line,opacity:step === s ? 1 : i < ['words','phrases','practice'].indexOf(step) ? 0.62 : 1,transition:'all 0.3s'}}/>
           ))}
         </div>
 
@@ -266,7 +266,7 @@ export default function LessonPage() {
               </button>
             ))}
             <button onClick={()=>setStep('practice')}
-              style={{width:'100%',padding:'14px',borderRadius:14,border:'none',background:C.voice,color:C.white,fontWeight:700,fontSize:'1rem',cursor:'pointer',marginTop:8}}>
+              style={{width:'100%',padding:'14px',borderRadius:14,border:'none',background:C.venus,color:C.venusInk,fontWeight:700,fontSize:'1rem',cursor:'pointer',marginTop:8}}>
               {lang==='ru'?'Готова говорить! →':'Ready to speak! →'}
             </button>
           </div>

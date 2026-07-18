@@ -2,27 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Mila — obsidian, Mercury action, Venus identity, Jupiter expansion ── */
+/* Mila's single brand language: warm neutrals, one rose interaction signal. */
 :root {
-  --noir: #000000; --noir-2: #050505; --noir-3: #0a0a0b;
-  --ivory: #f7f8f5; --stone: #a7ada9;
-  --mercury: #24d39a; --mercury-bright: #9af2d3; --mercury-soft: rgba(36,211,154,.14);
-  --venus: #f28bad; --venus-bright: #ffbdd0; --venus-deep: #5b1932; --venus-ink: #260c16; --venus-soft: rgba(242,139,173,.14);
-  --voice: #6adcf5; --voice-bright: #b7f2ff; --voice-soft: rgba(106,220,245,.14);
-  --jupiter: #f2c75c; --jupiter-bright: #ffe29a; --jupiter-soft: rgba(242,199,92,.14);
-  --gold: var(--jupiter); --gold-soft: var(--jupiter-soft);
-  --danger: #ff6b6b; --danger-soft: rgba(255,107,107,.14);
-  --rose: var(--danger); --rose-soft: var(--danger-soft);
-  --sage: #72e3b7; --sage-soft: rgba(114,227,183,0.14);
-  --glass: rgba(5,11,8,.88); --line: rgba(154,242,211,.14);
+  --noir: #171210; --noir-2: #201917; --noir-3: #2a211e;
+  --ivory: #fffaf5; --stone: #746861;
+  --mila-brand: #963640; --mila-brand-deep: #772a33;
+  --mila-brand-soft: rgba(150,54,64,.1); --mila-brand-line: rgba(150,54,64,.24);
+  --mercury: var(--mila-brand); --mercury-bright: #e46a73; --mercury-soft: var(--mila-brand-soft);
+  --venus: var(--mila-brand); --venus-bright: #e46a73; --venus-deep: var(--mila-brand-deep); --venus-ink: #241d19; --venus-soft: var(--mila-brand-soft);
+  --voice: var(--mila-brand); --voice-bright: #e46a73; --voice-soft: var(--mila-brand-soft);
+  --jupiter: var(--mila-brand); --jupiter-bright: #e46a73; --jupiter-soft: var(--mila-brand-soft);
+  --gold: var(--mila-brand); --gold-soft: var(--mila-brand-soft);
+  --danger: var(--mila-brand-deep); --danger-soft: var(--mila-brand-soft);
+  --rose: var(--mila-brand); --rose-soft: var(--mila-brand-soft);
+  --sage: var(--mila-brand); --sage-soft: var(--mila-brand-soft);
+  --glass: rgba(32,25,23,.94); --line: rgba(255,250,245,.14);
+  --lp-font-serif: var(--font-display);
+  --lp-font-accent: var(--font-sans);
+  --font-serif: var(--font-display);
 }
 
-html { background: var(--noir); }
+html { background: #f8f4ee; }
 
 body {
-  /* MUST stay transparent: the .atmosphere footage is fixed at z-index -2,
-     and any opaque body background paints over it. Noir base lives on html;
-     the gold/rose glows live on the .atmosphere scrim below. */
+  /* MUST stay transparent: the front-door atmosphere owns its neutral dark
+     canvas, while each app route paints its warm-paper or focus surface. */
   background: transparent;
   color: var(--ivory);
   font-family: var(--font-sans, 'Manrope'), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -85,8 +89,8 @@ h1, h2 {
 .atmosphere--motion video.is-on { opacity: .88; }
 .atmosphere--motion::after {
   background:
-    radial-gradient(900px 720px at 82% 18%, rgba(36,211,154,.035), transparent 64%),
-    radial-gradient(700px 560px at 92% 68%, rgba(106,220,245,.025), transparent 68%),
+    radial-gradient(900px 720px at 82% 18%, rgba(201,79,91,.035), transparent 64%),
+    radial-gradient(700px 560px at 92% 68%, rgba(201,79,91,.02), transparent 68%),
     linear-gradient(180deg, rgba(0,0,0,.26) 0%, rgba(0,0,0,.52) 58%, rgba(0,0,0,.88) 100%);
 }
 
@@ -102,15 +106,15 @@ h1, h2 {
   content: ''; position: absolute; inset: 0;
   background:
     radial-gradient(1200px 800px at 85% -10%, rgba(255,255,255,.025), transparent 62%),
-    radial-gradient(1000px 700px at -10% 25%, rgba(36,211,154,.022), transparent 58%),
+    radial-gradient(1000px 700px at -10% 25%, rgba(201,79,91,.022), transparent 58%),
     linear-gradient(180deg, rgba(0,0,0,.64) 0%, rgba(0,0,0,.78) 50%, rgba(0,0,0,.94) 100%);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
 .atmosphere--brand::after {
   background:
-    radial-gradient(900px 640px at 78% 34%, rgba(36,211,154,.035), transparent 66%),
-    radial-gradient(580px 500px at 82% 36%, rgba(242,139,173,.045), transparent 62%),
+    radial-gradient(900px 640px at 78% 34%, rgba(201,79,91,.035), transparent 66%),
+    radial-gradient(580px 500px at 82% 36%, rgba(201,79,91,.025), transparent 62%),
     linear-gradient(180deg,rgba(0,0,0,.24),rgba(0,0,0,.48) 60%,rgba(0,0,0,.84));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -3444,65 +3448,78 @@ html .mila-surface--welcome.mila-surface--front { background: transparent; }
 /* The welcome companion belongs to the warm room even when the learner has
    chosen the dark focus theme for lessons. */
 html .mila-surface--front .mila-guide__launcher {
-  border-color: rgba(168,61,100,.22);
-  background: linear-gradient(145deg,rgba(255,255,255,.98),rgba(255,240,244,.98));
-  box-shadow: 0 18px 46px rgba(93,46,66,.18),0 0 28px rgba(242,139,173,.1),inset 0 1px 0 #fff;
+  border-color: #d9cec2;
+  background: #fffaf5;
+  box-shadow: 0 18px 46px rgba(36,29,25,.18),inset 0 1px 0 #fff;
 }
-html .mila-surface--front .mila-guide__state { border-color: #fff8fa; }
+html .mila-surface--front .mila-guide__state { border-color: #fffaf5; background: #963640; box-shadow: none; }
 html .mila-surface--front .mila-guide__textchip {
-  border-color: rgba(168,61,100,.28);
-  color: #a83d64;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(93,46,66,.14);
+  border-color: #d9cec2;
+  color: #963640;
+  background: #fffaf5;
+  box-shadow: 0 8px 20px rgba(36,29,25,.12);
 }
 html .mila-surface--front .mila-guide__nudge,
 html .mila-surface--front .mila-guide__panel {
-  border-color: rgba(93,46,66,.14);
-  color: #4f4249;
-  background: rgba(255,252,253,.985);
-  box-shadow: 0 28px 84px rgba(93,46,66,.2),inset 0 1px 0 #fff;
+  border-color: #d9cec2;
+  color: #241d19;
+  background: rgba(255,250,245,.985);
+  box-shadow: 0 28px 84px rgba(36,29,25,.2),inset 0 1px 0 #fff;
 }
-html .mila-surface--front .mila-guide__header { border-color: rgba(93,46,66,.1); background: #fff2f6; }
-html .mila-surface--front .mila-guide__portrait { border-color: rgba(168,61,100,.2); background: #fff; }
-html .mila-surface--front .mila-guide__portrait > i { border-color: #fff2f6; }
-html .mila-surface--front .mila-guide__identity strong { color: #a83d64; }
+html .mila-surface--front .mila-guide__header { border-color: #d9cec2; background: #f8f4ee; }
+html .mila-surface--front .mila-guide__portrait { border-color: #d9cec2; background: #fffaf5; }
+html .mila-surface--front .mila-guide__portrait > i { border-color: #f8f4ee; background: #963640; box-shadow: none; }
+html .mila-surface--front .mila-guide__identity strong { color: #241d19; }
 html .mila-surface--front .mila-guide__identity span,
 html .mila-surface--front .mila-guide__page,
-html .mila-surface--front .mila-guide__nudge span { color: #756a73; }
-html .mila-surface--front .mila-guide__page { border-color: rgba(93,46,66,.12); background: #fff; }
-html .mila-surface--front .mila-guide__close { color: #756a73; }
+html .mila-surface--front .mila-guide__nudge span { color: #746861; }
+html .mila-surface--front .mila-guide__page { border-color: #d9cec2; background: #fffaf5; }
+html .mila-surface--front .mila-guide__close { color: #746861; }
 html .mila-surface--front .mila-guide__welcome,
 html .mila-surface--front .mila-guide__message.is-assistant,
 html .mila-surface--front .mila-guide__working {
-  border-color: rgba(93,46,66,.12);
-  color: #4f4249;
-  background: #fff;
-  box-shadow: inset 3px 0 0 rgba(242,139,173,.7);
+  border-color: #d9cec2;
+  color: #241d19;
+  background: #fffdf9;
+  box-shadow: inset 3px 0 0 #c94f5b;
 }
 html .mila-surface--front .mila-guide__welcome p,
-html .mila-surface--front .mila-guide__message.is-assistant p { color: #4f4249; }
+html .mila-surface--front .mila-guide__message.is-assistant p { color: #241d19; }
 html .mila-surface--front .mila-guide__welcome small,
-html .mila-surface--front .mila-guide__guest p { color: #756a73; }
+html .mila-surface--front .mila-guide__guest p { color: #746861; }
 html .mila-surface--front .mila-guide__actions button {
-  border-color: rgba(93,46,66,.13);
-  color: #5f545d;
-  background: #fff;
+  border-color: #d9cec2;
+  color: #746861;
+  background: #fffaf5;
 }
-html .mila-surface--front .mila-guide__composer { border-color: rgba(93,46,66,.14); background: #fff; }
-html .mila-surface--front .mila-guide__composer input { color: #372a20; }
-html .mila-surface--front .mila-guide__mic { color: #0c7895; background: #fff2f6; }
+html .mila-surface--front .mila-guide__actions button span,
+html .mila-surface--front .mila-guide__actions button .mila-icon { color: #963640; }
+html .mila-surface--front .mila-guide__composer { border-color: #d9cec2; background: #fffaf5; }
+html .mila-surface--front .mila-guide__composer input { color: #241d19; }
+html .mila-surface--front .mila-guide__mic { color: #963640; background: rgba(150,54,64,.1); }
+html .mila-surface--front .mila-guide__mic:hover:not(:disabled),
+html .mila-surface--front .mila-guide__mic.is-listening { color: #fffaf5; background: #963640; box-shadow: none; }
 html .mila-surface--front .mila-guide__message.is-user,
 html .mila-surface--front .mila-guide__send,
 html .mila-surface--front .mila-guide__guest button:first-child {
-  color: #fff;
-  background: linear-gradient(135deg,#b54b72,#983556);
-  box-shadow: 0 8px 22px rgba(168,61,100,.17);
+  color: #fffaf5;
+  background: #963640;
+  box-shadow: none;
 }
 html .mila-surface--front .mila-guide__guest button {
-  border-color: rgba(93,46,66,.13);
-  color: #5f545d;
-  background: #fff;
+  border-color: #d9cec2;
+  color: #746861;
+  background: #fffaf5;
 }
+html .mila-surface--front .mila-guide[data-state] .mila-guide__identity span i,
+html .mila-surface--front .mila-guide[data-state] .mila-guide__state { background: #963640; box-shadow: none; }
+html .mila-surface--front .mila-guide[data-state="listening"] .mila-guide__launcher,
+html .mila-surface--front .mila-guide[data-voice="1"] .mila-guide__launcher {
+  border-color: #c94f5b;
+  box-shadow: 0 0 0 8px rgba(201,79,91,.1),0 18px 46px rgba(36,29,25,.18);
+}
+html .mila-surface--front .mila-guide__launcher::before { background: rgba(201,79,91,.1); }
+html .mila-surface--front .mila-guide__orbit i { border-color: rgba(201,79,91,.28); }
 
 @media (max-width: 640px) {
   html .mila-surface--front .mila-guide:not(.is-open) {
@@ -3589,34 +3606,34 @@ body[data-bottom-nav] .mila-guide__launcher {
 .mila-showcase__slide{min-width:100%;box-sizing:border-box;padding:26px 30px;}
 .mila-showcase__top{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #cabfa6;padding-bottom:11px;}
 .mila-showcase__kick{font-family:var(--font-mono),monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#8a5a3e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.mila-showcase__live{flex-shrink:0;font-family:var(--font-mono),monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#e5352b;display:inline-flex;align-items:center;gap:6px;}
-.mila-showcase__live i{width:7px;height:7px;border-radius:50%;background:#e5352b;box-shadow:0 0 8px rgba(229,53,43,.5);}
+.mila-showcase__live{flex-shrink:0;font-family:var(--font-mono),monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#963640;display:inline-flex;align-items:center;gap:6px;}
+.mila-showcase__live i{width:7px;height:7px;border-radius:50%;background:#963640;box-shadow:0 0 8px rgba(229,53,43,.5);}
 .mila-showcase__word{position:relative;font-family:var(--font-serif),Georgia,serif;font-weight:500;font-size:clamp(38px,8.5vw,54px);line-height:1.03;letter-spacing:-.02em;color:#1c1611;margin:16px 0 3px;}
-.mila-showcase__ipa{position:relative;font-family:var(--font-mono),monospace;font-size:15px;color:#7c2d2d;margin:0 0 18px;letter-spacing:.02em;}
+.mila-showcase__ipa{position:relative;font-family:var(--font-mono),monospace;font-size:15px;color:#963640;margin:0 0 18px;letter-spacing:.02em;}
 .mila-showcase__route{position:relative;display:flex;align-items:center;margin-bottom:20px;}
 .mila-showcase__stop{position:relative;flex:1;text-align:center;font-family:var(--font-mono),monospace;font-size:12px;color:#6b6152;padding-top:19px;}
 .mila-showcase__stop::before{content:"";position:absolute;top:5px;left:0;right:0;height:3px;background:#cabfa6;}
 .mila-showcase__stop:first-child::before{left:50%}.mila-showcase__stop:last-child::before{right:50%}
 .mila-showcase__stop::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:#f3ede0;border:3px solid #1c1611;}
-.mila-showcase__stop.is-hub{color:#e5352b;font-weight:700;}
-.mila-showcase__stop.is-hub::after{border-color:#e5352b;width:16px;height:16px;top:-2px;}
-.mila-showcase__stop.is-hub::before,.mila-showcase__stop.is-after::before{background:#e5352b;}
+.mila-showcase__stop.is-hub{color:#963640;font-weight:700;}
+.mila-showcase__stop.is-hub::after{border-color:#963640;width:16px;height:16px;top:-2px;}
+.mila-showcase__stop.is-hub::before,.mila-showcase__stop.is-after::before{background:#963640;}
 .mila-showcase__vu{position:relative;display:flex;align-items:flex-end;gap:16px;border-top:1px solid #cabfa6;padding-top:14px;}
 .mila-showcase__vu-graph{flex:1;min-width:0;}
 .mila-showcase__vu-bars{display:flex;align-items:flex-end;gap:2px;height:30px;}
 .mila-showcase__vu-bars i{flex:1;border-radius:1px;}
 .mila-showcase__vu-cap{display:flex;justify-content:space-between;gap:10px;font-family:var(--font-mono),monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#8a7f6a;margin-top:6px;}
-.mila-showcase__vu-cap span:nth-child(2){color:#7c2d2d;}
+.mila-showcase__vu-cap span:nth-child(2){color:#963640;}
 .mila-showcase__score{flex-shrink:0;text-align:right;font-family:var(--font-mono),monospace;}
 .mila-showcase__score b{font-size:26px;color:#1c1611;font-weight:400;}
 .mila-showcase__score span{display:block;font-size:9px;letter-spacing:.1em;color:#8a7f6a;text-transform:uppercase;}
 .mila-showcase__ctl{display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding:0 2px;}
 .mila-showcase__dots{display:flex;gap:7px;}
 .mila-showcase__dot{width:8px;height:8px;border-radius:50%;border:none;padding:0;cursor:pointer;background:rgba(150,54,82,.26);transition:all .3s;}
-.mila-showcase__dot.is-on{background:#e5352b;width:22px;border-radius:4px;}
+.mila-showcase__dot.is-on{background:#963640;width:22px;border-radius:4px;}
 .mila-showcase__nav{display:flex;gap:8px;}
 .mila-showcase__nav button{width:34px;height:34px;border-radius:50%;border:1px solid #cabfa6;background:#f3ede0;color:#1c1611;cursor:pointer;font-size:15px;display:grid;place-items:center;transition:all .2s;}
-.mila-showcase__nav button:hover{background:#e5352b;color:#f3ede0;border-color:#e5352b;}
+.mila-showcase__nav button:hover{background:#963640;color:#f3ede0;border-color:#963640;}
 /* STUDIO — the dark twin: near-black console, same system, one signal red */
 html[data-mila-theme="dark"] .mila-showcase{background:#0c0d11;border-color:#24262e;}
 html[data-mila-theme="dark"] .mila-showcase__heading{color:#6f7480;}
@@ -3624,20 +3641,90 @@ html[data-mila-theme="dark"] .mila-showcase__grain{opacity:.32;background-image:
 html[data-mila-theme="dark"] .mila-showcase__top{border-color:#24262e;}
 html[data-mila-theme="dark"] .mila-showcase__kick{color:#8b909b;}
 html[data-mila-theme="dark"] .mila-showcase__word{color:#eceae4;}
-html[data-mila-theme="dark"] .mila-showcase__ipa{color:#ff5a4d;}
+html[data-mila-theme="dark"] .mila-showcase__ipa{color:#e46a73;}
 html[data-mila-theme="dark"] .mila-showcase__stop{color:#8b909b;}
 html[data-mila-theme="dark"] .mila-showcase__stop::before{background:#2b2e37;}
 html[data-mila-theme="dark"] .mila-showcase__stop::after{background:#0c0d11;border-color:#eceae4;}
-html[data-mila-theme="dark"] .mila-showcase__stop.is-hub{color:#ff5a4d;}
-html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::after{border-color:#ff5a4d;}
-html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::before,html[data-mila-theme="dark"] .mila-showcase__stop.is-after::before{background:#ff5a4d;}
+html[data-mila-theme="dark"] .mila-showcase__stop.is-hub{color:#e46a73;}
+html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::after{border-color:#e46a73;}
+html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::before,html[data-mila-theme="dark"] .mila-showcase__stop.is-after::before{background:#e46a73;}
 html[data-mila-theme="dark"] .mila-showcase__vu{border-color:#24262e;}
 html[data-mila-theme="dark"] .mila-showcase__vu-cap{color:#6f7480;}
-html[data-mila-theme="dark"] .mila-showcase__vu-cap span:nth-child(2){color:#ff8a7a;}
+html[data-mila-theme="dark"] .mila-showcase__vu-cap span:nth-child(2){color:#e46a73;}
 html[data-mila-theme="dark"] .mila-showcase__score b{color:#eceae4;}
 html[data-mila-theme="dark"] .mila-showcase__score span{color:#6f7480;}
 html[data-mila-theme="dark"] .mila-showcase__dot{background:#3a3d47;}
-html[data-mila-theme="dark"] .mila-showcase__dot.is-on{background:#ff5a4d;}
+html[data-mila-theme="dark"] .mila-showcase__dot.is-on{background:#e46a73;}
 html[data-mila-theme="dark"] .mila-showcase__nav button{background:#14161b;border-color:#2b2e37;color:#eceae4;}
-html[data-mila-theme="dark"] .mila-showcase__nav button:hover{background:#ff5a4d;color:#0c0d11;border-color:#ff5a4d;}
+html[data-mila-theme="dark"] .mila-showcase__nav button:hover{background:#e46a73;color:#0c0d11;border-color:#e46a73;}
 @media (max-width:640px){.mila-showcase__slide{padding:22px 20px;}.mila-showcase__vu{flex-direction:column;align-items:stretch;gap:12px;}.mila-showcase__score{text-align:left;}}
+
+/* Marketing and pricing use the same companion as the learning product.
+   Motion communicates listening/thinking/speaking; colour never changes role. */
+html .mila-surface--marketing .mila-guide {
+  --guide-paper: #fffaf5;
+  --guide-panel: #fffdf9;
+  --guide-ink: #241d19;
+  --guide-muted: #746861;
+  --guide-line: #d9cec2;
+  --guide-accent: #963640;
+  --guide-accent-deep: #772a33;
+  color: var(--guide-ink);
+}
+html .mila-surface--marketing .mila-guide__launcher {
+  border: 1px solid var(--guide-line) !important;
+  border-radius: 16px !important;
+  background: var(--guide-panel) !important;
+  box-shadow: 0 14px 36px rgba(36,29,25,.18) !important;
+}
+html .mila-surface--marketing .mila-guide__launcher:hover { border-color: var(--guide-accent) !important; box-shadow: 0 16px 40px rgba(36,29,25,.2) !important; }
+html .mila-surface--marketing .mila-guide__launcher:focus-visible { outline-color: var(--guide-accent); }
+html .mila-surface--marketing .mila-guide__launcher::before { display: none; }
+html .mila-surface--marketing .mila-guide__orbit i,
+html .mila-surface--marketing .mila-guide__orbit i:last-child { border-color: rgba(201,79,91,.28); }
+html .mila-surface--marketing .mila-guide__state,
+html .mila-surface--marketing .mila-guide[data-state] .mila-guide__state,
+html .mila-surface--marketing .mila-guide__identity span i,
+html .mila-surface--marketing .mila-guide[data-state] .mila-guide__identity span i,
+html .mila-surface--marketing .mila-guide__portrait > i {
+  border-color: var(--guide-panel) !important;
+  background: var(--guide-accent) !important;
+  box-shadow: none !important;
+}
+html .mila-surface--marketing .mila-guide[data-state] .mila-guide__launcher,
+html .mila-surface--marketing .mila-guide[data-voice="1"] .mila-guide__launcher { border-color: var(--guide-accent) !important; box-shadow: 0 14px 36px rgba(36,29,25,.18) !important; }
+html .mila-surface--marketing .mila-guide__textchip,
+html .mila-surface--marketing .mila-guide__voicechip {
+  border: 1px solid var(--guide-accent) !important;
+  border-radius: 10px !important;
+  color: var(--guide-paper) !important;
+  background: var(--guide-accent) !important;
+  box-shadow: none !important;
+}
+html .mila-surface--marketing :is(.mila-guide__panel,.mila-guide__nudge,.mila-guide__caption) {
+  border: 1px solid var(--guide-line) !important;
+  border-radius: 14px !important;
+  color: var(--guide-ink) !important;
+  background: var(--guide-panel) !important;
+  box-shadow: 0 20px 58px rgba(36,29,25,.2) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html .mila-surface--marketing .mila-guide__header { border-color: var(--guide-line) !important; background: var(--guide-paper) !important; }
+html .mila-surface--marketing .mila-guide__portrait { border-color: var(--guide-line) !important; border-radius: 10px; background: var(--guide-panel) !important; }
+html .mila-surface--marketing .mila-guide__identity strong,
+html .mila-surface--marketing .mila-guide__welcome p,
+html .mila-surface--marketing .mila-guide__message.is-assistant p { color: var(--guide-ink) !important; }
+html .mila-surface--marketing :is(.mila-guide__identity span,.mila-guide__page,.mila-guide__nudge span,.mila-guide__welcome small,.mila-guide__guest p) { color: var(--guide-muted) !important; }
+html .mila-surface--marketing :is(.mila-guide__welcome,.mila-guide__message.is-assistant,.mila-guide__working) { border-color: var(--guide-line) !important; color: var(--guide-ink) !important; background: var(--guide-paper) !important; box-shadow: inset 3px 0 0 var(--guide-accent) !important; }
+html .mila-surface--marketing .mila-guide__chips button,
+html .mila-surface--marketing .mila-guide__actions button,
+html .mila-surface--marketing .mila-guide__guest button { border-color: var(--guide-line) !important; color: var(--guide-ink) !important; background: var(--guide-panel) !important; }
+html .mila-surface--marketing .mila-guide__actions { flex-wrap: wrap; overflow-x: visible; }
+html .mila-surface--marketing .mila-guide__actions button { flex: 1 1 calc(50% - 4px); min-width: 0; justify-content: center; white-space: normal; }
+html .mila-surface--marketing .mila-guide__message.is-user,
+html .mila-surface--marketing .mila-guide__send,
+html .mila-surface--marketing .mila-guide__guest button:first-child { color: var(--guide-paper) !important; background: var(--guide-accent) !important; box-shadow: none !important; }
+html .mila-surface--marketing .mila-guide__composer { border-color: var(--guide-line) !important; background: var(--guide-panel) !important; box-shadow: none !important; }
+html .mila-surface--marketing .mila-guide__composer input { color: var(--guide-ink) !important; }
+html .mila-surface--marketing .mila-guide__mic { color: var(--guide-accent-deep) !important; background: rgba(201,79,91,.1) !important; }

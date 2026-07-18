@@ -18,6 +18,7 @@ import { C } from '@/lib/theme';
 import type { AssessmentResult } from '@/lib/assessment';
 
 type Phase = 'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'finalizing' | 'error';
+const SIGNAL = '#c94f5b';
 
 export default function AssessmentVoice() {
   const { lang } = useI18n();
@@ -192,15 +193,9 @@ export default function AssessmentVoice() {
     error:      lang==='ru' ? 'Что-то пошло не так' : 'Something went wrong',
   }[phase];
 
-  const orbColor = phase==='speaking' || phase==='listening'
-    ? C.voice
-    : phase==='thinking' || phase==='connecting'
-    ? C.mercury
-    : phase==='finalizing'
-    ? C.jupiter
-    : phase==='error'
-    ? C.rose
-    : C.mercury;
+  // Phase is communicated by the icon, copy, and motion. Mila keeps one visual
+  // signal instead of changing hue as the voice loop advances.
+  const orbColor = SIGNAL;
 
   return (
     <AppShell className="assessment-page">
@@ -277,7 +272,7 @@ export default function AssessmentVoice() {
         </button>}
 
         {mode === 'voice' && <div className="assessment-page__status" style={{
-          color: phase==='speaking'||phase==='listening'?C.voice:phase==='thinking'||phase==='connecting'?C.mercury:phase==='finalizing'?C.jupiter:phase==='error'?C.rose:C.warm,
+          color: phase==='idle'?C.warm:SIGNAL,
         }}>
           {statusText}
         </div>}
@@ -287,12 +282,12 @@ export default function AssessmentVoice() {
           <div className="assessment-page__captions" aria-live="polite">
             {examinerText && (
               <div className="assessment-page__caption is-mila">
-                <span style={{color:C.voice,fontWeight:700}}>Mila · </span>{examinerText}
+                <span style={{color:SIGNAL,fontWeight:700}}>Mila · </span>{examinerText}
               </div>
             )}
             {youText && (
               <div className="assessment-page__caption is-you">
-                <span style={{color:C.mercury,fontWeight:700}}>{lang==='ru'?'Ты · ':'You · '}</span>{youText}
+                <span style={{color:SIGNAL,fontWeight:700}}>{lang==='ru'?'Ты · ':'You · '}</span>{youText}
               </div>
             )}
           </div>
@@ -301,7 +296,7 @@ export default function AssessmentVoice() {
         {mode === 'voice' && phase==='error' && (
           <div className="assessment-page__error" role="alert">
             {errMsg}
-            <button onClick={start} className="focus-button focus-button--mercury">
+            <button onClick={start} className="focus-button focus-button--voice">
               {lang==='ru'?'Попробовать снова':'Try again'}
             </button>
             <button onClick={beginReliable} className="focus-button focus-button--quiet">

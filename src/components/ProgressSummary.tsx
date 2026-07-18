@@ -4,8 +4,8 @@
 import { Card } from '@/components/ui/Card';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 
-// Jupiter gold marks accumulated learning; each glyph can still carry its
-// semantic channel (Mercury for progress, cyan for time/audio).
+// Progress is communicated by value, icon, and copy while the visual signal
+// stays consistent with the rest of Mila.
 export default function ProgressSummary({ items }: {
   items: { icon: MilaIconName; val: number | string; label: string; color?: string }[];
 }) {

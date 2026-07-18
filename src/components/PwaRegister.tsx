@@ -96,10 +96,9 @@ export default function PwaRegister() {
         position: 'fixed', left: '50%', bottom: 88, transform: 'translateX(-50%)',
         zIndex: 60, display: 'flex', alignItems: 'center', gap: 10,
         maxWidth: 'min(92vw, 420px)', padding: '10px 12px 10px 16px',
-        background: 'rgba(5,11,8,0.92)', border: '1px solid rgba(154,242,211,0.22)',
-        borderRadius: 14, boxShadow: '0 10px 34px rgba(0,0,0,0.5)',
-        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-        color: '#f7f8f5', fontSize: '0.85rem', lineHeight: 1.45,
+        background: '#fffaf5', border: '1px solid #d9cec2',
+        borderRadius: 14, boxShadow: '0 10px 34px rgba(36,29,25,0.14)',
+        color: '#241d19', fontSize: '0.85rem', lineHeight: 1.45,
       }}
     >
       <span style={{ flex: 1 }}>
@@ -112,7 +111,7 @@ export default function PwaRegister() {
           onClick={install}
           style={{
             flexShrink: 0, padding: '8px 14px', borderRadius: 10, border: 'none',
-            background: 'linear-gradient(135deg,#9af2d3,#24d39a)', color: '#032018',
+            background: '#963640', color: '#fffaf5',
             fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer',
           }}
         >
@@ -124,8 +123,8 @@ export default function PwaRegister() {
         aria-label={ru ? 'Скрыть' : 'Dismiss'}
         style={{
           flexShrink: 0, width: 28, height: 28, borderRadius: 8,
-          border: '1px solid rgba(255,255,255,0.14)', background: 'transparent',
-          color: '#a7ada9', fontSize: '0.9rem', cursor: 'pointer', lineHeight: 1,
+          border: '1px solid #d9cec2', background: 'transparent',
+          color: '#746861', fontSize: '0.9rem', cursor: 'pointer', lineHeight: 1,
         }}
       >
         ×

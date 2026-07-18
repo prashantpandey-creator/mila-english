@@ -11,10 +11,13 @@ import { ACCENTS, playPhrase, hasRealVoice, startListening, missedSound } from '
 import { PHRASES, PACKS, SOUND_INFO } from '@/lib/phrases';
 import { useScene } from '@/lib/scene';
 
+const SIGNAL = '#c94f5b';
+const SIGNAL_SOFT = 'rgba(201,79,91,0.12)';
+
 const VERDICT = {
-  good:  { fg: C.jupiter, bg: C.jupiterL },
-  close: { fg: C.mercury, bg: C.mercuryL },
-  miss:  { fg: C.rose, bg: C.roseL },
+  good:  { fg: SIGNAL, bg: 'rgba(201,79,91,0.16)' },
+  close: { fg: SIGNAL, bg: SIGNAL_SOFT },
+  miss:  { fg: SIGNAL, bg: 'rgba(201,79,91,0.07)' },
 };
 
 const PACK_ICONS: Record<string, MilaIconName> = {
@@ -137,11 +140,10 @@ export default function ListenPage() {
 
   const ring = (score: number) => {
     const r = 26, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
-    const col = score >= 80 ? C.jupiter : score >= 55 ? C.mercury : C.rose;
     return (
       <svg width="62" height="62" viewBox="0 0 62 62" style={{flex:'0 0 auto'}}>
-        <circle cx="31" cy="31" r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="7"/>
-        <circle cx="31" cy="31" r={r} fill="none" stroke={col} strokeWidth="7" strokeLinecap="round"
+        <circle cx="31" cy="31" r={r} fill="none" stroke="var(--mila-line, rgba(36,29,25,0.12))" strokeWidth="7"/>
+        <circle cx="31" cy="31" r={r} fill="none" stroke={SIGNAL} strokeWidth="7" strokeLinecap="round"
           strokeDasharray={circ} strokeDashoffset={off} transform="rotate(-90 31 31)" style={{transition:'stroke-dashoffset .5s'}}/>
         <text x="31" y="37" textAnchor="middle" fontSize="19" fontWeight="800" fill={C.dark}>{score}</text>
       </svg>
@@ -169,7 +171,7 @@ export default function ListenPage() {
           <div className="focus-chip-strip">
             {PACKS.map(p=>(
               <button key={p.id} onClick={()=>onPack(p.id)}
-                className={`focus-chip focus-chip--jupiter ${pack===p.id ? 'is-active' : ''}`}
+                className={`focus-chip focus-chip--voice ${pack===p.id ? 'is-active' : ''}`}
                 aria-pressed={pack===p.id}>
                 <MilaIcon name={PACK_ICONS[p.id]} size={15}/>{lang==='ru'?p.ru:p.en}
               </button>
@@ -240,7 +242,7 @@ export default function ListenPage() {
             <div className="listen-page__tip">
               <MilaIcon name="sparkle" size={15}/><span>{result.tip}</span>
             </div>
-            <div style={{marginTop:8,fontSize:'0.8rem',color:'#9d9483'}}>{phrase.ru}</div>
+            <div style={{marginTop:8,fontSize:'0.8rem',color:'var(--mila-muted, #746861)'}}>{phrase.ru}</div>
           </section>
         )}
 
@@ -251,7 +253,7 @@ export default function ListenPage() {
         {/* mic + next */}
         <div className="listen-page__controls">
           <button onClick={next}
-            className="focus-button focus-button--mercury">
+            className="focus-button focus-button--voice">
             {lang==='ru'?'Следующая →':'Next phrase →'}
           </button>
           <button onClick={onMic} disabled={micBusy}
@@ -261,7 +263,7 @@ export default function ListenPage() {
           </button>
         </div>
         <div className="listen-page__mic-status" style={{
-          color:phase==='recording'?C.voice:phase==='scoring'?C.mercury:'#948b7c',
+          color:phase==='recording'||phase==='scoring'?SIGNAL:'var(--mila-muted, #746861)',
           fontWeight:(phase==='recording'||phase==='scoring')?700:400}} aria-live="polite">
           {phase==='recording'
             ? (lang==='ru'?'Слушаю… говори, потом нажми остановить':'Listening… speak, then tap stop')
@@ -283,12 +285,12 @@ export default function ListenPage() {
               const meta = SOUND_INFO[snd] || { ex: info.example, en: '', ru: '' };
               return (
                 <div key={snd} style={{display:'flex',alignItems:'flex-start',gap:11,marginBottom:11}}>
-                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:'rgba(232,85,109,0.16)',color:C.rose,
+                  <span style={{flex:'0 0 auto',minWidth:34,height:34,padding:'0 8px',borderRadius:9,background:SIGNAL_SOFT,color:SIGNAL,
                     fontWeight:800,fontSize:'0.95rem',fontFamily:'ui-monospace,monospace',display:'flex',alignItems:'center',justifyContent:'center'}}>{snd}</span>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'0.82rem',fontWeight:700,color:C.dark}}>
                       {lang==='ru'?`как в «${meta.ex}»`:`as in “${meta.ex}”`}
-                      <span style={{fontWeight:600,color:'#948b7c'}}> · {info.count}×</span>
+                      <span style={{fontWeight:600,color:'var(--mila-muted, #746861)'}}> · {info.count}×</span>
                     </div>
                     <div style={{fontSize:'0.76rem',color:C.warm,lineHeight:1.4,marginTop:1}}>{lang==='ru'?meta.ru:meta.en}</div>
                   </div>
@@ -296,7 +298,7 @@ export default function ListenPage() {
               );
             })}
             <button onClick={loadDrills} disabled={drillLoading}
-              className="focus-button focus-button--mercury">
+              className="focus-button focus-button--voice">
               <MilaIcon name="sparkle" size={16}/>
               {drillLoading
                 ? (lang==='ru'?'Мила готовит упражнения…':'Mila is building your drills…')
