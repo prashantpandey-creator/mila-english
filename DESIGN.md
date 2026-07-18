@@ -25,44 +25,54 @@
 
 ## The language (owner correction, 2026-07-18)
 
-Mila has one visual identity from the first page through the learning product.
-Dark is a neutral context, never another brand or another signal system.
+Mila has one bright visual identity from the first page through the learning
+product. It should feel authored, feminine without becoming childish, calm
+without becoming generic, and creative without becoming noisy. There is no
+second dark room and no route-specific colour story.
 
 | Role | Canonical value |
 |---|---|
-| Ground | warm paper `#f8f4ee` |
-| Panel | ivory `#fffaf5` |
-| Ink | espresso `#241d19` |
-| Muted ink | `#746861` |
-| Border | hairline `#d9cec2` |
-| Interaction signal | rose `#c94f5b`; accessible light-surface action `#963640`; dark-canvas signal `#e46a73` |
-| Immersive canvas | neutral `#0c0d11`; rose remains the only colour signal |
+| Ground | cool white `#fffdfd` |
+| Panel | white `#ffffff` |
+| Raised / quiet surface | blush `#fff7fa` |
+| Strong blush band | `#fff1f5` |
+| Ink | berry-black `#2f1b24` |
+| Muted ink | `#75606a` |
+| Border | rose hairline `#efd6df` |
+| Interaction signal | rose `#b63d68`; deep action `#8d2d50`; bright motion mark `#dc6d92` |
 
-- **Type.** Yeseva One (`--font-display`) carries brand and display headings.
-  Manrope (`--font-sans`) carries interface and body copy. IBM Plex Mono
-  (`--font-mono`) is reserved for IPA, phonemes, scores, levels, and system
-  labels. Do not add a route-specific font.
+- **Type.** Yeseva One (`--font-display`) carries the wordmark and rare
+  editorial phrases. Manrope (`--font-sans`) carries product headings,
+  interface, and body copy. IBM Plex Mono (`--font-mono`) is reserved for IPA,
+  phonemes, scores, levels, and system labels. Do not add a route-specific font.
 - **One signal.** Clickable, active, listening, speaking, correct, incorrect,
   measured, and progress states all use the rose family. Meaning comes from
   icon, label, motion, shape, and opacity—not cyan/green/gold/purple switches.
-- **Depth.** Use solid neutral surfaces, hairlines, and restrained warm shadows.
-  Photo contrast may be dark; UI chrome must remain clearly Mila.
+- **Depth.** Use solid white/blush surfaces, rose hairlines, and restrained
+  berry-tinted shadows. Translucent white is allowed only for sticky chrome
+  where the layer relationship must remain visible.
+- **Voice.** Mila's voice state is made legible through a label, waveform,
+  concentric ring rhythm, and motion. It remains on white and blush; a black
+  room is not required for focus.
+- **Editorial character.** The front door is a commissioned mixed-media collage
+  with real negative space. Across the product, character comes from scale,
+  typography, tactile edges, and asymmetrical rhythm—not stock travel cards,
+  flags, device props, glass thumbnails, or decorative technology clichés.
 
-**Banned:** secondary semantic hues, per-category colour coding, coloured
-glass, glow, gradient orbs, device-driven palette switching, and low-resolution
-photos behind learning workspaces.
+**Banned:** secondary semantic hues, per-category colour coding, black route
+surfaces, coloured glass, glow, gradient orbs, device-driven palette switching,
+generic country/flag cards, and low-resolution photos behind learning workspaces.
 
 ## Built so far
 
-- `src/app/inner-theme.css` owns the shared warm-paper tokens, shell, cards,
+- `src/app/inner-theme.css` owns the shared white/pink tokens, shell, cards,
   controls, lesson tools, assessment, chat, auth, legal pages, assistant
   furniture, and mobile navigation.
-- `src/components/RouteSurface.tsx` makes the palette deterministic. `/` keeps
-  its cinematic poster, `/start` uses the same warm system with a contained
-  dark pricing band, ordinary learning stays warm, and immersive voice alone
-  uses neutral dark.
-- Immersive voice motion is functional feedback. It uses neutral luminance and
-  the same rose signal; it does not introduce another palette.
+- `src/components/RouteSurface.tsx` makes the palette deterministic. `/`,
+  `/start`, pricing, ordinary learning, and immersive voice all use the same
+  light atelier.
+- Voice motion is functional feedback. It uses rose rings, a precise core mark,
+  and state labels on white; it does not introduce another palette.
 - The dashboard is a **conversation stage**, not a widget directory. Mila's
   live voice action owns the visual hierarchy, text chat is the clear second
   action, and lessons sit in a quieter supporting rail. `conversation-stage`

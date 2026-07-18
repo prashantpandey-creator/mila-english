@@ -29,7 +29,7 @@ type GuideContext = {
 // A short deferral is unavoidable when one pointer target supports both a
 // single- and double-click. It prevents the first click of a double-click from
 // requesting microphone permission before the text-chat intent is known.
-const LAUNCHER_SINGLE_CLICK_DELAY_MS = 800
+const LAUNCHER_SINGLE_CLICK_DELAY_MS = 360
 
 const PAGE_LABELS: Record<string, { en: string; ru: string }> = {
   '/': { en: 'Welcome', ru: 'Главная' },

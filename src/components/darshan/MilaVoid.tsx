@@ -5,8 +5,8 @@ import type { BinduState } from "./MilaBindu";
 
 // ─── Reactive living void ───────────────────────────────────────────────
 //
-// A full-field WebGL2 background for the Studio voice room: graphite, warm
-// ivory, and Mila's single rose signal over near-black.
+// A full-field WebGL2 background for Mila's light voice atelier: warm ivory,
+// translucent blush, and the same rose signal used everywhere else.
 
 const VS_SRC = /*glsl*/ `#version 300 es
 in vec2 a_pos;
@@ -31,39 +31,37 @@ float fbm(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ s += a *
 void main(){
   vec2 uv = v_uv; vec2 c = uv - 0.5; c.x *= u_res.x / u_res.y;
   float r = length(c); float ang = atan(c.y, c.x);
-  vec3 base = vec3(0.047, 0.051, 0.067);
+  vec3 base = vec3(1.0, 0.992, 0.992);
   vec2 q = c * 2.2;
   float warp = fbm(q * 1.3 + vec2(u_t * 0.03, u_t * 0.02));
   float aNear = pow(fbm(q + vec2(warp * 1.2 - u_t * 0.02, warp * 0.8 + u_t * 0.015)), 1.7);
   float aFar = pow(fbm(q * 0.55 + vec2(u_t * 0.008, -u_t * 0.011) + warp * 0.4), 2.0);
   float aur = aNear * 0.72 + aFar * 0.55;
   
-  // Studio palette: graphite, warm neutral, and one live signal.
-  vec3 graphite = vec3(0.18, 0.19, 0.22);
-  vec3 shadow = vec3(0.10, 0.11, 0.13);
-  vec3 roseTint = vec3(0.30, 0.18, 0.20);
-  vec3 signal = vec3(0.894, 0.416, 0.451);
+  // One light product palette: paper, blush, petal, and accessible rose.
+  vec3 blush = vec3(0.969, 0.867, 0.886);
+  vec3 petal = vec3(0.941, 0.722, 0.765);
+  vec3 signal = vec3(0.788, 0.310, 0.357);
 
-  vec3 hue = mix(shadow, graphite, 0.5 + 0.5 * sin(u_t * 0.05 + c.x * 1.5));
-  hue = mix(hue, roseTint, 0.38 * (0.5 + 0.5 * sin(u_t * 0.04 + c.y * 1.2)));
-  hue = mix(hue, signal, u_warm * 0.6);
+  vec3 hue = mix(blush, petal, 0.5 + 0.5 * sin(u_t * 0.05 + c.x * 1.5));
+  hue = mix(hue, signal, u_warm * 0.42);
   
-  float field = aur * (0.035 + 0.09 * u_lv);
-  vec3 col = base + hue * field;
+  float field = aur * (0.08 + 0.16 * u_lv);
+  vec3 col = mix(base, hue, field);
   
   float halo = exp(-r * (2.8 - 1.1 * u_lv)) * (0.04 + 0.16 * u_lv);
-  col += vec3(0.36, 0.17, 0.20) * halo;
+  col = mix(col, petal, halo * 0.5);
   
   float rays = (0.5 + 0.5 * sin(ang * 14.0 + u_t * 0.12)) * (0.5 + 0.5 * sin(ang * 5.0 - u_t * 0.07)) * exp(-r * 1.7) * u_warm * 0.16;
-  col += signal * rays;
+  col = mix(col, signal, rays * 0.42);
   
   float shim = (0.5 + 0.5 * sin(r * 24.0 - u_t * 0.35)) * smoothstep(0.25, 0.85, r) * 0.022 * (0.4 + 0.6 * u_lv);
-  col += mix(graphite, roseTint, u_warm) * shim;
+  col = mix(col, mix(blush, petal, u_warm), shim * 0.7);
   
   vec2 mg = uv * u_res * 0.6; mg.y += u_t * 6.0; float sd = h2(floor(mg));
   float tw = step(0.9986, sd) * (0.5 + 0.5 * sin(u_t * 1.6 + sd * 80.0));
-  col += vec3(0.925, 0.918, 0.894) * tw * 0.35;
-  col *= mix(0.38, 1.0, smoothstep(1.18, 0.10, r));
+  col = mix(col, vec3(1.0), tw * 0.35);
+  col = mix(base, col, mix(0.48, 1.0, smoothstep(1.18, 0.10, r)));
   o = vec4(col, 1.0);
 }`;
 

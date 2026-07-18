@@ -308,8 +308,8 @@ function PracticeRoom() {
             max(0.75rem, env(safe-area-inset-right, 0px))
             max(0.75rem, env(safe-area-inset-bottom, 0px))
             max(0.75rem, env(safe-area-inset-left, 0px));
-          color: var(--surface-text, #f8f4ee);
-          background: var(--surface-page, #0c0d11);
+          color: var(--surface-text, #2f1b24);
+          background: var(--surface-page, #fffdfd);
         }
 
         .practice-room__veil {
@@ -318,8 +318,8 @@ function PracticeRoom() {
           z-index: -1;
           pointer-events: none;
           background:
-            radial-gradient(circle at 50% 48%, rgba(228, 106, 115, 0.1), transparent 38%),
-            linear-gradient(180deg, rgba(12, 13, 17, 0.18), rgba(12, 13, 17, 0.72));
+            radial-gradient(circle at 50% 48%, rgba(182,61,104, 0.12), transparent 38%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 247, 250, 0.72));
         }
 
         .practice-header {
@@ -347,24 +347,24 @@ function PracticeRoom() {
         }
 
         .practice-header__eyebrow {
-          color: var(--surface-text, #f8f4ee);
+          color: var(--mila-action, #8d2d50);
           font-size: 0.72rem;
           font-weight: 700;
           letter-spacing: 0.16em;
           line-height: 1.35;
           text-transform: uppercase;
-          text-shadow: 0 1px 16px #0c0d11;
+          text-shadow: none;
         }
 
         .practice-header__title {
           margin-top: 0.3rem;
           overflow: hidden;
-          color: var(--surface-muted, #b9b0aa);
+          color: var(--surface-muted, #75606a);
           font-size: clamp(0.84rem, 2.8vw, 1rem);
           font-weight: 500;
           line-height: 1.35;
           text-overflow: ellipsis;
-          text-shadow: 0 1px 16px #0c0d11;
+          text-shadow: none;
           white-space: nowrap;
         }
 
@@ -375,22 +375,23 @@ function PracticeRoom() {
           height: 2.75rem;
           margin: 0;
           padding: 0;
-          border: 1px solid rgba(255, 255, 255, 0.24);
+          border: 1px solid var(--surface-line, #efd6df);
           border-radius: 999px;
-          color: var(--surface-text, #f8f4ee);
-          background: var(--surface-card, #14161b);
+          color: var(--surface-muted, #75606a);
+          background: var(--surface-card, #ffffff);
           cursor: pointer;
           transition: border-color 160ms ease, background 160ms ease;
         }
 
         .practice-header__exit:hover {
-          border-color: rgba(255, 255, 255, 0.52);
-          background: var(--surface-raised, #1b1d23);
+          border-color: var(--mila-line-strong, #d9aebb);
+          color: var(--surface-text, #2f1b24);
+          background: var(--mila-raised, #fff7fa);
         }
 
         .practice-header__exit:focus-visible,
         .practice-orb__button:focus-visible {
-          outline: 3px solid var(--mila-action, #e46a73);
+          outline: 3px solid var(--mila-action, #8d2d50);
           outline-offset: 4px;
         }
 
@@ -425,16 +426,16 @@ function PracticeRoom() {
           margin-inline: auto;
           padding: 0.8rem clamp(1rem, 4vw, 1.4rem);
           box-sizing: border-box;
-          border: 1px solid var(--surface-line, rgba(248,244,238,.14));
+          border: 1px solid var(--surface-line, #efd6df);
           border-radius: 1rem;
-          color: var(--surface-text, #f8f4ee);
-          background: var(--surface-card, #14161b);
-          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
+          color: var(--surface-text, #2f1b24);
+          background: var(--surface-card, #ffffff);
+          box-shadow: 0 14px 36px rgba(94, 35, 61, 0.07);
           text-align: center;
         }
 
         .practice-live__caption {
-          color: var(--surface-text, #f8f4ee);
+          color: var(--surface-text, #2f1b24);
           font-size: clamp(0.9rem, 3vw, 1rem);
           font-weight: 500;
           line-height: 1.48;
@@ -442,7 +443,7 @@ function PracticeRoom() {
         }
 
         .practice-live__status {
-          color: var(--surface-muted, #b9b0aa);
+          color: var(--surface-muted, #75606a);
           font-size: 0.72rem;
           font-weight: 700;
           letter-spacing: 0.1em;
@@ -454,27 +455,27 @@ function PracticeRoom() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          color: var(--mila-action, #e46a73);
+          color: var(--mila-action, #8d2d50);
         }
 
         .practice-live__status--listening i {
           width: 0.45rem;
           height: 0.45rem;
           border-radius: 50%;
-          background: var(--mila-action, #e46a73);
-          box-shadow: 0 0 0 0.28rem rgba(228,106,115,.14);
+          background: var(--mila-action, #8d2d50);
+          box-shadow: 0 0 0 0.28rem rgba(141,45,80,.12);
         }
 
         .practice-live__status--thinking {
-          color: var(--mila-action, #e46a73);
+          color: var(--mila-action, #8d2d50);
         }
 
         .practice-live__status--speaking {
-          color: var(--mila-action, #e46a73);
+          color: var(--mila-action, #8d2d50);
         }
 
         .practice-live__error {
-          color: var(--mila-action, #e46a73);
+          color: var(--mila-action, #8d2d50);
           font-size: 0.8rem;
           font-weight: 600;
           line-height: 1.4;
@@ -482,7 +483,7 @@ function PracticeRoom() {
 
         :global(.practice-room__void) {
           z-index: -2;
-          background: var(--surface-page, #0c0d11);
+          background: var(--surface-page, #fffdfd);
         }
 
         :global(.practice-orb__visual) {
@@ -553,7 +554,7 @@ function PracticeRoom() {
 
 export default function PracticePage() {
   return (
-    <Suspense fallback={<div className="fixed inset-0 bg-black" />}>
+    <Suspense fallback={<div className="fixed inset-0 bg-[#fffdfd]" />}>
       <PracticeRoom />
     </Suspense>
   );

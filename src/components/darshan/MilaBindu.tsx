@@ -73,12 +73,13 @@ void main() {
   vec2 st = (v_uv - 0.5) * 2.0;
   float t = u_t, lv = u_lv;
 
-  // The same Studio palette used by every focused learning surface.
-  vec3 cIvory    = vec3(0.973, 0.957, 0.933);
-  vec3 cSignal   = vec3(0.894, 0.416, 0.451);
-  vec3 cGraphite = vec3(0.18, 0.19, 0.22);
-  vec3 cShadow   = vec3(0.07, 0.075, 0.09);
-  vec3 cPearl    = vec3(0.72, 0.69, 0.67);
+  // White, blush, rose, and deep berry only. The outer field is deliberately
+  // light-valued so alpha compositing on white can never turn it charcoal.
+  vec3 cIvory  = vec3(1.0, 0.992, 0.992);
+  vec3 cSignal = vec3(0.714, 0.239, 0.408);
+  vec3 cPetal  = vec3(0.863, 0.427, 0.573);
+  vec3 cBlush  = vec3(1.0, 0.914, 0.941);
+  vec3 cBerry  = vec3(0.553, 0.176, 0.314);
 
   float n1 = fbm(vec3(st * 2.6, t * 0.16));
   float n2 = fbm(vec3(st * 3.0 + n1 * 0.5, t * 0.12 + 4.0));
@@ -122,32 +123,33 @@ void main() {
   float sturb = fbm(vec3(st * 3.0, t * 0.14));
   float arms = pow(0.5 + 0.5 * sin(spiralPhase), 6.0);
   float spiral = arms * smoothstep(0.30, 0.0, rr) * (0.7 + 0.5 * lv) * (0.7 + 0.4 * flicker) * (0.7 + 0.5 * sturb);
-  vec3 spiralHue = mix(cPearl, cSignal, 0.5 + 0.5 * sin(spiralPhase * 0.5 + t * 0.3));
-  spiralHue = mix(spiralHue, cShadow, 0.28 * sturb);
+  vec3 spiralHue = mix(cBlush, cSignal, 0.5 + 0.5 * sin(spiralPhase * 0.5 + t * 0.3));
+  spiralHue = mix(spiralHue, cBerry, 0.08 * sturb);
 
   float gwave = sin(wd * 16.0 - t * (1.0 + 0.4 * wspeed));
   float gwenv = exp(-wd * 1.15) * smoothstep(0.05, 0.20, wd);
   float gcrest = max(gwave, 0.0) * gwenv * (0.7 + 0.5 * lv);
 
   float hueT = 0.5 + 0.5 * sin(t * 0.18 + n2 * 2.5);
-  vec3 surroundHue = mix(cGraphite, cShadow, hueT);
+  vec3 surroundHue = mix(cBlush, cPetal, hueT);
   surroundHue = mix(surroundHue, cSignal, 0.32 * (0.5 + 0.5 * sin(t * 0.11 + n1 * 2.0)));
   float fineTex = fbm(vec3(st * 4.2 + 7.0, t * 0.10));
   float surroundField = smoothstep(1.18, 0.16, wd) * (0.08 + 0.12 * fineTex);
 
   vec3 col = surroundHue * surroundField * (0.7 + 0.5 * tide)
-    + core * cIvory
-    + corona * mix(cIvory, cSignal, 0.5)
-    + inner * mix(cSignal, cGraphite, 0.35 + n1 * 0.2)
-    + outer * mix(cGraphite, mix(cShadow, cPearl, 0.22), 0.30 + n2 * 0.25)
-    + bloom * mix(cShadow, cPearl, 0.62)
-    + aura * cPearl
-    + rings * mix(cSignal, cPearl, 0.34)
+    + core * cBerry
+    + corona * mix(cIvory, cSignal, 0.58)
+    + inner * mix(cSignal, cPetal, 0.35 + n1 * 0.2)
+    + outer * mix(cPetal, cBlush, 0.30 + n2 * 0.25)
+    + bloom * mix(cIvory, cBlush, 0.62)
+    + aura * cBlush
+    + rings * mix(cSignal, cBlush, 0.34)
     + spiral * spiralHue
-    + gcrest * mix(cPearl, cSignal, 0.45) * 0.24;
+    + gcrest * mix(cBlush, cSignal, 0.45) * 0.24;
 
-  col = clamp(col, 0.0, 1.0);
   float a = clamp(surroundField * 0.7 + core + corona * 0.8 + inner + outer * 0.7 + bloom + aura * 0.9 + rings + spiral + gcrest * 0.24, 0.0, 1.0);
+  col = clamp(col, 0.0, 1.0);
+  col = mix(cIvory, col, smoothstep(0.08, 0.92, a));
   o = vec4(col * a, a);
 }`;
 
@@ -182,12 +184,12 @@ void main() {
   glow *= ring;
   
   float h = fract(v_seed * 0.61);
-  vec3 signal = vec3(0.894, 0.416, 0.451);
-  vec3 graphite = vec3(0.18, 0.19, 0.22);
-  vec3 shadow = vec3(0.07, 0.075, 0.09);
-  vec3 ivory = vec3(0.973, 0.957, 0.933);
+  vec3 signal = vec3(0.788, 0.310, 0.357);
+  vec3 petal = vec3(0.914, 0.561, 0.647);
+  vec3 blush = vec3(0.949, 0.769, 0.808);
+  vec3 ivory = vec3(1.0, 0.992, 0.992);
   
-  vec3 col = mix(graphite, shadow, smoothstep(0.0, 0.34, h));
+  vec3 col = mix(blush, petal, smoothstep(0.0, 0.34, h));
   col = mix(col, signal, smoothstep(0.34, 0.68, h));
   col = mix(col, ivory, smoothstep(0.68, 1.0, h));
   
@@ -464,14 +466,14 @@ export function MilaBindu({
       <svg viewBox="0 0 320 320" width={size} height={size} className={className} role="img" aria-label={ariaLabel} style={{ display: "block", overflow: "visible" }}>
         <defs>
           <radialGradient id={halo}>
-            <stop offset="0%" stopColor="#e46a73" stopOpacity="0.35" />
-            <stop offset="55%" stopColor="#7f7b79" stopOpacity="0.1" />
-            <stop offset="100%" stopColor="#7f7b79" stopOpacity="0" />
+            <stop offset="0%" stopColor="#b63d68" stopOpacity="0.34" />
+            <stop offset="55%" stopColor="#f2c4ce" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#f2c4ce" stopOpacity="0" />
           </radialGradient>
           <radialGradient id={core}>
-            <stop offset="0%" stopColor="#000000" />
-            <stop offset="40%" stopColor="#eceae4" />
-            <stop offset="100%" stopColor="#e46a73" stopOpacity="0" />
+            <stop offset="0%" stopColor="#8d2d50" />
+            <stop offset="40%" stopColor="#ffffff" />
+            <stop offset="100%" stopColor="#b63d68" stopOpacity="0" />
           </radialGradient>
         </defs>
         <style>{`
@@ -482,15 +484,26 @@ export function MilaBindu({
         `}</style>
         <g className={`bindu-breathe-${id}`}>
           <circle cx="160" cy="160" r="150" fill={`url(#${halo})`} />
-          <circle cx="160" cy="160" r="118" fill="none" stroke="#e46a73" strokeWidth={1.4} opacity="0.5" />
-          <circle cx="160" cy="160" r="90" fill="none" stroke="#b9b0aa" strokeWidth={1} opacity="0.4" />
-          <circle cx="160" cy="160" r="58" fill="none" stroke="#7f7b79" strokeWidth={0.8} opacity="0.32" />
+          <circle cx="160" cy="160" r="118" fill="none" stroke="#b63d68" strokeWidth={1.4} opacity="0.5" />
+          <circle cx="160" cy="160" r="90" fill="none" stroke="#e98fa5" strokeWidth={1} opacity="0.46" />
+          <circle cx="160" cy="160" r="58" fill="none" stroke="#f2c4ce" strokeWidth={0.8} opacity="0.58" />
           <circle cx="160" cy="160" r="46" fill={`url(#${core})`} opacity="0.7" />
-          <circle cx="160" cy="160" r="13" fill="#000000" />
+          <circle cx="160" cy="160" r="13" fill="#8d2d50" />
         </g>
       </svg>
     );
   }
 
-  return <canvas ref={canvasRef} style={{ width: size, height: size, display: "block", borderRadius: "50%" }} className={className} role="img" aria-label={ariaLabel} />;
+  return (
+    <span
+      className={`mila-orb-shell${className ? ` ${className}` : ""}`}
+      data-orb-state={state}
+      style={{ width: size, height: size }}
+      role="img"
+      aria-label={ariaLabel}
+    >
+      <canvas ref={canvasRef} style={{ width: size, height: size, display: "block", borderRadius: "50%" }} aria-hidden="true" />
+      <span className="mila-orb-coremark" aria-hidden="true" />
+    </span>
+  );
 }

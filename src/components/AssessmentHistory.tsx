@@ -4,7 +4,7 @@
 import { C } from '@/lib/theme';
 import { Card } from '@/components/ui/Card';
 
-const SIGNAL = '#c94f5b';
+const SIGNAL = '#b63d68';
 
 const HISTORY = [
   { date: '2 weeks ago', score: '14/20', level: 'A2' },

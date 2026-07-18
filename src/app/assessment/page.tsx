@@ -12,13 +12,14 @@ import LangToggle from '@/components/LangToggle';
 import ReliableAssessment from '@/components/ReliableAssessment';
 import LocalVoiceAssessment from '@/components/LocalVoiceAssessment';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
+import { EditorialChoice, EditorialChoiceGroup } from '@/components/ui/EditorialChoice';
 import MilaIcon from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import type { AssessmentResult } from '@/lib/assessment';
 
 type Phase = 'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'finalizing' | 'error';
-const SIGNAL = '#c94f5b';
+const SIGNAL = '#b63d68';
 
 export default function AssessmentVoice() {
   const { lang } = useI18n();
@@ -234,30 +235,42 @@ export default function AssessmentVoice() {
         </h1>
         <p className="focus-copy">
           {lang==='ru'
-            ? 'Основная голосовая проверка отправляет запись только на сервер Mila и рассчитана на работу в России без VPN.'
-            : 'The primary voice check sends audio only to Mila and is designed to work in Russia without a VPN.'}
+            ? 'Выбирай способ, в котором тебе спокойно. Mila заметит, что уже получается, и соберёт личный маршрут без оценочного давления.'
+            : 'Choose the way that feels comfortable. Mila notices what already works and shapes a personal path without judgment.'}
         </p>
 
         {mode === 'choice' && (
-          <div className="assessment-page__choices">
-            <button type="button" onClick={beginLocalVoice}
-              className="focus-button focus-button--voice">
-              <MilaIcon name="voice" size={19}/>
-              {lang==='ru'?'Голосовая проверка · 3–5 минут':'Voice level check · 3–5 minutes'}
-              <span>
-                {lang==='ru'?'Только сервер Mila · без VPN':'Mila server only · no VPN'}
-              </span>
-            </button>
-            <button type="button" onClick={beginReliable}
-              className="focus-button focus-button--quiet">
-              {lang==='ru'?'Тест без микрофона · 5–7 минут':'No-microphone test · 5–7 minutes'}
-            </button>
-            <button type="button" onClick={start}
-              className="focus-button focus-button--quiet">
-              <MilaIcon name="sparkle" size={18}/>
-              {lang==='ru'?'Живое AI-собеседование (где доступно)':'Live AI interview (where supported)'}
-            </button>
-          </div>
+          <EditorialChoiceGroup
+            index="01"
+            columns={3}
+            label={lang==='ru' ? 'Выбери свой ритм' : 'Choose your rhythm'}
+            note={lang==='ru' ? 'Каждый путь приводит к одному личному плану.' : 'Every route leads to the same personal learning plan.'}
+          >
+            <EditorialChoice
+              title={lang==='ru' ? 'Поговорить с Милой' : 'Talk with Mila'}
+              detail={lang==='ru' ? 'Голос · 3–5 минут · сервер Mila, без VPN' : 'Voice · 3–5 min · Mila server, no VPN'}
+              mark="01"
+              meta={lang==='ru' ? 'Советуем начать' : 'Best beginning'}
+              icon={<MilaIcon name="voice" size={16}/>}
+              featured
+              onClick={beginLocalVoice}
+            />
+            <EditorialChoice
+              title={lang==='ru' ? 'Ответить письменно' : 'Answer in writing'}
+              detail={lang==='ru' ? 'Тихий режим · 5–7 минут · без микрофона' : 'Quiet mode · 5–7 min · no microphone'}
+              mark="02"
+              icon={<MilaIcon name="lessons" size={16}/>}
+              onClick={beginReliable}
+            />
+            <EditorialChoice
+              title={lang==='ru' ? 'Живой разговор' : 'Live conversation'}
+              detail={lang==='ru' ? 'Голосовое собеседование · доступ зависит от региона' : 'Voice interview · availability depends on region'}
+              mark="03"
+              meta={lang==='ru' ? 'По желанию' : 'Optional'}
+              icon={<MilaIcon name="sparkle" size={16}/>}
+              onClick={start}
+            />
+          </EditorialChoiceGroup>
         )}
 
         {/* The orb — tap to begin, then it breathes with the conversation */}

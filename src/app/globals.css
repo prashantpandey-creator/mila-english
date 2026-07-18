@@ -2,40 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Mila's single brand language: warm neutrals, one rose interaction signal. */
+/* Mila's single brand language: true white, cool blush, and one rose signal. */
 :root {
-  --noir: #171210; --noir-2: #201917; --noir-3: #2a211e;
-  --ivory: #fffaf5; --stone: #746861;
-  --mila-brand: #963640; --mila-brand-deep: #772a33;
-  --mila-brand-soft: rgba(150,54,64,.1); --mila-brand-line: rgba(150,54,64,.24);
-  --mercury: var(--mila-brand); --mercury-bright: #e46a73; --mercury-soft: var(--mila-brand-soft);
-  --venus: var(--mila-brand); --venus-bright: #e46a73; --venus-deep: var(--mila-brand-deep); --venus-ink: #241d19; --venus-soft: var(--mila-brand-soft);
-  --voice: var(--mila-brand); --voice-bright: #e46a73; --voice-soft: var(--mila-brand-soft);
-  --jupiter: var(--mila-brand); --jupiter-bright: #e46a73; --jupiter-soft: var(--mila-brand-soft);
+  --noir: #2f1b24; --noir-2: #3b222e; --noir-3: #492a38;
+  --ivory: #ffffff; --stone: #75606a;
+  --mila-brand: #b63d68; --mila-brand-deep: #8d2d50;
+  --mila-brand-bright: #dc6d92;
+  --mila-brand-soft: rgba(182,61,104,.1); --mila-brand-line: rgba(182,61,104,.24);
+  --mercury: var(--mila-brand); --mercury-bright: var(--mila-brand-bright); --mercury-soft: var(--mila-brand-soft);
+  --venus: var(--mila-brand); --venus-bright: var(--mila-brand-bright); --venus-deep: var(--mila-brand-deep); --venus-ink: #2f1b24; --venus-soft: var(--mila-brand-soft);
+  --voice: var(--mila-brand); --voice-bright: var(--mila-brand-bright); --voice-soft: var(--mila-brand-soft);
+  --jupiter: var(--mila-brand); --jupiter-bright: var(--mila-brand-bright); --jupiter-soft: var(--mila-brand-soft);
   --gold: var(--mila-brand); --gold-soft: var(--mila-brand-soft);
   --danger: var(--mila-brand-deep); --danger-soft: var(--mila-brand-soft);
   --rose: var(--mila-brand); --rose-soft: var(--mila-brand-soft);
   --sage: var(--mila-brand); --sage-soft: var(--mila-brand-soft);
-  --glass: rgba(32,25,23,.94); --line: rgba(255,250,245,.14);
+  --glass: rgba(255,255,255,.94); --line: rgba(182,61,104,.16);
   --lp-font-serif: var(--font-display);
   --lp-font-accent: var(--font-sans);
   --font-serif: var(--font-display);
 }
 
-html { background: #f8f4ee; }
+html { background: #fffdfd; color-scheme: light; }
 
 body {
-  /* MUST stay transparent: the front-door atmosphere owns its neutral dark
-     canvas, while each app route paints its warm-paper or focus surface. */
+  /* The front-door artwork remains visible through the transparent body. The
+     html canvas is white, so SSR, overscroll, and slow hydration never flash
+     the retired black theme. */
   background: transparent;
-  color: var(--ivory);
+  color: #2f1b24;
   font-family: var(--font-sans, 'Manrope'), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
 
-/* Display type — the front door's Yeseva One carries every room's headings
-   (Direction A, uniform across the site). Full Cyrillic. */
+/* Display type belongs to marketing and brand moments. Product typography is
+   normalised in inner-theme.css to keep cards and controls clean. */
 h1, h2 {
   font-family: var(--lp-font-serif, 'Yeseva One'), Georgia, serif;
   font-weight: 400;
@@ -1410,15 +1412,16 @@ h1, h2 {
   .mila-guide *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
-/* ── Obsidian strict — neutral surfaces, accents only where meaningful ─── */
-html { background: #000; }
-body { color: #f7f7f8; }
+/* Legacy rules below still provide structural fallbacks. The document canvas
+   itself stays on Mila's light palette so no route can flash black. */
+html { background: #fffdfd; }
+body { color: #2f1b24; }
 
 /* ── Learning journeys — one authored symbol and card language ────────── */
 .mila-icon { display: block; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
-.mila-icon__accent { stroke: #ff758a; }
+.mila-icon__accent { stroke: var(--mila-brand); }
 .mila-icon__fill { fill: currentColor; stroke: none; }
-.mila-icon__accent-fill { fill: #ff758a; stroke: #ff758a; }
+.mila-icon__accent-fill { fill: var(--mila-brand); stroke: var(--mila-brand); }
 
 .journey-stack {
   display: grid;
@@ -1969,17 +1972,16 @@ body { color: #f7f7f8; }
   .room-card:hover { border-color: color-mix(in srgb,var(--room-tone,var(--mercury)) 36%,transparent); background: linear-gradient(145deg,rgba(9,13,11,.88),rgba(3,5,4,.94)); box-shadow: 0 18px 48px rgba(0,0,0,.5),0 0 28px var(--room-glow,rgba(36,211,154,.07)); }
 }
 
-/* Keep the art-directed mobile scene legible. Surface-specific rules below
-   decide whether the route fades into the warm welcome room or focus studio. */
+/* Keep the art-directed mobile scene legible. */
 @media (max-width: 640px) {
   .landing-hero::before {
     background: linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(0,0,0,.36) 34%,rgba(0,0,0,.72) 72%,#000 100%);
   }
 }
 
-/* ── Two-room Mila: a warm welcome outside, a quiet focus studio inside ── */
-html[data-mila-surface="welcome"] { background: #fff8fa; }
-html[data-mila-surface="focus"] { background: #0c0a0e; }
+/* ── One-room Mila: compatibility selectors resolve to the light atelier ── */
+html[data-mila-surface="welcome"],
+html[data-mila-surface="focus"] { background: #fffdfd; }
 
 .mila-surface {
   min-height: 100vh;
@@ -1987,52 +1989,52 @@ html[data-mila-surface="focus"] { background: #0c0a0e; }
   transition: background-color .32s ease,color .24s ease;
 }
 .mila-surface--focus {
-  --surface-page: transparent;
-  --surface-text: #faf6f8;
-  --surface-muted: #bdb1b8;
-  --surface-card: var(--mila-paper-grain), rgba(25,20,27,.92);
-  --surface-nav: rgba(12,10,14,.9);
-  --surface-line: rgba(255,255,255,.12);
-  --surface-control: rgba(255,255,255,.055);
-  --surface-control-line: rgba(255,255,255,.16);
-  --surface-control-shadow: 0 2px 8px rgba(0,0,0,.36);
-  --surface-track: rgba(255,255,255,.1);
-  --surface-card-shadow: 0 14px 42px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.04);
-  --surface-card-shadow-hover: 0 18px 48px rgba(0,0,0,.54),0 0 28px rgba(36,211,154,.07);
-  --surface-card-line-hover: rgba(36,211,154,.38);
-  --surface-icon-tile: linear-gradient(145deg,rgba(36,211,154,.07),rgba(106,220,245,.025));
+  --surface-page: #fffdfd;
+  --surface-text: #2f1b24;
+  --surface-muted: #75606a;
+  --surface-card: var(--mila-paper-grain), #ffffff;
+  --surface-nav: rgba(255,255,255,.96);
+  --surface-line: #efd6df;
+  --surface-control: #fff7fa;
+  --surface-control-line: #efd6df;
+  --surface-control-shadow: 0 1px 3px rgba(47,27,36,.05);
+  --surface-track: rgba(47,27,36,.08);
+  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(94,35,61,.055);
+  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(94,35,61,.08);
+  --surface-card-line-hover: rgba(182,61,104,.3);
+  --surface-icon-tile: rgba(182,61,104,.1);
 }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome {
-  --surface-page: rgba(255,248,250,.96);
-  --surface-text: #2f2530;
-  --surface-muted: #6f6269;
-  --surface-card: var(--mila-paper-grain), rgba(250,247,240,.98);
-  --surface-nav: rgba(255,250,252,.9);
-  --surface-line: rgba(93,46,66,.1);
-  --surface-control: rgba(255,255,255,.76);
-  --surface-control-line: #cdb9c2;
-  --surface-control-shadow: 0 1px 3px rgba(93,46,66,.055);
-  --surface-track: rgba(93,46,66,.1);
-  --surface-card-shadow: 0 1px 2px rgba(63,32,45,.035),0 10px 28px rgba(93,46,66,.065);
-  --surface-card-shadow-hover: 0 2px 4px rgba(63,32,45,.04),0 16px 38px rgba(93,46,66,.09);
-  --surface-card-line-hover: rgba(168,61,100,.3);
-  --surface-icon-tile: linear-gradient(145deg,rgba(242,139,173,.14),rgba(36,211,154,.055));
-  --venus-readable: #a83d64;
-  --mercury-readable: #08785b;
-  --voice-readable: #0c7895;
-  --jupiter-readable: #906600;
+  --surface-page: rgba(255,253,253,.98);
+  --surface-text: #2f1b24;
+  --surface-muted: #75606a;
+  --surface-card: var(--mila-paper-grain), rgba(255,255,255,.98);
+  --surface-nav: rgba(255,255,255,.94);
+  --surface-line: #efd6df;
+  --surface-control: rgba(255,247,250,.9);
+  --surface-control-line: #e3becb;
+  --surface-control-shadow: 0 1px 3px rgba(94,35,61,.05);
+  --surface-track: rgba(47,27,36,.08);
+  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(94,35,61,.055);
+  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(94,35,61,.08);
+  --surface-card-line-hover: rgba(182,61,104,.3);
+  --surface-icon-tile: rgba(182,61,104,.1);
+  --venus-readable: var(--mila-brand);
+  --mercury-readable: var(--mila-brand);
+  --voice-readable: var(--mila-brand);
+  --jupiter-readable: var(--mila-brand);
   min-height: 100vh;
   background: var(--surface-page);
 }
 .mila-surface--front { background: transparent; }
 
-.atmosphere--focus { background: #0c0a0e; }
+.atmosphere--focus { background: #fffdfd; }
 .atmosphere--focus::after {
   background:
-    radial-gradient(980px 720px at 82% 8%,rgba(91,25,50,.1),transparent 62%),
-    linear-gradient(180deg,rgba(12,10,14,.6),rgba(12,10,14,.86) 56%,rgba(12,10,14,.97));
+    radial-gradient(980px 720px at 82% 8%,rgba(182,61,104,.1),transparent 62%),
+    linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,244,248,.92));
 }
-html:not([data-mila-theme="dark"]) .atmosphere--welcome { background: #fff8fa; }
+html:not([data-mila-theme="dark"]) .atmosphere--welcome { background: #fffdfd; }
 html:not([data-mila-theme="dark"]) .atmosphere--welcome video,
 html:not([data-mila-theme="dark"]) .atmosphere--welcome img {
   filter: saturate(.86) contrast(.96) brightness(1.05) blur(.2px);
@@ -2693,24 +2695,16 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .room-swipehint { disp
   .secondary-tools-grid { grid-template-columns: 1fr; }
 }
 
-/* ── Paper grain + welcome-at-night (combined onto pink-noir front-door) ────
-   Two independent things share this block:
-   1. PAPER: a baked SVG fractal-noise fiber, layered UNDER the card color via
-      --surface-card so every .mila-card (and the journey sheet) reads as real
-      paper — felt, not seen. Multiply on the light room, soft-light on noir.
-   2. NIGHT: pink-noir's welcome light CSS is gated on html:not([data-mila-theme=
-      "dark"]); when the device or the learner says dark, the noir design
-      underneath resurfaces. data-mila-theme is seeded pre-paint in layout.tsx.
-   Focus/reading routes are always dark and untouched by either. The pink-noir
-   front-door reskin lives in its own landing selectors, unaffected. */
+/* ── Paper grain ──────────────────────────────────────────────────────────
+   A baked SVG fiber sits under cards so the light atelier feels tactile. */
 .mila-surface {
   --mila-paper-grain: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='170'%20height='170'%3E%3Cfilter%20id='g'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.85'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='170'%20height='170'%20filter='url(%23g)'%20opacity='0.5'/%3E%3C/svg%3E");
 }
 .mila-surface .mila-card { background-blend-mode: multiply; }
-.mila-surface--focus .mila-card,
+.mila-surface--focus .mila-card { background-blend-mode: multiply; }
 html[data-mila-theme="dark"] .mila-surface--welcome .mila-card { background-blend-mode: soft-light; }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome .journey-stack {
-  background: var(--mila-paper-grain), #fbf9f4;
+  background: var(--mila-paper-grain), #ffffff;
   background-blend-mode: multiply;
 }
 
@@ -2718,38 +2712,38 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .journey-stack {
   .theme-toggle button { padding: 6px 8px; font-size: 0.7rem; }
 }
 
-html[data-mila-theme="dark"][data-mila-surface="welcome"] { background: #0c0a0e; }
+html[data-mila-theme="dark"][data-mila-surface="welcome"] { background: #fffdfd; }
 html[data-mila-theme="dark"] .mila-surface--welcome {
-  --surface-page: transparent;
-  --surface-text: #faf6f8;
-  --surface-muted: #bdb1b8;
-  --surface-card: var(--mila-paper-grain), rgba(25,20,27,.92);
-  --surface-nav: rgba(12,10,14,.9);
-  --surface-line: rgba(255,255,255,.12);
-  --surface-control: rgba(255,255,255,.055);
-  --surface-control-line: rgba(255,255,255,.16);
-  --surface-control-shadow: 0 2px 8px rgba(0,0,0,.36);
-  --surface-track: rgba(255,255,255,.1);
-  --surface-card-shadow: 0 14px 42px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.04);
-  --surface-card-shadow-hover: 0 18px 48px rgba(0,0,0,.54),0 0 28px rgba(36,211,154,.07);
-  --surface-card-line-hover: rgba(36,211,154,.38);
-  --surface-icon-tile: linear-gradient(145deg,rgba(36,211,154,.07),rgba(106,220,245,.025));
-  --venus-readable: #ffbdd0;
-  --mercury-readable: #9af2d3;
-  --voice-readable: #b7f2ff;
-  --jupiter-readable: #ffe29a;
-  background: transparent;
+  --surface-page: #fffdfd;
+  --surface-text: #2f1b24;
+  --surface-muted: #75606a;
+  --surface-card: var(--mila-paper-grain), #ffffff;
+  --surface-nav: rgba(255,255,255,.96);
+  --surface-line: #efd6df;
+  --surface-control: #fff7fa;
+  --surface-control-line: #efd6df;
+  --surface-control-shadow: 0 1px 3px rgba(47,27,36,.05);
+  --surface-track: rgba(47,27,36,.08);
+  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(94,35,61,.055);
+  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(94,35,61,.08);
+  --surface-card-line-hover: rgba(182,61,104,.3);
+  --surface-icon-tile: rgba(182,61,104,.1);
+  --venus-readable: var(--mila-brand);
+  --mercury-readable: var(--mila-brand);
+  --voice-readable: var(--mila-brand);
+  --jupiter-readable: var(--mila-brand);
+  background: var(--surface-page);
 }
 html[data-mila-theme="dark"] .mila-surface--welcome .journey-stack {
-  background: var(--mila-paper-grain), rgba(25,20,27,.92);
-  background-blend-mode: soft-light;
-  border-color: rgba(255,255,255,.1);
+  background: var(--mila-paper-grain), #ffffff;
+  background-blend-mode: multiply;
+  border-color: #efd6df;
 }
-html[data-mila-theme="dark"] .atmosphere--welcome { background: #0c0a0e; }
+html[data-mila-theme="dark"] .atmosphere--welcome { background: #fffdfd; }
 html[data-mila-theme="dark"] .atmosphere--welcome::after {
   background:
-    radial-gradient(980px 720px at 82% 8%,rgba(91,25,50,.1),transparent 62%),
-    linear-gradient(180deg,rgba(12,10,14,.6),rgba(12,10,14,.86) 56%,rgba(12,10,14,.97));
+    radial-gradient(980px 720px at 82% 8%,rgba(182,61,104,.1),transparent 62%),
+    linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,244,248,.92));
 }
 
 /* ── Shared learning-room shell ───────────────────────────────────────────
@@ -3222,7 +3216,7 @@ body { overflow-x: clip; }
 
 .mila-surface--focus,
 html[data-mila-theme="dark"] .mila-surface--welcome {
-  --surface-card: #171219;
+  --surface-card: #ffffff;
 }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome {
   --surface-card: rgba(255,255,255,.96);
@@ -3243,14 +3237,14 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome {
   text-align: left;
 }
 .mila-card--interactive:focus-visible {
-  outline: 2px solid var(--mercury,#24d39a);
+  outline: 2px solid var(--mila-brand);
   outline-offset: 3px;
 }
 @media (hover:hover) and (pointer:fine) {
   .mila-card--hover:hover {
     transform: translateY(-1px);
-    border-color: var(--surface-card-line-hover,rgba(36,211,154,.34)) !important;
-    box-shadow: var(--surface-card-shadow-hover,0 16px 38px rgba(0,0,0,.28)) !important;
+    border-color: var(--surface-card-line-hover,rgba(182,61,104,.3)) !important;
+    box-shadow: var(--surface-card-shadow-hover,0 16px 38px rgba(94,35,61,.1)) !important;
   }
 }
 
@@ -3260,7 +3254,7 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome .journey-stack {
   background-blend-mode: normal;
 }
 html[data-mila-theme="dark"] .mila-surface--welcome .journey-stack {
-  background: #171219;
+  background: #ffffff;
   background-image: none;
   background-blend-mode: normal;
 }
@@ -3448,86 +3442,78 @@ html .mila-surface--welcome.mila-surface--front { background: transparent; }
 /* The welcome companion belongs to the warm room even when the learner has
    chosen the dark focus theme for lessons. */
 html .mila-surface--front .mila-guide__launcher {
-  border-color: #d9cec2;
-  background: #fffaf5;
-  box-shadow: 0 18px 46px rgba(36,29,25,.18),inset 0 1px 0 #fff;
+  border-color: #efd6df;
+  background: #ffffff;
+  box-shadow: 0 18px 46px rgba(94,35,61,.14),inset 0 1px 0 #fff;
 }
-html .mila-surface--front .mila-guide__state { border-color: #fffaf5; background: #963640; box-shadow: none; }
+html .mila-surface--front .mila-guide__state { border-color: #ffffff; background: #b63d68; box-shadow: none; }
 html .mila-surface--front .mila-guide__textchip {
-  border-color: #d9cec2;
-  color: #963640;
-  background: #fffaf5;
-  box-shadow: 0 8px 20px rgba(36,29,25,.12);
+  border-color: #efd6df;
+  color: #b63d68;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(94,35,61,.1);
 }
 html .mila-surface--front .mila-guide__nudge,
 html .mila-surface--front .mila-guide__panel {
-  border-color: #d9cec2;
-  color: #241d19;
-  background: rgba(255,250,245,.985);
-  box-shadow: 0 28px 84px rgba(36,29,25,.2),inset 0 1px 0 #fff;
+  border-color: #efd6df;
+  color: #2f1b24;
+  background: rgba(255,255,255,.985);
+  box-shadow: 0 28px 84px rgba(94,35,61,.16),inset 0 1px 0 #fff;
 }
-html .mila-surface--front .mila-guide__header { border-color: #d9cec2; background: #f8f4ee; }
-html .mila-surface--front .mila-guide__portrait { border-color: #d9cec2; background: #fffaf5; }
-html .mila-surface--front .mila-guide__portrait > i { border-color: #f8f4ee; background: #963640; box-shadow: none; }
-html .mila-surface--front .mila-guide__identity strong { color: #241d19; }
+html .mila-surface--front .mila-guide__header { border-color: #efd6df; background: #fff7fa; }
+html .mila-surface--front .mila-guide__portrait { border-color: #efd6df; background: #ffffff; }
+html .mila-surface--front .mila-guide__portrait > i { border-color: #fff7fa; background: #b63d68; box-shadow: none; }
+html .mila-surface--front .mila-guide__identity strong { color: #2f1b24; }
 html .mila-surface--front .mila-guide__identity span,
 html .mila-surface--front .mila-guide__page,
-html .mila-surface--front .mila-guide__nudge span { color: #746861; }
-html .mila-surface--front .mila-guide__page { border-color: #d9cec2; background: #fffaf5; }
-html .mila-surface--front .mila-guide__close { color: #746861; }
+html .mila-surface--front .mila-guide__nudge span { color: #75606a; }
+html .mila-surface--front .mila-guide__page { border-color: #efd6df; background: #ffffff; }
+html .mila-surface--front .mila-guide__close { color: #75606a; }
 html .mila-surface--front .mila-guide__welcome,
 html .mila-surface--front .mila-guide__message.is-assistant,
 html .mila-surface--front .mila-guide__working {
-  border-color: #d9cec2;
-  color: #241d19;
-  background: #fffdf9;
-  box-shadow: inset 3px 0 0 #c94f5b;
+  border-color: #efd6df;
+  color: #2f1b24;
+  background: #fff7fa;
+  box-shadow: inset 3px 0 0 #b63d68;
 }
 html .mila-surface--front .mila-guide__welcome p,
-html .mila-surface--front .mila-guide__message.is-assistant p { color: #241d19; }
+html .mila-surface--front .mila-guide__message.is-assistant p { color: #2f1b24; }
 html .mila-surface--front .mila-guide__welcome small,
-html .mila-surface--front .mila-guide__guest p { color: #746861; }
+html .mila-surface--front .mila-guide__guest p { color: #75606a; }
 html .mila-surface--front .mila-guide__actions button {
-  border-color: #d9cec2;
-  color: #746861;
-  background: #fffaf5;
+  border-color: #efd6df;
+  color: #75606a;
+  background: #ffffff;
 }
 html .mila-surface--front .mila-guide__actions button span,
-html .mila-surface--front .mila-guide__actions button .mila-icon { color: #963640; }
-html .mila-surface--front .mila-guide__composer { border-color: #d9cec2; background: #fffaf5; }
-html .mila-surface--front .mila-guide__composer input { color: #241d19; }
-html .mila-surface--front .mila-guide__mic { color: #963640; background: rgba(150,54,64,.1); }
+html .mila-surface--front .mila-guide__actions button .mila-icon { color: #b63d68; }
+html .mila-surface--front .mila-guide__composer { border-color: #efd6df; background: #ffffff; }
+html .mila-surface--front .mila-guide__composer input { color: #2f1b24; }
+html .mila-surface--front .mila-guide__mic { color: #b63d68; background: rgba(182,61,104,.1); }
 html .mila-surface--front .mila-guide__mic:hover:not(:disabled),
-html .mila-surface--front .mila-guide__mic.is-listening { color: #fffaf5; background: #963640; box-shadow: none; }
+html .mila-surface--front .mila-guide__mic.is-listening { color: #ffffff; background: #b63d68; box-shadow: none; }
 html .mila-surface--front .mila-guide__message.is-user,
 html .mila-surface--front .mila-guide__send,
 html .mila-surface--front .mila-guide__guest button:first-child {
-  color: #fffaf5;
-  background: #963640;
+  color: #ffffff;
+  background: #b63d68;
   box-shadow: none;
 }
 html .mila-surface--front .mila-guide__guest button {
-  border-color: #d9cec2;
-  color: #746861;
-  background: #fffaf5;
+  border-color: #efd6df;
+  color: #75606a;
+  background: #ffffff;
 }
 html .mila-surface--front .mila-guide[data-state] .mila-guide__identity span i,
-html .mila-surface--front .mila-guide[data-state] .mila-guide__state { background: #963640; box-shadow: none; }
+html .mila-surface--front .mila-guide[data-state] .mila-guide__state { background: #b63d68; box-shadow: none; }
 html .mila-surface--front .mila-guide[data-state="listening"] .mila-guide__launcher,
 html .mila-surface--front .mila-guide[data-voice="1"] .mila-guide__launcher {
-  border-color: #c94f5b;
-  box-shadow: 0 0 0 8px rgba(201,79,91,.1),0 18px 46px rgba(36,29,25,.18);
+  border-color: #dc6d92;
+  box-shadow: 0 0 0 8px rgba(182,61,104,.1),0 18px 46px rgba(94,35,61,.14);
 }
-html .mila-surface--front .mila-guide__launcher::before { background: rgba(201,79,91,.1); }
-html .mila-surface--front .mila-guide__orbit i { border-color: rgba(201,79,91,.28); }
-
-@media (max-width: 640px) {
-  html .mila-surface--front .mila-guide:not(.is-open) {
-    position: absolute;
-    top: clamp(280px,44svh,390px);
-    bottom: auto;
-  }
-}
+html .mila-surface--front .mila-guide__launcher::before { background: rgba(182,61,104,.1); }
+html .mila-surface--front .mila-guide__orbit i { border-color: rgba(182,61,104,.28); }
 
 /* ── Persistent bottom navigation (the rim) ──────────────────────────────────
    The five core rooms, one tap apart from anywhere. Mounted in the layout
@@ -3662,26 +3648,26 @@ html[data-mila-theme="dark"] .mila-showcase__nav button:hover{background:#e46a73
 /* Marketing and pricing use the same companion as the learning product.
    Motion communicates listening/thinking/speaking; colour never changes role. */
 html .mila-surface--marketing .mila-guide {
-  --guide-paper: #fffaf5;
-  --guide-panel: #fffdf9;
-  --guide-ink: #241d19;
-  --guide-muted: #746861;
-  --guide-line: #d9cec2;
-  --guide-accent: #963640;
-  --guide-accent-deep: #772a33;
+  --guide-paper: #fff7fa;
+  --guide-panel: #ffffff;
+  --guide-ink: #2f1b24;
+  --guide-muted: #75606a;
+  --guide-line: #efd6df;
+  --guide-accent: #b63d68;
+  --guide-accent-deep: #8d2d50;
   color: var(--guide-ink);
 }
 html .mila-surface--marketing .mila-guide__launcher {
+  overflow: clip !important;
   border: 1px solid var(--guide-line) !important;
   border-radius: 16px !important;
   background: var(--guide-panel) !important;
-  box-shadow: 0 14px 36px rgba(36,29,25,.18) !important;
+  box-shadow: 0 14px 36px rgba(94,35,61,.14) !important;
 }
-html .mila-surface--marketing .mila-guide__launcher:hover { border-color: var(--guide-accent) !important; box-shadow: 0 16px 40px rgba(36,29,25,.2) !important; }
+html .mila-surface--marketing .mila-guide__launcher:hover { border-color: var(--guide-accent) !important; box-shadow: 0 16px 40px rgba(94,35,61,.16) !important; }
 html .mila-surface--marketing .mila-guide__launcher:focus-visible { outline-color: var(--guide-accent); }
 html .mila-surface--marketing .mila-guide__launcher::before { display: none; }
-html .mila-surface--marketing .mila-guide__orbit i,
-html .mila-surface--marketing .mila-guide__orbit i:last-child { border-color: rgba(201,79,91,.28); }
+html .mila-surface--marketing .mila-guide__orbit { display: none; }
 html .mila-surface--marketing .mila-guide__state,
 html .mila-surface--marketing .mila-guide[data-state] .mila-guide__state,
 html .mila-surface--marketing .mila-guide__identity span i,
@@ -3692,7 +3678,7 @@ html .mila-surface--marketing .mila-guide__portrait > i {
   box-shadow: none !important;
 }
 html .mila-surface--marketing .mila-guide[data-state] .mila-guide__launcher,
-html .mila-surface--marketing .mila-guide[data-voice="1"] .mila-guide__launcher { border-color: var(--guide-accent) !important; box-shadow: 0 14px 36px rgba(36,29,25,.18) !important; }
+html .mila-surface--marketing .mila-guide[data-voice="1"] .mila-guide__launcher { border-color: var(--guide-accent) !important; box-shadow: 0 14px 36px rgba(94,35,61,.14) !important; }
 html .mila-surface--marketing .mila-guide__textchip,
 html .mila-surface--marketing .mila-guide__voicechip {
   border: 1px solid var(--guide-accent) !important;
@@ -3706,7 +3692,7 @@ html .mila-surface--marketing :is(.mila-guide__panel,.mila-guide__nudge,.mila-gu
   border-radius: 14px !important;
   color: var(--guide-ink) !important;
   background: var(--guide-panel) !important;
-  box-shadow: 0 20px 58px rgba(36,29,25,.2) !important;
+  box-shadow: 0 20px 58px rgba(94,35,61,.16) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
@@ -3727,4 +3713,178 @@ html .mila-surface--marketing .mila-guide__send,
 html .mila-surface--marketing .mila-guide__guest button:first-child { color: var(--guide-paper) !important; background: var(--guide-accent) !important; box-shadow: none !important; }
 html .mila-surface--marketing .mila-guide__composer { border-color: var(--guide-line) !important; background: var(--guide-panel) !important; box-shadow: none !important; }
 html .mila-surface--marketing .mila-guide__composer input { color: var(--guide-ink) !important; }
-html .mila-surface--marketing .mila-guide__mic { color: var(--guide-accent-deep) !important; background: rgba(201,79,91,.1) !important; }
+html .mila-surface--marketing .mila-guide__mic { color: var(--guide-accent-deep) !important; background: rgba(182,61,104,.1) !important; }
+html .mila-surface--marketing .mila-guide__messages { scrollbar-color: var(--guide-line) transparent; }
+html .mila-surface--marketing .mila-guide__messages::-webkit-scrollbar-thumb { border-radius: 999px; background: var(--guide-line); }
+html .mila-surface--marketing .mila-guide__message > button,
+html .mila-surface--marketing .mila-guide__close { color: var(--guide-muted) !important; }
+html .mila-surface--marketing .mila-guide__message > button:hover,
+html .mila-surface--marketing .mila-guide__close:hover,
+html .mila-surface--marketing .mila-guide__chips button:hover {
+  color: var(--guide-accent) !important;
+  background: rgba(182,61,104,.09) !important;
+}
+html .mila-surface--marketing .mila-guide__error {
+  border-color: var(--guide-line) !important;
+  color: var(--guide-accent-deep) !important;
+  background: #fff1f6 !important;
+}
+
+/* ── White / pink compatibility guard ────────────────────────────────────
+   A few early utilities still exist for older routes and experiments. Keep
+   their geometry, but make their visual contract identical to the current
+   atelier: white paper, cool blush, berry action, and deep plum ink. This is
+   deliberately last so a stale saved `dark` preference cannot revive the
+   retired cyan, emerald, gold, beige, or black primitives. */
+::selection { color: #ffffff; background: #a52552; }
+
+.card,
+.glass,
+.glass-card {
+  color: #2f1b24;
+  border-color: #efd6df;
+  background: #ffffff;
+  background-image: none;
+  box-shadow: 0 1px 2px rgba(47,27,36,.025), 0 12px 32px rgba(94,35,61,.07);
+}
+.card:hover,
+.glass-card:hover {
+  border-color: rgba(182,61,104,.34);
+  box-shadow: 0 2px 4px rgba(47,27,36,.035), 0 16px 38px rgba(94,35,61,.1);
+}
+
+.btn-primary {
+  color: #ffffff;
+  border: 1px solid #a52552;
+  background: #a52552;
+  background-image: none;
+  box-shadow: 0 9px 24px rgba(141,45,80,.2);
+}
+.btn-primary:hover {
+  color: #ffffff;
+  border-color: #8d2d50;
+  background: #8d2d50;
+  box-shadow: 0 12px 30px rgba(141,45,80,.24);
+}
+.btn-primary:focus-visible,
+.lang-toggle button:focus-visible,
+.mila-showcase button:focus-visible,
+.mila-tabbar__tab:focus-visible {
+  outline: 2px solid #b63d68;
+  outline-offset: 3px;
+}
+
+.lang-toggle {
+  border-color: #efd6df;
+  background: #fff7fa;
+}
+.lang-toggle button { color: #75606a; }
+.lang-toggle button.active,
+.landing-nav .lang-toggle button.active {
+  color: #ffffff;
+  background: #a52552;
+  background-image: none;
+  box-shadow: none;
+}
+.streak-card {
+  border-color: #efd6df;
+  background: #fff7fa;
+  background-image: none;
+}
+.gradient-text {
+  background-image: linear-gradient(120deg, #8d2d50, #b63d68 52%, #dc6d92);
+}
+.hairline {
+  background: linear-gradient(90deg, transparent, rgba(182,61,104,.42), transparent);
+}
+
+html .mila-tabbar,
+html[data-mila-theme="dark"] .mila-tabbar {
+  border-top-color: #efd6df;
+  background: rgba(255,255,255,.95);
+  box-shadow: 0 -8px 28px rgba(94,35,61,.06);
+}
+html .mila-tabbar__tab,
+html[data-mila-theme="dark"] .mila-tabbar__tab { color: #75606a; }
+html .mila-tabbar__tab:not(.is-active):hover,
+html[data-mila-theme="dark"] .mila-tabbar__tab:not(.is-active):hover { color: #2f1b24; }
+html .mila-tabbar__tab.is-active,
+html[data-mila-theme="dark"] .mila-tabbar__tab.is-active { color: #8d2d50; }
+html .mila-tabbar__tab.is-active .mila-tabbar__icon,
+html[data-mila-theme="dark"] .mila-tabbar__tab.is-active .mila-tabbar__icon {
+  color: #a52552;
+  background: #fff1f5;
+}
+
+html .mila-showcase,
+html[data-mila-theme="dark"] .mila-showcase {
+  border-color: #efd6df;
+  background: #ffffff;
+  box-shadow: 0 16px 44px rgba(94,35,61,.08);
+}
+html .mila-showcase__grain,
+html[data-mila-theme="dark"] .mila-showcase__grain {
+  opacity: .18;
+  mix-blend-mode: multiply;
+  background-image: repeating-linear-gradient(105deg, rgba(182,61,104,.09) 0 1px, transparent 1px 6px);
+}
+html .mila-showcase__heading,
+html[data-mila-theme="dark"] .mila-showcase__heading,
+html .mila-showcase__vu-cap,
+html[data-mila-theme="dark"] .mila-showcase__vu-cap,
+html .mila-showcase__score span,
+html[data-mila-theme="dark"] .mila-showcase__score span { color: #75606a; }
+html .mila-showcase__top,
+html[data-mila-theme="dark"] .mila-showcase__top,
+html .mila-showcase__vu,
+html[data-mila-theme="dark"] .mila-showcase__vu { border-color: #efd6df; }
+html .mila-showcase__kick,
+html[data-mila-theme="dark"] .mila-showcase__kick { color: #75606a; }
+html .mila-showcase__live,
+html[data-mila-theme="dark"] .mila-showcase__live,
+html .mila-showcase__ipa,
+html[data-mila-theme="dark"] .mila-showcase__ipa,
+html .mila-showcase__stop.is-hub,
+html[data-mila-theme="dark"] .mila-showcase__stop.is-hub,
+html .mila-showcase__vu-cap span:nth-child(2),
+html[data-mila-theme="dark"] .mila-showcase__vu-cap span:nth-child(2) { color: #a52552; }
+html .mila-showcase__live i,
+html[data-mila-theme="dark"] .mila-showcase__live i {
+  background: #b63d68;
+  box-shadow: 0 0 0 5px rgba(182,61,104,.1);
+}
+html .mila-showcase__word,
+html[data-mila-theme="dark"] .mila-showcase__word,
+html .mila-showcase__score b,
+html[data-mila-theme="dark"] .mila-showcase__score b { color: #2f1b24; }
+html .mila-showcase__stop,
+html[data-mila-theme="dark"] .mila-showcase__stop { color: #75606a; }
+html .mila-showcase__stop::before,
+html[data-mila-theme="dark"] .mila-showcase__stop::before { background: #efd6df; }
+html .mila-showcase__stop::after,
+html[data-mila-theme="dark"] .mila-showcase__stop::after {
+  border-color: #2f1b24;
+  background: #ffffff;
+}
+html .mila-showcase__stop.is-hub::after,
+html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::after { border-color: #a52552; }
+html .mila-showcase__stop.is-hub::before,
+html .mila-showcase__stop.is-after::before,
+html[data-mila-theme="dark"] .mila-showcase__stop.is-hub::before,
+html[data-mila-theme="dark"] .mila-showcase__stop.is-after::before { background: #b63d68; }
+html .mila-showcase__dot,
+html[data-mila-theme="dark"] .mila-showcase__dot { background: rgba(182,61,104,.2); }
+html .mila-showcase__dot.is-on,
+html[data-mila-theme="dark"] .mila-showcase__dot.is-on { background: #b63d68; }
+html .mila-showcase__nav button,
+html[data-mila-theme="dark"] .mila-showcase__nav button {
+  color: #2f1b24;
+  border-color: #efd6df;
+  background: #ffffff;
+}
+html .mila-showcase__nav button:hover,
+html[data-mila-theme="dark"] .mila-showcase__nav button:hover {
+  color: #ffffff;
+  border-color: #a52552;
+  background: #a52552;
+}
