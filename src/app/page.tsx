@@ -213,39 +213,6 @@ export default function HomePage() {
     },
   ];
 
-  const moments = [
-    {
-      src: '/visuals/v2/cinematic/thumb-start-v1.webp',
-      kicker: T('Начни здесь', 'Start here'),
-      title: T('Проверка уровня', 'Level check'),
-      href: '/assessment',
-    },
-    {
-      src: '/visuals/v2/cinematic/thumb-london-v1.webp',
-      kicker: T('Слушай', 'Listen'),
-      title: T('Живая речь', 'Real accents'),
-      href: '/listen',
-    },
-    {
-      src: '/visuals/v2/cinematic/thumb-new-york-v1.webp',
-      kicker: T('Запоминай', 'Remember'),
-      title: T('Новые слова', 'New words'),
-      href: '/vocabulary',
-    },
-    {
-      src: '/visuals/v2/cinematic/thumb-india-v1.webp',
-      kicker: T('Собирай', 'Build'),
-      title: T('Грамматика', 'Grammar'),
-      href: '/grammar',
-    },
-    {
-      src: '/visuals/v2/cinematic/thumb-talk-v1.webp',
-      kicker: T('Говори', 'Speak'),
-      title: T('Мила рядом', 'Talk with Mila'),
-      href: '/darshan',
-    },
-  ];
-
   const cities = [
     { src: '/ambience/stills/uk-bigben-night.jpg', code: 'LDN', name: T('Лондон', 'London'), note: T('Британский английский', 'British English') },
     { src: '/ambience/stills/us-manhattan.jpg', code: 'NYC', name: T('Нью-Йорк', 'New York'), note: T('Американский английский', 'American English') },
@@ -314,85 +281,39 @@ export default function HomePage() {
       </header>
 
       <main id="lp-main">
-        {/* ── Introducing Mila — the free front-door conversation ── */}
-        <section className="lp-intro" aria-label={T('Познакомьтесь с Милой', 'Meet Mila')}>
-          <div className="lp-intro__glow" aria-hidden />
-          <div className="lp-shell lp-intro__inner">
-            <span className="lp-intro__eyebrow">{T('Знакомьтесь — Мила', 'Introducing Mila')}</span>
-            <h1 className="lp-intro__title">
-              {lang === 'ru'
-                ? <>Просто поговори с <em>Милой.</em></>
-                : <>Just talk to <em>Mila.</em></>}
-            </h1>
-            <p className="lp-intro__lede">
-              {T(
-                'Живой голосовой разговор с твоей AI-подругой — тёплой, весёлой, настоящей. Без урока, без вопросов по списку. Нажми и говори — она слушает.',
-                'A live voice chat with your AI girl — warm, playful, real. No lesson, no scripted questions. Tap and talk — she listens.',
-              )}
-            </p>
-            <button className="lp-intro__cta" onClick={startFreeTalk}>
-              <span className="lp-intro__pulse" aria-hidden><i /><i /><i /></span>
-              {T('Начать разговор с Милой', 'Start a conversation with Mila now')}
-              <Icon name="arrow" size={19} />
-            </button>
-            <div className="lp-intro__assure">
-              <span><Icon name="check" size={13} />{T('Бесплатно', 'Free')}</span>
-              <span><Icon name="check" size={13} />{T('Без регистрации', 'No sign-up')}</span>
-              <span><Icon name="voice" size={13} />{T('Просто голосом', 'Just your voice')}</span>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Hero ── */}
-        <section className="lp-hero">
+        {/* One promise, one action. The product proof follows immediately. */}
+        <section className="lp-hero" aria-label={T('Поговорить с Милой', 'Talk with Mila')}>
           <div className="lp-shell lp-hero__stage">
             <div className="lp-hero__copy">
-              <div className="lp-eyebrow"><i />{T('Персональная AI-наставница · Работает в России', 'Private AI English coach · Works in Russia')}</div>
-              <h1>{lang === 'ru' ? <>Английский, который <em>слышит тебя.</em></> : <>English that <em>listens back.</em></>}</h1>
+              <div className="lp-hero__live"><i />{T('Мила готова тебя слушать', 'Mila is ready to listen')}</div>
+              <h1>{lang === 'ru' ? <>Говори свободно. <em>Оставайся собой.</em></> : <>Speak freely. <em>Sound like you.</em></>}</h1>
               <p className="lp-hero__lede">
                 {T(
-                  'Говори как обычно. Мила разбирает твою речь до отдельного звука, объясняет один понятный следующий шаг и строит практику вокруг твоего голоса — на своих серверах, без VPN.',
-                  'Speak naturally. Mila maps your speech down to the single sound, explains one clear next step, and builds practice around your voice — on her own servers, no VPN.',
+                  'Живой разговор с Милой — без урока по сценарию и без страха ошибиться. После разговора ты получишь одну точную подсказку, чтобы звучать естественнее.',
+                  'Have a real conversation with Mila — no scripted lesson and no fear of getting it wrong. Afterwards, get one precise cue that helps you sound more natural.',
                 )}
               </p>
               <div className="lp-hero__actions">
-                <button className="lp-btn lp-btn--primary" disabled={!authReady} onClick={startCta}>
-                  {!authReady ? T('Готовим Mila…', 'Preparing Mila…') : isLoggedIn ? T('Продолжить обучение', 'Continue learning') : T('Начать бесплатно', 'Start for free')}
+                <button className="lp-btn lp-btn--primary lp-btn--talk" onClick={startFreeTalk}>
+                  <span className="lp-voicepulse" aria-hidden><i /><i /><i /></span>
+                  {T('Поговорить с Милой', 'Talk with Mila')}
                   <Icon name="arrow" size={18} />
                 </button>
-                {sessionStatus === 'out' && (
-                  <button className="lp-btn lp-btn--ghost" onClick={guest} disabled={loading}>
-                    {loading ? T('Открываем…', 'Opening…') : T('Войти как гость', 'Enter as a guest')}
-                  </button>
-                )}
+                <button className="lp-btn lp-btn--ghost" onClick={() => openDoor('/assessment')}>
+                  {T('Проверить свой уровень', 'Check my level')}
+                </button>
               </div>
               <div className="lp-assure" aria-label={T('Условия старта', 'Getting started')}>
-                <span><Icon name="check" size={13} />{T('Без карты', 'No card')}</span>
+                <span><Icon name="check" size={13} />{T('Бесплатно', 'Free')}</span>
+                <span><Icon name="check" size={13} />{T('Без регистрации', 'No sign-up')}</span>
                 <span><Icon name="check" size={13} />{T('Без VPN', 'No VPN')}</span>
-                <span><Icon name="lock" size={13} />{T('Голос остаётся у Mila', 'Your voice stays with Mila')}</span>
               </div>
             </div>
-
           </div>
-
-          <div className="lp-shell lp-storyrail" aria-label={T('Выбери следующую практику', 'Choose your next practice')}>
-            <div className="lp-storyrail__intro">
-              <span>{T('Твоя следующая сцена', 'Your next scene')}</span>
-              <small>{T('Каждая ведёт в живую практику', 'Every frame opens real practice')}</small>
-            </div>
-            <div className="lp-storyrail__track">
-              {moments.map((moment, index) => (
-                <button
-                  key={moment.href}
-                  className={`lp-storyrail__item${index === 0 ? ' is-active' : ''}`}
-                  onClick={() => openDoor(moment.href)}
-                  aria-label={`${moment.kicker}: ${moment.title}`}
-                >
-                  <span className="lp-storyrail__media"><img src={moment.src} alt="" width="320" height="320" decoding="async" /></span>
-                  <span className="lp-storyrail__text"><small>{moment.kicker}</small><strong>{moment.title}</strong></span>
-                </button>
-              ))}
-            </div>
+          <div className="lp-hero__proofbar" aria-label={T('Что даёт первый разговор', 'What your first conversation gives you')}>
+            <div><span>01</span><strong>{T('Живой разговор', 'A real conversation')}</strong></div>
+            <div><span>02</span><strong>{T('Разбор твоей речи', 'Feedback on your speech')}</strong></div>
+            <div><span>03</span><strong>{T('Личный следующий шаг', 'Your personal next step')}</strong></div>
           </div>
         </section>
 
