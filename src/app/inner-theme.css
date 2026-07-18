@@ -242,33 +242,261 @@ html[data-mila-app="app"] .atmosphere { display: none; }
 .mila-surface--app .focus-copy { color: var(--mila-muted); }
 .mila-surface--app .focus-error { border-color: var(--mila-danger); border-radius: var(--mila-radius); color: var(--mila-danger); background: var(--mila-danger-soft); }
 
-/* Dashboard: the voice invitation is editorial and belongs to this system. */
-.mila-surface--app .dashboard-page__main > div:first-child { border-bottom: 1px solid var(--mila-line); padding-bottom: 22px; }
-.mila-surface--app .dashboard-page__avatar {
-  border: 1px solid var(--mila-line-strong);
-  color: var(--mila-ink) !important;
-  background: transparent !important;
-  box-shadow: none !important;
+/* Dashboard: Mila is the product, not one card inside a widget directory. */
+.mila-surface--app[data-route="/dashboard"] .mila-guide { display: none !important; }
+.mila-surface--app .dashboard-conversation__main { --app-main-width: 1120px; padding-bottom: 132px; }
+.mila-surface--app .dashboard-toolbar__signout {
+  padding: 7px 12px !important;
+  font-size: .76rem;
+  font-weight: 650;
 }
-.mila-surface--app .mila-hero-card {
-  border: 1px solid var(--mila-line) !important;
-  border-radius: var(--mila-radius) !important;
-  background: #0c0d11 !important;
-  box-shadow: none !important;
+.mila-surface--app .dashboard-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
 }
-.mila-surface--app .mila-hero-card :is(div, p) { color: #eceae4 !important; }
-.mila-surface--app .mila-hero-card .mila-hero-halo { display: none; }
-.mila-surface--app .mila-hero-card .mila-hero-dot { background: var(--mila-signal) !important; box-shadow: none !important; }
-.mila-surface--app .mila-hero-card button {
-  border: 1px solid #52545b !important;
+.mila-surface--app .dashboard-intro p {
+  margin: 0;
+  color: var(--mila-muted);
+  font-size: .9rem;
+}
+.mila-surface--app .dashboard-intro p span { color: var(--mila-line-strong); }
+.mila-surface--app .dashboard-intro p strong { color: var(--mila-ink); font-weight: 650; }
+.mila-surface--app .dashboard-intro > div {
+  border-color: var(--mila-line) !important;
   border-radius: var(--mila-radius-sm) !important;
-  color: #eceae4 !important;
+  color: var(--mila-measure) !important;
   background: transparent !important;
-  background-image: none !important;
-  box-shadow: none !important;
 }
-.mila-surface--app .mila-hero-card button:first-child { border-color: #eceae4 !important; color: #111216 !important; background: #eceae4 !important; }
-.mila-surface--app .secondary-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.mila-surface--app .conversation-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(330px, .72fr);
+  min-height: 510px;
+  overflow: hidden;
+  border: 1px solid #2b2e37;
+  border-radius: 10px;
+  color: #eceae4;
+  background: #0c0d11;
+}
+.mila-surface--app .conversation-stage__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(42px, 5.4vw, 68px);
+}
+.mila-surface--app .conversation-stage__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+  color: #b3b6be;
+  font: 500 .7rem/1.3 var(--font-mono), monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.mila-surface--app .conversation-stage__eyebrow span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5a4d;
+  animation: dashboardSignal 1.8s ease-in-out infinite;
+}
+.mila-surface--app .conversation-stage__copy h1 {
+  max-width: 700px;
+  margin: 0;
+  color: #eceae4 !important;
+  font-family: var(--font-serif), Georgia, serif !important;
+  font-size: clamp(3rem, 5.4vw, 5.6rem);
+  font-weight: 500 !important;
+  letter-spacing: -.05em !important;
+  line-height: .96;
+}
+.mila-surface--app .conversation-stage__lede {
+  max-width: 660px;
+  margin: 24px 0 0;
+  color: #aeb1b8;
+  font-size: clamp(.96rem, 1.35vw, 1.08rem);
+  line-height: 1.66;
+}
+.mila-surface--app .conversation-stage__actions {
+  display: grid;
+  grid-template-columns: 1.12fr .88fr;
+  gap: 10px;
+  margin-top: 32px;
+}
+.mila-surface--app .conversation-action {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 12px 15px;
+  border: 1px solid #4a4d56;
+  border-radius: 6px;
+  color: #eceae4;
+  background: #15171c;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .16s ease, border-color .16s ease, background-color .16s ease;
+}
+.mila-surface--app .conversation-action:hover { transform: translateY(-2px); border-color: #777b85; background: #191b21; }
+.mila-surface--app .conversation-action--voice { border-color: #eceae4; color: #111216; background: #eceae4; }
+.mila-surface--app .conversation-action--voice:hover { border-color: #fff; background: #fff; }
+.mila-surface--app .conversation-action__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+.mila-surface--app .conversation-action > span:nth-child(2) { min-width: 0; }
+.mila-surface--app .conversation-action strong { display: block; font-size: .94rem; font-weight: 750; line-height: 1.25; }
+.mila-surface--app .conversation-action small { display: block; margin-top: 4px; color: inherit; font-size: .72rem; line-height: 1.3; opacity: .67; }
+.mila-surface--app .conversation-action > svg { justify-self: end; }
+.mila-surface--app .conversation-stage__promises {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 20px;
+  margin: 22px 0 0;
+  padding: 0;
+  color: #858991;
+  font: 500 .67rem/1.4 var(--font-mono), monospace;
+  letter-spacing: .06em;
+  list-style: none;
+  text-transform: uppercase;
+}
+.mila-surface--app .conversation-stage__promises li::before { content: '✓'; margin-right: 7px; color: #eceae4; }
+
+.mila-surface--app .conversation-stage__presence {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  border-left: 1px solid #2b2e37;
+  background: #111318;
+}
+.mila-surface--app .conversation-stage__presence::before,
+.mila-surface--app .conversation-stage__presence::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+.mila-surface--app .conversation-stage__presence::before { inset: 24px; border: 1px solid #24272e; }
+.mila-surface--app .conversation-stage__presence::after { top: 50%; left: 24px; right: 24px; border-top: 1px solid #24272e; }
+.mila-surface--app .conversation-stage__portrait {
+  position: relative;
+  z-index: 2;
+  width: min(82%, 340px);
+  aspect-ratio: 1;
+  padding: 20px;
+  border: 1px solid #5a5e67;
+  border-radius: 50%;
+  background: #dfe3e2;
+  box-sizing: border-box;
+  animation: dashboardMilaBreathe 4.4s ease-in-out infinite;
+}
+.mila-surface--app .conversation-stage__portrait img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; }
+.mila-surface--app .conversation-stage__signal {
+  position: absolute;
+  z-index: 2;
+  top: 42px;
+  right: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #aeb1b8;
+  font: 500 .64rem/1 var(--font-mono), monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.mila-surface--app .conversation-stage__signal-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff5a4d; }
+.mila-surface--app .conversation-stage__wave {
+  position: absolute;
+  z-index: 2;
+  right: 42px;
+  bottom: 42px;
+  left: 42px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+}
+.mila-surface--app .conversation-stage__wave i { flex: 1; height: 12%; background: #5b5f68; transform-origin: center; animation: dashboardWave 1.7s ease-in-out infinite alternate; }
+.mila-surface--app .conversation-stage__wave i:nth-child(3n + 1) { height: 35%; animation-delay: -.4s; }
+.mila-surface--app .conversation-stage__wave i:nth-child(4n + 2) { height: 72%; animation-delay: -.9s; }
+.mila-surface--app .conversation-stage__wave i:nth-child(5n) { height: 100%; background: #ff5a4d; animation-delay: -.2s; }
+
+.mila-surface--app .dashboard-support { margin-top: 34px; }
+.mila-surface--app .dashboard-support__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 15px;
+}
+.mila-surface--app .dashboard-support__heading p {
+  margin: 0 0 5px;
+  color: var(--mila-measure);
+  font: 500 .67rem/1.3 var(--font-mono), monospace;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+.mila-surface--app .dashboard-support__heading h2 { margin: 0; font-size: clamp(1.45rem, 2.6vw, 2.05rem); }
+.mila-surface--app .dashboard-support__progress { display: flex; gap: 24px; color: var(--mila-muted); font: 500 .66rem/1.15 var(--font-mono), monospace; text-transform: uppercase; }
+.mila-surface--app .dashboard-support__progress span { display: grid; gap: 3px; }
+.mila-surface--app .dashboard-support__progress strong { color: var(--mila-ink); font: 500 1.35rem/1 var(--font-serif), Georgia, serif; }
+.mila-surface--app .dashboard-practice-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+.mila-surface--app .dashboard-practice-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 10px;
+  min-height: 116px;
+  padding: 15px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius);
+  color: var(--mila-ink);
+  background: var(--mila-panel);
+  text-align: left;
+  cursor: pointer;
+  transition: transform .16s ease, border-color .16s ease, background-color .16s ease;
+}
+.mila-surface--app .dashboard-practice-card:hover { transform: translateY(-2px); border-color: var(--mila-line-strong); background: var(--mila-raised); }
+.mila-surface--app .dashboard-practice-card__icon { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--mila-line); border-radius: 50%; color: var(--mila-action); }
+.mila-surface--app .dashboard-practice-card__copy { min-width: 0; }
+.mila-surface--app .dashboard-practice-card strong { display: block; color: var(--mila-ink); font-family: var(--font-serif), Georgia, serif; font-size: .94rem; font-weight: 600; line-height: 1.2; }
+.mila-surface--app .dashboard-practice-card small { display: block; margin-top: 5px; color: var(--mila-muted); font-size: .7rem; line-height: 1.35; }
+.mila-surface--app .dashboard-practice-card > svg { justify-self: end; color: var(--mila-subtle); }
+.mila-surface--app .dashboard-level-check {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 15px 17px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius);
+  color: var(--mila-ink);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.mila-surface--app .dashboard-level-check > span:first-child { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: var(--mila-measure); background: var(--mila-measure-soft); }
+.mila-surface--app .dashboard-level-check strong,
+.mila-surface--app .dashboard-level-check small { display: block; }
+.mila-surface--app .dashboard-level-check strong { font-family: var(--font-serif), Georgia, serif; font-size: .96rem; }
+.mila-surface--app .dashboard-level-check small { margin-top: 3px; color: var(--mila-muted); font-size: .76rem; }
+.mila-surface--app .dashboard-level-check__action { display: inline-flex; align-items: center; gap: 8px; color: var(--mila-action); font-size: .76rem; font-weight: 750; }
+
+@keyframes dashboardSignal { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+@keyframes dashboardMilaBreathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-7px) scale(1.015); } }
+@keyframes dashboardWave { from { transform: scaleY(.35); opacity: .5; } to { transform: scaleY(1); opacity: 1; } }
 
 /* Lesson, vocabulary, grammar, progress, and achievements pages. */
 .mila-surface--app .lesson-stack { gap: 8px !important; }
@@ -345,6 +573,63 @@ html[data-mila-app="app"] .atmosphere { display: none; }
 .mila-surface--app .assessment-page__caption.is-you { border-color: var(--mila-line); color: var(--mila-muted); background: transparent; }
 
 /* Conversation: quiet transcript, one red live signal, no neon bubbles. */
+.mila-surface--app .chat-page__stream { width: min(800px, calc(100% - 32px)); }
+.mila-surface--app .chat-page__empty { width: min(620px, 100%); padding: 38px 22px; }
+.mila-surface--app .chat-page__empty-presence {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 18px;
+  padding: 9px;
+  border: 1px solid var(--mila-line-strong);
+  border-radius: 50%;
+  background: #dfe3e2;
+  box-sizing: border-box;
+}
+.mila-surface--app .chat-page__empty-presence img { width: 100%; height: 100%; object-fit: contain; }
+.mila-surface--app .chat-page__empty-presence span {
+  position: absolute;
+  right: 5px;
+  bottom: 8px;
+  width: 13px;
+  height: 13px;
+  border: 3px solid var(--mila-paper);
+  border-radius: 50%;
+  background: var(--mila-signal);
+}
+.mila-surface--app .chat-page__empty-kicker {
+  margin: 0 0 7px;
+  color: var(--mila-signal);
+  font: 500 .65rem/1.3 var(--font-mono), monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.mila-surface--app .chat-page__empty-title {
+  margin: 0;
+  color: var(--mila-ink) !important;
+  font: 500 clamp(2.35rem, 5vw, 3.7rem)/1 var(--font-serif), Georgia, serif !important;
+  letter-spacing: -.045em !important;
+}
+.mila-surface--app .chat-page__empty-copy { max-width: 54ch; margin: 15px auto 0; color: var(--mila-muted); font-size: .88rem; line-height: 1.65; }
+.mila-surface--app .chat-page__starters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 24px; }
+.mila-surface--app .chat-page__starters button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 8px;
+  min-height: 72px;
+  padding: 12px 13px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius);
+  color: var(--mila-ink);
+  background: var(--mila-panel);
+  font-size: .74rem;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+.mila-surface--app .chat-page__starters button:hover { border-color: var(--mila-line-strong); background: var(--mila-raised); }
+.mila-surface--app .chat-page__starters button svg { justify-self: end; color: var(--mila-signal); }
 .mila-surface--app .chat-page__composer { border-color: var(--mila-line); background: var(--mila-panel); -webkit-backdrop-filter: none; backdrop-filter: none; }
 body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: calc(56px + env(safe-area-inset-bottom)); }
 .mila-surface--app .chat-page__form input { border-color: var(--mila-line); border-radius: var(--mila-radius-sm); color: var(--mila-ink); background: var(--mila-raised); }
@@ -353,7 +638,21 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 .mila-surface--app .chat-page__form .chat-page__send-button { border-color: var(--mila-action); color: var(--mila-action-ink); background: var(--mila-action); }
 .mila-surface--app .chat-page__row .chat-page__bubble { border-radius: var(--mila-radius); box-shadow: none; }
 .mila-surface--app .chat-page__row.is-user .chat-page__bubble { color: var(--mila-action-ink); background: var(--mila-action); }
+.mila-surface--app .chat-page__row.is-assistant { align-items: flex-start; gap: 9px; }
 .mila-surface--app .chat-page__row.is-assistant .chat-page__bubble { border-color: var(--mila-line); color: var(--mila-ink); background: var(--mila-panel); }
+.mila-surface--app .chat-page__mila-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 35px;
+  width: 35px;
+  height: 35px;
+  padding: 3px;
+  border: 1px solid var(--mila-line);
+  border-radius: 50%;
+  background: #dfe3e2;
+  box-sizing: border-box;
+}
+.mila-surface--app .chat-page__mila-avatar img { width: 100%; height: 100%; object-fit: contain; }
 .mila-surface--app .chat-page__empty-icon { border-color: var(--mila-line); border-radius: var(--mila-radius); color: var(--mila-companion); background: transparent; }
 
 /* Persistent navigation: same rail in both rooms. */
@@ -529,12 +828,54 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
   max-height: calc(100dvh - 84px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }
 
+@media (max-width: 920px) {
+  .mila-surface--app .conversation-stage { grid-template-columns: 1fr; }
+  .mila-surface--app .conversation-stage__presence { min-height: 360px; border-top: 1px solid #2b2e37; border-left: 0; }
+  .mila-surface--app .conversation-stage__portrait { width: min(56%, 300px); }
+  .mila-surface--app .dashboard-practice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 640px) {
   .mila-surface--app .app-header__inner { width: calc(100% - 24px); }
   .mila-surface--app .app-main { width: calc(100% - 28px); padding-top: 24px; }
-  .mila-surface--app .secondary-tools-grid { grid-template-columns: 1fr; }
-  .mila-surface--app .mila-hero-card { padding: 17px !important; }
-  .mila-surface--app .mila-hero-card > div:last-child { flex-direction: column; }
+  .mila-surface--app .dashboard-page__header .app-header__inner { min-height: 58px; flex-wrap: nowrap; gap: 10px; padding: 0; }
+  .mila-surface--app .dashboard-page__header .app-header__actions { width: auto; margin-left: auto; }
+  .mila-surface--app .dashboard-page__header :is(.theme-toggle, .dashboard-toolbar__signout) { display: none !important; }
+  .mila-surface--app .dashboard-conversation__main { width: 100%; padding-top: 0; }
+  .mila-surface--app .dashboard-intro { padding: 14px 16px; margin: 0; }
+  .mila-surface--app .dashboard-intro p span,
+  .mila-surface--app .dashboard-intro p strong { display: none; }
+  .mila-surface--app .dashboard-intro > div { flex-shrink: 0; padding-inline: 8px !important; font-size: .7rem !important; }
+  .mila-surface--app .conversation-stage { min-height: 0; border-right: 0; border-left: 0; border-radius: 0; }
+  .mila-surface--app .conversation-stage__copy { padding: 32px 20px 28px; }
+  .mila-surface--app .conversation-stage__eyebrow { margin-bottom: 14px; font-size: .62rem; }
+  .mila-surface--app .conversation-stage__copy h1 { max-width: 10ch; font-size: clamp(2.75rem, 13.2vw, 4rem); }
+  .mila-surface--app .conversation-stage__lede { margin-top: 18px; font-size: .92rem; line-height: 1.58; }
+  .mila-surface--app .conversation-stage__actions { grid-template-columns: 1fr; margin-top: 24px; }
+  .mila-surface--app .conversation-action { min-height: 72px; }
+  .mila-surface--app .conversation-stage__promises { gap: 7px 13px; margin-top: 18px; font-size: .58rem; }
+  .mila-surface--app .conversation-stage__presence { min-height: 292px; }
+  .mila-surface--app .conversation-stage__presence::before { inset: 16px; }
+  .mila-surface--app .conversation-stage__presence::after { right: 16px; left: 16px; }
+  .mila-surface--app .conversation-stage__portrait { width: min(62%, 220px); }
+  .mila-surface--app .conversation-stage__signal { top: 29px; right: 28px; font-size: .56rem; }
+  .mila-surface--app .conversation-stage__wave { right: 28px; bottom: 26px; left: 28px; height: 24px; }
+  .mila-surface--app .dashboard-support { margin: 0; padding: 28px 14px 0; }
+  .mila-surface--app .dashboard-support__heading { align-items: flex-start; }
+  .mila-surface--app .dashboard-support__heading p { font-size: .6rem; }
+  .mila-surface--app .dashboard-support__heading h2 { font-size: 1.5rem; }
+  .mila-surface--app .dashboard-support__progress { display: none; }
+  .mila-surface--app .dashboard-practice-grid { grid-template-columns: 1fr; }
+  .mila-surface--app .dashboard-practice-card { min-height: 82px; }
+  .mila-surface--app .dashboard-level-check { grid-template-columns: 42px minmax(0, 1fr); }
+  .mila-surface--app .dashboard-level-check__action { grid-column: 2; }
+  .mila-surface--app .chat-page__empty { padding: 24px 4px 30px; }
+  .mila-surface--app .chat-page__empty-presence { width: 92px; height: 92px; margin-bottom: 14px; }
+  .mila-surface--app .chat-page__empty-title { font-size: 2.35rem !important; }
+  .mila-surface--app .chat-page__empty-copy { margin-top: 12px; font-size: .82rem; }
+  .mila-surface--app .chat-page__starters { grid-template-columns: 1fr; gap: 7px; margin-top: 19px; }
+  .mila-surface--app .chat-page__starters button { min-height: 54px; padding: 10px 12px; }
+  .mila-surface--app .chat-page__mila-avatar { flex-basis: 31px; width: 31px; height: 31px; }
   .mila-surface--app .journey-card { grid-template-columns: 42px minmax(0, 1fr) 20px; gap: 11px; padding-inline: 12px; }
   .mila-surface--app .journey-card__icon { width: 40px; height: 40px; }
   .mila-surface--app .mila-guide__panel { border-radius: var(--mila-radius) !important; }

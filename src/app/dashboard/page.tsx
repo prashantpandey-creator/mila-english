@@ -1,250 +1,229 @@
-// @ts-nocheck
 'use client';
 
-import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import ThemeToggle from '@/components/ThemeToggle';
 import StreakCounter from '@/components/StreakCounter';
-import ProgressSummary from '@/components/ProgressSummary';
-import PronunciationButton from '@/components/PronunciationButton';
-import LeaderboardCard from '@/components/LeaderboardCard';
-import { Card, IconTile } from '@/components/ui/Card';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
-import LearningJourneyCard from '@/components/LearningJourneyCard';
-import ShowcaseSlider from '@/components/ShowcaseSlider';
-import Image from 'next/image';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
-import { C } from '@/lib/theme';
+
+type Learner = {
+  name?: string;
+  streakDays?: number;
+  level?: string;
+};
+
+type Progress = {
+  completedLessons: number;
+  totalTimeSeconds: number;
+  avgScore: number;
+};
 
 export default function DashboardPage() {
-  const { t, lang } = useI18n();
+  const { lang } = useI18n();
   const router = useRouter();
-  const [m, setM] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [stats, setStats] = useState<{completedLessons:number;totalTimeSeconds:number;avgScore:number}|null>(null);
-  useEffect(()=>{
-    setM(true);
-    fetch('/api/users/me').then(r=>r.ok?r.json():null).then(d=>{if(d)setUser(d);}).catch(()=>{});
-    fetch('/api/progress').then(r=>r.ok?r.json():null).then(d=>{if(d)setStats(d);}).catch(()=>{});
-  },[]);
+  const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState<Learner | null>(null);
+  const [stats, setStats] = useState<Progress | null>(null);
 
-  const getGreeting = () => {
-    const h = new Date().getHours();
-    if (h < 12) return lang==='ru' ? 'Доброе утро' : 'Good morning';
-    if (h < 17) return lang==='ru' ? 'Добрый день' : 'Good afternoon';
-    return lang==='ru' ? 'Добрый вечер' : 'Good evening';
+  useEffect(() => {
+    setMounted(true);
+    fetch('/api/users/me').then((response) => response.ok ? response.json() : null).then((data) => {
+      if (data) setUser(data);
+    }).catch(() => {});
+    fetch('/api/progress').then((response) => response.ok ? response.json() : null).then((data) => {
+      if (data) setStats(data);
+    }).catch(() => {});
+  }, []);
+
+  const greeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return lang === 'ru' ? 'Доброе утро' : 'Good morning';
+    if (hour < 17) return lang === 'ru' ? 'Добрый день' : 'Good afternoon';
+    return lang === 'ru' ? 'Добрый вечер' : 'Good evening';
   };
+
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // The public front door is still the safe destination if logout fails.
     }
     router.push('/');
     router.refresh();
   };
 
-  if (!m) return null;
+  if (!mounted) return null;
+
+  const firstName = user?.name?.trim().split(/\s+/)[0];
+  const practiceRoutes: Array<{
+    icon: MilaIconName;
+    labelEn: string;
+    labelRu: string;
+    detailEn: string;
+    detailRu: string;
+    href: string;
+  }> = [
+    {
+      icon: 'lessons',
+      labelEn: 'Continue a lesson',
+      labelRu: 'Продолжить урок',
+      detailEn: 'Choose a real-life topic',
+      detailRu: 'Выбрать тему из жизни',
+      href: '/lessons',
+    },
+    {
+      icon: 'listening',
+      labelEn: 'Train your ear',
+      labelRu: 'Тренировать слух',
+      detailEn: 'Hear, notice and repeat',
+      detailRu: 'Слушать, замечать, повторять',
+      href: '/listen',
+    },
+    {
+      icon: 'phonetics',
+      labelEn: 'Polish a sound',
+      labelRu: 'Поставить звук',
+      detailEn: 'See exactly what to change',
+      detailRu: 'Понять, что именно изменить',
+      href: '/phonetics',
+    },
+    {
+      icon: 'vocabulary',
+      labelEn: 'Review your words',
+      labelRu: 'Повторить слова',
+      detailEn: 'Return to saved vocabulary',
+      detailRu: 'Вернуться к сохранённым словам',
+      href: '/vocabulary',
+    },
+  ];
 
   return (
-    <AppShell className="welcome-dashboard dashboard-page">
+    <AppShell className="welcome-dashboard dashboard-page dashboard-conversation">
       <AppHeader
         backHref="/"
         className="dashboard-page__header"
-        actions={<>
-          <LangToggle />
-          <ThemeToggle />
-          <button className="welcome-toolbar__quiet" onClick={handleLogout}
-            style={{padding:'6px 14px',borderRadius:12,border:'1.5px solid var(--surface-control-line, rgba(255,255,255,.2))',background:'var(--surface-control, rgba(255,255,255,.025))',color:C.warm,
-              fontWeight:600,fontSize:'0.8rem',cursor:'pointer'}}>
-            {lang==='ru'?'Выйти':'Sign Out'}
-          </button>
-          <div className="dashboard-page__avatar" style={{width:34,height:34,borderRadius:'50%',background:`linear-gradient(135deg,${C.mercury},#0a7d5c)`,
-            display:'flex',alignItems:'center',justifyContent:'center',color:'#03150e',fontWeight:800,fontSize:'0.8rem',
-            boxShadow:'0 0 18px rgba(36,211,154,.16)'}}>
-            {user?.name ? user.name[0].toUpperCase() : (lang==='ru'?'Г':'G')}
-          </div>
-        </>}
+        actions={(
+          <>
+            <LangToggle />
+            <ThemeToggle />
+            <button className="welcome-toolbar__quiet dashboard-toolbar__signout" onClick={handleLogout} type="button">
+              {lang === 'ru' ? 'Выйти' : 'Sign out'}
+            </button>
+          </>
+        )}
       />
 
-      <AppMain width="work" className="dashboard-page__main">
-        {/* Greeting */}
-        <div style={{marginBottom:24}}>
-          <h1 style={{display:'flex',alignItems:'center',gap:9,fontSize:'1.6rem',fontWeight:800,margin:0,color:C.dark}}>
-            {getGreeting()} <span style={{display:'grid',color:C.venus}}><MilaIcon name="sparkle" size={22}/></span>
-          </h1>
-          <div style={{display:'flex',alignItems:'center',gap:10,marginTop:6}}>
-            <p style={{color:C.warm,margin:0}}>
-              {lang==='ru'?'Готова позаниматься?':'Ready to practice?'}
-            </p>
-            <StreakCounter days={user?.streakDays || 0} lang={lang} />
-          </div>
+      <AppMain width="wide" className="dashboard-page__main dashboard-conversation__main">
+        <div className="dashboard-intro">
+          <p>
+            {greeting()}{firstName ? `, ${firstName}` : ''}
+            <span aria-hidden> — </span>
+            <strong>{lang === 'ru' ? 'Мила рядом.' : 'Mila is here.'}</strong>
+          </p>
+          <StreakCounter days={user?.streakDays || 0} lang={lang} />
         </div>
 
-        {/* Flagship: the live conversation is the front door, never a secondary tool. */}
-        <style>{`
-          .mila-hero-card {
-            transition: transform .18s ease, box-shadow .18s ease;
-            background: linear-gradient(150deg, rgba(242,139,173,.16), rgba(5,11,8,.9) 46%, rgba(106,220,245,.12));
-          }
-          html:not([data-mila-theme="dark"]) .mila-surface--welcome .mila-hero-card {
-            background: linear-gradient(150deg, rgba(242,139,173,.22), rgba(255,250,252,.96) 46%, rgba(106,220,245,.16));
-          }
-          .mila-hero-card:active { transform: scale(.988); }
-          @media (prefers-reduced-motion: no-preference) {
-            .mila-hero-orb { animation: milaHeroBreathe 4.5s ease-in-out infinite; }
-            .mila-hero-halo { animation: milaHeroSpin 9s linear infinite; }
-            .mila-hero-bar { animation: milaHeroWave 1.35s ease-in-out infinite; }
-            .mila-hero-dot { animation: milaHeroBreathe 2.2s ease-in-out infinite; }
-          }
-          @keyframes milaHeroBreathe { 0%,100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.05); opacity: 1; } }
-          @keyframes milaHeroSpin { to { transform: rotate(360deg); } }
-          @keyframes milaHeroWave { 0%,100% { transform: scaleY(.4); } 50% { transform: scaleY(1); } }
-        `}</style>
-        <section aria-label={lang==='ru'?'Поговорить с Милой':'Talk with Mila'} style={{marginBottom:24}}>
-          <div className="mila-hero-card" onClick={()=>router.push('/darshan')}
-            style={{position:'relative',overflow:'hidden',cursor:'pointer',borderRadius:22,padding:20,
-              border:'1px solid rgba(242,139,173,0.32)',
-              boxShadow:'0 18px 44px rgba(242,139,173,0.14), var(--surface-card-shadow, 0 2px 10px rgba(0,0,0,0.5))'}}>
-            <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:16}}>
-              <div aria-hidden style={{position:'relative',width:76,height:76,flexShrink:0}}>
-                <span className="mila-hero-halo" style={{position:'absolute',inset:-7,borderRadius:'50%',
-                  background:`conic-gradient(from 0deg, ${C.voice}00, ${C.voice}55, ${C.venus}55, ${C.voice}00)`,filter:'blur(6px)'}}/>
-                <span className="mila-hero-orb" style={{position:'absolute',inset:0,display:'grid',placeItems:'center'}}>
-                  <Image src="/mascot/mila-mascot.png" alt="Mila" width={1254} height={1254}
-                    style={{width:'100%',height:'100%',objectFit:'contain',filter:'drop-shadow(0 6px 12px rgba(0,15,28,0.35))'}}/>
+        <section className="conversation-stage" aria-labelledby="conversation-stage-title">
+          <div className="conversation-stage__copy">
+            <p className="conversation-stage__eyebrow">
+              <span aria-hidden />
+              {lang === 'ru' ? 'Мила готова слушать' : 'Mila is ready to listen'}
+            </p>
+            <h1 id="conversation-stage-title">
+              {lang === 'ru' ? 'О чём хочешь поговорить?' : 'What do you want to say?'}
+            </h1>
+            <p className="conversation-stage__lede">
+              {lang === 'ru'
+                ? 'Говори естественно. Мила выслушает, ответит вслух и подскажет одну полезную вещь для твоего английского — без допроса и заученного сценария.'
+                : 'Talk naturally. Mila listens, answers aloud, and gives you one useful English cue—without turning every sentence into a test.'}
+            </p>
+
+            <div className="conversation-stage__actions">
+              <button className="conversation-action conversation-action--voice" type="button" onClick={() => router.push('/darshan')}>
+                <span className="conversation-action__icon" aria-hidden><MilaIcon name="voice" size={24} /></span>
+                <span>
+                  <strong>{lang === 'ru' ? 'Говорить с Милой' : 'Speak with Mila'}</strong>
+                  <small>{lang === 'ru' ? 'Живой голосовой разговор' : 'A live voice conversation'}</small>
                 </span>
-              </div>
-              <div style={{minWidth:0}}>
-                <div style={{display:'flex',alignItems:'center',gap:7,fontSize:'0.68rem',fontWeight:800,letterSpacing:1.6,color:'var(--voice-readable,var(--voice))',textTransform:'uppercase',marginBottom:5}}>
-                  <span className="mila-hero-dot" style={{width:7,height:7,borderRadius:'50%',background:'var(--voice-readable,var(--voice))',boxShadow:'0 0 10px var(--voice-readable,var(--voice))'}}/>
-                  {lang==='ru'?'Живой голос':'Live voice'}
-                </div>
-                <div style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:800,fontSize:'1.45rem',letterSpacing:'-0.03em',color:C.dark,lineHeight:1.15}}>
-                  {lang==='ru'?'Поговори с Милой':'Talk with Mila'}
-                </div>
-                <p style={{margin:'6px 0 0',fontSize:'0.86rem',lineHeight:1.5,color:C.warm}}>
-                  {lang==='ru'
-                    ? 'Живой голосовой диалог. Просто начни говорить — Мила услышит и ответит.'
-                    : 'A live voice conversation. Just start speaking—Mila listens and answers aloud.'}
-                </p>
-              </div>
+                <MilaIcon name="arrow" size={20} />
+              </button>
+              <button className="conversation-action conversation-action--chat" type="button" onClick={() => router.push('/chat')}>
+                <span className="conversation-action__icon" aria-hidden><MilaIcon name="conversation" size={24} /></span>
+                <span>
+                  <strong>{lang === 'ru' ? 'Написать Миле' : 'Chat with Mila'}</strong>
+                  <small>{lang === 'ru' ? 'Спокойно, в своём темпе' : 'Type at your own pace'}</small>
+                </span>
+                <MilaIcon name="arrow" size={20} />
+              </button>
             </div>
-            <div style={{display:'flex',gap:10}}>
-              <button type="button" onClick={(e)=>{e.stopPropagation();router.push('/darshan');}}
-                style={{flex:1.4,padding:'13px 16px',borderRadius:14,border:'none',
-                  background:`linear-gradient(135deg,${C.mercuryBright},${C.mercury})`,color:'#032018',
-                  fontWeight:800,fontSize:'0.95rem',cursor:'pointer',boxShadow:'0 10px 30px rgba(36,211,154,0.25)',
-                  display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
-                <MilaIcon name="voice" size={18}/>{lang==='ru'?'Начать разговор':'Start talking'}
-              </button>
-              <button type="button" onClick={(e)=>{e.stopPropagation();router.push('/chat');}}
-                style={{flex:1,padding:'13px 16px',borderRadius:14,border:'1.5px solid rgba(242,139,173,0.4)',
-                  background:'rgba(242,139,173,0.08)',color:'var(--venus-readable,var(--venus-bright))',fontWeight:700,fontSize:'0.9rem',cursor:'pointer',
-                  display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
-                <MilaIcon name="tutor" size={17}/>{lang==='ru'?'Текстом':'Text chat'}
-              </button>
+
+            <ul className="conversation-stage__promises" aria-label={lang === 'ru' ? 'Как работает разговор' : 'How the conversation works'}>
+              <li>{lang === 'ru' ? 'Без сценария' : 'No script'}</li>
+              <li>{lang === 'ru' ? 'Можно по-русски' : 'Russian is welcome'}</li>
+              <li>{lang === 'ru' ? 'Одна полезная подсказка' : 'One useful cue'}</li>
+            </ul>
+          </div>
+
+          <div className="conversation-stage__presence" aria-hidden="true">
+            <div className="conversation-stage__portrait">
+              <Image
+                src="/mascot/mila-mascot.png"
+                alt=""
+                width={1254}
+                height={1254}
+                priority
+              />
+            </div>
+            <div className="conversation-stage__signal">
+              <span className="conversation-stage__signal-dot" />
+              <span>{lang === 'ru' ? 'Можно начинать' : 'Ready when you are'}</span>
+            </div>
+            <div className="conversation-stage__wave" aria-hidden="true">
+              {Array.from({ length: 15 }, (_, index) => <i key={index} />)}
             </div>
           </div>
         </section>
 
-        <ShowcaseSlider />
-
-        {/* AI Assessment Banner (If pending) */}
-        {user?.level === 'pending' && (
-          <Card hover={false} padding="24px" style={{ marginBottom: 24 }}>
-            <div style={{width:34,height:34,display:'grid',placeItems:'center',marginBottom:8,color:'var(--jupiter-readable,var(--jupiter))'}}><MilaIcon name="sparkle" size={28}/></div>
-            <h2 style={{fontSize:'1.5rem',margin:'0 0 6px',color:C.dark}}>{lang==='ru'?'Твой личный план обучения':'Your custom learning plan'}</h2>
-            <p style={{fontSize:'0.9rem',lineHeight:1.55,margin:'0 0 16px',color:C.warm}}>{lang==='ru'?'Пройди надёжный тест через сервер Mila — без внешнего ИИ. Голосовой вариант доступен там, где его поддерживает провайдер.':'Take the reliable Mila-only test with no external AI. Voice remains available where the provider supports it.'}</p>
-            <button onClick={()=>router.push('/assessment')}
-              style={{width:'100%',padding:'13px',borderRadius:12,border:'none',
-                background:`linear-gradient(135deg,${C.mercuryBright},${C.mercury})`,color:'#032018',fontWeight:800,fontSize:'1rem',
-                cursor:'pointer',boxShadow:'0 10px 30px rgba(36,211,154,0.22)'}}>
-              {lang==='ru'?'Проверить уровень →':'Check my level →'}
-            </button>
-          </Card>
-        )}
-
-        {/* Custom Plan Display (If generated) */}
-        {user?.level !== 'pending' && user?.learnerProfile && (()=>{
-          let plan: any = null;
-          try { plan = JSON.parse(user.learnerProfile); } catch { plan = null; }
-          return (
-          <Card hover={false} padding="20px" style={{ marginBottom: 24 }}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
-              <div>
-                <div style={{fontSize:'0.72rem',fontWeight:700,color:'var(--jupiter-readable,var(--jupiter))',textTransform:'uppercase',letterSpacing:1.5,marginBottom:4}}>
-                  {lang==='ru'?'Персональный план':'Custom plan'}
-                </div>
-                <div style={{fontFamily:"var(--font-display, 'Manrope'),sans-serif",fontWeight:700,fontSize:'1.3rem',letterSpacing:'-0.03em',color:C.dark}}>Level {user.level.toUpperCase()}</div>
-              </div>
-              <IconTile size={44}>{user.level.slice(0,2).toUpperCase()}</IconTile>
+        <section className="dashboard-support" aria-labelledby="dashboard-support-title">
+          <div className="dashboard-support__heading">
+            <div>
+              <p>{lang === 'ru' ? 'Если хочется позаниматься точечно' : 'When you want focused practice'}</p>
+              <h2 id="dashboard-support-title">{lang === 'ru' ? 'Другой путь на сегодня' : 'Another path for today'}</h2>
             </div>
-            <p style={{fontSize:'0.85rem',color:C.warm,lineHeight:1.55,margin:0}}>
-              {plan?.weak_summary || (lang==='ru'?'Мы составили план на основе твоего собеседования.':'We built this plan from your assessment.')}
-            </p>
-          </Card>
-          );
-        })()}
+            <div className="dashboard-support__progress" aria-label={lang === 'ru' ? 'Краткий прогресс' : 'Progress summary'}>
+              <span><strong>{stats?.completedLessons ?? '—'}</strong>{lang === 'ru' ? 'уроков' : 'lessons'}</span>
+              <span><strong>{stats ? Math.round(stats.totalTimeSeconds / 60) : '—'}</strong>{lang === 'ru' ? 'минут' : 'minutes'}</span>
+            </div>
+          </div>
 
-        {/* Mary Stage 1: five simple, functioning learner journeys. */}
-        <h2 style={{fontSize:'1.05rem',color:C.dark,margin:'0 0 10px'}}>{lang==='ru'?'Что будем делать?':'What shall we do?'}</h2>
-        <div className="journey-stack">
-          {[
-            {kind:'level' as const,ru:'Определить уровень',en:'Level check',ruSub:'Короткая голосовая проверка',enSub:'A short voice check',href:'/assessment'},
-            {kind:'listening' as const,ru:'Аудирование',en:'Listening',ruSub:'Слушай, различай и повторяй',enSub:'Hear, notice and repeat',href:'/listen'},
-            {kind:'vocabulary' as const,ru:'Новые слова',en:'New words',ruSub:'Личные сохранённые повторения',enSub:'Personal saved reviews',href:'/vocabulary'},
-            {kind:'tutor' as const,ru:'Мила-наставница',en:'AI tutor',ruSub:'Текстовый чат с Милой',enSub:'Text chat with Mila',href:'/chat'},
-            {kind:'grammar' as const,ru:'Грамматика',en:'Grammar',ruSub:'Практика без сухих правил',enSub:'Patterns without dry rules',href:'/grammar'},
-          ].map((item)=>(
-            <LearningJourneyCard
-              key={item.href}
-              kind={item.kind}
-              title={lang==='ru'?item.ru:item.en}
-              subtitle={lang==='ru'?item.ruSub:item.enSub}
-              onClick={()=>router.push(item.href)}
-            />
-          ))}
-        </div>
-
-        {/* Stats */}
-        <div style={{marginBottom:20}}>
-          <ProgressSummary items={[
-            {icon:'lesson',val:stats?.completedLessons ?? '…',label:lang==='ru'?'Уроков пройдено':'Lessons done',color:C.jupiter},
-            {icon:'time',val:stats ? Math.round(stats.totalTimeSeconds/60) : '…',label:lang==='ru'?'Минут':'Minutes',color:C.voice},
-          ]}/>
-        </div>
-
-        {/* Pronunciation */}
-        <Card hover={false} padding="20px 24px" style={{ marginBottom: 16, textAlign: 'center' }}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,fontWeight:700,fontSize:'1rem',color:C.dark,marginBottom:4}}><span style={{display:'grid',color:'var(--voice-readable,var(--voice))'}}><MilaIcon name="pronunciation" size={18}/></span>{lang==='ru'?'Произношение':'Pronunciation'}</div>
-          <p style={{fontSize:'0.85rem',color:C.warm,margin:'0 0 14px'}}>{lang==='ru'?'Нажми и послушай':'Tap to listen'}</p>
-          <div style={{display:'flex',justifyContent:'center',gap:20}}>
-            {['hello','world','thank you'].map(w=>(
-              <PronunciationButton key={w} word={w}/>
+          <div className="dashboard-practice-grid">
+            {practiceRoutes.map((item) => (
+              <button className="dashboard-practice-card" type="button" key={item.href} onClick={() => router.push(item.href)}>
+                <span className="dashboard-practice-card__icon" aria-hidden><MilaIcon name={item.icon} size={25} /></span>
+                <span className="dashboard-practice-card__copy">
+                  <strong>{lang === 'ru' ? item.labelRu : item.labelEn}</strong>
+                  <small>{lang === 'ru' ? item.detailRu : item.detailEn}</small>
+                </span>
+                <MilaIcon name="arrow" size={18} />
+              </button>
             ))}
           </div>
-        </Card>
 
-        {/* Secondary tools */}
-        <div className="secondary-tools-grid" style={{display:'grid',gap:10,marginBottom:20}}>
-          {[
-            {icon:'lessons' as MilaIconName,label:lang==='ru'?'Уроки':'Lessons',sub:lang==='ru'?'По темам':'By topic',href:'/lessons',tone:'var(--jupiter-readable,var(--jupiter))'},
-            {icon:'progress' as MilaIconName,label:lang==='ru'?'Прогресс':'Progress',sub:lang==='ru'?'Статистика':'Stats',href:'/progress',tone:'var(--mercury-readable,var(--mercury))'},
-            {icon:'badges' as MilaIconName,label:lang==='ru'?'Успехи':'Badges',sub:lang==='ru'?'Награды':'Achievements',href:'/achievements',tone:'var(--jupiter-readable,var(--jupiter))'},
-            {icon:'phonetics' as MilaIconName,label:lang==='ru'?'Фонетика':'Phonetics',sub:lang==='ru'?'Звуки':'Sounds',href:'/phonetics',tone:'var(--voice-readable,var(--voice))'},
-            {icon:'voice' as MilaIconName,label:lang==='ru'?'Практика':'Speaking practice',sub:lang==='ru'?'Голосом, по уроку':'By voice, lesson-focused',href:'/practice',tone:'var(--voice-readable,var(--voice))'},
-          ].map((l,i)=>(
-            <Card key={i} onClick={()=>router.push(l.href)} padding="14px" style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <IconTile size={40}><span style={{display:'grid',color:l.tone}}><MilaIcon name={l.icon} size={20}/></span></IconTile>
-              <div><div style={{fontWeight:600,fontSize:'0.95rem',color:C.dark}}>{l.label}</div><div style={{fontSize:'0.8rem',color:C.warm}}>{l.sub}</div></div>
-            </Card>
-          ))}
-        </div>
-
-        <LeaderboardCard lang={lang} stats={stats}/>
+          {user?.level === 'pending' ? (
+            <button className="dashboard-level-check" type="button" onClick={() => router.push('/assessment')}>
+              <span><MilaIcon name="level" size={21} /></span>
+              <span>
+                <strong>{lang === 'ru' ? 'Не знаешь, с чего начать?' : 'Not sure where to begin?'}</strong>
+                <small>{lang === 'ru' ? 'Пятиминутная проверка уровня даст Миле отправную точку.' : 'A five-minute level check gives Mila a useful starting point.'}</small>
+              </span>
+              <span className="dashboard-level-check__action">{lang === 'ru' ? 'Проверить' : 'Check my level'} <MilaIcon name="arrow" size={17} /></span>
+            </button>
+          ) : null}
+        </section>
       </AppMain>
     </AppShell>
   );

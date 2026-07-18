@@ -58,5 +58,8 @@ backgrounds behind the workspace.
   conversion/pricing room; every other route receives the unified app system.
 - Immersive voice rooms use the Studio palette and signal red for a live state.
   Their reactive WebGL presence is functional feedback, not decorative glow.
-- `src/components/ShowcaseSlider.tsx` + `.mila-showcase` remain the reference
-  composition for Atelier dashboard content.
+- The dashboard is a **conversation stage**, not a widget directory. Mila's
+  live voice action owns the visual hierarchy, text chat is the clear second
+  action, and lessons sit in a quieter supporting rail. `conversation-stage`
+  and `chat-page__empty-presence` are the reference compositions for carrying
+  that hierarchy from the dashboard into the actual conversation surface.
