@@ -1,0 +1,547 @@
+/* ── Mila product system ────────────────────────────────────────────────────
+   The two intentional rooms now share one grammar:
+   Atelier = warm paper for choosing and reflecting.
+   Studio  = quiet near-black for active listening, speaking, and testing.
+
+   Marketing routes (/ and /start) are deliberately outside this layer. The
+   cinematic front door and the dark pricing funnel keep their own art
+   direction; the signed-in product no longer inherits those campaign styles. */
+
+.mila-surface--app {
+  --mila-paper: #f3ede0;
+  --mila-panel: #f8f3e8;
+  --mila-raised: #fffaf0;
+  --mila-line: #cabfa6;
+  --mila-line-strong: #a99c83;
+  --mila-ink: #1c1611;
+  --mila-muted: #6b6152;
+  --mila-subtle: #8a7f6a;
+  --mila-action: #7c2d2d;
+  --mila-action-deep: #501c1c;
+  --mila-action-ink: #fffaf1;
+  --mila-action-soft: rgba(124, 45, 45, .09);
+  --mila-audio: #4f6269;
+  --mila-audio-soft: rgba(79, 98, 105, .1);
+  --mila-measure: #8a5a3e;
+  --mila-measure-deep: #503321;
+  --mila-measure-soft: rgba(138, 90, 62, .1);
+  --mila-companion: #9b465b;
+  --mila-companion-deep: #5b1932;
+  --mila-companion-ink: #260c16;
+  --mila-companion-soft: rgba(155, 70, 91, .1);
+  --mila-danger: #b42318;
+  --mila-danger-soft: rgba(180, 35, 24, .09);
+  --mila-signal: #e5352b;
+  --mila-radius: 8px;
+  --mila-radius-sm: 5px;
+  --mila-shadow: 0 1px 1px rgba(52, 39, 27, .04), 0 8px 24px rgba(52, 39, 27, .055);
+
+  --surface-page: var(--mila-paper);
+  --surface-text: var(--mila-ink);
+  --surface-muted: var(--mila-muted);
+  --surface-card: var(--mila-panel);
+  --surface-nav: var(--mila-panel);
+  --surface-line: var(--mila-line);
+  --surface-control: var(--mila-raised);
+  --surface-control-line: var(--mila-line);
+  --surface-control-shadow: none;
+  --surface-track: rgba(28, 22, 17, .1);
+  --surface-card-shadow: var(--mila-shadow);
+  --surface-card-shadow-hover: 0 10px 28px rgba(52, 39, 27, .09);
+  --surface-card-line-hover: var(--mila-line-strong);
+  --surface-icon-tile: var(--mila-action-soft);
+  --focus-inset: rgba(28, 22, 17, .035);
+  --venus: var(--mila-companion);
+  --venus-bright: var(--mila-companion);
+  --mercury: var(--mila-action);
+  --mercury-bright: var(--mila-action);
+  --voice: var(--mila-audio);
+  --voice-bright: var(--mila-audio);
+  --jupiter: var(--mila-measure);
+  --jupiter-bright: var(--mila-measure);
+  --mercury-readable: var(--mila-action);
+  --voice-readable: var(--mila-audio);
+  --jupiter-readable: var(--mila-measure);
+  --venus-readable: var(--mila-companion);
+
+  min-height: 100dvh;
+  color: var(--mila-ink);
+  background-color: var(--mila-paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .34 0 0 0 0 .24 0 0 0 0 .15 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+
+.mila-surface--app.mila-surface--focus,
+html[data-mila-theme="dark"] .mila-surface--app.mila-surface--welcome {
+  --mila-paper: #0c0d11;
+  --mila-panel: #14161b;
+  --mila-raised: #191b21;
+  --mila-line: #2b2e37;
+  --mila-line-strong: #484c56;
+  --mila-ink: #eceae4;
+  --mila-muted: #a1a5ad;
+  --mila-subtle: #747983;
+  --mila-action: #e8e4dc;
+  --mila-action-deep: #bdb8af;
+  --mila-action-ink: #111216;
+  --mila-action-soft: rgba(236, 234, 228, .08);
+  --mila-audio: #aeb7bd;
+  --mila-audio-soft: rgba(174, 183, 189, .09);
+  --mila-measure: #c5a47a;
+  --mila-measure-deep: #8f7352;
+  --mila-measure-soft: rgba(197, 164, 122, .1);
+  --mila-companion: #cf93a2;
+  --mila-companion-deep: #8f5a69;
+  --mila-companion-ink: #1d1216;
+  --mila-companion-soft: rgba(207, 147, 162, .1);
+  --mila-danger: #ff6b60;
+  --mila-danger-soft: rgba(255, 107, 96, .1);
+  --mila-signal: #ff5a4d;
+  --mila-shadow: 0 12px 34px rgba(0, 0, 0, .2);
+  --focus-inset: rgba(255, 255, 255, .035);
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.025' filter='url(%23s)'/%3E%3C/svg%3E");
+}
+
+html[data-mila-app="app"] { background: #0c0d11; }
+html[data-mila-app="app"][data-mila-surface="welcome"]:not([data-mila-theme="dark"]) { background: #f3ede0; }
+html[data-mila-app="app"] .atmosphere { display: none; }
+
+.mila-surface--app,
+.mila-surface--app button,
+.mila-surface--app input,
+.mila-surface--app textarea { font-family: var(--font-sans), Manrope, sans-serif; }
+
+.mila-surface--app h1,
+.mila-surface--app h2,
+.mila-surface--app h3,
+.mila-surface--app .focus-title {
+  color: var(--mila-ink) !important;
+  font-family: var(--font-serif), Lora, Georgia, serif !important;
+  font-weight: 500 !important;
+  letter-spacing: -.025em !important;
+}
+
+.mila-surface--app :is(.focus-kicker, .focus-field__label, .app-header__eyebrow, .listen-page__phrase-meta) {
+  color: var(--mila-measure) !important;
+  font-family: var(--font-mono), monospace !important;
+  font-weight: 500 !important;
+  letter-spacing: .11em !important;
+  text-transform: uppercase;
+}
+
+/* Shared shell: a real frame, not floating glass. */
+.mila-surface--app .app-shell { color: var(--mila-ink); background: transparent; }
+.mila-surface--app .app-header {
+  min-height: 66px;
+  border-bottom: 1px solid var(--mila-line);
+  background: var(--mila-panel) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.mila-surface--app .app-header__inner { min-height: 65px; }
+.mila-surface--app .app-header__brand {
+  color: var(--mila-ink);
+  font: 600 16px/1 var(--font-serif), Georgia, serif;
+  letter-spacing: -.01em;
+}
+.mila-surface--app .app-header__mark {
+  width: 33px;
+  height: 33px;
+  border: 1px solid var(--mila-line-strong);
+  border-radius: 4px;
+  color: var(--mila-ink);
+  background: transparent !important;
+  box-shadow: none !important;
+  font: 500 15px/1 var(--font-serif), Georgia, serif;
+}
+.mila-surface--app .app-header__heading::before { background: var(--mila-line); }
+.mila-surface--app .app-header__heading h1 {
+  color: var(--mila-ink);
+  font: 500 14px/1.2 var(--font-serif), Georgia, serif !important;
+}
+.mila-surface--app .app-header__actions { gap: 7px; }
+.mila-surface--app :is(.app-header__button, .app-header__badge, .welcome-toolbar__quiet) {
+  min-height: 36px;
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-muted) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .app-header__button:hover:not(:disabled) { color: var(--mila-ink) !important; border-color: var(--mila-line-strong) !important; }
+.mila-surface--app .app-header__badge { color: var(--mila-measure) !important; font-family: var(--font-mono), monospace; }
+.mila-surface--app .app-main { width: min(var(--app-main-width, 760px), calc(100% - 36px)); padding-top: clamp(28px, 4vw, 46px); }
+
+/* Controls and cards share one geometry everywhere. */
+.mila-surface--app :is(.mila-card, .focus-card, .welcome-panel, .journey-card) {
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius) !important;
+  color: var(--mila-ink) !important;
+  background: var(--mila-panel) !important;
+  background-image: none !important;
+  box-shadow: var(--mila-shadow) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.mila-surface--app .mila-card--hover:hover,
+.mila-surface--app .journey-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--mila-line-strong) !important;
+  background: var(--mila-raised) !important;
+  box-shadow: var(--mila-shadow) !important;
+}
+.mila-surface--app .mila-card--interactive:focus-visible,
+.mila-surface--app .journey-card:focus-visible,
+.mila-surface--app button:focus-visible {
+  outline: 2px solid var(--mila-signal) !important;
+  outline-offset: 3px;
+}
+.mila-surface--app .journey-stack { gap: 8px; background: transparent !important; }
+.mila-surface--app .journey-card { min-height: 78px; grid-template-columns: 45px minmax(0, 1fr) 24px; padding: 13px 15px; }
+.mila-surface--app .journey-card__icon,
+.mila-surface--app [style*="borderRadius:14"] {
+  box-shadow: none !important;
+}
+.mila-surface--app .journey-card__icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius-sm);
+  color: var(--mila-action) !important;
+  background: transparent !important;
+}
+.mila-surface--app .journey-card__copy strong { color: var(--mila-ink) !important; font-family: var(--font-serif), Georgia, serif; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.mila-surface--app .journey-card__copy small { color: var(--mila-muted) !important; }
+.mila-surface--app .journey-card__action { color: var(--mila-subtle) !important; }
+.mila-surface--app .journey-card:hover .journey-card__action { color: var(--mila-signal) !important; }
+
+.mila-surface--app .lang-toggle {
+  gap: 0;
+  padding: 2px;
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm);
+  background: transparent !important;
+}
+.mila-surface--app .lang-toggle button { min-width: 38px; border-radius: 3px; color: var(--mila-muted); }
+.mila-surface--app .lang-toggle button.active { color: var(--mila-action-ink) !important; background: var(--mila-action) !important; box-shadow: none !important; }
+.mila-surface--app .theme-toggle { border-color: var(--mila-line) !important; border-radius: var(--mila-radius-sm) !important; background: transparent !important; box-shadow: none !important; }
+
+.mila-surface--app :is(.focus-chip, .focus-button, .listen-page__hear) {
+  border-radius: var(--mila-radius-sm) !important;
+  box-shadow: none !important;
+  background-image: none !important;
+}
+.mila-surface--app .focus-chip { border-color: var(--mila-line); color: var(--mila-muted); background: transparent; }
+.mila-surface--app .focus-chip.is-active { border-color: var(--mila-action) !important; color: var(--mila-action-ink) !important; background: var(--mila-action) !important; }
+.mila-surface--app .focus-button--quiet { border-color: var(--mila-line); color: var(--mila-ink); background: transparent; }
+.mila-surface--app :is(.focus-button--mercury, .focus-button--voice) {
+  border: 1px solid var(--mila-action) !important;
+  color: var(--mila-action-ink) !important;
+  background: var(--mila-action) !important;
+}
+.mila-surface--app .focus-copy { color: var(--mila-muted); }
+.mila-surface--app .focus-error { border-color: var(--mila-danger); border-radius: var(--mila-radius); color: var(--mila-danger); background: var(--mila-danger-soft); }
+
+/* Dashboard: the voice invitation is editorial and belongs to this system. */
+.mila-surface--app .dashboard-page__main > div:first-child { border-bottom: 1px solid var(--mila-line); padding-bottom: 22px; }
+.mila-surface--app .dashboard-page__avatar {
+  border: 1px solid var(--mila-line-strong);
+  color: var(--mila-ink) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .mila-hero-card {
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius) !important;
+  background: #0c0d11 !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .mila-hero-card :is(div, p) { color: #eceae4 !important; }
+.mila-surface--app .mila-hero-card .mila-hero-halo { display: none; }
+.mila-surface--app .mila-hero-card .mila-hero-dot { background: var(--mila-signal) !important; box-shadow: none !important; }
+.mila-surface--app .mila-hero-card button {
+  border: 1px solid #52545b !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: #eceae4 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .mila-hero-card button:first-child { border-color: #eceae4 !important; color: #111216 !important; background: #eceae4 !important; }
+.mila-surface--app .secondary-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Lesson, vocabulary, grammar, progress, and achievements pages. */
+.mila-surface--app .lesson-stack { gap: 8px !important; }
+.mila-surface--app .lesson-generator__control { padding: 10px !important; }
+.mila-surface--app .lesson-generator__input {
+  border-color: var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-ink) !important;
+  background: var(--mila-raised) !important;
+}
+.mila-surface--app .lesson-generator__input:focus { border-color: var(--mila-signal) !important; }
+.mila-surface--app .lesson-generator__button {
+  border: 1px solid var(--mila-action) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-action-ink) !important;
+  background: var(--mila-action) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .category-filter__button {
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-muted) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .category-filter__button.is-active {
+  border-color: var(--mila-action) !important;
+  color: var(--mila-action-ink) !important;
+  background: var(--mila-action) !important;
+}
+.mila-surface--app .lesson-card > div:first-child,
+.mila-surface--app .secondary-tools-grid .mila-card > div:first-child {
+  border-color: var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-action) !important;
+  background: transparent !important;
+}
+.mila-surface--app .lesson-player__main button,
+.mila-surface--app .grammar-page__main button,
+.mila-surface--app .vocabulary-page__main button,
+.mila-surface--app .progress-page__main button {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+.mila-surface--app .lesson-player__main > div:first-child > div { border-radius: 0 !important; }
+
+/* Listening and assessment use the same console primitives. */
+.mila-surface--app .listen-page__phrase-text,
+.mila-surface--app .listen-page__result-title { color: var(--mila-ink); font-family: var(--font-serif), Georgia, serif; font-weight: 500; }
+.mila-surface--app .listen-page__ipa { color: var(--mila-signal); font-family: var(--font-mono), monospace; }
+.mila-surface--app .listen-page__hear { border-color: var(--mila-line-strong); color: var(--mila-ink); background: transparent; }
+.mila-surface--app .listen-page__mic {
+  border: 1px solid var(--mila-line-strong);
+  border-radius: var(--mila-radius) !important;
+  color: var(--mila-ink);
+  background: var(--mila-raised);
+  box-shadow: none;
+}
+.mila-surface--app .listen-page__mic.is-recording,
+.mila-surface--app .listen-page__mic.is-scoring { border-color: var(--mila-signal); color: #fff; background: var(--mila-signal); }
+.mila-surface--app .listen-page__tip { border-left: 2px solid var(--mila-signal); border-radius: 0; background: transparent; }
+.mila-surface--app .assessment-page__orb {
+  border: 1px solid var(--mila-line-strong);
+  border-radius: 50%;
+  color: var(--mila-ink);
+  background: var(--mila-panel);
+  background-image: none;
+  box-shadow: none;
+}
+.mila-surface--app .assessment-page__orb.is-live { border-color: var(--mila-signal); color: var(--mila-signal); }
+.mila-surface--app .assessment-page__caption { border-radius: var(--mila-radius); }
+.mila-surface--app .assessment-page__caption.is-mila { border-color: var(--mila-line); color: var(--mila-ink); background: var(--mila-panel); }
+.mila-surface--app .assessment-page__caption.is-you { border-color: var(--mila-line); color: var(--mila-muted); background: transparent; }
+
+/* Conversation: quiet transcript, one red live signal, no neon bubbles. */
+.mila-surface--app .chat-page__composer { border-color: var(--mila-line); background: var(--mila-panel); -webkit-backdrop-filter: none; backdrop-filter: none; }
+body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: calc(56px + env(safe-area-inset-bottom)); }
+.mila-surface--app .chat-page__form input { border-color: var(--mila-line); border-radius: var(--mila-radius-sm); color: var(--mila-ink); background: var(--mila-raised); }
+.mila-surface--app .chat-page__form input:focus { border-color: var(--mila-signal); box-shadow: none; }
+.mila-surface--app .chat-page__form button { border: 1px solid var(--mila-line-strong); border-radius: var(--mila-radius-sm); color: var(--mila-ink); background: transparent; }
+.mila-surface--app .chat-page__form .chat-page__send-button { border-color: var(--mila-action); color: var(--mila-action-ink); background: var(--mila-action); }
+.mila-surface--app .chat-page__row .chat-page__bubble { border-radius: var(--mila-radius); box-shadow: none; }
+.mila-surface--app .chat-page__row.is-user .chat-page__bubble { color: var(--mila-action-ink); background: var(--mila-action); }
+.mila-surface--app .chat-page__row.is-assistant .chat-page__bubble { border-color: var(--mila-line); color: var(--mila-ink); background: var(--mila-panel); }
+.mila-surface--app .chat-page__empty-icon { border-color: var(--mila-line); border-radius: var(--mila-radius); color: var(--mila-companion); background: transparent; }
+
+/* Persistent navigation: same rail in both rooms. */
+.mila-surface--app .mila-tabbar {
+  border-top: 1px solid var(--mila-line);
+  background: var(--mila-panel) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.mila-surface--app .mila-tabbar__tab { color: var(--mila-subtle) !important; }
+.mila-surface--app .mila-tabbar__tab.is-active { color: var(--mila-ink) !important; }
+.mila-surface--app .mila-tabbar__tab.is-active .mila-tabbar__icon { color: var(--mila-signal); background: transparent !important; }
+.mila-surface--app .mila-tabbar__label { font-family: var(--font-mono), monospace; font-size: 9px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+
+/* Mila follows the room instead of bringing a third visual system. */
+.mila-surface--app .mila-guide__launcher {
+  border: 1px solid var(--mila-line-strong) !important;
+  border-radius: var(--mila-radius) !important;
+  background: var(--mila-panel) !important;
+  box-shadow: var(--mila-shadow) !important;
+}
+.mila-surface--app .mila-guide__launcher::before,
+.mila-surface--app .mila-guide__orbit { display: none; }
+.mila-surface--app .mila-guide__state { border-color: var(--mila-panel); background: var(--mila-signal) !important; box-shadow: none !important; }
+.mila-surface--app .mila-guide__textchip,
+.mila-surface--app .mila-guide__voicechip {
+  border: 1px solid var(--mila-line-strong) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-ink) !important;
+  background: var(--mila-panel) !important;
+  box-shadow: none !important;
+}
+.mila-surface--app :is(.mila-guide__panel, .mila-guide__nudge) {
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius) !important;
+  color: var(--mila-ink) !important;
+  background: var(--mila-panel) !important;
+  box-shadow: var(--mila-shadow) !important;
+}
+.mila-surface--app .mila-guide__header { border-color: var(--mila-line) !important; background: var(--mila-raised) !important; }
+.mila-surface--app .mila-guide__portrait { border-color: var(--mila-line) !important; border-radius: var(--mila-radius-sm); background: var(--mila-paper) !important; }
+.mila-surface--app .mila-guide__portrait > i { border-color: var(--mila-raised) !important; background: var(--mila-signal) !important; box-shadow: none !important; }
+.mila-surface--app .mila-guide__identity strong { color: var(--mila-ink) !important; font-family: var(--font-serif), Georgia, serif; }
+.mila-surface--app :is(.mila-guide__identity span, .mila-guide__page, .mila-guide__nudge span) { color: var(--mila-muted) !important; }
+.mila-surface--app .mila-guide__page { border-color: var(--mila-line) !important; border-radius: var(--mila-radius-sm); background: transparent !important; font-family: var(--font-mono), monospace; }
+.mila-surface--app :is(.mila-guide__welcome, .mila-guide__message.is-assistant, .mila-guide__working) { border-color: var(--mila-line) !important; border-radius: var(--mila-radius); color: var(--mila-ink) !important; background: var(--mila-raised) !important; box-shadow: none !important; }
+.mila-surface--app :is(.mila-guide__welcome p, .mila-guide__message.is-assistant p) { color: var(--mila-ink) !important; }
+.mila-surface--app :is(.mila-guide__welcome small, .mila-guide__guest p) { color: var(--mila-muted) !important; }
+.mila-surface--app .mila-guide__message.is-user { border-radius: var(--mila-radius); color: var(--mila-action-ink) !important; background: var(--mila-action) !important; box-shadow: none !important; }
+.mila-surface--app .mila-guide__actions button { border-color: var(--mila-line) !important; border-radius: var(--mila-radius-sm); color: var(--mila-muted) !important; background: transparent !important; }
+.mila-surface--app .mila-guide__actions button .mila-icon { color: var(--mila-measure) !important; }
+.mila-surface--app .mila-guide__composer { border-color: var(--mila-line) !important; border-radius: var(--mila-radius); background: var(--mila-paper) !important; box-shadow: none !important; }
+.mila-surface--app .mila-guide__composer input { color: var(--mila-ink) !important; }
+.mila-surface--app .mila-guide__mic { border-radius: var(--mila-radius-sm); color: var(--mila-muted) !important; background: transparent !important; }
+.mila-surface--app .mila-guide__send { border-radius: var(--mila-radius-sm); color: var(--mila-action-ink) !important; background: var(--mila-action) !important; box-shadow: none !important; }
+.mila-surface--app .mila-guide__guest button { border-color: var(--mila-line) !important; border-radius: var(--mila-radius-sm); color: var(--mila-ink) !important; background: transparent !important; }
+.mila-surface--app .mila-guide__guest button:first-child { color: var(--mila-action-ink) !important; background: var(--mila-action) !important; }
+
+/* Account entry is the Atelier welcome desk, not a separate pink microsite. */
+.mila-surface--app .welcome-auth {
+  --auth-ink: var(--mila-ink);
+  --auth-muted: var(--mila-muted);
+  --auth-pink: var(--mila-action);
+  --auth-pink-deep: var(--mila-action);
+  --auth-pink-soft: var(--mila-companion-soft);
+  --auth-line: var(--mila-line);
+  --auth-danger: var(--mila-danger);
+  color: var(--mila-ink) !important;
+  background: transparent !important;
+}
+.mila-surface--app .welcome-auth::before,
+.mila-surface--app .welcome-auth::after { display: none !important; }
+.mila-surface--app .welcome-auth__nav {
+  border-color: var(--mila-line) !important;
+  background: var(--mila-panel) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.mila-surface--app .welcome-auth__brand-mark {
+  border-color: var(--mila-line-strong) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-ink) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: var(--font-serif), Georgia, serif !important;
+}
+.mila-surface--app .welcome-auth__brand-name { color: var(--mila-ink) !important; font-family: var(--font-serif), Georgia, serif !important; font-weight: 600 !important; }
+.mila-surface--app .welcome-auth__card {
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius) !important;
+  background: var(--mila-panel) !important;
+  box-shadow: var(--mila-shadow) !important;
+}
+.mila-surface--app .welcome-auth__bloom {
+  width: 68px !important;
+  height: 68px !important;
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius) !important;
+  background: var(--mila-paper) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.mila-surface--app .welcome-auth__bloom img { width: 76px; height: 76px; max-width: none; object-fit: contain; }
+.mila-surface--app .welcome-auth__title { color: var(--mila-ink) !important; font-family: var(--font-serif), Georgia, serif !important; font-weight: 500 !important; letter-spacing: -.025em !important; }
+.mila-surface--app :is(.welcome-auth__subtitle, .welcome-auth__footer, .welcome-auth__separator) { color: var(--mila-muted) !important; }
+.mila-surface--app .welcome-auth__label { color: var(--mila-ink) !important; font-family: var(--font-mono), monospace; font-size: 11px !important; font-weight: 500 !important; letter-spacing: .06em; text-transform: uppercase; }
+.mila-surface--app .welcome-auth__input {
+  border: 1px solid var(--mila-line) !important;
+  border-radius: var(--mila-radius-sm) !important;
+  color: var(--mila-ink) !important;
+  background: var(--mila-raised) !important;
+  box-shadow: none !important;
+}
+.mila-surface--app .welcome-auth__input:focus { border-color: var(--mila-signal) !important; box-shadow: none !important; }
+.mila-surface--app .welcome-auth__button { border-radius: var(--mila-radius-sm) !important; box-shadow: none !important; transform: none !important; }
+.mila-surface--app .welcome-auth__button--primary { border-color: var(--mila-action) !important; color: var(--mila-action-ink) !important; background: var(--mila-action) !important; }
+.mila-surface--app .welcome-auth__button--secondary { border-color: var(--mila-line) !important; color: var(--mila-ink) !important; background: transparent !important; }
+.mila-surface--app .welcome-auth__separator::before,
+.mila-surface--app .welcome-auth__separator::after { background: var(--mila-line) !important; }
+.mila-surface--app .welcome-auth__link { color: var(--mila-action) !important; }
+
+/* Public trust and help pages use the same editorial furniture. */
+.mila-surface--app .legal-page__article { color: var(--mila-ink); font-size: 15px; line-height: 1.75; }
+.mila-surface--app .legal-page__article > h1 { max-width: 14ch; margin: 6px 0 14px; font-size: clamp(2.5rem, 7vw, 4.5rem); line-height: 1.02; }
+.mila-surface--app .legal-page__kicker { margin: 0; color: var(--mila-signal); font: 500 11px/1.2 var(--font-mono), monospace; letter-spacing: .13em; }
+.mila-surface--app :is(.legal-page__meta, .legal-page__lede) { color: var(--mila-muted); }
+.mila-surface--app .legal-page__lede { max-width: 58ch; font-size: 18px; }
+.mila-surface--app .legal-page__article section { margin-top: 34px; }
+.mila-surface--app .legal-page__article section h2 { margin: 0 0 9px; font-size: 20px; }
+.mila-surface--app .legal-page__article a { color: var(--mila-action); font-weight: 700; }
+.mila-surface--app .legal-page__note,
+.mila-surface--app .legal-page__card { border: 1px solid var(--mila-line); border-radius: var(--mila-radius); background: var(--mila-panel); }
+.mila-surface--app .legal-page__note { padding: 22px; }
+.mila-surface--app .legal-page__note h2 { margin-top: 0; }
+.mila-surface--app .legal-page__button { display: inline-block; margin: 22px 0 6px; padding: 13px 18px; border-radius: var(--mila-radius-sm); color: var(--mila-action-ink) !important; background: var(--mila-action); text-decoration: none; }
+.mila-surface--app .legal-page__cards { display: grid; gap: 10px; }
+.mila-surface--app .legal-page__card { padding: 20px; }
+.mila-surface--app .legal-page__card h2 { margin: 0 0 7px; font-size: 18px; }
+.mila-surface--app .legal-page__card p { margin: 0; color: var(--mila-muted); }
+
+/* Immersive voice remains alive, but it now belongs to Studio. */
+.mila-surface--app .voice-stage { color: #eceae4; background: #0c0d11 !important; }
+.mila-surface--app .voice-exit {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  padding: 0 !important;
+  border: 1px solid #2b2e37;
+  border-radius: var(--mila-radius-sm);
+  color: #a1a5ad;
+  background: #14161b;
+}
+.mila-surface--app .voice-exit:hover { border-color: #484c56; color: #eceae4; }
+.mila-surface--app :is(.voice-invoke, .voice-q) { color: #a1a5ad !important; font-family: var(--font-mono), monospace; letter-spacing: .08em; }
+.mila-surface--app .voice-ripple { border-color: rgba(255, 90, 77, .5) !important; }
+.mila-surface--app .voice-a { color: #eceae4 !important; text-shadow: none !important; }
+.mila-surface--app .voice-ascrim { background: rgba(12, 13, 17, .88) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.mila-surface--app .practice-room { color: #eceae4; background: #0c0d11; }
+.mila-surface--app .practice-room__veil { background: rgba(12, 13, 17, .42) !important; }
+.mila-surface--app .practice-header__eyebrow { color: #c5a47a; font-family: var(--font-mono), monospace; font-weight: 500; }
+.mila-surface--app .practice-header__title { color: #a1a5ad; }
+.mila-surface--app .practice-header__exit { border-color: #2b2e37; border-radius: var(--mila-radius-sm); color: #a1a5ad; background: #14161b; box-shadow: none; }
+.mila-surface--app .practice-live__status--listening { color: #ff5a4d; }
+.mila-surface--app .practice-live__status--listening i { background: #ff5a4d; box-shadow: none; }
+
+body[data-bottom-nav] .mila-surface--app .mila-guide {
+  bottom: calc(86px + env(safe-area-inset-bottom)) !important;
+}
+body[data-bottom-nav] .mila-surface--app .mila-guide__launcher { bottom: 0 !important; }
+body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel {
+  bottom: calc(-8px + env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 84px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+@media (max-width: 640px) {
+  .mila-surface--app .app-header__inner { width: calc(100% - 24px); }
+  .mila-surface--app .app-main { width: calc(100% - 28px); padding-top: 24px; }
+  .mila-surface--app .secondary-tools-grid { grid-template-columns: 1fr; }
+  .mila-surface--app .mila-hero-card { padding: 17px !important; }
+  .mila-surface--app .mila-hero-card > div:last-child { flex-direction: column; }
+  .mila-surface--app .journey-card { grid-template-columns: 42px minmax(0, 1fr) 20px; gap: 11px; padding-inline: 12px; }
+  .mila-surface--app .journey-card__icon { width: 40px; height: 40px; }
+  .mila-surface--app .mila-guide__panel { border-radius: var(--mila-radius) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mila-surface--app *,
+  .mila-surface--app *::before,
+  .mila-surface--app *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

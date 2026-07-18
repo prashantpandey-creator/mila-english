@@ -27,18 +27,20 @@ No local screenshot counts. No "LIVE" claim without both.**
 
 ## LOCAL / UNPUSHED
 
-- No unpushed product code. The Apple Distribution IPA remains local only
-  because App Store Connect is waiting for an interactive Apple ID sign-in and
-  app-record creation before validation/upload.
+- **Cohesive Atelier/Studio app pass (pending deploy).** The cinematic `/`
+  poster and dark `/start` pricing funnel are protected; all inner routes now
+  share one token system, shell, card/control language, assistant placement,
+  auth/legal treatment, and Studio voice palette. Local production build and
+  TypeScript check pass. A 390 px browser sweep covered 17 routes with zero
+  horizontal overflow; dashboard, chat, assistant panel, auth/legal, and all
+  three immersive voice rooms were visually checked.
+- The Apple Distribution IPA remains local only because App Store Connect is
+  waiting for an interactive Apple ID sign-in and app-record creation before
+  validation/upload.
 
 ## OWED (asked, NOT done — do not claim these)
 1. **"Make the flow intuitive."** The information architecture / navigation flow
    has NOT been reworked. Front-door visuals are done; the *flow* is untouched.
-2. **Inner-room visual uniformity check.** Type + shell landed app-wide, but
-   dashboard/lessons/listen were NOT visually verified after the theme merge
-   (local guest-session 500 blocked it; prod has its own DB). Verify on prod.
-3. **Voice-chat / Mila-bot UI refinement.** Bot floats bottom-right (square +
-   shadow) and is live; owner asked to "refine more" — open.
 
 ---
 
