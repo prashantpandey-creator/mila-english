@@ -16,7 +16,7 @@ No local screenshot counts. No "LIVE" claim without both.**
 
 | Area | State | Commit | Proof |
 |------|-------|--------|-------|
-| Front door `/` design | **Direction A boho** — Yeseva One + Caveat type, rose `#cf4f7d`, blush paper sections `#fff0f7`, arch city photos, night-city clips | `421fd86` (2026-07-17) | live CSS has `Yeseva`+`cf4f7d`+`fff0f7`; old `#d63d72` gone; screenshot verified |
+| Front door `/` design | **Conversation poster** — one full-bleed cinematic hero, free Talk with Mila action first, level check second, solid three-outcome proof band, then a Studio pronunciation proof. The duplicate intro and glass thumbnail rail are removed. | `683aa47` (2026-07-18) | deploy run `29624436105` green; live HTML/CSS contains `Speak freely.`, `lp-hero__proofbar`, `#111217`, and the desktop assistant offset; live desktop + mobile screenshots verified with the correct responsive art and no horizontal overflow/assistant overlap |
 | Front-door clips | city-night-bokeh / us-manhattan / woman-silk / uk-bigben-night. **The café-people clips (woman-cafe-laptop, woman-city-phone) are CUT** — owner rejected the reading-faces on a Russia front door | `421fd86` | `woman-cafe-laptop` absent from live DOM |
 | App-wide headings | globals `h1,h2` now use Yeseva One (loaded at layout level, not just landing) | `421fd86` | in-bundle |
 | Voice/Piper TTS | `/api/tts` serves real WAV | prior | 200 + RIFF WAV |
