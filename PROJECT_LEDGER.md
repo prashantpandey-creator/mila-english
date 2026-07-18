@@ -34,9 +34,11 @@ No local screenshot counts. No "LIVE" claim without both.**
   identity, provides natural starter prompts, and keeps a direct voice-room
   control in the composer. The follow-up behavior patch separates focused-drill
   history from ordinary chat, makes conversation the default, and treats “just
-  talk / stop correcting / stop repeating” as a hard mode switch. Desktop and
-  390 px local browser checks pass with no horizontal overflow; production
-  behavior proof is still required before this moves to LIVE NOW.
+  talk / stop correcting / stop repeating” as a hard mode switch. Ordinary text
+  turns now use the smaller resident local conversation model instead of making
+  the learner wait on the 20B tutor model. Desktop and 390 px local browser
+  checks pass with no horizontal overflow; production latency proof is still
+  required before this moves to LIVE NOW.
 - The Apple Distribution IPA remains local only because App Store Connect is
   waiting for an interactive Apple ID sign-in and app-record creation before
   validation/upload.
