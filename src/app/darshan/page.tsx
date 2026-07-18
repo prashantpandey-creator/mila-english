@@ -445,7 +445,7 @@ export default function VoicePage() {
   const showQuestion = (phase === "listening" || phase === "thinking") && !!liveText;
 
   return (
-    <div className="voice-stage fixed inset-0 overflow-hidden bg-black">
+    <div className="voice-stage fixed inset-0 overflow-hidden" data-phase={phase}>
       <MilaAurora phase={phase} />
 
       <button
@@ -479,7 +479,7 @@ export default function VoicePage() {
         )}
 
         {isConnecting && (
-           <div className="absolute inset-0 rounded-full border-2 border-[#e46a73]/50 border-t-transparent animate-spin z-20 pointer-events-none" style={{ width: orbSize, height: orbSize, left: '50%', top: '50%', marginLeft: -orbSize/2, marginTop: -orbSize/2 }}></div>
+           <div className="voice-connecting absolute inset-0 rounded-full border-2 border-t-transparent animate-spin z-20 pointer-events-none" style={{ width: orbSize, height: orbSize, left: '50%', top: '50%', marginLeft: -orbSize/2, marginTop: -orbSize/2 }}></div>
         )}
 
         <MilaOrb state={phase} size={orbSize} />
@@ -521,20 +521,20 @@ export default function VoicePage() {
         >
           <p className="text-center text-[11px] tracking-[0.1em] uppercase mb-2 transition-colors duration-300">
             {phase === "listening" ? (
-              <span className="text-[#e46a73]">● Hearing you</span>
+              <span className="voice-status voice-status--listening">● Hearing you</span>
             ) : phase === "thinking" ? (
-              <span className="text-[#e46a73]/80">Reflecting…</span>
+              <span className="voice-status voice-status--thinking">Reflecting…</span>
             ) : phase === "manifesting" ? (
-              <span className="text-[#e46a73]">Speaking — tap to interrupt</span>
+              <span className="voice-status voice-status--speaking">Speaking — tap to interrupt</span>
             ) : (
-              <span className="text-[#b9b0aa]">Speak to start</span>
+              <span className="voice-status voice-status--resting">Speak to start</span>
             )}
           </p>
         </div>
       )}
 
       {voiceError && (
-        <p className="absolute bottom-[3%] left-1/2 z-20 w-[90%] max-w-md -translate-x-1/2 text-center text-xs text-[#e46a73]" role="alert">
+        <p className="voice-error absolute bottom-[3%] left-1/2 z-20 w-[90%] max-w-md -translate-x-1/2 text-center text-xs" role="alert">
           {voiceError}
         </p>
       )}

@@ -1,20 +1,10 @@
-export type MilaSurface = 'welcome' | 'focus';
-
-const FOCUS_ROUTES = [
-  '/darshan',
-  '/pia',
-  '/voice-lab',
-];
+export type MilaSurface = 'welcome';
 
 /**
- * Mila has one product room, with a neutral focus surface reserved only for
- * full-screen voice experiences. Listening drills and assessment are standard
- * learning pages, so they deliberately stay on the warm welcome surface.
- *
- * New informational routes default to welcome so they never accidentally
- * inherit the immersive-room atmosphere.
+ * Mila has one visual room. Voice and practice routes communicate their state
+ * through labels, motion, and geometry rather than switching the whole product
+ * into a competing dark palette.
  */
-export function routeSurfaceForPath(pathname: string): MilaSurface {
-  if (FOCUS_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) return 'focus';
+export function routeSurfaceForPath(_pathname: string): MilaSurface {
   return 'welcome';
 }

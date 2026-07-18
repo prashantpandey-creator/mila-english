@@ -4,20 +4,20 @@
 import { useState, useEffect } from 'react';
 import LangToggle from '@/components/LangToggle';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
+import { EditorialChoice, EditorialChoiceGroup } from '@/components/ui/EditorialChoice';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import { ACCENTS, playPhrase, hasRealVoice, startListening, missedSound } from '@/lib/speech';
 import { PHRASES, PACKS, SOUND_INFO } from '@/lib/phrases';
-import { useScene } from '@/lib/scene';
 
-const SIGNAL = '#c94f5b';
-const SIGNAL_SOFT = 'rgba(201,79,91,0.12)';
+const SIGNAL = '#b63d68';
+const SIGNAL_SOFT = 'rgba(182,61,104,0.12)';
 
 const VERDICT = {
-  good:  { fg: SIGNAL, bg: 'rgba(201,79,91,0.16)' },
+  good:  { fg: SIGNAL, bg: 'rgba(182,61,104,0.16)' },
   close: { fg: SIGNAL, bg: SIGNAL_SOFT },
-  miss:  { fg: SIGNAL, bg: 'rgba(201,79,91,0.07)' },
+  miss:  { fg: SIGNAL, bg: 'rgba(182,61,104,0.07)' },
 };
 
 const PACK_ICONS: Record<string, MilaIconName> = {
@@ -28,9 +28,22 @@ const PACK_ICONS: Record<string, MilaIconName> = {
   emergencies: 'voice',
 };
 
+const PACK_PRESENTATION: Record<string, { mark: string; en: string; ru: string }> = {
+  airport: { mark: '01', en: 'At the gate', ru: 'У выхода на посадку' },
+  cafe: { mark: '02', en: 'Order with ease', ru: 'Заказать без суеты' },
+  hotel: { mark: '03', en: 'Check in clearly', ru: 'Спокойно заселиться' },
+  directions: { mark: '04', en: 'Find your way', ru: 'Спросить дорогу' },
+  emergencies: { mark: '05', en: 'Ask for help', ru: 'Попросить о помощи' },
+};
+
+const ACCENT_PRESENTATION: Record<string, { mark: string; enTitle: string; ruTitle: string; enDetail: string; ruDetail: string }> = {
+  uk: { mark: 'GB', enTitle: 'London', ruTitle: 'Лондон', enDetail: 'British English · native recording', ruDetail: 'Британский английский · запись носителя' },
+  us: { mark: 'US', enTitle: 'New York', ruTitle: 'Нью-Йорк', enDetail: 'American English · native recording', ruDetail: 'Американский английский · запись носителя' },
+  in: { mark: 'IN', enTitle: 'Mumbai', ruTitle: 'Мумбаи', enDetail: 'Indian English · native recording', ruDetail: 'Индийский английский · запись носителя' },
+};
+
 export default function ListenPage() {
   const { lang } = useI18n();
-  const { setScene } = useScene();
   const [m, setM] = useState(false);
   const [accent, setAccent] = useState(ACCENTS[0]);
   const [pack, setPack] = useState(PACKS[0].id);
@@ -46,10 +59,6 @@ export default function ListenPage() {
 
   useEffect(() => { setM(true); }, []);
   useEffect(() => { if (typeof window !== 'undefined') window.speechSynthesis?.getVoices(); }, [m]);
-  // The backdrop follows the room: pick UK → London, US → New York, IN → Mumbai;
-  // the situation pack (airport/hotel…) is the softer fallback signal.
-  useEffect(() => { setScene({ country: accent.id as any, topic: pack as any }); }, [accent.id, pack]);
-  useEffect(() => () => setScene({ country: null, topic: null }), []); // clear on leave
   if (!m) return null;
 
   // Phrases of the current pack, carrying their global index (= audio file index).
@@ -142,7 +151,7 @@ export default function ListenPage() {
     const r = 26, circ = 2 * Math.PI * r, off = circ - (score / 100) * circ;
     return (
       <svg width="62" height="62" viewBox="0 0 62 62" style={{flex:'0 0 auto'}}>
-        <circle cx="31" cy="31" r={r} fill="none" stroke="var(--mila-line, rgba(36,29,25,0.12))" strokeWidth="7"/>
+        <circle cx="31" cy="31" r={r} fill="none" stroke="var(--mila-line, rgba(47,27,36,0.12))" strokeWidth="7"/>
         <circle cx="31" cy="31" r={r} fill="none" stroke={SIGNAL} strokeWidth="7" strokeLinecap="round"
           strokeDasharray={circ} strokeDashoffset={off} transform="rotate(-90 31 31)" style={{transition:'stroke-dashoffset .5s'}}/>
         <text x="31" y="37" textAnchor="middle" fontSize="19" fontWeight="800" fill={C.dark}>{score}</text>
@@ -164,35 +173,50 @@ export default function ListenPage() {
       />
 
       <AppMain width="compact" className="listen-page__main">
-        <section className="focus-field" aria-labelledby="listen-situation-label">
-          <div id="listen-situation-label" className="focus-field__label">
-            {lang==='ru'?'Ситуация':'Situation'}
-          </div>
-          <div className="focus-chip-strip">
-            {PACKS.map(p=>(
-              <button key={p.id} onClick={()=>onPack(p.id)}
-                className={`focus-chip focus-chip--voice ${pack===p.id ? 'is-active' : ''}`}
-                aria-pressed={pack===p.id}>
-                <MilaIcon name={PACK_ICONS[p.id]} size={15}/>{lang==='ru'?p.ru:p.en}
-              </button>
-            ))}
-          </div>
-        </section>
+        <EditorialChoiceGroup
+          index="01"
+          columns={5}
+          label={lang==='ru' ? 'Где потренируемся?' : 'Where shall we practise?'}
+          note={lang==='ru' ? 'Пять коротких сцен из путешествия.' : 'Five small scenes from the journey.'}
+        >
+          {PACKS.map((p) => {
+            const presentation = PACK_PRESENTATION[p.id]
+            return (
+              <EditorialChoice
+                key={p.id}
+                title={lang==='ru' ? p.ru : p.en}
+                detail={lang==='ru' ? presentation.ru : presentation.en}
+                mark={presentation.mark}
+                icon={<MilaIcon name={PACK_ICONS[p.id]} size={15}/>}
+                selected={pack === p.id}
+                onClick={() => onPack(p.id)}
+                ariaLabel={`${lang==='ru' ? p.ru : p.en}. ${lang==='ru' ? presentation.ru : presentation.en}`}
+              />
+            )
+          })}
+        </EditorialChoiceGroup>
 
-        <section className="focus-field" aria-labelledby="listen-accent-label">
-          <div id="listen-accent-label" className="focus-field__label">
-            {lang==='ru'?'Акцент':'Accent'}
-          </div>
-          <div className="focus-chip-strip">
-            {ACCENTS.map(a=>(
-              <button key={a.id} onClick={()=>setAccent(a)}
-                className={`focus-chip focus-chip--voice ${accent.id===a.id ? 'is-active' : ''}`}
-                aria-pressed={accent.id===a.id}>
-                {a.flag} {a.label}
-              </button>
-            ))}
-          </div>
-        </section>
+        <EditorialChoiceGroup
+          index="02"
+          columns={3}
+          label={lang==='ru' ? 'Какой голос слушаем?' : 'Which voice shall we hear?'}
+          note={lang==='ru' ? 'Произношение меняется, атмосфера Mila остаётся той же.' : 'The pronunciation changes; the Mila atmosphere stays the same.'}
+        >
+          {ACCENTS.map((a) => {
+            const presentation = ACCENT_PRESENTATION[a.id]
+            return (
+              <EditorialChoice
+                key={a.id}
+                title={lang==='ru' ? presentation.ruTitle : presentation.enTitle}
+                detail={lang==='ru' ? presentation.ruDetail : presentation.enDetail}
+                mark={presentation.mark}
+                selected={accent.id === a.id}
+                onClick={() => setAccent(a)}
+                ariaLabel={`${lang==='ru' ? presentation.ruTitle : presentation.enTitle}. ${lang==='ru' ? presentation.ruDetail : presentation.enDetail}`}
+              />
+            )
+          })}
+        </EditorialChoiceGroup>
 
         {/* phrase card */}
         <section className={`focus-card listen-page__phrase ${inDrill ? 'is-drill' : ''}`}>
@@ -205,7 +229,9 @@ export default function ListenPage() {
           <div className="listen-page__ipa">{phrase.ipa}</div>
           <button onClick={onListen} disabled={phase==='speaking'}
             className="listen-page__hear">
-            <MilaIcon name="volume" size={17}/>{phase==='speaking' ? (lang==='ru'?'Звучит…':'Playing…') : `${lang==='ru'?'Прослушать':'Hear it'} — ${accent.flag} ${accent.label}`}
+            <MilaIcon name="volume" size={17}/>{phase==='speaking'
+              ? (lang==='ru'?'Звучит…':'Playing…')
+              : `${lang==='ru'?'Прослушать':'Hear it'} — ${lang==='ru' ? ACCENT_PRESENTATION[accent.id].ruTitle : ACCENT_PRESENTATION[accent.id].enTitle}`}
           </button>
           <div className="listen-page__voice-note">
             {hasRealVoice(accent) && <MilaIcon name="sparkle" size={13}/>}<span>{hasRealVoice(accent)
@@ -242,7 +268,7 @@ export default function ListenPage() {
             <div className="listen-page__tip">
               <MilaIcon name="sparkle" size={15}/><span>{result.tip}</span>
             </div>
-            <div style={{marginTop:8,fontSize:'0.8rem',color:'var(--mila-muted, #746861)'}}>{phrase.ru}</div>
+            <div style={{marginTop:8,fontSize:'0.8rem',color:'var(--mila-muted, #75606a)'}}>{phrase.ru}</div>
           </section>
         )}
 
@@ -263,7 +289,7 @@ export default function ListenPage() {
           </button>
         </div>
         <div className="listen-page__mic-status" style={{
-          color:phase==='recording'||phase==='scoring'?SIGNAL:'var(--mila-muted, #746861)',
+          color:phase==='recording'||phase==='scoring'?SIGNAL:'var(--mila-muted, #75606a)',
           fontWeight:(phase==='recording'||phase==='scoring')?700:400}} aria-live="polite">
           {phase==='recording'
             ? (lang==='ru'?'Слушаю… говори, потом нажми остановить':'Listening… speak, then tap stop')
@@ -290,7 +316,7 @@ export default function ListenPage() {
                   <div style={{flex:1}}>
                     <div style={{fontSize:'0.82rem',fontWeight:700,color:C.dark}}>
                       {lang==='ru'?`как в «${meta.ex}»`:`as in “${meta.ex}”`}
-                      <span style={{fontWeight:600,color:'var(--mila-muted, #746861)'}}> · {info.count}×</span>
+                      <span style={{fontWeight:600,color:'var(--mila-muted, #75606a)'}}> · {info.count}×</span>
                     </div>
                     <div style={{fontSize:'0.76rem',color:C.warm,lineHeight:1.4,marginTop:1}}>{lang==='ru'?meta.ru:meta.en}</div>
                   </div>

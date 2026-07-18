@@ -4,9 +4,9 @@
 import { useState } from 'react';
 import { C } from '@/lib/theme';
 
-const SIGNAL = '#c94f5b';
-const SIGNAL_SOFT = 'rgba(201,79,91,0.12)';
-const SIGNAL_INK = '#fffaf7';
+const SIGNAL = '#b63d68';
+const SIGNAL_SOFT = 'rgba(182,61,104,0.12)';
+const SIGNAL_INK = '#ffffff';
 
 const QUESTIONS = [
   { q: 'She ___ to the store yesterday.', options: ['go', 'goes', 'went', 'gone'], answer: 'went' },
@@ -25,15 +25,15 @@ export default function AssessmentPlayer() {
         {q.options.map(o=>(
           <button key={o} onClick={()=>setPicked(o)}
             style={{padding:'10px',borderRadius:10,cursor:'pointer',fontSize:'0.9rem',
-              border:picked===o?`2px solid ${SIGNAL}`:'1.5px solid var(--mila-line, rgba(36,29,25,0.14))',
-              background:picked===o?SIGNAL_SOFT:'var(--mila-raised, #fffdf9)',color:C.dark}}>
+              border:picked===o?`2px solid ${SIGNAL}`:'1.5px solid var(--mila-line, rgba(47,27,36,0.14))',
+              background:picked===o?SIGNAL_SOFT:'var(--mila-raised, #fff7fa)',color:C.dark}}>
             {o}
           </button>
         ))}
       </div>
       <button disabled={!picked} onClick={()=>{setI(Math.min(i+1,QUESTIONS.length-1)); setPicked(null);}}
         style={{marginTop:14,padding:'10px 20px',borderRadius:10,border:'none',
-          background:picked?SIGNAL:'var(--mila-line, rgba(36,29,25,0.14))',color:picked?SIGNAL_INK:C.warm,fontWeight:600,cursor:picked?'pointer':'default'}}>
+          background:picked?SIGNAL:'var(--mila-line, rgba(47,27,36,0.14))',color:picked?SIGNAL_INK:C.warm,fontWeight:600,cursor:picked?'pointer':'default'}}>
         Next →
       </button>
     </div>

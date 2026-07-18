@@ -11,7 +11,7 @@ import { useI18n } from '@/lib/i18n-provider';
 import { SOUND_INFO } from '@/lib/phrases';
 import MilaIcon from '@/components/ui/MilaIcon';
 
-const SIGNAL = '#c94f5b';
+const SIGNAL = '#b63d68';
 
 export default function ProgressPage() {
   const {t,lang}=useI18n(); const router=useRouter();

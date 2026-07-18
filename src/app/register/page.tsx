@@ -7,15 +7,15 @@ import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
 
 const welcomeTheme = {
-  '--auth-ink': '#241d19',
-  '--auth-muted': '#746861',
-  '--auth-pink': '#c94f5b',
-  '--auth-pink-deep': '#963640',
-  '--auth-pink-soft': 'rgba(201, 79, 91, 0.10)',
-  '--auth-cream': '#fffaf5',
-  '--auth-line': '#d9cec2',
-  '--auth-shadow': 'rgba(36, 29, 25, 0.14)',
-  '--auth-danger': '#963640',
+  '--auth-ink': '#2f1b24',
+  '--auth-muted': '#75606a',
+  '--auth-pink': '#b63d68',
+  '--auth-pink-deep': '#8d2d50',
+  '--auth-pink-soft': '#fff1f5',
+  '--auth-cream': '#fff7fa',
+  '--auth-line': '#efd6df',
+  '--auth-shadow': 'rgba(47, 27, 36, 0.12)',
+  '--auth-danger': '#8d2d50',
 } as CSSProperties;
 
 export default function RegisterPage() {
@@ -99,9 +99,9 @@ export default function RegisterPage() {
           overflow-x: hidden;
           color: var(--auth-ink);
           background:
-            radial-gradient(circle at 8% 8%, rgba(255, 190, 214, .7) 0, rgba(255, 190, 214, 0) 31rem),
-            radial-gradient(circle at 92% 84%, rgba(255, 221, 202, .72) 0, rgba(255, 221, 202, 0) 33rem),
-            linear-gradient(145deg, #fffdfb 0%, #fff5f8 48%, #fceaf1 100%);
+            radial-gradient(circle at 8% 8%, rgba(182, 61, 104, .12) 0, rgba(182, 61, 104, 0) 31rem),
+            radial-gradient(circle at 92% 84%, rgba(255, 241, 245, .94) 0, rgba(255, 241, 245, 0) 33rem),
+            linear-gradient(145deg, #fffdfd 0%, #ffffff 48%, #fff7fa 100%);
           position: relative;
           isolation: isolate;
         }
@@ -119,23 +119,23 @@ export default function RegisterPage() {
           aspect-ratio: 1;
           top: 15%;
           right: -9rem;
-          border: 1px solid rgba(225, 116, 158, .14);
-          box-shadow: 0 0 0 3rem rgba(255, 255, 255, .18), 0 0 0 6rem rgba(239, 153, 186, .06);
+          border: 1px solid rgba(182, 61, 104, .14);
+          box-shadow: 0 0 0 3rem rgba(255, 255, 255, .28), 0 0 0 6rem rgba(182, 61, 104, .05);
         }
         .welcome-auth::after {
           width: 9rem;
           aspect-ratio: 1;
           left: -3rem;
           bottom: 8%;
-          background: rgba(255, 255, 255, .34);
-          box-shadow: 0 20px 60px rgba(202, 104, 142, .08);
+          background: rgba(255, 241, 245, .7);
+          box-shadow: 0 20px 60px rgba(141, 45, 80, .08);
         }
         .welcome-auth__nav {
           position: relative;
           z-index: 2;
           padding: .85rem clamp(1rem, 4vw, 2.5rem);
-          border-bottom: 1px solid rgba(190, 91, 130, .12);
-          background: rgba(255, 252, 250, .72);
+          border-bottom: 1px solid rgba(182, 61, 104, .12);
+          background: rgba(255, 253, 253, .84);
           backdrop-filter: blur(20px) saturate(1.1);
           -webkit-backdrop-filter: blur(20px) saturate(1.1);
         }
@@ -153,11 +153,11 @@ export default function RegisterPage() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(200, 92, 135, .34);
+          border: 1px solid rgba(182, 61, 104, .34);
           border-radius: 50%;
           color: var(--auth-pink-deep);
-          background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(251,229,238,.88));
-          box-shadow: 0 7px 20px rgba(193, 80, 123, .12);
+          background: linear-gradient(145deg, #ffffff, #fff1f5);
+          box-shadow: 0 7px 20px rgba(141, 45, 80, .12);
           font-family: var(--font-display), sans-serif;
           font-size: 1.05rem;
           font-weight: 800;
@@ -170,7 +170,7 @@ export default function RegisterPage() {
           letter-spacing: -.025em;
         }
         .welcome-auth__nav :global(.lang-toggle) {
-          border-color: rgba(190, 91, 130, .14);
+          border-color: rgba(182, 61, 104, .14);
           background: rgba(255, 255, 255, .68);
           box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
         }
@@ -178,7 +178,7 @@ export default function RegisterPage() {
         .welcome-auth__nav :global(.lang-toggle button.active) {
           color: #fff;
           background: linear-gradient(135deg, var(--auth-pink), var(--auth-pink-deep));
-          box-shadow: 0 5px 16px rgba(200, 92, 135, .2);
+          box-shadow: 0 5px 16px rgba(141, 45, 80, .2);
         }
         .welcome-auth__main {
           min-height: calc(100vh - 65px);
@@ -192,10 +192,10 @@ export default function RegisterPage() {
           width: 100%;
           max-width: 460px;
           padding: clamp(1.55rem, 4vw, 2.35rem) clamp(1.25rem, 5vw, 2.25rem) 1.8rem;
-          border: 1px solid rgba(255,255,255,.82);
+          border: 1px solid var(--auth-line);
           border-radius: 1.25rem;
-          background: rgba(255, 255, 255, .94);
-          box-shadow: 0 1px 2px rgba(116,57,82,.035), 0 16px 48px rgba(116,57,82,.1);
+          background: rgba(255, 255, 255, .96);
+          box-shadow: 0 1px 2px rgba(47,27,36,.035), 0 16px 48px rgba(141,45,80,.1);
         }
         .welcome-auth__intro { margin-bottom: 1.4rem; text-align: center; }
         .welcome-auth__bloom {
@@ -204,10 +204,10 @@ export default function RegisterPage() {
           margin: 0 auto .7rem;
           display: grid;
           place-items: center;
-          border: 1px solid rgba(220, 111, 153, .15);
+          border: 1px solid rgba(182, 61, 104, .15);
           border-radius: 1rem;
           background: linear-gradient(145deg, #fff, var(--auth-pink-soft));
-          box-shadow: 0 8px 20px rgba(194, 80, 124, .08);
+          box-shadow: 0 8px 20px rgba(141, 45, 80, .08);
           font-size: 1.9rem;
           transform: rotate(3deg);
         }
@@ -231,18 +231,18 @@ export default function RegisterPage() {
           border-radius: .88rem;
           outline: none;
           color: var(--auth-ink);
-          background: rgba(255,255,255,.8);
+          background: #ffffff;
           box-shadow: inset 0 1px 0 rgba(255,255,255,.96);
           font: inherit;
           font-size: .93rem;
           transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
         }
-        .welcome-auth__input::placeholder { color: #b7a4ad; }
-        .welcome-auth__input:hover { border-color: rgba(190, 91, 130, .3); }
+        .welcome-auth__input::placeholder { color: rgba(117, 96, 106, .64); }
+        .welcome-auth__input:hover { border-color: rgba(182, 61, 104, .3); }
         .welcome-auth__input:focus {
           border-color: var(--auth-pink);
           background: #fff;
-          box-shadow: 0 0 0 4px rgba(231, 127, 165, .13);
+          box-shadow: 0 0 0 4px rgba(182, 61, 104, .13);
         }
         .welcome-auth__input:-webkit-autofill,
         .welcome-auth__input:-webkit-autofill:hover,
@@ -253,10 +253,10 @@ export default function RegisterPage() {
         }
         .welcome-auth__error {
           padding: .75rem 1rem;
-          border: 1px solid rgba(185, 68, 100, .14);
+          border: 1px solid rgba(141, 45, 80, .14);
           border-radius: .85rem;
           color: var(--auth-danger);
-          background: rgba(255, 235, 241, .78);
+          background: rgba(255, 241, 245, .88);
           font-size: .87rem;
           text-align: center;
         }
@@ -272,36 +272,36 @@ export default function RegisterPage() {
           transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         }
         .welcome-auth__button:hover:not(:disabled) { transform: translateY(-2px); }
-        .welcome-auth__button:focus-visible { outline: 3px solid rgba(231, 127, 165, .25); outline-offset: 3px; }
+        .welcome-auth__button:focus-visible { outline: 3px solid rgba(182, 61, 104, .25); outline-offset: 3px; }
         .welcome-auth__button:disabled { cursor: wait; opacity: .62; }
         .welcome-auth__button--primary {
           margin-top: .35rem;
           border: 1px solid transparent;
           color: #fff;
           background: linear-gradient(135deg, var(--auth-pink), var(--auth-pink-deep));
-          box-shadow: 0 12px 28px rgba(200, 92, 135, .25);
+          box-shadow: 0 12px 28px rgba(141, 45, 80, .25);
         }
-        .welcome-auth__button--primary:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(200, 92, 135, .32); }
+        .welcome-auth__button--primary:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(141, 45, 80, .32); }
         .welcome-auth__button--secondary {
-          border: 1px solid rgba(190, 91, 130, .2);
+          border: 1px solid rgba(182, 61, 104, .2);
           color: var(--auth-ink);
-          background: rgba(255,255,255,.74);
-          box-shadow: 0 8px 22px rgba(116, 57, 82, .08);
+          background: #ffffff;
+          box-shadow: 0 8px 22px rgba(47, 27, 36, .08);
         }
         .welcome-auth__button--secondary:hover:not(:disabled) {
-          border-color: rgba(190, 91, 130, .34);
-          box-shadow: 0 12px 28px rgba(116, 57, 82, .12);
+          border-color: rgba(182, 61, 104, .34);
+          box-shadow: 0 12px 28px rgba(47, 27, 36, .12);
         }
-        .welcome-auth__separator { display: flex; align-items: center; gap: .75rem; color: #a28d97; font-size: .8rem; }
+        .welcome-auth__separator { display: flex; align-items: center; gap: .75rem; color: var(--auth-muted); font-size: .8rem; }
         .welcome-auth__separator::before,
-        .welcome-auth__separator::after { content: ''; height: 1px; flex: 1; background: rgba(190, 91, 130, .14); }
+        .welcome-auth__separator::after { content: ''; height: 1px; flex: 1; background: rgba(182, 61, 104, .14); }
         .welcome-auth__footer { margin: 1.35rem 0 0; color: var(--auth-muted); font-size: .87rem; line-height: 1.5; text-align: center; }
         .welcome-auth__link { color: var(--auth-pink-deep); font-weight: 750; text-decoration: none; }
         .welcome-auth__link:hover { text-decoration: underline; text-underline-offset: 3px; }
         @media (max-width: 480px) {
           .welcome-auth__nav { padding: .7rem 1rem; }
           .welcome-auth__main { align-items: flex-start; padding-top: 1.25rem; }
-          .welcome-auth__card { border-radius: 1.1rem; box-shadow: 0 1px 3px rgba(116,57,82,.06); }
+          .welcome-auth__card { border-radius: 1.1rem; box-shadow: 0 1px 3px rgba(47,27,36,.06); }
         }
         @media (prefers-reduced-motion: reduce) {
           .welcome-auth__button, .welcome-auth__input { transition: none; }

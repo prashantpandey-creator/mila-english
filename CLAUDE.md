@@ -31,22 +31,28 @@ Push `main` → `.github/workflows/deploy.yml` (SSH to Mumbai, reset --hard,
 compose build). **Containers start BY NAME in the workflow** — a new compose
 service must also be added to the workflow's up/health lists in the same commit.
 
-## Design system (current — one Mila language, owner correction 2026-07-18)
-- **Type:** Yeseva One for brand/display, Manrope for interface/body, IBM Plex
-  Mono only for measured language such as IPA and levels. All support Cyrillic.
-- **Palette:** warm paper `#f8f4ee`, ivory panel `#fffaf5`, espresso ink
-  `#241d19`, muted ink `#746861`, hairline `#d9cec2`, and one rose family:
-  `#c94f5b` for marks, contrast-safe `#963640` for light-surface actions, and
-  `#e46a73` on dark canvases. No category or state gets another hue.
-- **Dark context:** the liked pricing band and immersive voice canvases may use
-  neutral near-black, but their only chromatic signal is the same rose family.
-- **Footage:** `src/lib/visualScenes.ts`. Front-door pool = night-city clips.
-  **Never put reading-faces / café-people clips on the front door** (owner
-  rejected — wrong signal for the Russia market). Frame-check every clip by eye
-  (ffmpeg still) before using it.
-- **One identity:** `src/lib/routeSurface.ts` keeps marketing and ordinary learning pages on
-  warm paper. Only full-screen voice routes use the neutral dark canvas. Never
-  use device preference or a route-specific accent to recolour the product.
+## Design system (current — white/pink editorial house, owner correction 2026-07-18)
+- **Type:** Yeseva One is reserved for the Mila wordmark and rare editorial
+  display moments. Manrope owns product headings, interface, and body copy. IBM
+  Plex Mono is only for measured language such as IPA and levels. All support
+  Cyrillic.
+- **Palette:** cool white ground `#fffdfd`, white panel `#ffffff`, blush raised
+  surface `#fff7fa`, berry ink `#2f1b24`, muted ink `#75606a`, rose hairline
+  `#efd6df`, action rose `#b63d68`, and deep action `#8d2d50`. These are the
+  whole product palette. No category, route, state, price band, or voice room
+  gets cyan, emerald, gold, orange, purple, beige, or black.
+- **Depth:** solid paper is the default. Translucent white is limited to sticky
+  chrome where it preserves context; use rose-tinted shadows sparingly. Never
+  use coloured glass, glow, or a gradient orb as decoration.
+- **Front-door art:** `src/lib/visualScenes.ts` points to the commissioned
+  white/pink mixed-media editorial portrait in `public/visuals/v3/`. The idea is
+  a learner finding her own voice: handmade paper, expressive portrait, torn
+  edges, ribbon, petals, and waveform marks with generous negative space.
+  **Never use headphones, chairs, desks, devices, classrooms, flags, landmark
+  postcards, generic country photos, or stock-learning scenes in this hero.**
+- **One identity:** `src/lib/routeSurface.ts` resolves every route to the same
+  light atelier. Voice state is expressed with labels, motion, rings, and
+  waveform geometry—not a dark canvas or a route-specific accent.
 
 ## Where things live
 - Front door: `src/app/page.tsx` + `src/app/landing.css` (`.lp-*` namespace).

@@ -1,21 +1,11 @@
 'use client';
 
-// Living backdrop — slow crossfading footage behind every page, under a
-// dark-glass scrim (globals.css .atmosphere). It resolves what to show in
-// priority order, most specific first:
-//   1. COUNTRY  — a page set the scene country (Listen accent: UK→London,
-//                 US→New York, IN→Mumbai). The backdrop becomes that place.
-//   2. TOPIC    — a page set a situation (airport, hotel…). Show that setting.
-//   3. ROUTE    — otherwise draw from the room's themed pool (nature for
-//                 progress, classrooms for lessons, social for the talk rooms,
-//                 the club set for the front door).
-// Versioned custom scenes live in public/visuals; legacy place clips remain in
-// public/ambience. If one fails to load, the component quietly falls back to
-// the route's warm or focus surface color.
+// The commissioned editorial artwork belongs to Mila's front door. Learning
+// rooms intentionally keep a quiet white/blush field: no route, country, or
+// topic is allowed to re-introduce legacy dark photography behind the UI.
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { usePathname } from 'next/navigation';
-import { useScene } from '@/lib/scene';
-import { COUNTRY_SCENES, MILA_STUDIO, TOPIC_SCENES, visualScenesForRoute, type VisualScene } from '@/lib/visualScenes';
+import { MILA_ATELIER, visualScenesForRoute } from '@/lib/visualScenes';
 import { routeSurfaceForPath } from '@/lib/routeSurface';
 
 const HOLD_MS = 28000; // how long each scene breathes before the next (calm cadence)
@@ -28,7 +18,6 @@ type SceneStyle = CSSProperties & {
 export default function Atmosphere() {
   const pathname = usePathname() || '/';
   const surface = routeSurfaceForPath(pathname);
-  const { country, topic } = useScene();
   const [allowMotion, setAllowMotion] = useState(false);
 
   useEffect(() => {
@@ -50,18 +39,11 @@ export default function Atmosphere() {
     };
   }, []);
 
-  // Motion ONLY on the front door ('/'). Everywhere else: stills — video is
-  // distracting once you're working; a still holds the mood without pulling the eye.
+  // Motion belongs only on the front door. Learning rooms render no media.
   const motion = pathname === '/' && allowMotion;
 
-  // Resolve the active pool, most specific signal wins. A key string lets us
-  // reset the rotation whenever the resolved scene changes (tap a new flag →
-  // instant new place), without depending on array identity.
-  let scenes: VisualScene[];
-  let sceneKey: string;
-  if (country && COUNTRY_SCENES[country]) { scenes = COUNTRY_SCENES[country]; sceneKey = `c:${country}`; }
-  else if (topic && TOPIC_SCENES[topic]) { scenes = TOPIC_SCENES[topic]; sceneKey = `t:${topic}`; }
-  else { scenes = visualScenesForRoute(pathname); sceneKey = `r:${pathname}`; }
+  const scenes = visualScenesForRoute(pathname);
+  const sceneKey = `r:${pathname}`;
 
   const [idx, setIdx] = useState(0);
   const [on, setOn] = useState(false);
@@ -88,7 +70,7 @@ export default function Atmosphere() {
     };
   }, [idx, dead, motion, scenes.length]);
 
-  const activeScene = scenes[idx] ?? scenes[0] ?? MILA_STUDIO;
+  const activeScene = scenes[idx] ?? scenes[0] ?? MILA_ATELIER;
   const playVideo = motion && Boolean(activeScene.video);
   const sceneStyle: SceneStyle = {
     '--scene-focus-desktop': activeScene.focusDesktop ?? 'center center',
@@ -134,10 +116,10 @@ export default function Atmosphere() {
     };
   }, [activeScene.id, dead, playVideo]);
 
-  if (dead) return <div className={`atmosphere atmosphere--${surface}`} aria-hidden />;
+  if (pathname !== '/' || dead) return <div className={`atmosphere atmosphere--${surface}`} aria-hidden />;
 
   return (
-    <div className={`atmosphere atmosphere--${activeScene.grade ?? 'quiet'} atmosphere--${surface} ${pathname === '/' ? 'atmosphere--front' : ''} ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
+    <div className={`atmosphere atmosphere--${activeScene.grade ?? 'quiet'} atmosphere--${surface} atmosphere--front ${motion ? 'atmosphere--motion' : ''}`} aria-hidden>
       {playVideo ? (
         <video
           ref={vidRef}

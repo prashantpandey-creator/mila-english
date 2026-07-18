@@ -10,9 +10,9 @@ import { ACCENTS, startListening, type Assessment, type Session } from '@/lib/sp
 import { ttsSpeak } from '@/lib/tts'
 import { C } from '@/lib/theme'
 
-const SIGNAL = '#c94f5b'
-const SIGNAL_SOFT = 'rgba(201,79,91,0.12)'
-const SIGNAL_INK = '#fffaf7'
+const SIGNAL = '#b63d68'
+const SIGNAL_SOFT = 'rgba(182,61,104,0.12)'
+const SIGNAL_INK = '#ffffff'
 
 type Sound = {
   ipa: string
@@ -56,8 +56,8 @@ function recordingMessage(problem: unknown, lang: 'ru'|'en') {
 function MouthMap({ sound }: { sound: Sound }) {
   const tongue = sound.tongue === 'teeth' ? 'M42 69 Q68 47 108 61' : sound.tongue === 'low' ? 'M35 72 Q74 83 119 69' : sound.tongue === 'ridge' ? 'M39 72 Q71 48 111 55' : 'M42 72 Q82 60 115 45'
   return <svg role="img" aria-label={`Mouth position for ${sound.ipa}`} width="100%" height="150" viewBox="0 0 160 120" style={{display:'block'}}>
-    <path d="M18 58 Q25 17 79 16 Q138 16 145 58 Q137 102 80 104 Q25 101 18 58Z" fill="var(--mila-raised, #fffdf9)" stroke="var(--mila-line, rgba(36,29,25,.18))" strokeWidth="2"/>
-    <path d="M27 54 Q78 36 136 53" fill="none" stroke="var(--mila-muted, #746861)" strokeWidth="5" strokeLinecap="round"/>
+    <path d="M18 58 Q25 17 79 16 Q138 16 145 58 Q137 102 80 104 Q25 101 18 58Z" fill="var(--mila-raised, #fff7fa)" stroke="var(--mila-line, rgba(47,27,36,.18))" strokeWidth="2"/>
+    <path d="M27 54 Q78 36 136 53" fill="none" stroke="var(--mila-muted, #75606a)" strokeWidth="5" strokeLinecap="round"/>
     <path d={tongue} fill="none" stroke={SIGNAL} strokeWidth="10" strokeLinecap="round"/>
     {sound.tongue === 'teeth' && <path d="M78 48 L80 69" stroke={SIGNAL} strokeWidth="5" strokeLinecap="round"/>}
     <path d="M80 75 C101 77 125 70 147 60" fill="none" stroke={SIGNAL} strokeWidth="2" strokeDasharray="4 5"/>
@@ -120,11 +120,11 @@ export default function PronunciationLab() {
       <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}><span style={{width:44,height:44,borderRadius:14,display:'grid',placeItems:'center',color:SIGNAL,background:SIGNAL_SOFT,border:`1px solid ${SIGNAL}`}}><MilaIcon name="pronunciation" size={23}/></span><div><div style={{fontSize:'.72rem',fontWeight:800,letterSpacing:1.4,textTransform:'uppercase',color:SIGNAL}}>{lang==='ru'?'Лаборатория звуков':'Sound laboratory'}</div><h1 style={{fontSize:'clamp(1.65rem,5vw,2.25rem)',margin:2,color:C.dark}}>{lang==='ru'?'Произношение без догадок':'Pronunciation without guesswork'}</h1></div></div>
       <p style={{color:C.warm,lineHeight:1.6,margin:'12px 0 22px',maxWidth:620}}>{lang==='ru'?'Выбери сложный звук, посмотри положение языка, послушай фразу и получи мягкую оценку своей записи.':'Choose a difficult sound, see the tongue position, hear a phrase, and get gentle feedback on your recording.'}</p>
 
-      <label style={{display:'block',marginBottom:16}}><span style={{display:'block',fontSize:'.76rem',fontWeight:750,color:C.warm,marginBottom:7}}>{lang==='ru'?'Найти звук или слово':'Find a sound or word'}</span><input value={query} onChange={event=>search(event.target.value)} placeholder={lang==='ru'?'Например: th, world, /æ/':'For example: th, world, /æ/'} style={{width:'100%',boxSizing:'border-box',padding:'12px 14px',borderRadius:13,border:`1px solid ${C.line}`,background:'var(--mila-raised, #fffdf9)',color:C.dark,outline:'none',fontSize:'.95rem'}}/></label>
+      <label style={{display:'block',marginBottom:16}}><span style={{display:'block',fontSize:'.76rem',fontWeight:750,color:C.warm,marginBottom:7}}>{lang==='ru'?'Найти звук или слово':'Find a sound or word'}</span><input value={query} onChange={event=>search(event.target.value)} placeholder={lang==='ru'?'Например: th, world, /æ/':'For example: th, world, /æ/'} style={{width:'100%',boxSizing:'border-box',padding:'12px 14px',borderRadius:13,border:`1px solid ${C.line}`,background:'var(--mila-raised, #fff7fa)',color:C.dark,outline:'none',fontSize:'.95rem'}}/></label>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:9,marginBottom:18}}>
-        {filtered.map(({item,index})=><button type="button" key={item.ipa} onClick={()=>chooseSound(index)} aria-pressed={active===index} style={{padding:'12px 8px',borderRadius:14,border:active===index?`1.5px solid ${SIGNAL}`:`1px solid ${C.line}`,background:active===index?SIGNAL_SOFT:'var(--mila-raised, #fffdf9)',color:C.dark,cursor:'pointer',textAlign:'center'}}><span style={{display:'block',fontSize:'1.22rem',fontWeight:800,color:active===index?SIGNAL:C.dark}}>{item.ipa}</span><span style={{display:'block',fontSize:'.75rem',color:C.warm,marginTop:3}}>{item.word}</span></button>)}
+        {filtered.map(({item,index})=><button type="button" key={item.ipa} onClick={()=>chooseSound(index)} aria-pressed={active===index} style={{padding:'12px 8px',borderRadius:14,border:active===index?`1.5px solid ${SIGNAL}`:`1px solid ${C.line}`,background:active===index?SIGNAL_SOFT:'var(--mila-raised, #fff7fa)',color:C.dark,cursor:'pointer',textAlign:'center'}}><span style={{display:'block',fontSize:'1.22rem',fontWeight:800,color:active===index?SIGNAL:C.dark}}>{item.ipa}</span><span style={{display:'block',fontSize:'.75rem',color:C.warm,marginTop:3}}>{item.word}</span></button>)}
       </div>
-      {!filtered.length && <div style={{padding:16,borderRadius:14,background:'var(--mila-raised, #fffdf9)',color:C.warm,marginBottom:18}}>{lang==='ru'?'Такого звука пока нет. Попробуй слово из списка.':'That sound is not in the lab yet. Try one of the listed words.'}</div>}
+      {!filtered.length && <div style={{padding:16,borderRadius:14,background:'var(--mila-raised, #fff7fa)',color:C.warm,marginBottom:18}}>{lang==='ru'?'Такого звука пока нет. Попробуй слово из списка.':'That sound is not in the lab yet. Try one of the listed words.'}</div>}
 
       <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(280px,100%),1fr))',gap:12,marginBottom:14}}>
         <div className="focus-card" style={{padding:'20px'}}>

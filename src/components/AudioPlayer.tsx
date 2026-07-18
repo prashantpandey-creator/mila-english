@@ -20,7 +20,7 @@ export default function AudioPlayer({ word = 'pronunciation' }: { word?: string 
   return (
     <button onClick={speak} disabled={playing}
       style={{display:'flex',alignItems:'center',gap:10,padding:'12px 20px',borderRadius:14,
-        border:`1px solid ${C.voice}`,background:playing ? C.voice : C.voiceL,color:playing?'#021418':C.voice,fontWeight:600,
+        border:`1px solid ${C.voice}`,background:playing ? C.voice : C.voiceL,color:playing?C.venusInk:C.voice,fontWeight:600,
         cursor:playing?'default':'pointer',marginTop:16,transition:'background 0.2s'}}>
       <MilaIcon name="volume" size={17}/>{playing ? 'Playing…' : `Listen: ${word}`}
     </button>

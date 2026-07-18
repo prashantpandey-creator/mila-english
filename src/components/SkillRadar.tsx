@@ -21,7 +21,7 @@ export default function SkillRadar() {
     <Card padding="20px" style={{marginTop:16,textAlign:'center'}}>
       <svg width="220" height="220" viewBox="0 0 220 220">
         {[0.33,0.66,1].map(f=>(
-          <circle key={f} cx={cx} cy={cy} r={r*f} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1"/>
+          <circle key={f} cx={cx} cy={cy} r={r*f} fill="none" stroke="var(--mila-line, #efd6df)" strokeWidth="1"/>
         ))}
         <polygon points={pts} fill={C.mercuryL} stroke={C.mercury} strokeWidth="2" opacity="0.85"/>
         {SKILLS.map((s,i)=>{

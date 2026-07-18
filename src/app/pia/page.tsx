@@ -129,7 +129,7 @@ export default function PiaPage() {
   const showQuestion = (phase === "listening" || phase === "thinking") && !!liveText;
 
   return (
-    <div className="voice-stage fixed inset-0 overflow-hidden bg-black">
+    <div className="voice-stage fixed inset-0 overflow-hidden" data-phase={phase}>
       <MilaAurora phase={phase} />
 
       <button
@@ -151,7 +151,7 @@ export default function PiaPage() {
         className="absolute left-1/2 z-20 -translate-x-1/2 text-center"
         style={{ top: "max(1.4rem, env(safe-area-inset-top, 0px))" }}
       >
-        <span className="text-[13px] uppercase tracking-[0.42em] text-[#e46a73]/70">Pia</span>
+        <span className="voice-name text-[13px] uppercase tracking-[0.42em]">Pia</span>
       </div>
 
       {/* The orb — the touch target */}
@@ -171,7 +171,7 @@ export default function PiaPage() {
 
         {isConnecting && (
           <div
-            className="absolute inset-0 z-20 animate-spin rounded-full border-2 border-[#e46a73]/50 border-t-transparent pointer-events-none"
+            className="voice-connecting absolute inset-0 z-20 animate-spin rounded-full border-2 border-t-transparent pointer-events-none"
             style={{ width: orbSize, height: orbSize, left: "50%", top: "50%", marginLeft: -orbSize / 2, marginTop: -orbSize / 2 }}
           />
         )}
@@ -214,20 +214,20 @@ export default function PiaPage() {
         >
           <p className="mb-2 text-center text-[11px] uppercase tracking-[0.1em] transition-colors duration-300">
             {phase === "listening" ? (
-              <span className="text-[#e46a73]">● Sun rahi hoon</span>
+              <span className="voice-status voice-status--listening">● Sun rahi hoon</span>
             ) : phase === "thinking" ? (
-              <span className="text-[#e46a73]/80">Soch rahi hoon…</span>
+              <span className="voice-status voice-status--thinking">Soch rahi hoon…</span>
             ) : phase === "manifesting" ? (
-              <span className="text-[#e46a73]">Bol rahi hoon — rokne ke liye tap</span>
+              <span className="voice-status voice-status--speaking">Bol rahi hoon — rokne ke liye tap</span>
             ) : (
-              <span className="text-[#b9b0aa]">Bolo, shuru karte hain</span>
+              <span className="voice-status voice-status--resting">Bolo, shuru karte hain</span>
             )}
           </p>
         </div>
       )}
 
       {error && (
-        <p className="absolute bottom-[3%] left-1/2 z-20 w-[90%] max-w-md -translate-x-1/2 text-center text-xs text-[#e46a73]" role="alert">
+        <p className="voice-error absolute bottom-[3%] left-1/2 z-20 w-[90%] max-w-md -translate-x-1/2 text-center text-xs" role="alert">
           {error}
         </p>
       )}

@@ -51,7 +51,7 @@ function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => voi
       <button onClick={onStart}
         style={{width:'100%',maxWidth:340,padding:'16px',borderRadius:16,border:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:8,
           background:C.venus,color:C.venusInk,fontWeight:800,fontSize:'1.1rem',
-          cursor:'pointer',boxShadow:'0 6px 20px rgba(150,54,64,0.24)',letterSpacing:'0.01em'}}>
+          cursor:'pointer',boxShadow:'0 6px 20px rgba(141,45,80,0.24)',letterSpacing:'0.01em'}}>
         {lang==='ru' ? 'Начать упражнение' : 'Start Exercise'} <MilaIcon name="arrow" size={18}/>
       </button>
     </div>
@@ -284,7 +284,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
                 cursor:micBusy?'default':'pointer',
                 background: phase==='recording'||phase==='scoring' ? C.venus : C.venusL,
                 color:phase==='recording'||phase==='scoring'?C.venusInk:C.venusDeep,fontSize:'1.6rem',
-                boxShadow:'0 8px 24px rgba(150,54,64,.24)',
+                boxShadow:'0 8px 24px rgba(141,45,80,.24)',
                 animation: phase==='recording' ? 'pulse 1.2s ease-in-out infinite' : 'none',
                 transition:'background 0.2s'}}>
               {phase==='recording'
@@ -312,7 +312,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
               <MilaIcon name="voice" size={17}/>{lang==='ru' ? 'Ещё раз' : 'Try again'}
             </button>
             <button onClick={next}
-              style={{flex:2,padding:'16px',borderRadius:16,border:'none',background:C.venus,color:C.venusInk,fontWeight:800,fontSize:'1.05rem',cursor:'pointer',boxShadow:'0 6px 18px rgba(150,54,64,0.24)'}}>
+              style={{flex:2,padding:'16px',borderRadius:16,border:'none',background:C.venus,color:C.venusInk,fontWeight:800,fontSize:'1.05rem',cursor:'pointer',boxShadow:'0 6px 18px rgba(141,45,80,0.24)'}}>
               {pos >= phrases.length - 1 ? (lang==='ru' ? 'Завершить урок' : 'Complete lesson') : (lang==='ru' ? 'Продолжить →' : 'Continue →')}
             </button>
           </div>

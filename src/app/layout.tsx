@@ -34,12 +34,12 @@ export const metadata: Metadata = {
   title: 'Mila — the English atelier',
   description: 'Английский как искусство: живые уроки, ИИ-наставница, произношение до фонемы. Private-club English for Russian speakers.',
   manifest: '/manifest.webmanifest',
-  appleWebApp: { capable: true, title: 'Mila', statusBarStyle: 'black-translucent' },
+  appleWebApp: { capable: true, title: 'Mila', statusBarStyle: 'default' },
   icons: { icon: '/icon', apple: '/apple-icon' },
 }
 
 export const viewport: Viewport = {
-  width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#f8f4ee',
+  width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#fffdfd', colorScheme: 'light',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

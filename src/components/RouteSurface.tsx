@@ -9,14 +9,13 @@ export default function RouteSurface({ children }: { children: ReactNode }) {
   const surface = routeSurfaceForPath(pathname);
   const isMarketing = pathname === '/' || pathname === '/start';
 
-  // Route intent is deterministic: warm paper throughout the site; neutral
-  // near-black is reserved for immersive voice and contained editorial bands.
-  // A saved device preference must never split Mila into competing palettes.
+  // Route intent is deterministic: the same warm paper and rose language on
+  // every page. A saved device preference must never split Mila into competing
+  // palettes or make a voice room feel like a different product.
   useEffect(() => {
-    const dark = surface === 'focus';
-    document.documentElement.dataset.milaTheme = dark ? 'dark' : 'light';
+    document.documentElement.dataset.milaTheme = 'light';
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    if (meta) meta.content = dark ? '#0c0d11' : '#f8f4ee';
+    if (meta) meta.content = '#fffdfd';
   }, [pathname, surface]);
 
   useEffect(() => {

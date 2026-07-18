@@ -157,7 +157,7 @@ export default function HomePage() {
 
   const proof = [
     { n: '01', title: T('Слышит каждый звук', 'Hears every sound'), copy: T('Разбор произношения до отдельной фонемы — не «хорошо/плохо», а что именно.', 'Pronunciation mapped to the single phoneme — not “good/bad”, but exactly what.') },
-    { n: '02', title: T('Три живых акцента', 'Three living accents'), copy: T('Лондон · Нью-Йорк · Мумбаи. Слушай английский таким, какой он есть.', 'London · New York · Mumbai. Hear English the way it is actually spoken.') },
+    { n: '02', title: T('Живой английский', 'Real-world English'), copy: T('Лондон · Нью-Йорк · Мумбаи. Три ритма — без туристических клише.', 'London · New York · Mumbai. Three rhythms, without the travel clichés.') },
     { n: '03', title: T('Свои серверы', 'Its own servers'), copy: T('Голос обрабатывается у Mila и удаляется после проверки. Поэтому — без VPN.', 'Your voice is processed on Mila’s servers and deleted after scoring. Hence — no VPN.') },
     { n: '04', title: T('Помнит твой путь', 'Remembers your path'), copy: T('Слова и звуки возвращаются ровно тогда, когда ты готов их забыть.', 'Words and sounds return exactly when you are about to forget them.') },
   ];
@@ -214,9 +214,9 @@ export default function HomePage() {
   ];
 
   const cities = [
-    { src: '/ambience/stills/uk-bigben-night.jpg', code: 'LDN', name: T('Лондон', 'London'), note: T('Британский английский', 'British English') },
-    { src: '/ambience/stills/us-manhattan.jpg', code: 'NYC', name: T('Нью-Йорк', 'New York'), note: T('Американский английский', 'American English') },
-    { src: '/ambience/stills/in-palace.jpg', code: 'JAI', name: T('Джайпур', 'Jaipur'), note: T('Индийский английский', 'Indian English') },
+    { code: 'LDN', edition: '01', name: T('Лондон', 'London'), note: T('Точный · сдержанный · музыкальный', 'Precise · restrained · musical'), phrase: 'Mind the rhythm' },
+    { code: 'NYC', edition: '02', name: T('Нью-Йорк', 'New York'), note: T('Прямой · быстрый · живой', 'Direct · quick · alive'), phrase: 'Make it yours' },
+    { code: 'BOM', edition: '03', name: T('Мумбаи', 'Mumbai'), note: T('Тёплый · гибкий · выразительный', 'Warm · fluid · expressive'), phrase: 'Speak with colour' },
   ];
 
   const homeRows = [
@@ -285,18 +285,18 @@ export default function HomePage() {
         <section className="lp-hero" aria-label={T('Поговорить с Милой', 'Talk with Mila')}>
           <div className="lp-shell lp-hero__stage">
             <div className="lp-hero__copy">
-              <div className="lp-hero__live"><i />{T('Мила готова тебя слушать', 'Mila is ready to listen')}</div>
-              <h1>{lang === 'ru' ? <>Говори свободно. <em>Оставайся собой.</em></> : <>Speak freely. <em>Sound like you.</em></>}</h1>
+              <div className="lp-hero__live"><i />{T('Твоя личная мастерская английского', 'Your private English atelier')}</div>
+              <h1>{lang === 'ru' ? <>Английский — <em>твоим голосом.</em></> : <>English, in <em>your own voice.</em></>}</h1>
               <p className="lp-hero__lede">
                 {T(
-                  'Живой разговор с Милой — без урока по сценарию и без страха ошибиться. После разговора ты получишь одну точную подсказку, чтобы звучать естественнее.',
-                  'Have a real conversation with Mila — no scripted lesson and no fear of getting it wrong. Afterwards, get one precise cue that helps you sound more natural.',
+                  'Приходи как есть и говори без сценария. Мила услышит тебя, поддержит разговор и предложит один точный шаг — без оценок и чужой роли.',
+                  'Come as you are and speak without a script. Mila listens, keeps the conversation alive, then offers one precise next step — without judgement or performance.',
                 )}
               </p>
               <div className="lp-hero__actions">
                 <button className="lp-btn lp-btn--primary lp-btn--talk" onClick={startFreeTalk}>
                   <span className="lp-voicepulse" aria-hidden><i /><i /><i /></span>
-                  {T('Поговорить с Милой', 'Talk with Mila')}
+                  {T('Начать разговор', 'Start a conversation')}
                   <Icon name="arrow" size={18} />
                 </button>
                 <button className="lp-btn lp-btn--ghost" onClick={() => openDoor('/assessment')}>
@@ -305,7 +305,7 @@ export default function HomePage() {
               </div>
               <div className="lp-assure" aria-label={T('Условия старта', 'Getting started')}>
                 <span><Icon name="check" size={13} />{T('Бесплатно', 'Free')}</span>
-                <span><Icon name="check" size={13} />{T('Без регистрации', 'No sign-up')}</span>
+                <span><Icon name="check" size={13} />{T('Без чужих ролей', 'No pretending')}</span>
                 <span><Icon name="check" size={13} />{T('Без VPN', 'No VPN')}</span>
               </div>
             </div>
@@ -321,8 +321,8 @@ export default function HomePage() {
           <section className="lp-sample">
             <div className="lp-shell lp-sample__grid">
               <Reveal className="lp-section__head lp-sample__intro">
-                <span className="lp-label">{T('Послушай разницу', 'Hear the difference')}</span>
-                <h2>{lang === 'ru' ? <>Один звук. <em>Один ясный шаг.</em></> : <>One sound. <em>One clear next step.</em></>}</h2>
+                <span className="lp-label">{T('Небольшая репетиция', 'A small rehearsal')}</span>
+                <h2>{lang === 'ru' ? <>Услышь один звук. <em>Сохрани свой голос.</em></> : <>Hear one sound. <em>Keep your whole voice.</em></>}</h2>
                 <p>{T('Попробуй интерактивный разбор: выбери акцент, услышь слово и посмотри, как Мила превращает речь в понятную практику.', 'Try the live sample: choose an accent, hear the word, and see how Mila turns speech into clear practice.')}</p>
               </Reveal>
 
@@ -477,14 +477,17 @@ export default function HomePage() {
         <section className="lp-section" style={{ paddingTop: 0 }} aria-label={T('Акценты Mila', 'Mila accents')}>
           <div className="lp-shell">
             <Reveal className="lp-section__head lp-section__head--center">
-              <span className="lp-label">{T('Три акцента', 'Three accents')}</span>
-              <h2>{lang === 'ru' ? <>Учись для мест, <em>куда собираешься.</em></> : <>Learn for the places <em>you are going.</em></>}</h2>
+              <span className="lp-label">{T('Три живых ритма', 'Three living rhythms')}</span>
+              <h2>{lang === 'ru' ? <>Не страны на открытке. <em>Люди в разговоре.</em></> : <>Not countries on postcards. <em>People in conversation.</em></>}</h2>
+              <p>{T('Выбирай не флаг, а звучание, которое хочется понимать и чувствовать.', 'Choose a way of speaking you want to understand and feel — not a flag.')}</p>
             </Reveal>
             <div className="lp-cities">
               {cities.map((city) => (
                 <Reveal key={city.code}>
                   <figure className="lp-city" style={{ margin: 0 }}>
-                    <img src={city.src} alt={city.name} loading="lazy" />
+                    <div className="lp-city__edition"><span>{city.edition}</span><small>MILA VOICE EDITION</small></div>
+                    <div className="lp-city__signal" aria-hidden><i /><i /><i /><i /><i /></div>
+                    <blockquote>{city.phrase}</blockquote>
                     <figcaption>
                       <span>{city.code}</span>
                       <strong>{city.name}</strong>
