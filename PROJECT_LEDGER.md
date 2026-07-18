@@ -53,7 +53,12 @@ loads with mmap off), so every load was a guaranteed cgroup OOM kill
 That means prod local chat was hard-down under those caps, not merely deploys
 red. Compose never healed it because `docker update` is invisible to compose's
 config hash — five `up -d` runs left the strangled containers untouched.
-Fix shipped 2026-07-18: `docker-compose.prod.yml` now declares ALL LLM limits
+Fix shipped 2026-07-18 — commit `e36069e`, deploy run `29626342384` **GREEN**
+in 12m47s, the first since 01:19: both LLM containers `Recreated`, `local chat
+model warmed` on the first attempt, the voice warm-up 500'd once and the new
+retry caught it, both residencies `ready`; after the run `/` and `/assessment`
+200 from outside and purangpt.com still answering (no freeze-window casualty).
+What changed: `docker-compose.prod.yml` now declares ALL LLM limits
 (chat 16g, voice 6g, memswap pinned) and the next deploy recreates both
 containers back to git truth; the workflow's warm-up + residency checks are
 retried and then become `::warning::` lines instead of hard failures (the
