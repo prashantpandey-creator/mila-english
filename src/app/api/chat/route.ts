@@ -324,12 +324,14 @@ export async function POST(request: NextRequest) {
   });
 
   const voiceExternalFirst = spoken && /^(?:1|true|yes)$/i.test(process.env.VOICE_EXTERNAL_FIRST || '');
-  // Ordinary text conversation must feel live too. Use Mila's smaller resident
-  // local conversation model for `/chat`, the same low-latency brain used by
-  // spoken turns. The larger chat model remains available to the floating
-  // guide, where longer app explanations matter more than turn-taking speed.
+  // Ordinary text conversation must feel live too. `/chat` tries the already
+  // configured fast external provider first, then falls back to Mila's smaller
+  // resident local conversation model when no provider is configured. The
+  // privacy page discloses transcript-only provider processing; audio is not
+  // sent through this route.
   const modelSurface = surfaceKind === 'practice' || surfaceKind === 'chat' ? 'voice' : surfaceKind;
-  const choice = await chooseModel(modelSurface, voiceExternalFirst);
+  const chatExternalFirst = surfaceKind === 'chat';
+  const choice = await chooseModel(modelSurface, voiceExternalFirst || chatExternalFirst);
   if (!choice) {
     const reply = builtInCompanionReply(latestUserMessage, pathname, locale, profile?.level);
     await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
