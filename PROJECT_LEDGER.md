@@ -17,6 +17,7 @@ No local screenshot counts. No "LIVE" claim without both.**
 | Area | State | Commit | Proof |
 |------|-------|--------|-------|
 | Front door `/` design | **Conversation poster** — one full-bleed cinematic hero, free Talk with Mila action first, level check second, solid three-outcome proof band, then a Studio pronunciation proof. The duplicate intro and glass thumbnail rail are removed. | `683aa47` (2026-07-18) | deploy run `29624436105` green; live HTML/CSS contains `Speak freely.`, `lp-hero__proofbar`, `#111217`, and the desktop assistant offset; live desktop + mobile screenshots verified with the correct responsive art and no horizontal overflow/assistant overlap |
+| Conversation-first Mila core | `/dashboard` is a Mila conversation stage instead of a widget directory: **Speak with Mila** is primary, **Chat with Mila** is second, and lessons are a quieter supporting rail. `/chat` carries Mila's identity, starter prompts, assistant portraits, and a direct voice handoff. Ordinary chat is isolated from focused-drill history; “just talk / stop correcting / stop repeating” overrides prior lesson context; fast configured-provider text turns fall back to the resident local model. Placeholder Guest names no longer leak across interface languages. | `f7cc269`, `74508b0`, `12e65a9`, merged as `7512b45`, `1c6afb7`, `60f0207` (2026-07-18) | deploy runs `29637130227`, `29637431694`, `29637788415` all green. `/dashboard`, `/chat`, `/darshan` 200; live CSS `3a9ac04649781d65.css` contains `conversation-stage__presence`, `chat-page__empty-presence`, `dashboard-conversation__main`, `chat-page__starters`; live dashboard/chat JS contains the new voice/chat copy. Desktop + 390 px live screenshots pass with no horizontal overflow. Live clicks prove dashboard→voice, dashboard→chat, chat mic→voice. The exact “Let's just talk… no repeat or correct” probe stopped the old drill and returned ordinary conversation; the final live timing probe showed first visible reply at **1.576 s**, full reply at **2.096 s**. |
 | Front-door clips | city-night-bokeh / us-manhattan / woman-silk / uk-bigben-night. **The café-people clips (woman-cafe-laptop, woman-city-phone) are CUT** — owner rejected the reading-faces on a Russia front door | `421fd86` | `woman-cafe-laptop` absent from live DOM |
 | App-wide headings | globals `h1,h2` now use Yeseva One (loaded at layout level, not just landing) | `421fd86` | in-bundle |
 | Voice/Piper TTS | `/api/tts` serves real WAV | prior | 200 + RIFF WAV |
@@ -27,26 +28,14 @@ No local screenshot counts. No "LIVE" claim without both.**
 
 ## LOCAL / UNPUSHED
 
-- **Conversation-first product core (pending deploy):** `/dashboard` is no
-  longer a generic collection of learning cards. It opens with a dominant Mila
-  speaking stage, makes live voice the primary action and text chat the second,
-  then moves lessons into a supporting rail. `/chat` now carries the same Mila
-  identity, provides natural starter prompts, and keeps a direct voice-room
-  control in the composer. The follow-up behavior patch separates focused-drill
-  history from ordinary chat, makes conversation the default, and treats “just
-  talk / stop correcting / stop repeating” as a hard mode switch. Ordinary text
-  turns now try the configured fast cloud model first and fall back to the
-  smaller resident local conversation model when no provider is available;
-  the local-only production probe still took 56 seconds end-to-end. Desktop and
-  390 px local browser checks pass with no horizontal overflow; production
-  cloud-latency proof is still required before this moves to LIVE NOW.
 - The Apple Distribution IPA remains local only because App Store Connect is
   waiting for an interactive Apple ID sign-in and app-record creation before
   validation/upload.
 
 ## OWED (asked, NOT done — do not claim these)
-1. **"Make the flow intuitive."** The information architecture / navigation flow
-   has NOT been reworked. Front-door visuals are done; the *flow* is untouched.
+1. **"Make the flow intuitive."** The dashboard → chat/voice core is now
+   conversation-first and live. A full route-by-route information-architecture
+   cleanup across every learning page is still owed.
 
 ---
 
