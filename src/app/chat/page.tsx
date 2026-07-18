@@ -1,6 +1,7 @@
 'use client';
 
 import { useChat } from 'ai/react';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
@@ -12,13 +13,14 @@ import { announceCompanionHistoryCleared, announceCompanionHistoryUpdated, useCo
 export default function Chat() {
   const { lang } = useI18n();
   const router = useRouter();
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput } = useChat({
     id: 'mila-full-chat',
     api: '/api/chat',
     body: { context: { pathname: '/chat', lang, surface: 'chat' } },
     onFinish: () => announceCompanionHistoryUpdated(),
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [m, setM] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [clearError, setClearError] = useState(false);
@@ -53,13 +55,30 @@ export default function Chat() {
     }
   };
 
+  const starterPrompts = lang === 'ru'
+    ? [
+        'Давай потренируем живой разговор',
+        'Помоги сказать это естественно',
+        'Мягко объясни мою ошибку',
+      ]
+    : [
+        'Let’s practise a real conversation',
+        'Help me say this naturally',
+        'Explain my mistake gently',
+      ];
+
+  const chooseStarter = (prompt: string) => {
+    setInput(prompt);
+    window.requestAnimationFrame(() => inputRef.current?.focus());
+  };
+
   if (!m) return null;
 
   return (
     <AppShell className="chat-page" fullHeight>
       <AppHeader
-        title={lang==='ru' ? 'Наставница' : 'Tutor & companion'}
-        eyebrow={lang==='ru' ? 'Разговор' : 'Conversation'}
+        title={lang==='ru' ? 'Чат с Милой' : 'Chat with Mila'}
+        eyebrow={lang==='ru' ? 'Текстовый разговор' : 'Text conversation'}
         actions={
           <>
           <button
@@ -87,20 +106,36 @@ export default function Chat() {
 
         {!isHydrating && messages.length === 0 && (
           <div className="chat-page__empty">
-            <span className="chat-page__empty-icon" aria-hidden="true"><MilaIcon name="conversation" size={24}/></span>
-            <div className="chat-page__empty-title">
-              {lang==='ru' ? 'Начни разговор!' : 'Start a conversation!'}
+            <div className="chat-page__empty-presence" aria-hidden="true">
+              <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} priority />
+              <span />
             </div>
-            <div className="chat-page__empty-copy">
+            <p className="chat-page__empty-kicker">{lang === 'ru' ? 'Мила здесь' : 'Mila is here'}</p>
+            <h1 className="chat-page__empty-title">
+              {lang==='ru' ? 'О чём думаешь?' : 'What’s on your mind?'}
+            </h1>
+            <p className="chat-page__empty-copy">
               {lang==='ru'
-                ? 'Спроси о чём угодно или начни практику английского. Мила помнит контекст между страницами.'
-                : 'Ask about anything or start an English practice. Mila keeps the conversation going when you move around the app.'}
+                ? 'Пиши как есть — на русском или английском. Я помогу продолжить мысль и, если нужно, подскажу более естественную английскую фразу.'
+                : 'Write naturally—in Russian or English. I’ll follow your meaning and, when useful, offer a more natural English phrase.'}
+            </p>
+            <div className="chat-page__starters" aria-label={lang === 'ru' ? 'Начать с подсказки' : 'Start with a prompt'}>
+              {starterPrompts.map((prompt) => (
+                <button type="button" key={prompt} onClick={() => chooseStarter(prompt)}>
+                  <span>{prompt}</span><MilaIcon name="arrow" size={16} />
+                </button>
+              ))}
             </div>
           </div>
         )}
 
         {messages.map(m => (
           <div key={m.id} className={`chat-page__row ${m.role === 'user' ? 'is-user' : 'is-assistant'}`}>
+            {m.role !== 'user' ? (
+              <span className="chat-page__mila-avatar" aria-label="Mila">
+                <Image src="/mascot/mila-mascot.png" alt="" width={1254} height={1254} />
+              </span>
+            ) : null}
             <div className="chat-page__bubble">
               {m.content}
             </div>
@@ -137,6 +172,7 @@ export default function Chat() {
             <MilaIcon name="voice" size={19}/>
           </button>
           <input
+            ref={inputRef}
             value={input}
             onChange={handleInputChange}
             placeholder={lang==='ru' ? 'Спроси Милу или попрактикуйся…' : 'Ask Mila anything or practise English…'}
