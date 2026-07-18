@@ -10,7 +10,6 @@ import LessonList from '@/components/LessonList';
 import GenerateLessonButton from '@/components/GenerateLessonButton';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import { useI18n } from '@/lib/i18n-provider';
-import { C } from '@/lib/theme';
 import { COURSE_LESSON_IDS, getBuiltinLesson } from '@/lib/builtinLessons';
 import type { MilaIconName } from '@/components/ui/MilaIcon';
 
@@ -85,7 +84,10 @@ export default function LessonsPage() {
       />
 
       <AppMain width="work" className="lessons-page__main">
-        <p style={{color:C.warm,margin:'4px 0 20px'}}>{t('lessons_subtitle')}</p>
+        <div className="product-intro">
+          <p className="product-intro__kicker">{lang==='ru'?'Выбери сцену':'Choose a scene'}</p>
+          <p className="product-intro__copy">{t('lessons_subtitle')}</p>
+        </div>
 
         <GenerateLessonButton />
         <CategoryFilter categories={cats} active={activeCat} onChange={setActiveCat}/>

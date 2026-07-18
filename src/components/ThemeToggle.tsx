@@ -10,7 +10,7 @@ const OPTIONS: ThemePreference[] = ['system', 'light', 'dark'];
 // styling. Only the welcome room reacts — the focus studio is always dark.
 export default function ThemeToggle() {
   const { lang } = useI18n();
-  const [preference, setPreference] = useState<ThemePreference>('system');
+  const [preference, setPreference] = useState<ThemePreference>('light');
 
   useEffect(() => { setPreference(getThemePreference()); }, []);
 

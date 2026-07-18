@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n-provider';
 import MilaIcon from '@/components/ui/MilaIcon';
-import { C } from '@/lib/theme';
 import { Card } from '@/components/ui/Card';
 
 // Commission a lesson from the AI — on success we walk straight into it
@@ -35,8 +34,12 @@ export default function GenerateLessonButton() {
   };
 
   return (
-    <div className="lesson-generator" style={{marginBottom:18}}>
-      <Card className="lesson-generator__control" padding="14px" style={{display:'flex',gap:10}}>
+    <div className="lesson-generator">
+      <div className="lesson-generator__label">
+        <MilaIcon name="sparkle" size={15}/>
+        <span>{lang==='ru'?'Урок по твоему запросу':'Made for your moment'}</span>
+      </div>
+      <Card className="lesson-generator__control" padding="0">
         <input
           type="text"
           placeholder={lang==='ru'?'Закажи урок: «собеседование в IT», «светская беседа»…':'Commission a lesson: “job interview”, “small talk at dinner”…'}
@@ -45,22 +48,16 @@ export default function GenerateLessonButton() {
           onKeyDown={e => { if (e.key === 'Enter') handleGenerate(); }}
           disabled={loading}
           className="lesson-generator__input"
-          style={{flex:1,minWidth:0,padding:'11px 14px',borderRadius:11,border:'1px solid var(--surface-control-line)',
-            background:'var(--surface-control)',color:C.dark,fontSize:'0.9rem',outline:'none'}}
         />
         <button
           onClick={handleGenerate}
           disabled={loading || !topic.trim()}
-          className="lesson-generator__button"
-          style={{padding:'11px 20px',borderRadius:11,border:'none',whiteSpace:'nowrap',
-            background:'linear-gradient(135deg,#b54b72,#983556)',color:'#fff',fontWeight:800,fontSize:'0.88rem',
-            cursor:(loading||!topic.trim())?'default':'pointer',opacity:(loading||!topic.trim())?0.55:1,
-            boxShadow:'0 8px 20px rgba(168,61,100,.2)',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:7}}>
+          className="lesson-generator__button">
           <MilaIcon name="sparkle" size={16}/>{loading ? (lang==='ru'?'Мила пишет…':'Mila is writing…') : (lang==='ru'?'Создать урок':'Commission it')}
         </button>
       </Card>
       {err && (
-        <div style={{marginTop:8,fontSize:'0.8rem',color:'#e8556d',textAlign:'center'}}>
+        <div className="product-feedback is-error">
           {lang==='ru'?'Не получилось — попробуй ещё раз.':'Something failed — try once more.'}
         </div>
       )}

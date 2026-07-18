@@ -1,7 +1,6 @@
 // @ts-nocheck
 'use client';
 
-import { C } from '@/lib/theme';
 import { Card } from '@/components/ui/Card';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 
@@ -10,20 +9,13 @@ import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 export default function ProgressSummary({ items }: {
   items: { icon: MilaIconName; val: number | string; label: string; color?: string }[];
 }) {
-  const readable = (color?: string) => {
-    if (color === C.jupiter) return `var(--jupiter-readable, ${C.jupiter})`;
-    if (color === C.voice) return `var(--voice-readable, ${C.voice})`;
-    if (color === C.mercury) return `var(--mercury-readable, ${C.mercury})`;
-    return color || `var(--mercury-readable, ${C.mercury})`;
-  };
-
   return (
-    <div className="metric-grid" style={{ display: 'grid', gap: 10 }}>
+    <div className="metric-grid">
       {items.map((s, i) => (
-        <Card key={i} hover={false} padding="15px 10px" style={{ textAlign: 'center', boxShadow: 'none' }}>
-          <div style={{ width: 34, height: 28, display: 'grid', placeItems: 'center', margin: '0 auto 2px', color: readable(s.color) }}><MilaIcon name={s.icon} size={21} /></div>
-          <div style={{ fontFamily: "var(--font-display, 'Manrope'),sans-serif", fontSize: '1.65rem', fontWeight: 700, color: `var(--jupiter-readable, ${C.jupiter})`, lineHeight: 1.15 }}>{s.val}</div>
-          <div style={{ fontSize: '0.72rem', color: C.warm, letterSpacing: '0.02em' }}>{s.label}</div>
+        <Card key={i} hover={false} padding="0" className="metric-card">
+          <div className="metric-card__icon"><MilaIcon name={s.icon} size={20} /></div>
+          <div className="metric-card__value">{s.val}</div>
+          <div className="metric-card__label">{s.label}</div>
         </Card>
       ))}
     </div>
