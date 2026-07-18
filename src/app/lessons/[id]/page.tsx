@@ -232,13 +232,6 @@ export default function LessonPage() {
           <h1 style={{fontSize:'1.4rem',fontWeight:800,color:C.dark,margin:'0 0 4px'}}>
             {lang==='ru'?lesson.title:lesson.titleEn}
           </h1>
-          <button
-            type="button"
-            onClick={()=>router.push(`/practice?lesson=${lesson.id}`)}
-            style={{flexShrink:0,minHeight:44,border:'1px solid rgba(255,255,255,0.22)',background:'rgba(255,255,255,0.08)',color:C.dark,borderRadius:999,padding:'7px 13px',fontSize:'0.78rem',fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:6}}
-          >
-            <MilaIcon name="voice" size={15}/>{lang==='ru'?'Практика голосом':'Speak it'}
-          </button>
         </div>
         <p style={{color:C.warm,margin:'0 0 20px'}}>
           {step==='words'?(lang==='ru'?'Выучи слова':'Learn the words'):

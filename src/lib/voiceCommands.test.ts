@@ -23,9 +23,12 @@ assert.strictEqual(gotoRoute('take me home'), '/dashboard');
 assert.strictEqual(gotoRoute('open pronunciation'), '/phonetics');
 assert.strictEqual(gotoRoute('open listening'), '/listen');
 
-// The practice room.
-assert.strictEqual(gotoRoute('open speaking practice'), '/practice');
-assert.strictEqual(gotoRoute('открой практику'), '/practice');
+// The practice room is hidden at /voice-lab (internal): spoken "practice"
+// must no longer resolve to a navigation command at all.
+for (const phrase of ['open speaking practice', 'открой практику']) {
+  const cmd = parseVoiceCommand(phrase);
+  assert.ok(!cmd || cmd.kind !== 'goto', `"${phrase}" must NOT navigate anywhere`);
+}
 
 // Navigation — RU.
 assert.strictEqual(gotoRoute('открой уроки'), '/lessons');
