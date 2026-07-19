@@ -393,17 +393,21 @@ export async function POST(request: NextRequest) {
   // External model calls have a real marginal cost. Bound both the signed-in
   // learner and their network before opening a provider stream; private/local
   // Mila turns and deterministic fallbacks do not consume this allowance.
-  if (choice.runtime === 'external') {
+  // Speculative voice drafts (internal partial-transcript retries) are NOT real
+  // turns — counting them silently drains the allowance and mutes the learner,
+  // especially now that every chat turn is external (the resident local model
+  // is currently absent). Only real turns consume the budget.
+  if (choice.runtime === 'external' && !speculative) {
     const userRate = consumeAuthAttempt(`model-user:${userId}`, { limit: 120, windowMs: 60 * 60_000 });
     const ipRate = consumeAuthAttempt(`model-ip:${requestIdentity(request)}`, { limit: 240, windowMs: 60 * 60_000 });
     if (!userRate.allowed || !ipRate.allowed) {
-      return NextResponse.json({
-        error: 'Too many AI turns in a short time. Continue in a little while.',
-        code: 'MODEL_RATE_LIMITED',
-      }, {
-        status: 429,
-        headers: { 'Retry-After': String(Math.max(userRate.retryAfterSeconds, ipRate.retryAfterSeconds)) },
-      });
+      // Never answer a learner with silence: a bare 429 is dropped by the chat
+      // UI and reads as "Mila is dead". Reply with a visible, model-free line.
+      const waitMin = Math.max(1, Math.ceil(Math.max(userRate.retryAfterSeconds, ipRate.retryAfterSeconds) / 60));
+      const reply = locale === 'ru'
+        ? `Мы много общались за этот час — дай мне короткую паузу и вернись примерно через ${waitMin} мин.`
+        : `We've talked a lot this hour — let me catch my breath and come back in about ${waitMin} min.`;
+      return dataStreamText(reply, 'model-rate-limited');
     }
   }
 
