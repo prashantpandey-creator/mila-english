@@ -4,6 +4,7 @@ import { authenticate } from '@/lib/auth';
 import { buildRealtimeSession } from '@/lib/assessment';
 import { getUserPlan } from '@/lib/subscriptionStore';
 import { FEATURES, planUnlocks, resolvePlan } from '@/lib/subscription';
+import { realtimeModeRequiresPaid } from '@/lib/realtimeAccess';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -46,10 +47,18 @@ export async function POST(req: Request) {
     : 'tutor';
 
   const user = await authenticate(new Request(req.url, { headers: req.headers }) as any);
-  // The free companions (Mila off-the-clock, Pia in Hindi) are open to guests;
-  // the coach and the assessment still require a signed-in learner.
+  // Companion personas can identify a guest in non-production testing; the
+  // production paid gate below still blocks external Realtime for free users.
+  // The coach and assessment require a signed-in learner at this boundary.
   if (!user && mode !== 'companion' && mode !== 'pia') {
     return errorResponse('You must be logged in to start a voice session.', 401, 'UNAUTHORIZED');
+  }
+
+  // Microphone permission alone is not consent to send audio to OpenAI. Every
+  // first-party caller adds this assertion only after its disclosure flow has
+  // been accepted (or an account-scoped prior choice has been restored).
+  if (req.headers.get('x-mila-openai-audio-consent') !== 'v1') {
+    return errorResponse('Confirm the OpenAI audio disclosure before starting live voice.', 409, 'OPENAI_AUDIO_CONSENT_REQUIRED');
   }
 
   const apiKey = process.env.OPENAI_API_KEY?.trim();
@@ -69,11 +78,10 @@ export async function POST(req: Request) {
     return errorResponse('Too many voice sessions in a short time. Please wait a moment and try again.', 429, 'RATE_LIMITED');
   }
 
-  // Paid gate for the premium realtime voice — OFF by default so the voice
-  // stays a free acquisition hook pre-launch. Flip VOICE_REALTIME_PAID_ONLY=1
-  // to require an active subscription (the assessment stays open either way, so
-  // onboarding is never paywalled). Guests are always free-tier.
-  if (/^(?:1|true|yes)$/i.test(process.env.VOICE_REALTIME_PAID_ONLY || '') && mode !== 'assessment') {
+  // Production Realtime voice is always paid, regardless of mutable server env
+  // drift. Local/staging can use VOICE_REALTIME_PAID_ONLY for product testing.
+  // Assessment remains outside this product paywall.
+  if (realtimeModeRequiresPaid(mode)) {
     const userId = Number(user?.sub);
     const plan = Number.isSafeInteger(userId) && userId > 0 ? await getUserPlan(userId) : resolvePlan({});
     if (!planUnlocks(plan, FEATURES.REALTIME_VOICE)) {

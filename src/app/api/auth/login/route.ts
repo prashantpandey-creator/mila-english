@@ -1,26 +1,47 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { verifyPassword, createSession } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import {
+  createSession,
+  DUMMY_PASSWORD_HASH,
+  hashPassword,
+  passwordNeedsUpgrade,
+  verifyPassword,
+} from '@/lib/auth';
+import { loginSchema } from '@/lib/authSchemas';
+import { consumeAuthAttempt, requestIdentity } from '@/lib/authRateLimit';
+import { publicUser } from '@/lib/publicUser';
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    
-    const user = await prisma.user.findUnique({
-      where: { email: body.email }
-    })
-    
-    if (!user || !verifyPassword(body.password, user.password)) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
-    }
-    
-    // Create session
-    await createSession({ sub: user.id.toString(), email: user.email })
-    
-    const { password: _, ...userWithoutPassword } = user
-    return NextResponse.json(userWithoutPassword, { status: 200 })
-  } catch (error) {
-    console.error(error)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  const parsed = loginSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Enter a valid email and password.', code: 'INVALID_INPUT' }, { status: 400 });
   }
+
+  const { email, password } = parsed.data;
+  const identity = requestIdentity(request);
+  const ipRate = consumeAuthAttempt(`login-ip:${identity}`, { limit: 30, windowMs: 15 * 60_000 });
+  const emailRate = consumeAuthAttempt(`login-email:${email}`, { limit: 8, windowMs: 15 * 60_000 });
+  if (!ipRate.allowed || !emailRate.allowed) {
+    const retryAfterSeconds = Math.max(ipRate.retryAfterSeconds, emailRate.retryAfterSeconds);
+    return NextResponse.json(
+      { error: 'Too many sign-in attempts. Try again later.', code: 'RATE_LIMITED' },
+      { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } },
+    );
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  const passwordMatches = await verifyPassword(password, user?.password || DUMMY_PASSWORD_HASH);
+  if (!user || !passwordMatches) {
+    return NextResponse.json({ error: 'Email or password is incorrect.', code: 'INVALID_CREDENTIALS' }, { status: 401 });
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      accountType: 'registered',
+      ...(passwordNeedsUpgrade(user.password) ? { password: await hashPassword(password) } : {}),
+    },
+  });
+  await createSession(updated);
+  return NextResponse.json(publicUser(updated));
 }

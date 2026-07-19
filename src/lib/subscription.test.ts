@@ -43,5 +43,7 @@ assert.strictEqual(isPaid(at({ plan: 'pro', planStatus: 'active', planRenewsAt: 
 // unlocks it, a free user does not.
 assert.strictEqual(planUnlocks(at({ plan: 'pro', planStatus: 'active', planRenewsAt: future }), FEATURES.REALTIME_VOICE), true);
 assert.strictEqual(planUnlocks(at({}), FEATURES.REALTIME_VOICE), false);
+assert.strictEqual(planUnlocks(at({ plan: 'pro', planStatus: 'active', planRenewsAt: future }), FEATURES.CUSTOM_LESSONS), true);
+assert.strictEqual(planUnlocks(at({}), FEATURES.CUSTOM_LESSONS), false);
 
 console.log('subscription: all assertions pass');

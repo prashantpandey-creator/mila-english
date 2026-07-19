@@ -134,7 +134,7 @@ async function generateLessonPlan(result: AssessmentResult, userId: string): Pro
 }
 
 async function saveLessons(plan: LessonPlan, result: AssessmentResult, userId: number) {
-  await prisma.$transaction(plan.lessons.map((lesson) => prisma.lesson.create({
+  return prisma.$transaction(plan.lessons.map((lesson) => prisma.lesson.create({
     data: {
       title: lesson.title,
       category: lesson.category,
@@ -217,8 +217,14 @@ export async function POST(req: Request) {
 
   try {
     const { plan, provider } = await generateLessonPlan(result, user.sub);
-    await saveLessons(plan, result, userId);
-    return NextResponse.json({ success: true, level: result.level, lessonsGenerated: true, provider });
+    const lessons = await saveLessons(plan, result, userId);
+    return NextResponse.json({
+      success: true,
+      level: result.level,
+      lessonsGenerated: true,
+      recommendedLessonId: lessons[0]?.id ?? null,
+      provider,
+    });
   } catch (error) {
     console.error('Assessment saved, but lesson generation failed', error);
     return NextResponse.json({

@@ -52,6 +52,8 @@ export type RealtimeVoiceSession = {
 export async function connectRealtimeVoice(options: {
   lang: 'en' | 'ru';
   events: RealtimeVoiceEvents;
+  /** Caller may set this literal only after its OpenAI audio disclosure flow. */
+  openAIAudioConsent: true;
   /** Which persona to run: the lesson coach (default), the free English
    * companion, or Pia — the free Hindi/Hinglish companion. */
   mode?: 'tutor' | 'companion' | 'pia';
@@ -229,6 +231,7 @@ export async function connectRealtimeVoice(options: {
           // Random per-browser identity: avoids grouping all reduced Android
           // Chrome user agents into the same anonymous rate-limit bucket.
           'X-Device-Id': voiceDeviceId(),
+          'X-Mila-OpenAI-Audio-Consent': options.openAIAudioConsent ? 'v1' : '',
         },
         signal: requestController.signal,
       });

@@ -5,7 +5,7 @@
 // talk, it doesn't read what they type. Reuses the /darshan realtime WebRTC loop
 // with mode=assessment: the examiner interviews by voice, then calls
 // finalize_assessment (a realtime function call) which we catch here and POST to
-// /api/assessment/finalize (unchanged contract), then route to the dashboard.
+// /api/assessment/finalize (unchanged contract), then show the saved result.
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
@@ -30,12 +30,16 @@ export default function AssessmentVoice() {
   const [youText, setYouText] = useState('');              // your last transcribed answer
   const [errMsg, setErrMsg] = useState('');
   const [mode, setMode] = useState<'choice' | 'voice' | 'local-voice' | 'reliable'>('choice');
+  const [showLiveConsent, setShowLiveConsent] = useState(false);
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mediaRef = useRef<MediaStream | null>(null);
   const finalizeStartedRef = useRef(false);
+  // Consent is deliberately page-session-only. It is never inferred from a
+  // microphone permission or another Mila voice surface.
+  const liveConsentRef = useRef(false);
 
   useEffect(() => { setM(true); }, []);
   useEffect(() => () => {
@@ -61,7 +65,16 @@ export default function AssessmentVoice() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...args, method }),
       });
-      if (res.ok) { router.push('/dashboard'); router.refresh(); }
+      const body = await res.json().catch(() => null);
+      if (res.ok) {
+        const recommendedLessonId = body?.lessonsGenerated === true
+          && Number.isSafeInteger(body?.recommendedLessonId)
+          && body.recommendedLessonId > 0
+          ? body.recommendedLessonId
+          : null;
+        router.push(recommendedLessonId ? `/assessment/result?lesson=${recommendedLessonId}` : '/assessment/result');
+        router.refresh();
+      }
       else {
         finalizeStartedRef.current = false;
         setErrMsg(lang==='ru'?'Не удалось сохранить результат.':'Could not save the result.');
@@ -75,6 +88,13 @@ export default function AssessmentVoice() {
 
   const start = async () => {
     if (phase !== 'idle' && phase !== 'error') return;
+    // Browser microphone permission is not consent to send audio to a model
+    // provider. Fail closed unless this assessment page showed its disclosure
+    // and the learner explicitly accepted it first.
+    if (!liveConsentRef.current) {
+      setShowLiveConsent(true);
+      return;
+    }
     finalizeStartedRef.current = false;
     setMode('voice');
     setErrMsg(''); setExaminerText(''); setYouText(''); setPhase('connecting');
@@ -144,7 +164,10 @@ export default function AssessmentVoice() {
       await pc.setLocalDescription(offer);
       const sdp = await fetch('/api/session?mode=assessment', {
         method: 'POST', body: offer.sdp,
-        headers: { 'Content-Type': 'application/sdp' },
+        headers: {
+          'Content-Type': 'application/sdp',
+          'X-Mila-OpenAI-Audio-Consent': 'v1',
+        },
       });
       if (!sdp.ok) {
         const problem = await sdp.json().catch(() => null);
@@ -168,6 +191,8 @@ export default function AssessmentVoice() {
 
   const beginReliable = () => {
     stopVoice();
+    setShowLiveConsent(false);
+    liveConsentRef.current = false;
     finalizeStartedRef.current = false;
     setErrMsg('');
     setExaminerText('');
@@ -178,9 +203,22 @@ export default function AssessmentVoice() {
 
   const beginLocalVoice = () => {
     stopVoice();
+    setShowLiveConsent(false);
+    liveConsentRef.current = false;
     finalizeStartedRef.current = false;
     setErrMsg(''); setExaminerText(''); setYouText(''); setPhase('idle');
     setMode('local-voice');
+  };
+
+  const requestLiveAssessment = () => {
+    liveConsentRef.current = false;
+    setShowLiveConsent(true);
+  };
+
+  const confirmLiveAssessment = () => {
+    liveConsentRef.current = true;
+    setShowLiveConsent(false);
+    void start();
   };
 
   const live = phase === 'listening' || phase === 'thinking' || phase === 'speaking';
@@ -264,13 +302,55 @@ export default function AssessmentVoice() {
             />
             <EditorialChoice
               title={lang==='ru' ? 'Живой разговор' : 'Live conversation'}
-              detail={lang==='ru' ? 'Голосовое собеседование · доступ зависит от региона' : 'Voice interview · availability depends on region'}
+              detail={lang==='ru' ? 'OpenAI · аудио и расшифровка · только после согласия' : 'OpenAI · microphone audio + transcript · consent required'}
               mark="03"
               meta={lang==='ru' ? 'По желанию' : 'Optional'}
               icon={<MilaIcon name="sparkle" size={16}/>}
-              onClick={start}
+              onClick={requestLiveAssessment}
             />
           </EditorialChoiceGroup>
+        )}
+
+        {showLiveConsent && (
+          <div className="fixed inset-0 z-[90] grid place-items-center bg-slate-950/45 p-5" role="presentation">
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="assessment-live-consent-title"
+              aria-describedby="assessment-live-consent-description"
+              className="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl"
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') setShowLiveConsent(false);
+              }}
+            >
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-pink-700">{lang === 'ru' ? 'НЕОБЯЗАТЕЛЬНЫЙ РЕЖИМ' : 'OPTIONAL MODE'}</p>
+              <h2 id="assessment-live-consent-title" className="mb-3 text-xl font-semibold">
+                {lang === 'ru' ? 'Пройти живое AI-собеседование?' : 'Use the live AI assessment?'}
+              </h2>
+              <p id="assessment-live-consent-description" className="mb-6 text-sm leading-6 text-slate-600">
+                {lang === 'ru'
+                  ? 'В этом режиме звук с микрофона и расшифровка отправляются в OpenAI для обработки разговора в реальном времени. До нажатия «Согласен» ничего не отправляется. Вместо этого всегда можно выбрать приватную проверку на сервере Mila.'
+                  : 'This mode sends your microphone audio and transcript to OpenAI for live processing. Nothing is sent until you choose “I agree.” You can use Mila’s private server assessment instead.'}
+              </p>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  autoFocus
+                  className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-800"
+                  onClick={beginLocalVoice}
+                >
+                  {lang === 'ru' ? 'Оставить приватный режим' : 'Keep it private'}
+                </button>
+                <button
+                  type="button"
+                  className="rounded-xl bg-pink-700 px-4 py-2.5 text-sm font-semibold text-white"
+                  onClick={confirmLiveAssessment}
+                >
+                  {lang === 'ru' ? 'Согласен — начать' : 'I agree — start live'}
+                </button>
+              </div>
+            </section>
+          </div>
         )}
 
         {/* The orb — tap to begin, then it breathes with the conversation */}

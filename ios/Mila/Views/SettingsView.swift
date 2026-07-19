@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var password = ""
     @State private var busy = false
     @State private var error: String?
+    @State private var resetMessage: String?
     @State private var confirmDelete = false
     @State private var webDestination: WebDestination?
 
@@ -114,6 +115,15 @@ struct SettingsView: View {
                 SecureField(language == .ru ? "Пароль" : "Password", text: $password)
                     .textContentType(accountMode == .register ? .newPassword : .password)
                     .milaField()
+                if accountMode == .signIn {
+                    Button(language == .ru ? "Забыли пароль? Отправить ссылку" : "Forgot password? Send a reset link") {
+                        Task { await requestPasswordReset() }
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.milaCyan)
+                    .disabled(busy || email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    if let resetMessage { Text(resetMessage).font(.caption).foregroundStyle(Color.milaGreen) }
+                }
                 if let error { Text(error).font(.caption).foregroundStyle(Color.milaPink) }
                 Button {
                     Task { await submitAccount() }
@@ -149,6 +159,10 @@ struct SettingsView: View {
                 title: language == .ru ? "Политика конфиденциальности" : "Privacy policy",
                 icon: "hand.raised.fill"
             ) { webDestination = .init(title: language == .ru ? "Конфиденциальность" : "Privacy", path: "/privacy") }
+            settingsRow(
+                title: language == .ru ? "Условия использования" : "Terms of service",
+                icon: "doc.text.fill"
+            ) { webDestination = .init(title: language == .ru ? "Условия" : "Terms", path: "/terms") }
             settingsRow(
                 title: language == .ru ? "Сообщить об ошибке" : "Report a problem",
                 icon: "exclamationmark.bubble.fill"
@@ -187,6 +201,7 @@ struct SettingsView: View {
 
     private func submitAccount() async {
         busy = true
+        resetMessage = nil
         defer { busy = false }
         do {
             if accountMode == .signIn {
@@ -198,6 +213,23 @@ struct SettingsView: View {
             error = nil
         } catch {
             self.error = error.localizedDescription
+        }
+    }
+
+    private func requestPasswordReset() async {
+        busy = true
+        error = nil
+        resetMessage = nil
+        defer { busy = false }
+        do {
+            try await MilaAPI.shared.requestPasswordReset(email: email)
+            resetMessage = language == .ru
+                ? "Если такой аккаунт существует, Mila отправила приватную ссылку на 30 минут."
+                : "If that account exists, Mila sent a private 30-minute reset link."
+        } catch {
+            self.error = language == .ru
+                ? "Не удалось запросить ссылку. Проверь соединение и попробуй ещё раз."
+                : "Could not request a reset link. Check your connection and try again."
         }
     }
 

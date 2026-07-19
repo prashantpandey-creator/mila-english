@@ -6,7 +6,7 @@ for the current live state.
 ## What Mila is
 Pronunciation-first English app for Russian speakers. Live at
 **https://mila.purangpt.com** (Mumbai box `209.182.233.163`, behind Caddy).
-Next.js 14 app + self-hosted voice stack (Piper TTS, faster-whisper ASR,
+Next.js 15 app + self-hosted voice stack (Piper TTS, faster-whisper ASR,
 wav2vec2 phoneme scorer, local Ollama LLM). "Works in Russia, no VPN" because
 the voice services are self-hosted, not third-party.
 

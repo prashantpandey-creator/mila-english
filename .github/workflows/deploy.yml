@@ -43,6 +43,109 @@ jobs:
             docker rm -f mila-llm mila-voice-llm >/dev/null 2>&1 || true
             docker volume rm mila_mila_llm mila_mila_voice_llm >/dev/null 2>&1 || true
             test -f pron-service/model.onnx || { echo "model.onnx missing — see pron-service/README.md"; exit 1; }
+            # Take a transactionally consistent SQLite snapshot before the new
+            # image can run `prisma db push`. VACUUM INTO reads the live database
+            # without modifying it; any backup or integrity-check failure aborts
+            # the deploy while the current container is still serving.
+            if [ "$(docker inspect -f '{{.State.Running}}' mila 2>/dev/null || true)" = "true" ]; then
+              docker exec mila test -s /data/mila.db || { echo "Running Mila has no non-empty /data/mila.db; refusing to deploy"; exit 1; }
+              backup_stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+              backup_path="/data/backups/mila-${backup_stamp}.db"
+              docker exec mila mkdir -p /data/backups
+              docker exec -e MILA_BACKUP_PATH="$backup_path" mila node -e '
+                const { PrismaClient } = require("@prisma/client");
+                const db = new PrismaClient();
+                const path = process.env.MILA_BACKUP_PATH;
+                if (!/^\/data\/backups\/mila-\d{8}T\d{6}Z\.db$/.test(path || "")) {
+                  console.error("Refusing unexpected backup path");
+                  process.exit(2);
+                }
+                db.$executeRawUnsafe("VACUUM INTO ?", path)
+                  .then(() => db.$disconnect())
+                  .catch(async error => { console.error(error); await db.$disconnect(); process.exit(1); });
+              '
+              docker exec -e DATABASE_URL="file:$backup_path" mila node -e '
+                const { PrismaClient } = require("@prisma/client");
+                const db = new PrismaClient();
+                db.$queryRawUnsafe("PRAGMA quick_check")
+                  .then(async rows => {
+                    const ok = Array.isArray(rows) && rows.some(row => row.quick_check === "ok");
+                    console.log("SQLite backup quick_check:", JSON.stringify(rows));
+                    await db.$disconnect();
+                    if (!ok) process.exit(1);
+                  })
+                  .catch(async error => { console.error(error); await db.$disconnect(); process.exit(1); });
+              '
+              echo "SQLite pre-deploy backup verified: $backup_path"
+              # Keep storage bounded only after the new snapshot has passed its
+              # integrity check. The retention script accepts files—not links—
+              # with Mila's exact UTC backup shape, always preserves this deploy's
+              # snapshot, and unlinks validated paths one at a time.
+              docker exec -e MILA_BACKUP_PATH="$backup_path" mila node -e '
+                const fs = require("node:fs");
+                const path = require("node:path");
+                const directory = "/data/backups";
+                const currentPath = process.env.MILA_BACKUP_PATH || "";
+                const absolutePattern = /^\/data\/backups\/mila-\d{8}T\d{6}Z\.db$/;
+                const filenamePattern = /^mila-\d{8}T\d{6}Z\.db$/;
+                const retain = 14;
+
+                if (!absolutePattern.test(currentPath) || path.dirname(currentPath) !== directory) {
+                  console.error("Refusing retention for unexpected backup path");
+                  process.exit(2);
+                }
+                const directoryStat = fs.lstatSync(directory);
+                if (!directoryStat.isDirectory()) {
+                  console.error("Refusing retention outside the real backup directory");
+                  process.exit(2);
+                }
+                const current = path.basename(currentPath);
+                const currentStat = fs.lstatSync(currentPath);
+                if (!currentStat.isFile() || currentStat.size <= 0) {
+                  console.error("Refusing retention without the verified backup file");
+                  process.exit(2);
+                }
+
+                const entries = fs.readdirSync(directory, { withFileTypes: true });
+                const unexpectedEntry = entries.find(entry => filenamePattern.test(entry.name) && !entry.isFile());
+                if (unexpectedEntry) {
+                  console.error("Refusing non-file backup entry:", unexpectedEntry.name);
+                  process.exit(2);
+                }
+                const backups = entries
+                  .filter(entry => entry.isFile() && filenamePattern.test(entry.name))
+                  .map(entry => entry.name)
+                  .sort()
+                  .reverse();
+                if (!backups.includes(current)) {
+                  console.error("Verified backup disappeared before retention");
+                  process.exit(2);
+                }
+
+                const keep = new Set([current]);
+                for (const filename of backups) {
+                  if (keep.size >= retain) break;
+                  keep.add(filename);
+                }
+                const prune = backups.filter(filename => !keep.has(filename));
+                for (const filename of prune) {
+                  if (!filenamePattern.test(filename)) {
+                    console.error("Refusing unexpected retention filename");
+                    process.exit(2);
+                  }
+                  const candidate = path.join(directory, filename);
+                  if (path.dirname(candidate) !== directory || !fs.lstatSync(candidate).isFile()) {
+                    console.error("Refusing unexpected retention target:", candidate);
+                    process.exit(2);
+                  }
+                  fs.unlinkSync(candidate);
+                  console.log("Pruned old Mila backup:", candidate);
+                }
+                console.log(`SQLite backup retention: kept ${keep.size}, pruned ${prune.length}, limit ${retain}`);
+              '
+            else
+              echo "No running Mila container; skipping first-deploy SQLite snapshot"
+            fi
             docker compose -f docker-compose.prod.yml build
             # Public app first; speech services after it is serving.
             docker compose -f docker-compose.prod.yml up -d --no-deps mila
@@ -56,6 +159,13 @@ jobs:
               fi
               sleep 2
             done
+            docker exec mila node -e "
+              if (process.env.NODE_ENV !== 'production' || process.env.VOICE_REALTIME_PAID_ONLY !== 'true') {
+                console.error('Production Realtime paid-only invariant is not active');
+                process.exit(1);
+              }
+              console.log('Realtime paid-only invariant active');
+            "
             docker compose -f docker-compose.prod.yml up -d --no-deps mila-pron mila-asr mila-tts
             wait_for_health() {
               container="$1"
@@ -104,4 +214,3 @@ jobs:
             "
             docker exec mila node -e "require('http').get('http://localhost:3000/',r=>{console.log('status',r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"
             echo "✅ Mila deployed — cloud brain, local voice; PuranGPT's RAM restored"
-

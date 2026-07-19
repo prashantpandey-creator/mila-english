@@ -2,6 +2,7 @@ import { createOpenAI, openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/auth';
+import { consumeAuthAttempt, requestIdentity } from '@/lib/authRateLimit';
 import {
   buildCompanionSystemPrompt,
   applyLocalModelRequestOptions,
@@ -134,11 +135,15 @@ function externalChoice(voice: boolean): ModelChoice | null {
   return null;
 }
 
-async function chooseModel(surface: 'voice' | 'guide' | 'chat', externalFirst = false): Promise<ModelChoice | null> {
+async function chooseModel(
+  surface: 'voice' | 'guide' | 'chat',
+  externalFirst = false,
+  allowExternal = true,
+): Promise<ModelChoice | null> {
   // VOICE_EXTERNAL_FIRST experiment: spoken turns try the fast cloud brain
   // before the local model; the local model remains the always-there fallback
   // (see the spoken branch's pre-first-sentence failover).
-  if (externalFirst) {
+  if (externalFirst && allowExternal) {
     const external = externalChoice(surface === 'voice');
     if (external) return external;
   }
@@ -177,7 +182,8 @@ async function chooseModel(surface: 'voice' | 'guide' | 'chat', externalFirst = 
     return { model: provider(local.model), provider: 'ollama', modelId: local.model, runtime: candidate.runtime };
   }
 
-  const externalAllowed = /^(?:1|true|yes)$/i.test(process.env.ALLOW_EXTERNAL_CHAT_FALLBACK || '');
+  const externalAllowed = allowExternal
+    && /^(?:1|true|yes)$/i.test(process.env.ALLOW_EXTERNAL_CHAT_FALLBACK || '');
   if (!externalAllowed) return null;
   return externalChoice(false);
 }
@@ -227,6 +233,10 @@ export async function POST(request: NextRequest) {
   // Speculative voice drafts run against partial transcripts: they must never
   // persist a turn or execute a memory command heard mid-sentence.
   const speculative = surfaceKind === 'voice' && payload?.context?.speculative === true;
+  // The private Darshan pipeline keeps both microphone audio and the derived
+  // transcript away from external model providers. If Mila's resident model
+  // is unavailable, the deterministic built-in response remains the fallback.
+  const localOnly = surfaceKind === 'voice' && payload?.context?.privacyMode === 'local';
 
   const bugReportDescription = parseBugReportRequest(latestUserMessage);
   if (bugReportDescription !== null && speculative) {
@@ -373,11 +383,28 @@ export async function POST(request: NextRequest) {
   // sent through this route.
   const modelSurface = surfaceKind === 'practice' || surfaceKind === 'chat' ? 'voice' : surfaceKind;
   const chatExternalFirst = surfaceKind === 'chat';
-  const choice = await chooseModel(modelSurface, voiceExternalFirst || chatExternalFirst);
+  const choice = await chooseModel(modelSurface, voiceExternalFirst || chatExternalFirst, !localOnly);
   if (!choice) {
     const reply = builtInCompanionReply(latestUserMessage, pathname, locale, profile?.level);
     await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
     return dataStreamText(reply);
+  }
+
+  // External model calls have a real marginal cost. Bound both the signed-in
+  // learner and their network before opening a provider stream; private/local
+  // Mila turns and deterministic fallbacks do not consume this allowance.
+  if (choice.runtime === 'external') {
+    const userRate = consumeAuthAttempt(`model-user:${userId}`, { limit: 120, windowMs: 60 * 60_000 });
+    const ipRate = consumeAuthAttempt(`model-ip:${requestIdentity(request)}`, { limit: 240, windowMs: 60 * 60_000 });
+    if (!userRate.allowed || !ipRate.allowed) {
+      return NextResponse.json({
+        error: 'Too many AI turns in a short time. Continue in a little while.',
+        code: 'MODEL_RATE_LIMITED',
+      }, {
+        status: 429,
+        headers: { 'Retry-After': String(Math.max(userRate.retryAfterSeconds, ipRate.retryAfterSeconds)) },
+      });
+    }
   }
 
   const messages: ChatMessage[] = [

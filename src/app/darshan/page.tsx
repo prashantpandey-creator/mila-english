@@ -22,6 +22,14 @@ const INVITES = [
   "What do you seek?",
 ];
 
+type VoicePreference = "private" | "realtime";
+
+const REALTIME_CONSENT_VALUE = "realtime-consent-v1";
+
+function voicePreferenceKey(userId: number): string {
+  return `mila-voice-preference-v1:${userId}`;
+}
+
 function completeSpokenPrefix(value: string): string {
   const endings = [...value.matchAll(/[.!?…]+["')\]]*(?=\s|$)/gu)];
   const last = endings[endings.length - 1];
@@ -36,6 +44,10 @@ export default function VoicePage() {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [voiceError, setVoiceError] = useState("");
+  const [isPro, setIsPro] = useState(false);
+  const [voicePreference, setVoicePreference] = useState<VoicePreference>("private");
+  const [preferenceUserId, setPreferenceUserId] = useState<number | null>(null);
+  const [showRealtimeConsent, setShowRealtimeConsent] = useState(false);
 
   const [liveText, setLiveText] = useState("");
   const [answer, setAnswer] = useState("");
@@ -101,7 +113,9 @@ export default function VoicePage() {
   const { append, isLoading, messages, stop } = useChat({
     id: "mila-voice-local",
     api: "/api/chat",
-    body: { context: { pathname: "/darshan", lang, surface: "voice" } },
+    // This hook is exclusively the private fallback. Realtime uses its own
+    // WebRTC session and is only entered after explicit consent below.
+    body: { context: { pathname: "/darshan", lang, surface: "voice", privacyMode: "local" } },
     keepLastMessageOnError: true,
     onError: () => {
       const failedTurn = requestTurnRef.current;
@@ -188,6 +202,41 @@ export default function VoicePage() {
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
+  }, []);
+
+  // A saved Realtime preference is scoped to the signed-in Pro account. A
+  // guest, free account, signed-out browser, or a different account always
+  // starts in private mode.
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/users/me", { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (cancelled) return;
+        const userId = Number(data?.id);
+        const paid = data?.subscription?.isPaid === true
+          && data?.isGuest !== true
+          && Number.isSafeInteger(userId)
+          && userId > 0;
+        setIsPro(paid);
+        setPreferenceUserId(paid ? userId : null);
+        if (!paid) {
+          setVoicePreference("private");
+          return;
+        }
+        const stored = window.localStorage.getItem(voicePreferenceKey(userId));
+        setVoicePreference(stored === REALTIME_CONSENT_VALUE ? "realtime" : "private");
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setIsPro(false);
+          setPreferenceUserId(null);
+          setVoicePreference("private");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Invocation drift
@@ -319,17 +368,17 @@ export default function VoicePage() {
   }, [startListening]);
 
   /**
-   * Flagship path: the same OpenAI Realtime WebRTC loop that powers the voice
-   * assessment, in tutor mode. Full duplex — the mic stays open, Mila can be
-   * interrupted by voice, and turns are persisted to the shared companion
-   * history. Throws when unreachable so the caller falls back to the local
-   * cascade without the learner noticing anything except a slower Mila.
+   * Optional Pro path: the OpenAI Realtime WebRTC loop. This function is only
+   * called after the learner has explicitly consented to send microphone audio
+   * to OpenAI, or has retained that account-scoped preference from an earlier
+   * call. Throws when unreachable so the caller falls back to the private path.
    */
   const startRealtimeVoice = useCallback(async (connectionAttempt: number, signal: AbortSignal) => {
     const session = await connectRealtimeVoice({
       lang: lang === "ru" ? "ru" : "en",
       mode: freeMode ? "companion" : "tutor",
       signal,
+      openAIAudioConsent: true,
       events: {
         onListening: () => {
           if (!activeRef.current || engineRef.current !== "realtime") return;
@@ -353,14 +402,11 @@ export default function VoicePage() {
           setAnswer(fullText);
         },
         onTurnComplete: ({ user, assistant }) => {
-          // Free guests aren't signed in and keep no history; only the
-          // logged-in coach persists turns to the shared companion memory.
-          if (freeMode) return;
           // Voice Mila and text Mila share one memory: persist the spoken turn.
-          void fetch("/api/chat/history", {
+          void fetch("/api/chat/commit", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user, assistant, pathname: "/darshan", lang }),
+            body: JSON.stringify({ user, assistant, lang }),
           }).then((response) => {
             if (response.ok) announceCompanionHistoryUpdated();
           }).catch((error) => console.error("Could not persist the voice turn", error));
@@ -370,13 +416,27 @@ export default function VoicePage() {
           console.error("Realtime voice service error", error);
         },
         onDisconnect: () => {
-          // Connection died mid-conversation: silently hand over to the local
-          // cascade so Mila gets slower, never dead.
+          // Connection died mid-conversation: hand over to the private path.
+          // Establishing/reusing the session first prevents the authenticated
+          // chat endpoint from turning the fallback into a login dead-end.
           realtimeRef.current = null;
           if (!activeRef.current) return;
-          engineRef.current = "local";
-          setPhase("resting");
-          scheduleListening(turnRef.current, 200);
+          void ensureGuestSession().then((seated) => {
+            if (!activeRef.current) return;
+            if (!seated) {
+              activeRef.current = false;
+              engineRef.current = null;
+              setIsConnected(false);
+              setPhase("resting");
+              setVoiceError(lang === "ru"
+                ? "Не удалось начать приватный голосовой сеанс. Попробуй ещё раз."
+                : "I could not start a private voice session. Please try again.");
+              return;
+            }
+            engineRef.current = "local";
+            setPhase("resting");
+            scheduleListening(turnRef.current, 200);
+          });
         },
       },
     });
@@ -384,13 +444,32 @@ export default function VoicePage() {
       session.close();
       throw new Error("voice-connect-cancelled");
     }
+    if (!session.isOpen()) {
+      session.close();
+      throw new Error("REALTIME_DISCONNECTED_DURING_SETUP");
+    }
     realtimeRef.current = session;
     engineRef.current = "realtime";
     activeRef.current = true;
     setIsConnected(true);
     setVoiceError("");
     setPhase("listening");
-  }, [lang, scheduleListening, freeMode]);
+  }, [freeMode, lang, scheduleListening]);
+
+  const selectPrivateVoice = useCallback(() => {
+    setShowRealtimeConsent(false);
+    setVoicePreference("private");
+    if (preferenceUserId) {
+      window.localStorage.setItem(voicePreferenceKey(preferenceUserId), "private");
+    }
+  }, [preferenceUserId]);
+
+  const confirmRealtimeVoice = useCallback(() => {
+    if (!isPro || !preferenceUserId) return;
+    window.localStorage.setItem(voicePreferenceKey(preferenceUserId), REALTIME_CONSENT_VALUE);
+    setVoicePreference("realtime");
+    setShowRealtimeConsent(false);
+  }, [isPro, preferenceUserId]);
 
   const connectToVoice = async () => {
     if (isConnecting || connectingRef.current) return;
@@ -447,28 +526,28 @@ export default function VoicePage() {
     voiceConnectAbortRef.current = connectAbort;
     connectingRef.current = true;
     setIsConnecting(true);
-    let freeSessionReady = !freeMode;
     try {
-      if (freeMode) {
-        const seated = await (guestSessionRef.current ?? ensureGuestSession());
-        guestSessionRef.current = seated ? Promise.resolve(true) : null;
-        freeSessionReady = seated;
+      // Realtime is Pro-only and consent-only. Everyone else, including a tap
+      // while account status is still loading, stays on Mila's private path.
+      if (isPro && voicePreference === "realtime") {
+        try {
+          await startRealtimeVoice(connectionAttempt, connectAbort.signal);
+          return;
+        } catch (error) {
+          console.info("Realtime voice unavailable, using the private voice path", error);
+        }
         if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) return;
       }
 
-      try {
-        // Perfect voice first: OpenAI Realtime wherever it can reach.
-        await startRealtimeVoice(connectionAttempt, connectAbort.signal);
-        return;
-      } catch (error) {
-        // Region, network, or configuration — the local cascade is the net.
-        console.info("Realtime voice unavailable, using the local voice path", error);
-      }
+      const seated = await (freeMode
+        ? (guestSessionRef.current ?? ensureGuestSession())
+        : ensureGuestSession());
+      if (freeMode) guestSessionRef.current = seated ? Promise.resolve(true) : null;
       if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) return;
-      if (!freeSessionReady) {
+      if (!seated) {
         setVoiceError(lang === "ru"
-          ? "Не удалось запустить бесплатную голосовую сессию. Обнови страницу и попробуй снова."
-          : "The free voice session could not start. Reload the page and try again.");
+          ? "Не удалось начать приватный голосовой сеанс. Попробуй ещё раз."
+          : "I could not start a private voice session. Please try again.");
         setPhase("resting");
         return;
       }
@@ -533,6 +612,75 @@ export default function VoicePage() {
           <path d="M18 6 6 18" /><path d="m6 6 12 12" />
         </svg>
       </button>
+
+      <div
+        className="absolute left-4 top-4 z-30 flex max-w-[calc(100%-5.5rem)] items-center gap-1 rounded-xl border border-black/10 bg-white/90 p-1 text-[11px] shadow-sm backdrop-blur"
+        style={{ marginTop: "env(safe-area-inset-top, 0px)" }}
+        aria-label="Voice privacy mode"
+      >
+        <span className="px-2 text-slate-600">
+          {lang === "ru" ? "Режим голоса" : "Voice mode"}
+        </span>
+        <button
+          type="button"
+          className={`rounded-lg px-2.5 py-1.5 font-semibold transition ${voicePreference === "private" ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"}`}
+          aria-pressed={voicePreference === "private"}
+          disabled={isConnected}
+          onClick={selectPrivateVoice}
+          title={lang === "ru" ? "Аудио микрофона не отправляется в OpenAI" : "Microphone audio is not sent to OpenAI"}
+        >
+          {lang === "ru" ? "Приватный" : "Private"}
+        </button>
+        {isPro && (
+          <button
+            type="button"
+            className={`rounded-lg px-2.5 py-1.5 font-semibold transition ${voicePreference === "realtime" ? "bg-pink-700 text-white" : "text-slate-700 hover:bg-slate-100"}`}
+            aria-pressed={voicePreference === "realtime"}
+            disabled={isConnected}
+            onClick={() => setShowRealtimeConsent(true)}
+          >
+            {lang === "ru" ? "Быстрый Pro" : "Fast Pro"}
+          </button>
+        )}
+      </div>
+
+      {showRealtimeConsent && (
+        <div className="absolute inset-0 z-50 grid place-items-center bg-slate-950/45 p-5" role="presentation">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="realtime-consent-title"
+            aria-describedby="realtime-consent-description"
+            className="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl"
+          >
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-pink-700">Mila Pro</p>
+            <h2 id="realtime-consent-title" className="mb-3 text-xl font-semibold">
+              {lang === "ru" ? "Включить быстрый голос?" : "Use fast live voice?"}
+            </h2>
+            <p id="realtime-consent-description" className="mb-6 text-sm leading-6 text-slate-600">
+              {lang === "ru"
+                ? "В быстром режиме звук с микрофона и расшифровка отправляются в OpenAI для обработки разговора в реальном времени. Выбирай этот режим, только если согласен. Настройка сохранится для этого аккаунта; перед звонком всегда можно вернуться в приватный режим."
+                : "Fast mode sends your microphone audio and transcript to OpenAI for live processing. Choose it only if you consent. This preference is saved for this account, and you can switch back to Private before any call."}
+            </p>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-800"
+                onClick={selectPrivateVoice}
+              >
+                {lang === "ru" ? "Оставить приватный" : "Keep private"}
+              </button>
+              <button
+                type="button"
+                className="rounded-xl bg-pink-700 px-4 py-2.5 text-sm font-semibold text-white"
+                onClick={confirmRealtimeVoice}
+              >
+                {lang === "ru" ? "Согласен — включить" : "I agree — use fast voice"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {/* The orb — edgeless, centered, the touch target */}
       <button

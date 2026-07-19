@@ -11,41 +11,108 @@ generator client {
 }
 
 model User {
-  id                Int               @id @default(autoincrement())
-  email             String            @unique
-  password          String
-  name              String
-  learnerCategory   String
-  nativeLanguage    String
-  level             String?
-  joinDate          DateTime
+  id                 Int               @id @default(autoincrement())
+  email              String            @unique
+  password           String
+  name               String
+  learnerCategory    String
+  nativeLanguage     String
+  level              String?
+  joinDate           DateTime
   // ── Learner model (the person axis) ──
-  ability           Float? // ELO / online-IRT ability estimate θ (speaking level)
-  goal              String? // "travel", "job interview", …
-  tonePreference    String? // companion persona pref: teacher | friend | guide
-  streakDays        Int               @default(0)
-  learnerProfile    String? // synthesized JSON blob (strengths, weak_summary, learner_arc, focus)
-  learnerProfileAt  DateTime?
-  Progresses        Progress[]
-  Assessments       Assessment[]
-  Achievements      Achievement[]
-  StudySessions     StudySession[]
-  PhonemeStats      PhonemeStat[]
-  WordReviews       WordReview[]
-  GeneratedLessons  Lesson[]          @relation("LessonCreator")
-  CompanionThreads  CompanionThread[]
-  CompanionMemories CompanionMemory[]
+  ability            Float? // ELO / online-IRT ability estimate θ (speaking level)
+  goal               String? // "travel", "job interview", …
+  tonePreference     String? // companion persona pref: teacher | friend | guide
+  streakDays         Int               @default(0)
+  learnerProfile     String? // synthesized JSON blob (strengths, weak_summary, learner_arc, focus)
+  learnerProfileAt   DateTime?
+  Progresses         Progress[]
+  Assessments        Assessment[]
+  Achievements       Achievement[]
+  StudySessions      StudySession[]
+  PhonemeStats       PhonemeStat[]
+  WordReviews        WordReview[]
+  GeneratedLessons   Lesson[]          @relation("LessonCreator")
+  CompanionThreads   CompanionThread[]
+  CompanionMemories  CompanionMemory[]
+  AccountTokens      AccountToken[]
+  Payments           Payment[]
+  // Explicit account/session state. accountType stays nullable so existing
+  // guest rows can be recognized by their legacy guest email and backfilled
+  // without a destructive migration.
+  accountType        String? // guest | registered
+  // Existing accounts receive the database default during rollout. New
+  // registrations explicitly set this to null until the email link is used.
+  emailVerifiedAt    DateTime?         @default(now())
+  sessionVersion     Int               @default(0)
   // ── Subscription (the money axis) — read via src/lib/subscription.ts;
   // written only by the payment/webhook + admin-grant layer. ──
-  plan               String    @default("free") // "free" | "pro"
-  planStatus         String    @default("active") // active | canceled | past_due | expired
+  plan               String            @default("free") // "free" | "pro"
+  planStatus         String            @default("active") // active | canceled | past_due | expired
   planRenewsAt       DateTime? // current period end; null = no expiry (lifetime / manual)
   planProvider       String? // stripe | razorpay | yookassa | apple | google | manual
   planCustomerId     String? // provider customer id
   planSubscriptionId String? // provider subscription id
   planUpdatedAt      DateTime?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+}
+
+// Single-use account recovery tokens. Only a SHA-256 digest is stored; the
+// bearer token itself exists only in the email link.
+model AccountToken {
+  id        String    @id @default(cuid())
+  userId    Int
+  type      String // password_reset
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@index([userId, type, createdAt])
+}
+
+// Durable money ledger. Entitlement fields on User are a read-optimized
+// projection; verified provider payments are the source of truth.
+model Payment {
+  id                String    @id @default(cuid())
+  userId            Int?
+  provider          String
+  productCode       String
+  amountMinor       Int
+  currency          String
+  status            String    @default("created") // created | pending | paid | canceled | refunded | abandoned | failed
+  idempotencyKey    String    @unique
+  providerPaymentId String?   @unique
+  checkoutUrl       String?
+  paidAt            DateTime?
+  refundedAt        DateTime?
+  accessStartsAt    DateTime?
+  accessEndsAt      DateTime?
+  User              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([userId, status, createdAt])
+  @@index([provider, providerPaymentId])
+}
+
+// Provider callbacks can be retried or delivered out of order. This table
+// makes processing idempotent without retaining card/payment payloads.
+model PaymentEvent {
+  id                String    @id @default(cuid())
+  provider          String
+  providerEventKey  String    @unique
+  providerPaymentId String
+  eventType         String
+  status            String    @default("received") // received | processed | ignored | error
+  result            String?
+  processedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([providerPaymentId, createdAt])
 }
 
 // Quantified per-phoneme state — the math layer (ELO difficulty, FSRS scheduling,

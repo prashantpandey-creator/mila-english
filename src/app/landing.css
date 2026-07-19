@@ -60,6 +60,8 @@
 .lp-brand__name { font: 400 25px/1 var(--lp-serif); letter-spacing: 0.02em; }
 .lp-brand__tag { padding-left: 12px; border-left: 1px solid rgba(255, 255, 255, 0.14); color: var(--lp-faint); font-size: 10.5px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; }
 .lp-nav__actions { display: flex; align-items: center; gap: 12px; }
+.lp-nav__link { color: var(--lp-muted); font-size: 13px; font-weight: 700; text-decoration: none; }
+.lp-nav__link:hover { color: var(--lp-terra-bright); }
 .lp-nav .lang-toggle { background: rgba(255, 255, 255, 0.055); }
 .lp-signin {
   padding: 9px 18px; border-radius: 999px; cursor: pointer;
@@ -303,10 +305,11 @@
 .lp-footer__brand { display: flex; align-items: center; gap: 12px; }
 .lp-footer__brand strong { display: block; font: 400 19px/1 var(--lp-serif); color: var(--lp-strong); }
 .lp-footer__brand small { display: block; margin-top: 3px; color: var(--lp-faint); font-size: 11.5px; }
-.lp-footer__links { display: flex; align-items: center; gap: 18px; color: var(--lp-faint); font-size: 12.5px; }
-.lp-footer__links button { padding: 4px 0; border: 0; color: var(--lp-muted); background: transparent; font: inherit; cursor: pointer; }
-.lp-footer__links button:hover { color: var(--lp-terra); }
-.lp-footer__links button:focus-visible { outline: 2px solid var(--lp-terra); outline-offset: 3px; }
+.lp-footer__links { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; color: var(--lp-faint); font-size: 12.5px; }
+.lp-footer__links a { padding: 4px 0; color: var(--lp-muted); font: inherit; font-weight: 650; text-decoration: none; }
+.lp-footer__links a:hover { color: var(--lp-terra-bright); text-decoration: underline; text-underline-offset: 3px; }
+.lp-footer__links a:focus-visible { outline: 2px solid var(--lp-terra); outline-offset: 3px; }
+.lp-footer__inner > span { color: var(--lp-faint); font-size: 12.5px; }
 
 /* ── Mobile dock ── */
 .lp-dock {
@@ -607,10 +610,15 @@
   .lp-brand__mark { width: 32px; height: 32px; border-radius: 10px; font-size: 17px; }
   .lp-brand__name { font-size: 22px; }
   .lp-nav__actions { flex: none; gap: 6px; }
+  .lp-nav__link { display: none; }
   .lp-nav .lang-toggle button { min-width: 34px; padding-inline: 8px; font-size: 11px; }
   .lp-signin { flex: none; padding-inline: 10px; font-size: 12px; white-space: nowrap; }
   .lp-hero__copy { padding-inline: 16px; }
   .lp-hero h1 { font-size: 38px; }
+}
+
+@media (max-width: 760px) {
+  .lp-footer__inner { flex-direction: column; text-align: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {

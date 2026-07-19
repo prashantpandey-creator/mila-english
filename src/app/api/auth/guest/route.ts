@@ -1,32 +1,39 @@
-import { NextResponse } from 'next/server';
 import { randomBytes, randomUUID } from 'node:crypto';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { hashPassword, createSession } from '@/lib/auth';
+import { authenticate, createSession, hashPassword } from '@/lib/auth';
+import { consumeAuthAttempt, requestIdentity } from '@/lib/authRateLimit';
+import { publicUser } from '@/lib/publicUser';
 
-export async function POST() {
-  try {
-    // Each browser gets an isolated guest learner. Sharing a single database row
-    // leaked progress and assessment state between unrelated pilot students.
-    const guestId = randomUUID();
-    const user = await prisma.user.create({
-      data: {
-        email: `guest-${guestId}@mila.local`,
-        name: 'Гость / Guest',
-        password: hashPassword(randomBytes(32).toString('hex')),
-        learnerCategory: 'pending',
-        nativeLanguage: 'Русский',
-        level: 'pending',
-        joinDate: new Date(),
-      }
-    });
-
-    // Set the session token cookie
-    await createSession({ sub: user.id.toString(), email: user.email });
-
-    const { password: _, ...userWithoutPassword } = user;
-    return NextResponse.json(userWithoutPassword, { status: 200 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+export async function POST(request: NextRequest) {
+  const current = await authenticate(request);
+  if (current) {
+    const existing = await prisma.user.findUnique({ where: { id: Number(current.sub) } });
+    if (existing) return NextResponse.json(publicUser(existing));
   }
+
+  const rate = consumeAuthAttempt(`guest:${requestIdentity(request)}`, { limit: 6, windowMs: 60 * 60_000 });
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many guest profiles were created. Try again later.', code: 'RATE_LIMITED' },
+      { status: 429, headers: { 'Retry-After': String(rate.retryAfterSeconds) } },
+    );
+  }
+
+  const guestId = randomUUID();
+  const user = await prisma.user.create({
+    data: {
+      email: `guest-${guestId}@mila.local`,
+      name: 'Гость / Guest',
+      password: await hashPassword(randomBytes(32).toString('hex')),
+      learnerCategory: 'pending',
+      nativeLanguage: 'Русский',
+      level: 'pending',
+      accountType: 'guest',
+      joinDate: new Date(),
+    },
+  });
+
+  await createSession(user);
+  return NextResponse.json(publicUser(user));
 }
