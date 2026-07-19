@@ -3495,10 +3495,11 @@ html .atmosphere.atmosphere--front.atmosphere--welcome::after {
   -webkit-backdrop-filter: none;
 }
 
-/* ── The voice draws itself ────────────────────────────────────────────────
-   A one-time, original graphite-to-electric development for the homepage.
-   The permanent colour image is always present; only wrapper opacity and
-   clip-path animate, so slow devices and failed sketch requests fail open. */
+/* ── A line learns to listen ───────────────────────────────────────────────
+   A one-session, original paper story for the homepage. Two equal graphite
+   figures find a shared voice, their folds become Mila, and the registered
+   mineral artwork is released beneath the canvas. The page itself is usable
+   throughout; this layer is silent, decorative, abortable and never loops. */
 .atmosphere__still-stack,
 .atmosphere__layer {
   position: absolute;
@@ -3508,56 +3509,93 @@ html .atmosphere.atmosphere--front.atmosphere--welcome::after {
 }
 .atmosphere__still-stack { overflow: hidden; }
 .atmosphere__layer { display: block; }
-.atmosphere__layer--sketch {
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
 .atmosphere__layer--electric {
   z-index: 2;
-  clip-path: circle(150% at 76% 44%);
+  clip-path: none;
 }
-html .atmosphere.atmosphere--front .atmosphere-rotoscope__sketch {
-  opacity: 0;
-  filter: contrast(1.02) brightness(1.035) sepia(.04);
-  transform: scale(1.005);
-  transition: opacity 160ms ease;
-}
-html .atmosphere.atmosphere--front .atmosphere-rotoscope__sketch.is-ready { opacity: 1; }
 
-.atmosphere[data-rotoscope='sketch'] .atmosphere__layer--sketch,
-.atmosphere[data-rotoscope='developing'] .atmosphere__layer--sketch { opacity: .98; }
-.atmosphere[data-rotoscope='loading'] .atmosphere__layer--electric,
-.atmosphere[data-rotoscope='sketch'] .atmosphere__layer--electric {
-  clip-path: circle(0 at 76% 44%);
-}
-.atmosphere[data-rotoscope='developing'] .atmosphere__layer--electric {
-  will-change: clip-path;
-  animation: milaElectricDevelop 1450ms cubic-bezier(.16,1,.3,1) both;
-}
-.atmosphere[data-rotoscope='developing'] .atmosphere__layer--sketch {
+.atmosphere-story {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  background: #fffafc;
+  pointer-events: none;
   will-change: opacity;
-  animation: milaGraphiteRelease 1450ms linear both;
+  contain: strict;
 }
-.atmosphere[data-rotoscope='sketch'] .atmosphere-rotoscope__sketch,
-.atmosphere[data-rotoscope='developing'] .atmosphere-rotoscope__sketch {
-  animation: milaGraphiteBoil 460ms steps(2,end) 3;
+@media (min-width: 641px) {
+  .atmosphere-story[data-phase='loading'] {
+    background: #fffafc url('/visuals/v6/mila-story-00-quiet-desktop-v1.webp') center center / cover no-repeat;
+  }
 }
-
-.atmosphere-rotoscope__trace {
+.atmosphere-story__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.atmosphere-story__worlds,
+.atmosphere-story__dialogue {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+}
+.atmosphere-story__dialogue { z-index: 5; }
+.atmosphere-story__worlds svg,
+.atmosphere-story__dialogue svg { display: block; width: 100%; height: 100%; }
+.atmosphere-story__worlds-mobile,
+.atmosphere-story__dialogue-mobile { display: none !important; }
+.atmosphere-story__worlds path {
+  fill: none;
+  stroke: rgba(91,69,81,.52);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.atmosphere-story__worlds [data-world='organic'],
+.atmosphere-story__worlds [data-world='geometric'] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.atmosphere-story__worlds [data-world='geometric'] path { stroke-dasharray: 7 11; }
+.atmosphere-story__worlds [data-world='seam'] {
+  stroke-width: 1.45;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.atmosphere-story__worlds [data-world='meeting'] {
+  fill: #ff168a;
+  opacity: 0;
+  filter: drop-shadow(0 0 7px rgba(217,0,108,.5));
+}
+.atmosphere-story__dialogue path {
+  fill: none;
+  stroke: #5b4551;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 .45px rgba(91,69,81,.25));
+}
+.atmosphere-story__trace {
   position: absolute;
   left: 48%;
   top: 32%;
-  z-index: 3;
+  z-index: 5;
   width: 41%;
   height: 24%;
   overflow: visible;
   opacity: 0;
   pointer-events: none;
 }
-.atmosphere-rotoscope__trace path {
+.atmosphere-story__trace path {
   fill: none;
-  stroke: #ff2d95;
+  stroke: #ff168a;
   stroke-width: 2.6;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -3566,73 +3604,67 @@ html .atmosphere.atmosphere--front .atmosphere-rotoscope__sketch.is-ready { opac
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 0 7px rgba(217,0,108,.34));
 }
-.atmosphere[data-rotoscope='developing'] .atmosphere-rotoscope__trace {
-  animation: milaElectricTraceFade 1120ms 80ms ease-out both;
-}
-.atmosphere[data-rotoscope='developing'] .atmosphere-rotoscope__trace path {
-  animation: milaElectricTraceDraw 920ms 80ms cubic-bezier(.2,.8,.2,1) both;
-}
-html .atmosphere.atmosphere--front::after { z-index: 4; pointer-events: none; }
+html .atmosphere.atmosphere--front::after { z-index: 6; pointer-events: none; }
 
-@keyframes milaElectricDevelop {
-  0% { clip-path: circle(0 at 76% 44%); }
-  14% { clip-path: circle(7% at 76% 44%); }
-  100% { clip-path: circle(150% at 76% 44%); }
+.atmosphere-story__skip {
+  position: fixed;
+  top: calc(78px + env(safe-area-inset-top));
+  right: max(20px,env(safe-area-inset-right));
+  z-index: 72;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid rgba(217,0,108,.24);
+  border-radius: 999px;
+  color: #75003f;
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 10px 28px rgba(117,0,63,.11),inset 0 1px 0 #fff;
+  -webkit-backdrop-filter: blur(16px) saturate(1.08);
+  backdrop-filter: blur(16px) saturate(1.08);
+  font: 700 12px/1 var(--font-sans,'Manrope'),system-ui,sans-serif;
+  letter-spacing: .02em;
+  cursor: pointer;
+  animation: milaStorySkipIn 360ms 240ms ease both;
 }
-@keyframes milaGraphiteRelease {
-  0%, 68% { opacity: .98; }
-  100% { opacity: 0; }
+.atmosphere-story__skip:hover { color: #fff; border-color: #d9006c; background: #d9006c; }
+.atmosphere-story__skip:focus-visible { outline: 3px solid rgba(255,22,138,.3); outline-offset: 3px; }
+html[data-mila-story-active='true'] .mila-guide.is-home,
+html:has(.atmosphere-story) .mila-guide.is-home {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
-@keyframes milaGraphiteBoil {
-  0%, 100% { transform: scale(1.005) translate3d(0,0,0); }
-  33% { transform: scale(1.005) translate3d(.35px,-.2px,0); }
-  66% { transform: scale(1.005) translate3d(-.28px,.28px,0); }
-}
-@keyframes milaElectricTraceDraw { to { stroke-dashoffset: 0; } }
-@keyframes milaElectricTraceFade {
-  0% { opacity: 0; }
-  12%, 72% { opacity: .9; }
-  100% { opacity: 0; }
+@keyframes milaStorySkipIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 640px) {
-  .atmosphere__layer--electric { clip-path: circle(150% at 50% 29%); }
-  .atmosphere[data-rotoscope='loading'] .atmosphere__layer--electric,
-  .atmosphere[data-rotoscope='sketch'] .atmosphere__layer--electric { clip-path: circle(0 at 50% 29%); }
-  .atmosphere[data-rotoscope='developing'] .atmosphere__layer--electric {
-    animation-name: milaElectricDevelopMobile;
-    animation-duration: 1180ms;
+  .atmosphere-story__worlds-desktop,
+  .atmosphere-story__dialogue-desktop { display: none !important; }
+  .atmosphere-story__worlds-mobile,
+  .atmosphere-story__dialogue-mobile { display: block !important; }
+  .atmosphere-story__worlds path { stroke-width: 1.3; }
+  .atmosphere-story__dialogue path { stroke-width: 1.6; }
+  .atmosphere-story__trace { left: 8%; top: 22%; width: 84%; height: 19%; }
+  .atmosphere-story__skip {
+    top: clamp(270px, 41svh, 374px);
+    right: auto;
+    left: max(12px,env(safe-area-inset-left));
+    min-height: 36px;
+    padding-inline: 12px;
+    font-size: 11px;
   }
-  .atmosphere[data-rotoscope='developing'] .atmosphere__layer--sketch { animation-duration: 1180ms; }
-  .atmosphere-rotoscope__trace { left: 8%; top: 22%; width: 84%; height: 19%; }
-}
-@keyframes milaElectricDevelopMobile {
-  0% { clip-path: circle(0 at 50% 29%); }
-  14% { clip-path: circle(6% at 50% 29%); }
-  100% { clip-path: circle(150% at 50% 29%); }
-}
-
-.atmosphere[data-motion='off'] .atmosphere__layer--sketch,
-.atmosphere[data-motion='pending'] .atmosphere__layer--sketch,
-.atmosphere[data-rotoscope='complete'] .atmosphere__layer--sketch,
-.atmosphere[data-motion='off'] .atmosphere-rotoscope__trace,
-.atmosphere[data-motion='pending'] .atmosphere-rotoscope__trace { display: none; }
-.atmosphere[data-motion='off'] .atmosphere__layer--electric,
-.atmosphere[data-rotoscope='complete'] .atmosphere__layer--electric {
-  clip-path: none;
-  animation: none;
+  .atmosphere-story[data-phase='loading'] {
+    background: #fffafc url('/visuals/v6/mila-story-00-quiet-mobile-v1.webp') center 31% / cover no-repeat;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .atmosphere__layer--sketch,
-  .atmosphere-rotoscope__trace { display: none !important; }
-  .atmosphere__layer--electric { clip-path: none !important; animation: none !important; }
+  .atmosphere-story,
+  .atmosphere-story__worlds,
+  .atmosphere-story__dialogue,
+  .atmosphere-story__trace,
+  .atmosphere-story__skip { display: none !important; }
 }
-.atmosphere[data-color-failed='true'] .atmosphere__layer--sketch {
-  display: block !important;
-  opacity: .98;
-  animation: none !important;
-}
-.atmosphere[data-color-failed='true'] .atmosphere__layer--electric { display: none; }
 html .mila-surface--welcome.mila-surface--front { background: transparent; }
 
 /* The welcome companion belongs to the warm room even when the learner has

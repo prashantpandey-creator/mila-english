@@ -50,9 +50,15 @@ service must also be added to the workflow's up/health lists in the same commit.
 - **Front-door art:** `src/lib/visualScenes.ts` points to the commissioned
   faceless mineral-paper voice sculpture in `public/visuals/v6/`, with separate
   desktop/mobile compositions. Carbon/eucalyptus ribbons balance the magenta
-  waveform. A matching graphite pair in `public/visuals/v5/`
-  provides one original, once-per-session pencil-to-electric entrance; it never
-  loops, blocks interaction, or runs under Reduced Motion / Save Data. The prior
+  waveform. A matching graphite pair in `public/visuals/v5/` registers the
+  final transition. Six additional art-directed `public/visuals/v6/` story
+  beats show two equal, faceless paper figures arriving from organic and
+  geometric worlds; their voice-lines meet, the boundary dissolves, and the
+  shared ribbons wind continuously into Mila. The silent entrance is 9.6s
+  desktop / 8.4s mobile, runs once per session, exposes a visible bilingual
+  Skip control, and never loops, blocks interaction, or runs under Reduced
+  Motion / Save Data. It borrows no character, portal, shot, or narrative
+  sequence from another work. The prior
   woman portrait remains untouched in `public/visuals/v3/` as backup only. City
   cards crop one connected abstract rhythm strip rather than literal destination
   photography. **Never use faces,
