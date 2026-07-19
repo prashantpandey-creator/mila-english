@@ -1,0 +1,41 @@
+{
+  "release": {
+    "appStoreName": "Mila: English Speaking",
+    "displayName": "Mila",
+    "bundleId": "com.purangpt.mila",
+    "version": "1.0",
+    "build": "1",
+    "teamId": "8U3RHGA83G",
+    "bundleIdResourceId": "54MZM2T7K9",
+    "platform": "iOS",
+    "deviceFamily": "iPhone",
+    "minimumOS": "16.0"
+  },
+  "urls": {
+    "production": "https://mila.purangpt.com",
+    "privacy": "https://mila.purangpt.com/privacy",
+    "support": "https://mila.purangpt.com/support"
+  },
+  "binary": {
+    "path": "ios/build/export/Mila.ipa",
+    "sha256": "3668e9f4d4863deecb519aaec921a3137e9d7aba9a7436a3b2ed9fc20b30ef06",
+    "archiveCreatedAtUtc": "2026-07-19T01:26:46Z",
+    "signingCertificateType": "Apple Distribution",
+    "nonExemptEncryption": false
+  },
+  "screenshots": [
+    "docs/app-store-assets/1.0/screenshots-6.9-inch/01-home.png",
+    "docs/app-store-assets/1.0/screenshots-6.9-inch/02-learn.png",
+    "docs/app-store-assets/1.0/screenshots-6.9-inch/03-speak.png",
+    "docs/app-store-assets/1.0/screenshots-6.9-inch/04-progress.png",
+    "docs/app-store-assets/1.0/screenshots-6.9-inch/05-live-tutor.png"
+  ],
+  "appleResourceIds": {
+    "appId": null,
+    "appStoreVersionId": null,
+    "buildId": null,
+    "deliveryId": null,
+    "reviewSubmissionId": null,
+    "submittedAtUtc": null
+  }
+}

@@ -49,3 +49,20 @@ Support URL: https://mila.purangpt.com/support
 
 The project file is generated from `project.yml`. Change the YAML first, then
 regenerate; do not hand-edit the `.xcodeproj` as the source of truth.
+
+## App Store submission packet
+
+The finalized App Store Connect fields, App Review notes, App Privacy answers,
+age-rating selections, screenshot order, and remaining manual gates live in
+[`docs/app-store-assets/1.0/`](../docs/app-store-assets/1.0/metadata.md).
+
+After exporting the IPA, run the release preflight before validation or upload:
+
+```bash
+./scripts/verify-ios-app-store-release.sh ios/build/export/Mila.ipa
+```
+
+The preflight checks metadata limits, screenshot dimensions and alpha, public
+reviewer URLs, the privacy manifest, Apple Distribution signing, bundle and
+build identity, production origin, export compliance, and the recorded IPA
+SHA-256.

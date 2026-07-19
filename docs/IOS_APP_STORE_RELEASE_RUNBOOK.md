@@ -18,6 +18,27 @@ The release is complete only when:
 
 `READY_FOR_REVIEW` is still a draft state.
 
+## Checked-in submission packet
+
+Do not reconstruct App Store Connect answers from chat history. Use the 1.0
+packet checked into [`docs/app-store-assets/1.0/`](app-store-assets/1.0/metadata.md):
+
+- [`metadata.md`](app-store-assets/1.0/metadata.md) — new app record, shared app
+  information, version fields, screenshot order, pricing, content rights, age
+  rating, and export-compliance wording;
+- [`app-privacy-answers.md`](app-store-assets/1.0/app-privacy-answers.md) — exact
+  retained data types, linked status, purposes, and tracking answers;
+- [`app-store-connect/review_notes.txt`](app-store-assets/1.0/app-store-connect/review_notes.txt)
+  — final plain-text App Review notes;
+- [`submission-checklist.md`](app-store-assets/1.0/submission-checklist.md) — the
+  straight upload-and-submit sequence and the few manual gates that remain;
+- [`release-manifest.json`](app-store-assets/1.0/release-manifest.json) — fixed
+  build identity, URLs, screenshot files, artifact checksum, and pending Apple
+  resource IDs.
+
+Run the repo preflight after every re-export. A stale IPA whose embedded privacy
+manifest differs from the checked-in answer sheet must not be uploaded.
+
 ## Release manifest
 
 ```bash
@@ -78,6 +99,18 @@ xcodebuild \
 Inspect the archive bundle ID, version, build, signing team, privacy manifest,
 permission copy, and lack of development URLs before upload.
 
+## Repo preflight
+
+```bash
+./scripts/verify-ios-app-store-release.sh "$IPA_PATH"
+```
+
+This is the local release gate. It checks App Store text limits, screenshot
+format, public privacy/support URLs, source and embedded privacy manifests,
+Apple Distribution signing, the bundle/version/build/team/minimum-iOS values,
+production-only networking, export compliance, and the SHA-256 recorded in the
+release manifest.
+
 ## Validate and upload
 
 ```bash
@@ -99,7 +132,10 @@ Wait for build processing. Record the delivery ID and build resource ID.
 Create the app record in App Store Connect before upload. Confirm the name,
 bundle ID, primary language, SKU, categories, content rights, age rating, free
 price, availability, version localization, screenshots, review notes, contact,
-and export compliance. Publish App Privacy rather than leaving it as a draft.
+and export compliance using the checked-in answer sheet. Publish App Privacy
+rather than leaving it as a draft. The App Review contact phone number and the
+account-level Digital Services Act trader status cannot be inferred from the
+repo and must be confirmed by the owner.
 
 Create or reuse one draft review submission, attach the intended version, and
 submit it. Then read the two authoritative resources through the App Store
@@ -125,5 +161,8 @@ Verified version state:
 Privacy publication summary:
 Screenshot devices:
 Physical-device tests:
+App Review contact phone confirmed:
+DSA trader status and eligible territories confirmed:
+Release manifest IPA SHA-256:
 Warnings or follow-ups:
 ```

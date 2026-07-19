@@ -1,0 +1,9 @@
+Mila can be reviewed without credentials. On a clean launch, the app automatically creates an isolated guest profile. No sign-in or demo account is required.
+
+The native tab bar contains Home, Learn, Speak, Mila, and Progress. To test text tutoring, open Mila and tap any suggested conversation, or type a short English-learning question. To test voice, open Speak, allow microphone access, tap the large microphone, say one sentence, and tap it again. Mila sends the recording to its first-party service for transcription, shows the transcript, generates a short tutor reply, and plays the reply aloud.
+
+Account deletion is available from the profile icon on Home. A guest sees "Delete guest data"; a registered learner sees "Delete account and data." After confirmation, Mila permanently deletes the profile, progress, assessments, vocabulary reviews, chat history, and saved memories, then creates a fresh guest profile.
+
+Version 1.0 has no purchases, subscriptions, advertising, or tracking. The complete level check, listening, grammar, privacy, and support modules open fixed first-party pages from mila.purangpt.com inside focused web views; users cannot browse the open web from the app. Online tutoring and guest bootstrap require network access. Pocket phrases remain available offline.
+
+Microphone audio is used only for the requested transcription and is deleted after the request. Chat messages, transcripts, and learning progress remain linked to the guest or registered profile until the learner deletes that profile.

@@ -31,9 +31,11 @@ No local screenshot counts. No "LIVE" claim without both.**
 
 ## LOCAL / UNPUSHED
 
-- The Apple Distribution IPA remains local only because App Store Connect is
-  waiting for an interactive Apple ID sign-in and app-record creation before
-  validation/upload.
+- The refreshed Apple Distribution IPA is local at
+  `ios/build/export/Mila.ipa` with SHA-256
+  `3668e9f4d4863deecb519aaec921a3137e9d7aba9a7436a3b2ed9fc20b30ef06`.
+  App Store Connect still requires an interactive Apple sign-in and app-record
+  creation before validation/upload.
 
 ## OWED (asked, NOT done — do not claim these)
 
@@ -149,13 +151,24 @@ evidence. The app-specific procedure is in
   streamed tutor, and WAV TTS endpoints verified from the release client path.
 - [x] Five 6.9-inch screenshots captured at `1320×2868` from the passing UI
   journey in `docs/app-store-assets/1.0/screenshots-6.9-inch/`.
+- [x] App Store Connect metadata, review notes, age rating, pricing/content
+  rights, exact App Privacy answers, and upload-and-submit checklist finalized
+  under `docs/app-store-assets/1.0/`.
+- [x] Release preflight script verifies metadata limits, public reviewer URLs,
+  screenshots, App Store icon, privacy manifest, Apple Distribution signing,
+  binary identity, production origin, export compliance, and IPA checksum.
 - [ ] Microphone, transcription, chat, TTS, and deletion verified on physical iPhone.
+- [ ] App Review contact phone confirmed.
+- [ ] Account-level DSA trader status and eligible territories confirmed.
 - [x] Public privacy and support URLs deployed and rechecked with live screenshots.
 - [x] Production deletion verified with a disposable guest: delete 200, then
   profile 401 using the same session.
 - [x] Apple bundle ID created.
 - [ ] App Store app record created.
-- [x] Release archive exported as an Apple Distribution-signed IPA.
+- [x] Release archive re-exported on 2026-07-19 as an Apple
+  Distribution-signed IPA with the finalized privacy manifest; local preflight
+  passed for SHA-256
+  `3668e9f4d4863deecb519aaec921a3137e9d7aba9a7436a3b2ed9fc20b30ef06`.
 - [ ] `altool` validation passed (currently awaiting the App Store app record).
 - [ ] Build uploaded and processing completed.
 - [ ] App Privacy published.
