@@ -87,13 +87,18 @@ forced into the delivery cut.
 - Encode/package verifier: `scripts/verify-mila-story-film.mjs`
 - Drawing-boundary continuity auditor:
   `scripts/audit-mila-story-continuity.mjs`
+- Deterministic portrait-finale registration:
+  `scripts/register-mila-story-mobile.mjs`
+- Deterministic landscape-pulse registration and decoded-film gate:
+  `scripts/register-mila-story-desktop-pulse.mjs` and
+  `scripts/audit-mila-story-desktop-pulse.mjs`
 
 Delivery metadata:
 
 | Film | Raster | Codec | Frames | Duration | Size |
 | --- | ---: | --- | ---: | ---: | ---: |
-| Desktop | 2048×978 | H.264 High, Level 4.2, BT.709, yuv420p | 141 | 11.75 s | 10,065,913 bytes |
-| Mobile | 960×2024 | H.264 High, Level 4.2, BT.709, yuv420p | 141 | 11.75 s | 7,441,857 bytes |
+| Desktop | 2048×978 | H.264 High, Level 4.2, BT.709, yuv420p | 141 | 11.75 s | 10,040,802 bytes |
+| Mobile | 960×2024 | H.264 High, Level 4.2, BT.709, yuv420p | 141 | 11.75 s | 7,241,344 bytes |
 
 Only the viewport-appropriate film is assigned to the video element. Portrait
 phones and tablets through 1100 CSS px use the portrait composition and its
@@ -110,8 +115,10 @@ All new art used the built-in ImageGen edit workflow in `compositing` mode.
 Existing approved drawings supplied both endpoints. Every prompt required a
 locked camera, paper border, copy negative space, waveform axis, and graphite
 medium; only the causal ribbon geometry was allowed to advance. ImageGen output
-rasters vary by a few pixels, so the renderer normalizes them onto one delivery
-canvas instead of claiming pixel-identical paper registration.
+rasters vary by a few pixels, so the renderer first normalizes them onto one
+delivery canvas. It then registers the portrait finale and the three unstable
+landscape settling drawings locally inside their graphite forms; paper outside
+each feathered union mask remains mathematically unchanged.
 
 The five first-pass anchor pairs came from:
 
@@ -267,23 +274,64 @@ grayscale raw video, reads the orientation-specific hold schedule, and measures
 only genuine drawing boundaries. It reports within-hold codec noise separately
 so compression is never mistaken for a new drawing.
 
-For the final cut, landscape boundary MAD has median 4.781 and maximum 10.704;
-its late-film median is 5.015 and maximum 10.348. Portrait boundary MAD has
-median 5.537 and maximum 14.332; its late-film median is 9.195 and maximum
-14.332. The higher portrait numbers are concentrated in fresh graphite tone
-and hatching changes; contact-sheet review confirmed a monotonic silhouette.
-The selected p695 materially reduces the p67→p72 geometric move. Direct
-p92→p94 and p99→final cuts were retained because both generated alternatives
-moved scale or placement away from the registered final pose.
+For the final cut, landscape boundary MAD has median 4.781 and maximum 11.895;
+its late-film median is 5.015 and maximum 11.895. Portrait boundary MAD has
+median 5.439 and maximum 13.571; its late-film median is 8.532 and maximum
+13.571. The portrait auditor also decodes the 21 screened finale drawings at
+native resolution. Their centroid x, centroid y, and measured bounding area are
+all strictly monotonic; the checked-in H.264 has a 7.466 px maximum centroid
+step and a 1.060% maximum area-scale step (the pre-encode renderer result is
+7.838 px and 0.991%).
+
+Before registration, the source finale's maximum centroid jump was 82.184 px
+and its geometric area-scale jump was 11.235%. The deterministic full-linear
+registration therefore removes the visible position snap while retaining all
+21 selected drawings. Its localized mask hard-locks `y < 220`, `y >= 1375`,
+the full left rail `x < 64`, and the full right rail `x >= 896`. It then uses
+an 80 px cubic feather on each side before reaching the moving graphite.
+Across both 64 px rails, source-to-output MAD fell from 14.470 to exactly 0 and
+the maximum channel delta fell from 239 to 0. The paper-only taper seam step
+fell from 4.173 to 1.407. A decoded 390×664 finale sample also reduced temporal
+rail MAD from 4.257 to 3.258 at the median and 10.432 to 9.989 at the maximum.
+The selected p695 materially reduces the p67→p72 geometric move.
+
+The landscape gate separately decodes p76, p80, p825, p85, and p90. Registering
+only the three interior drawings reduced the maximum centroid jump from 32.273
+px to 10.989 px and the perceived scale jump from 3.956% to 0.433%. Centroid x,
+centroid y, and weighted radius all advance monotonically. The maximum centroid
+trajectory error is 0.238 px, the maximum scale-trajectory error is 0.035%, the
+paper-edge MAD is exactly 0, and the last 16 delivery columns remain unchanged.
 
 ## Render method
 
 The renderer normalizes 53 landscape and 51 portrait drawings to their delivery
 canvases with Lanczos, small per-stage contrast compensation, and restrained
-spatial sharpening. It then links each drawing into its explicit exposure
-schedule and encodes H.264
+spatial sharpening. After normalization, the portrait Node + Sharp helper
+measures drawings 30–50 from strong graphite pixels inside the safe area between
+the two locked rails. It linearly interpolates endpoint centroids and log-area,
+applies ten deterministic correction passes, and composites the fixed-canvas transform only
+inside the dilated, feathered union of the original and transformed graphite
+masks. The hard-zero paper bands make edge registration mathematical rather
+than visual. The helper fails before publication if x/y/area cease to be
+monotonic, centroid movement exceeds 8 px, pre-encode area-scale movement
+exceeds 1.45%, either 64 px paper rail moves by even one channel value, the
+paper-only taper seam exceeds 1.45, or outer-edge MAD is nonzero.
+
+The landscape helper keeps p76 and p90 as untouched anchors and corrects only
+p80, p825, and p85. It interpolates weighted graphite centroid and radius,
+solves each local affine control against the decoded geometry, and tapers the
+right-edge edit to zero. Its independent decoded-film audit fails publication
+on a pulse, trajectory reversal, scale rebound, or changed paper edge.
+
+The renderer then links each drawing into its explicit exposure schedule and
+encodes H.264
 with `libx264`, `preset slow`, `CRF 23`, `tune animation`, `yuv420p`, fast-start,
 a two-second GOP, and explicit BT.709 VUI metadata. There is no audio.
+
+The runtime serves `/visuals/v7/*` with a one-year immutable cache because this
+is the first publication of these URLs. Any future visual change must increment
+the public path or filename version; the renderer's `v1` outputs must never be
+silently redeployed over an already cached release.
 
 An optical-flow prototype at
 `/private/tmp/mila-film-proto.JhdzK7/desktop-draft.mp4` was rejected. It created

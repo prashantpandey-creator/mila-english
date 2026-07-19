@@ -604,6 +604,20 @@
   .lp-hero__actions .lp-btn { width: auto; flex: 1; padding-inline: 12px; font-size: 12.5px; white-space: nowrap; }
 }
 
+/* A 390px phone cannot carry the brand, Plans, language switcher and account
+   action without crushing the final pill. Pricing remains in the page and
+   footer, so keep the primary mobile header calm and single-line. */
+@media (min-width: 361px) and (max-width: 420px) {
+  .lp-nav__inner { gap: 8px; padding-block: 10px; }
+  .lp-brand { gap: 8px; }
+  .lp-brand__mark { width: 32px; height: 32px; border-radius: 10px; font-size: 17px; }
+  .lp-brand__name { font-size: 22px; }
+  .lp-nav__actions { flex: none; gap: 6px; }
+  .lp-nav__link { display: none; }
+  .lp-nav .lang-toggle button { min-width: 34px; padding-inline: 8px; font-size: 11px; }
+  .lp-signin { flex: none; padding-inline: 10px; font-size: 12px; white-space: nowrap; }
+}
+
 @media (max-width: 360px) {
   .lp-nav__inner { gap: 8px; padding-block: 10px; }
   .lp-brand { gap: 8px; }

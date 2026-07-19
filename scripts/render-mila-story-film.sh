@@ -162,6 +162,20 @@ render_mode() {
       -vf "scale=${width}:${height}:force_original_aspect_ratio=increase:flags=lanczos,crop=${width}:${height},eq=contrast=${contrast}:brightness=-0.004,unsharp=5:5:0.68:3:3:0.16" \
       -frames:v 1 "$temp/drawing-${padded}.png"
 
+  done
+
+  # Register only the localized drawing run that needs it, after every source
+  # is normalized onto its delivery raster. Both helpers preserve the workshop
+  # originals and the paper outside a feathered graphite union mask.
+  if [[ "$mode" == "desktop" ]]; then
+    node "$ROOT/scripts/register-mila-story-desktop-pulse.mjs" "$temp" > "$temp/desktop-registration.json"
+  else
+    node "$ROOT/scripts/register-mila-story-mobile.mjs" "$temp" > "$temp/mobile-registration.json"
+  fi
+
+  for index in "${!holds[@]}"; do
+    padded="$(printf '%02d' "$index")"
+    hold="${holds[$index]}"
     for ((exposure = 0; exposure < hold; exposure++)); do
       frame_name="$(printf '%03d' "$frame")"
       ln -s "$temp/drawing-${padded}.png" "$temp/frame-${frame_name}.png"
@@ -211,6 +225,9 @@ render_mode desktop 2048 978
 render_mode mobile 960 2024
 verify_mode desktop 2048 978
 verify_mode mobile 960 2024
+node "$ROOT/scripts/audit-mila-story-desktop-pulse.mjs" \
+  "$PUBLISH_STAGE/mila-origin-film-desktop-v1.mp4" > /dev/null
+node "$ROOT/scripts/audit-mila-story-continuity.mjs" "$PUBLISH_STAGE" > /dev/null
 cp "$OUTPUT/mila-origin-poster-desktop-v1.webp" "$PUBLISH_STAGE/"
 cp "$OUTPUT/mila-origin-poster-mobile-v1.webp" "$PUBLISH_STAGE/"
 

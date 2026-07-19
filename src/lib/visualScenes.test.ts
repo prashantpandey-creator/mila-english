@@ -64,6 +64,55 @@ function assertFilm(source: string, width: number, height: number): void {
 assertFilm(MILA_VOICE_ORIGIN_FILM.desktop, 2048, 978);
 assertFilm(MILA_VOICE_ORIGIN_FILM.mobile, 960, 2024);
 
+const continuity = JSON.parse(execFileSync(
+  process.execPath,
+  [resolve('scripts/audit-mila-story-continuity.mjs')],
+  { encoding: 'utf8' },
+)) as Array<{
+  mode: string;
+  registration?: {
+    drawings: number;
+    maxCentroidStepPx: number;
+    maxAreaScaleStepPercent: number;
+    encodedAreaLimit: number;
+    monotonic: Record<string, boolean>;
+  };
+}>;
+const mobileRegistration = continuity.find(({ mode }) => mode === 'mobile')?.registration;
+assert.ok(mobileRegistration, 'checked-in mobile film must expose its registration audit');
+assert.equal(mobileRegistration.drawings, 21);
+assert.ok(Object.values(mobileRegistration.monotonic).every(Boolean));
+assert.ok(mobileRegistration.maxCentroidStepPx <= 8);
+assert.ok(mobileRegistration.maxAreaScaleStepPercent <= mobileRegistration.encodedAreaLimit);
+
+const desktopPulse = JSON.parse(execFileSync(
+  process.execPath,
+  [
+    resolve('scripts/audit-mila-story-desktop-pulse.mjs'),
+    resolve('public/visuals/v7/mila-origin-film-desktop-v1.mp4'),
+  ],
+  { encoding: 'utf8' },
+)) as {
+  labels: string[];
+  maxCentroidStepPx: number;
+  maxAreaScaleStepPercent: number;
+  maxCentroidTrajectoryErrorPx: number;
+  maxAreaTrajectoryErrorPercent: number;
+  monotonic: Record<string, boolean>;
+};
+assert.deepEqual(desktopPulse.labels, ['p76', 'p80', 'p825', 'p85', 'p90']);
+assert.ok(Object.values(desktopPulse.monotonic).every(Boolean));
+assert.ok(desktopPulse.maxCentroidStepPx <= 12.5);
+assert.ok(desktopPulse.maxAreaScaleStepPercent <= 0.8);
+assert.ok(desktopPulse.maxCentroidTrajectoryErrorPx <= 1.5);
+assert.ok(desktopPulse.maxAreaTrajectoryErrorPercent <= 0.8);
+
+const portraitRegistrar = readFileSync(resolve('scripts/register-mila-story-mobile.mjs'), 'utf8');
+assert.match(portraitRegistrar, /const PAPER_RAIL_LOCK_PX = 64;/);
+assert.match(portraitRegistrar, /maxPaperRailMad: 0,/);
+assert.match(portraitRegistrar, /maxPaperRailPixelDelta: 0,/);
+assert.match(portraitRegistrar, /maxTaperColumnResidualStep: 1\.45,/);
+
 assert.deepEqual(readdirSync(resolve('public/visuals/v7')).sort(), [
   'mila-origin-film-desktop-v1.mp4',
   'mila-origin-film-mobile-v1.mp4',

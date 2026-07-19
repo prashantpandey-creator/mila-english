@@ -4,8 +4,13 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  REGISTRATION_LIMITS,
+  measureGraphiteGeometry,
+} from './register-mila-story-mobile.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const visualsRoot = resolve(process.argv[2] ?? resolve(root, 'public/visuals/v7'));
 const renderer = readFileSync(resolve(root, 'scripts/render-mila-story-film.sh'), 'utf8');
 function rendererHolds(name) {
   return renderer
@@ -66,10 +71,69 @@ function summarize(values) {
   };
 }
 
+function auditMobileRegistration(file, starts) {
+  const finaleStarts = starts.slice(30);
+  const width = 960;
+  const height = 2024;
+  const frameSize = width * height * 3;
+  const expression = finaleStarts.map((frame) => `eq(n\\,${frame})`).join('+');
+  const raw = execFileSync(
+    'ffmpeg',
+    [
+      '-v', 'error', '-i', file,
+      '-vf', `select=${expression}`,
+      '-vsync', '0', '-pix_fmt', 'rgb24', '-f', 'rawvideo', 'pipe:1',
+    ],
+    { maxBuffer: 256 * 1024 * 1024 },
+  );
+  if (raw.length !== frameSize * finaleStarts.length) {
+    throw new Error(`mobile registration: decoded ${raw.length / frameSize} drawings, expected ${finaleStarts.length}`);
+  }
+  const geometry = finaleStarts.map((_, index) => measureGraphiteGeometry(
+    raw.subarray(index * frameSize, (index + 1) * frameSize),
+  ));
+  let maxCentroidStepPx = 0;
+  let maxAreaScaleStepPercent = 0;
+  for (let index = 1; index < geometry.length; index += 1) {
+    const previous = geometry[index - 1];
+    const current = geometry[index];
+    maxCentroidStepPx = Math.max(
+      maxCentroidStepPx,
+      Math.hypot(current.cx - previous.cx, current.cy - previous.cy),
+    );
+    maxAreaScaleStepPercent = Math.max(
+      maxAreaScaleStepPercent,
+      Math.abs((Math.sqrt(current.bboxArea / previous.bboxArea) - 1) * 100),
+    );
+  }
+  const monotonic = {
+    centroidX: geometry.every((value, index) => index === 0 || value.cx > geometry[index - 1].cx),
+    centroidY: geometry.every((value, index) => index === 0 || value.cy > geometry[index - 1].cy),
+    bboxArea: geometry.every((value, index) => index === 0 || value.bboxArea > geometry[index - 1].bboxArea),
+  };
+  const encodedAreaLimit = 1.51;
+  if (!Object.values(monotonic).every(Boolean)) {
+    throw new Error(`Encoded mobile finale is not monotonic: ${JSON.stringify(monotonic)}`);
+  }
+  if (maxCentroidStepPx > REGISTRATION_LIMITS.maxCentroidStepPx) {
+    throw new Error(`Encoded centroid step ${maxCentroidStepPx} exceeds ${REGISTRATION_LIMITS.maxCentroidStepPx}.`);
+  }
+  if (maxAreaScaleStepPercent > encodedAreaLimit) {
+    throw new Error(`Encoded area-scale step ${maxAreaScaleStepPercent} exceeds ${encodedAreaLimit}.`);
+  }
+  return {
+    drawings: finaleStarts.length,
+    maxCentroidStepPx,
+    maxAreaScaleStepPercent,
+    encodedAreaLimit,
+    monotonic,
+  };
+}
+
 function audit(mode, height) {
   const holds = holdsByMode[mode];
   const labels = labelsByMode[mode];
-  const file = resolve(root, `public/visuals/v7/mila-origin-film-${mode}-v1.mp4`);
+  const file = resolve(visualsRoot, `mila-origin-film-${mode}-v1.mp4`);
   const width = 216;
   const frameSize = width * height;
   const expectedFrames = holds.reduce((sum, hold) => sum + hold, 0);
@@ -132,6 +196,7 @@ function audit(mode, height) {
       ...transition,
       medianMultiple: transition.mad / globalMedian,
     })),
+    ...(mode === 'mobile' ? { registration: auditMobileRegistration(file, starts) } : {}),
   };
 }
 
