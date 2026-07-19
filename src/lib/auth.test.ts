@@ -16,6 +16,9 @@ test('email and guest identity normalization are explicit', () => {
   assert.equal(isGuestIdentity('guest', 'named@example.com'), true);
   assert.equal(isGuestIdentity('registered', 'guest-user@mila.local'), false);
   assert.equal(isGuestIdentity(null, 'guest-123e4567-e89b-12d3-a456-426614174000@mila.local'), true);
+  assert.equal(isGuestIdentity(null, 'guest@purangpt.com'), true);
+  assert.equal(isGuestIdentity('registered', 'guest@purangpt.com'), true);
+  assert.equal(isGuestIdentity('registered', 'guest-123e4567-e89b-12d3-a456-426614174000@mila.local'), true);
 });
 
 test('guest responses retain the native string contract without losing explicit guest state', () => {

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Payment, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { isGuestIdentity } from '@/lib/auth';
 import { getUserPlan } from '@/lib/subscriptionStore';
 import { isPaid } from '@/lib/subscription';
 import {
@@ -64,7 +65,7 @@ export async function beginCheckout(input: {
 
   const user = await prisma.user.findUnique({ where: { id: input.userId } });
   if (!user) throw new BillingError('UNAUTHORIZED', 'Sign in again to continue.', 401);
-  if (user.accountType === 'guest' || (!user.accountType && user.email.endsWith('@mila.local'))) {
+  if (isGuestIdentity(user.accountType, user.email)) {
     throw new BillingError('ACCOUNT_REQUIRED', 'Create an account first so paid access cannot be lost.', 409);
   }
   if (!user.emailVerifiedAt) {

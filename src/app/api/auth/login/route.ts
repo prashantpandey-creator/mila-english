@@ -4,6 +4,7 @@ import {
   createSession,
   DUMMY_PASSWORD_HASH,
   hashPassword,
+  isGuestIdentity,
   passwordNeedsUpgrade,
   verifyPassword,
 } from '@/lib/auth';
@@ -31,7 +32,10 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.findUnique({ where: { email } });
   const passwordMatches = await verifyPassword(password, user?.password || DUMMY_PASSWORD_HASH);
-  if (!user || !passwordMatches) {
+  // Guest placeholders are session-only profiles, not password accounts. In
+  // particular, never let the historical shared pilot guest be promoted by
+  // signing in with its once-public bootstrap password.
+  if (!user || isGuestIdentity(user.accountType, user.email) || !passwordMatches) {
     return NextResponse.json({ error: 'Email or password is incorrect.', code: 'INVALID_CREDENTIALS' }, { status: 401 });
   }
 
