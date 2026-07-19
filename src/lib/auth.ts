@@ -26,9 +26,16 @@ export function normalizeEmail(value: unknown): string {
 }
 
 export function isGuestIdentity(accountType: string | null | undefined, email: string): boolean {
+  const normalized = normalizeEmail(email);
+  // Mila's first pilot shared one public guest row before isolated UUID guests
+  // were introduced. Reserved placeholder addresses stay guests even if a
+  // rollout default or an old login briefly wrote a misleading accountType.
+  if (normalized === 'guest@purangpt.com' || /^guest-[0-9a-f-]+@mila\.local$/i.test(normalized)) {
+    return true;
+  }
   if (accountType === 'guest') return true;
   if (accountType === 'registered') return false;
-  return /^guest-[0-9a-f-]+@mila\.local$/i.test(email);
+  return false;
 }
 
 function jwtSecret(): Uint8Array {
