@@ -31,25 +31,26 @@ Push `main` → `.github/workflows/deploy.yml` (SSH to Mumbai, reset --hard,
 compose build). **Containers start BY NAME in the workflow** — a new compose
 service must also be added to the workflow's up/health lists in the same commit.
 
-## Design system (current — Electric Paper atelier, owner correction 2026-07-19)
+## Design system (current — Mineral Paper atelier, owner refinement 2026-07-19)
 - **Type:** Yeseva One is reserved for the Mila wordmark and rare editorial
   display moments. Manrope owns product headings, interface, and body copy. IBM
   Plex Mono is only for measured language such as IPA and levels. All support
   Cyrillic.
-- **Palette:** cool white ground `#fffcfe`, white panel `#ffffff`, electric
-  blush `#fff4fa`, strong band `#ffe8f3`, berry ink `#26131f`, muted ink
-  `#65535f`, hairline `#f0c7da`, accessible action magenta `#d9006c`, deep
-  action `#a40050`, and decorative electric flare `#ff2d95`. The flare is not
-  body text. No category, route, state, price band, or voice room gets cyan,
-  emerald, gold, orange, mauve, beige, or black.
-- **Depth:** solid paper is the default. Translucent white is limited to sticky
-  chrome where it preserves context. Strength comes from a restrained plum
-  offset plate and shadow on the primary voice action and feature cards. A soft
-  electric halo may reinforce an active voice signal; never spread neon glow
-  across every surface or use coloured glass and gradient orbs.
+- **Palette:** linen ground `#faf8f5`, white panel `#ffffff`, mineral mist
+  `#f3f6f7`, warm linen `#f1ece5`, eucalyptus mist `#dde8e3`, graphite ink
+  `#26343b`, muted ink `#5e6a6a`, and neutral hairline `#d8e0e3`. Accessible
+  magenta `#d9006c`, deep action `#a40050`, and flare `#ff2d95` remain Mila's
+  signature. Eucalyptus `#456a60`/`#5f7d72` is the supporting counterweight for
+  listening, measurement, progress, and atmosphere—not a category rainbow.
+- **Depth:** solid paper is the default, supported by broad planar gradients:
+  graphite-to-eucalyptus for one anchor panel, linen-to-mist for quiet bands,
+  and magenta-to-deep-magenta for primary action. Translucent white is limited
+  to sticky chrome. Never spread neon glow across every surface or use coloured
+  glass, gradient orbs, or SaaS-style floating blobs.
 - **Front-door art:** `src/lib/visualScenes.ts` points to the commissioned
-  faceless electric-paper voice sculpture in `public/visuals/v4/`, with separate
-  desktop/mobile compositions. A matching graphite pair in `public/visuals/v5/`
+  faceless mineral-paper voice sculpture in `public/visuals/v6/`, with separate
+  desktop/mobile compositions. Carbon/eucalyptus ribbons balance the magenta
+  waveform. A matching graphite pair in `public/visuals/v5/`
   provides one original, once-per-session pencil-to-electric entrance; it never
   loops, blocks interaction, or runs under Reduced Motion / Save Data. The prior
   woman portrait remains untouched in `public/visuals/v3/` as backup only. City
@@ -58,8 +59,8 @@ service must also be added to the workflow's up/health lists in the same commit.
   headphones, chairs, desks, devices, classrooms, flags, landmark postcards,
   generic country photos, or stock-learning scenes in the active hero.**
 - **One identity:** `src/lib/routeSurface.ts` resolves every route to the same
-  light atelier. Voice state is expressed with labels, motion, rings, and
-  waveform geometry—not a dark canvas or a route-specific accent.
+  light mineral atelier. Voice state is expressed with labels, motion, rings,
+  waveform geometry, and the shared material palette—not a route-specific skin.
 
 ## Where things live
 - Front door: `src/app/page.tsx` + `src/app/landing.css` (`.lp-*` namespace).

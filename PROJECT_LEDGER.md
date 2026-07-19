@@ -97,8 +97,9 @@ Mumbai box — this is the sanctioned door.
   hard-refresh on device.
 - **One bright room system** (`src/lib/routeSurface.ts`): every route resolves
   to `welcome` / light. Do not reintroduce route-specific dark focus rooms or
-  device-preference palette changes; hierarchy comes from white, cool blush,
-  rose, deep berry, typography, borders, and restrained shadows.
+  device-preference palette changes; hierarchy comes from linen paper, carbon
+  structure, eucalyptus atmosphere, magenta action, broad tonal gradients,
+  typography, borders, and restrained shadows.
 - **Fresh worktree = no dev DB.** `DATABASE_URL="file:./dev.db" npx prisma db
   push` before guest/login flows work locally, or they 500.
 - **Concurrent sessions** push to this repo. `git fetch` + rebase onto

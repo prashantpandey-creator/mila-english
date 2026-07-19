@@ -23,38 +23,43 @@
 6. **Lock the winner into the system** so it stops getting swapped for cheap
    defaults by the next hand.
 
-## The language (owner correction, 2026-07-19)
+## The language (owner refinement, 2026-07-19)
 
-Mila has one **Electric Paper** identity from the first page through the
-learning product. It should feel authored, warm without relying on a literal
-woman's face, strong without becoming cyberpunk, and creative without becoming
-noisy. There is no second dark room and no route-specific colour story.
+Mila has one **Mineral Paper** identity from the first page through the
+learning product. It keeps Electric Paper's authored magenta signature, but
+balances it with graphite, linen, and eucalyptus so the experience has tonal
+depth instead of reading as pink on white. It should feel warm without relying
+on a literal woman's face, strong without becoming cyberpunk, and creative
+without becoming noisy. There is no second route-specific colour story.
 
 | Role | Canonical value |
 |---|---|
-| Ground | cool white `#fffcfe` |
+| Ground | linen paper `#faf8f5` |
 | Panel | white `#ffffff` |
-| Raised / quiet surface | electric blush `#fff4fa` |
-| Strong blush band | `#ffe8f3` |
-| Ink | berry-black `#26131f` |
-| Muted ink | `#65535f` |
-| Border | electric hairline `#f0c7da`; strong line `#e58bb5` |
+| Raised / quiet surface | mineral mist `#f3f6f7` |
+| Alternating band | eucalyptus mist `#dde8e3`; warm linen `#f1ece5` |
+| Ink | graphite `#26343b`; mid-carbon `#40525a` |
+| Muted ink | `#5e6a6a` |
+| Border | mineral hairline `#d8e0e3`; strong line `#a9bab6` |
+| Calm counterweight | eucalyptus `#456a60`; mid `#5f7d72` |
 | Interaction signal | accessible magenta `#d9006c`; deep action `#a40050`; decorative flare `#ff2d95`; plum plate `#75003f` |
 
 - **Type.** Yeseva One (`--font-display`) carries the wordmark and rare
   editorial phrases. Manrope (`--font-sans`) carries product headings,
   interface, and body copy. IBM Plex Mono (`--font-mono`) is reserved for IPA,
   phonemes, scores, levels, and system labels. Do not add a route-specific font.
-- **One signal.** Clickable, active, listening, speaking, correct, incorrect,
-  measured, and progress states all use the magenta family. Meaning comes from
-  icon, label, motion, shape, and opacity—not cyan/green/gold/purple switches.
-- **Depth.** Use solid white/blush surfaces, electric hairlines, and restrained
-  plum offset plates. The primary voice action and feature imagery may carry a
-  soft electric halo. Translucent white is allowed only for sticky chrome where
+- **One signature.** Magenta identifies Mila, primary action, and the live
+  voice signal. Eucalyptus supports listening, measurement, progress, and calm
+  surfaces; it is a counterweight, not a route-by-route rainbow. Meaning still
+  comes from icon, label, motion, shape, and explicit language.
+- **Depth.** Use linen/mineral surfaces, neutral hairlines, one graphite anchor
+  panel, and restrained plum offset plates. Broad sectional gradients may move
+  within one material family: graphite-to-eucalyptus, linen-to-mist, or
+  magenta-to-deep-magenta. Translucent white is limited to sticky chrome where
   the layer relationship must remain visible.
 - **Voice.** Mila's voice state is made legible through a label, waveform,
-  concentric ring rhythm, and motion. It remains on white and blush; a black
-  room is not required for focus.
+  concentric ring rhythm, and motion. Linen, carbon, and eucalyptus carry the
+  atmosphere while magenta marks the active signal.
 - **Editorial character.** The front door is a commissioned faceless
   ribbon-and-resin voice sculpture with real negative space. The city editions
   crop one connected abstract rhythm panorama. Across the product, character
@@ -67,21 +72,21 @@ noisy. There is no second dark room and no route-specific colour story.
   Motion or Save Data. It never copies characters, footage, or narrative from
   another work and never becomes a persistent background loop.
 
-**Banned:** dusty rose, mauve, secondary semantic hues, per-category colour
-coding, black route surfaces, coloured glass, indiscriminate neon glow, gradient
-orbs, device-driven palette switching, face-led heroes, generic country/flag
-cards, and low-resolution photos behind learning workspaces.
+**Banned:** dusty rose, mauve, per-category rainbow coding, black route
+surfaces, coloured glass, indiscriminate neon glow, gradient orbs/blobs,
+device-driven palette switching, face-led heroes, generic country/flag cards,
+and low-resolution photos behind learning workspaces.
 
 ## Built so far
 
-- `src/app/inner-theme.css` owns the shared white/pink tokens, shell, cards,
+- `src/app/inner-theme.css` owns the shared mineral-paper tokens, shell, cards,
   controls, lesson tools, assessment, chat, auth, legal pages, assistant
   furniture, and mobile navigation.
 - `src/components/RouteSurface.tsx` makes the palette deterministic. `/`,
   `/start`, pricing, ordinary learning, and immersive voice all use the same
   light atelier.
-- Voice motion is functional feedback. It uses magenta rings, a precise core mark,
-  and state labels on white; it does not introduce another palette.
+- Voice motion is functional feedback. It uses a carbon/eucalyptus material
+  field, magenta active rings, a precise core mark, and explicit state labels.
 - The dashboard is a **conversation stage**, not a widget directory. Mila's
   live voice action owns the visual hierarchy, text chat is the clear second
   action, and lessons sit in a quieter supporting rail. `conversation-stage`

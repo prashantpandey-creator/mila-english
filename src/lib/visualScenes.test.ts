@@ -2,8 +2,8 @@
 import assert from 'node:assert';
 import { MILA_ATELIER, visualScenesForRoute } from './visualScenes';
 
-assert.equal(MILA_ATELIER.stillDesktop, '/visuals/v4/mila-electric-voice-desktop-v1.webp');
-assert.equal(MILA_ATELIER.stillMobile, '/visuals/v4/mila-electric-voice-mobile-v1.webp');
+assert.equal(MILA_ATELIER.stillDesktop, '/visuals/v6/mila-mineral-voice-desktop-v1.webp');
+assert.equal(MILA_ATELIER.stillMobile, '/visuals/v6/mila-mineral-voice-mobile-v1.webp');
 assert.equal(MILA_ATELIER.sketchDesktop, '/visuals/v5/mila-graphite-voice-desktop-v1.webp');
 assert.equal(MILA_ATELIER.sketchMobile, '/visuals/v5/mila-graphite-voice-mobile-v1.webp');
 
@@ -17,4 +17,4 @@ for (const route of ['/dashboard', '/listen', '/assessment', '/darshan', '/start
   assert.deepEqual(visualScenesForRoute(route), [], `${route} must not load hero media`);
 }
 
-console.log('visual scenes: electric and graphite pairs are route-safe');
+console.log('visual scenes: mineral and graphite pairs are route-safe');

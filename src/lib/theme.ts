@@ -1,6 +1,5 @@
-// Shared Mila palette. Historical semantic names remain for compatibility, but
-// every interactive channel resolves to the same electric signal. Meaning comes
-// from copy, iconography, and state — never from a competing accent colour.
+// Shared Mila palette. Magenta remains the companion/action signature, while
+// audio, measurement, and progress use the calmer mineral-eucalyptus channel.
 export const C = {
   pageBg: 'var(--surface-page, transparent)',
   venus: 'var(--mila-action, #d9006c)',
@@ -16,22 +15,22 @@ export const C = {
   mercuryBright: 'var(--mila-action, #d9006c)',
   mercuryDeep: 'var(--mila-action-deep, #a40050)',
   mercuryL: 'var(--mila-action-soft, rgba(217,0,108,0.12))',
-  voice: 'var(--mila-action, #d9006c)',
-  voiceBright: 'var(--mila-action, #d9006c)',
-  voiceL: 'var(--mila-action-soft, rgba(217,0,108,0.12))',
-  jupiter: 'var(--mila-action, #d9006c)',
-  jupiterBright: 'var(--mila-action, #d9006c)',
-  jupiterDeep: 'var(--mila-action-deep, #a40050)',
-  jupiterL: 'var(--mila-action-soft, rgba(217,0,108,0.12))',
-  sage: 'var(--mila-action, #d9006c)',
-  sageL: 'var(--mila-action-soft, rgba(217,0,108,0.12))',
-  gold: 'var(--mila-action, #d9006c)',
-  goldL: 'var(--mila-action-soft, rgba(217,0,108,0.12))',
+  voice: 'var(--mila-audio, #456a60)',
+  voiceBright: 'var(--mila-eucalyptus-mid, #5f7d72)',
+  voiceL: 'var(--mila-audio-soft, rgba(69,106,96,0.12))',
+  jupiter: 'var(--mila-measure, #456a60)',
+  jupiterBright: 'var(--mila-eucalyptus-mid, #5f7d72)',
+  jupiterDeep: 'var(--mila-measure-deep, #314f47)',
+  jupiterL: 'var(--mila-measure-soft, rgba(69,106,96,0.12))',
+  sage: 'var(--mila-eucalyptus, #456a60)',
+  sageL: 'var(--mila-eucalyptus-soft, #dde8e3)',
+  gold: 'var(--mila-eucalyptus, #456a60)',
+  goldL: 'var(--mila-eucalyptus-soft, #dde8e3)',
   purple: 'var(--mila-action, #d9006c)',
-  warm: 'var(--surface-muted, #65535f)',
-  dark: 'var(--surface-text, #26131f)',
+  warm: 'var(--surface-muted, #5e6a6a)',
+  dark: 'var(--surface-text, #26343b)',
   white: 'var(--mila-action-ink, #ffffff)',
   card: 'var(--surface-card, #ffffff)',
-  line: 'var(--surface-line, #f0c7da)',
+  line: 'var(--surface-line, #d8e0e3)',
   navBg: 'var(--surface-nav, #ffffff)',
 };

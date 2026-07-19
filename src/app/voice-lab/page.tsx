@@ -308,8 +308,8 @@ function PracticeRoom() {
             max(0.75rem, env(safe-area-inset-right, 0px))
             max(0.75rem, env(safe-area-inset-bottom, 0px))
             max(0.75rem, env(safe-area-inset-left, 0px));
-          color: var(--surface-text, #26131f);
-          background: var(--surface-page, #fffcfe);
+          color: var(--surface-text, #26343b);
+          background: #faf8f5;
         }
 
         .practice-room__veil {
@@ -318,8 +318,10 @@ function PracticeRoom() {
           z-index: -1;
           pointer-events: none;
           background:
-            radial-gradient(circle at 50% 48%, rgba(217,0,108, 0.12), transparent 38%),
-            linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 247, 250, 0.72));
+            radial-gradient(circle at 50% 48%, rgba(217, 0, 108, 0.12), transparent 36%),
+            radial-gradient(circle at 20% 18%, rgba(95, 125, 114, 0.16), transparent 44%),
+            radial-gradient(circle at 84% 78%, rgba(64, 82, 90, 0.1), transparent 48%),
+            linear-gradient(145deg, rgba(242, 246, 244, 0.64), rgba(241, 236, 229, 0.76) 54%, rgba(250, 248, 245, 0.92));
         }
 
         .practice-header {
@@ -375,18 +377,18 @@ function PracticeRoom() {
           height: 2.75rem;
           margin: 0;
           padding: 0;
-          border: 1px solid var(--surface-line, #f0c7da);
+          border: 1px solid #dde8e3;
           border-radius: 999px;
-          color: var(--surface-muted, #65535f);
-          background: var(--surface-card, #ffffff);
+          color: var(--surface-muted, #40525a);
+          background: rgba(250, 248, 245, 0.9);
           cursor: pointer;
           transition: border-color 160ms ease, background 160ms ease;
         }
 
         .practice-header__exit:hover {
-          border-color: var(--mila-line-strong, #e58bb5);
-          color: var(--surface-text, #26131f);
-          background: var(--mila-raised, #fff4fa);
+          border-color: #5f7d72;
+          color: var(--surface-text, #26343b);
+          background: #f2f6f4;
         }
 
         .practice-header__exit:focus-visible,
@@ -426,11 +428,11 @@ function PracticeRoom() {
           margin-inline: auto;
           padding: 0.8rem clamp(1rem, 4vw, 1.4rem);
           box-sizing: border-box;
-          border: 1px solid var(--surface-line, #f0c7da);
+          border: 1px solid #dde8e3;
           border-radius: 1rem;
-          color: var(--surface-text, #26131f);
-          background: var(--surface-card, #ffffff);
-          box-shadow: 0 14px 36px rgba(117,0,63, 0.07);
+          color: var(--surface-text, #26343b);
+          background: linear-gradient(145deg, rgba(250, 248, 245, 0.96), rgba(242, 246, 244, 0.92));
+          box-shadow: 0 14px 36px rgba(38, 52, 59, 0.1);
           text-align: center;
         }
 
@@ -483,7 +485,7 @@ function PracticeRoom() {
 
         :global(.practice-room__void) {
           z-index: -2;
-          background: var(--surface-page, #fffcfe);
+          background: #faf8f5;
         }
 
         :global(.practice-orb__visual) {
@@ -554,7 +556,7 @@ function PracticeRoom() {
 
 export default function PracticePage() {
   return (
-    <Suspense fallback={<div className="fixed inset-0 bg-[#fffcfe]" />}>
+    <Suspense fallback={<div className="fixed inset-0 bg-[#faf8f5]" />}>
       <PracticeRoom />
     </Suspense>
   );
