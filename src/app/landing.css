@@ -604,6 +604,20 @@
   .lp-hero__actions .lp-btn { width: auto; flex: 1; padding-inline: 12px; font-size: 12.5px; white-space: nowrap; }
 }
 
+/* A 390px phone cannot carry the brand, Plans, language switcher and account
+   action without crushing the final pill. Pricing remains in the page and
+   footer, so keep the primary mobile header calm and single-line. */
+@media (min-width: 361px) and (max-width: 420px) {
+  .lp-nav__inner { gap: 8px; padding-block: 10px; }
+  .lp-brand { gap: 8px; }
+  .lp-brand__mark { width: 32px; height: 32px; border-radius: 10px; font-size: 17px; }
+  .lp-brand__name { font-size: 22px; }
+  .lp-nav__actions { flex: none; gap: 6px; }
+  .lp-nav__link { display: none; }
+  .lp-nav .lang-toggle button { min-width: 34px; padding-inline: 8px; font-size: 11px; }
+  .lp-signin { flex: none; padding-inline: 10px; font-size: 12px; white-space: nowrap; }
+}
+
 @media (max-width: 360px) {
   .lp-nav__inner { gap: 8px; padding-block: 10px; }
   .lp-brand { gap: 8px; }
@@ -1334,6 +1348,44 @@
   }
 }
 
+/* Portrait tablets share the separately art-directed portrait film. Give that
+   film the same calm art-above/card-below composition as phones, with more room
+   to show the final sculpture before the copy begins. */
+@media (min-width: 641px) and (max-width: 1100px) and (orientation: portrait) {
+  .mila-surface--front .lp-hero {
+    min-height: 0;
+    display: flex;
+    padding: clamp(600px, 58svh, 800px) 0 0;
+  }
+  .mila-surface--front .lp-hero::before { display: none; }
+  .mila-surface--front .lp-hero__stage {
+    width: min(calc(100% - 48px), 760px);
+    min-height: 0;
+    padding: 0;
+  }
+  .mila-surface--front .lp-hero__copy {
+    max-width: none;
+    padding: 38px 42px 36px;
+    border: 1px solid #d8e0e3;
+    border-bottom: 0;
+    border-radius: 34px 34px 0 0;
+    background: linear-gradient(155deg,rgba(255,255,255,.985),rgba(241,236,229,.975) 62%,rgba(221,232,227,.965));
+    box-shadow: 0 -22px 60px rgba(38,52,59,.11);
+  }
+  .mila-surface--front .lp-hero h1 {
+    max-width: 680px;
+    font-size: clamp(58px, 8.6vw, 78px);
+  }
+  .mila-surface--front .lp-hero__lede {
+    max-width: 620px;
+    font-size: 16px;
+  }
+  .mila-surface--front .lp-hero__actions {
+    align-items: center;
+    flex-direction: row;
+  }
+}
+
 /* ── Mila conversation rail ────────────────────────────────────────────────
    On the front door the assistant reads as one of the two conversation
    entrances, using the same Electric Paper furniture as the hero. */
@@ -1511,7 +1563,7 @@ html .mila-surface--front .mila-guide .mila-guide__panel {
   .mila-surface--front .lp-hero {
     min-height: 0;
     display: flex;
-    padding: clamp(315px, 47svh, 430px) 0 0;
+    padding: clamp(345px, 52svh, 470px) 0 0;
   }
   .mila-surface--front .lp-hero::before { display: none; }
   .mila-surface--front .lp-hero__stage {

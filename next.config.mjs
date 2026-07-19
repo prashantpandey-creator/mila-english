@@ -28,6 +28,12 @@ const config = {
           { key: 'Referrer-Policy', value: 'no-referrer' },
         ],
       },
+      {
+        source: '/visuals/v7/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
     ];
   },
   async rewrites() {

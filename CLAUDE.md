@@ -51,14 +51,18 @@ service must also be added to the workflow's up/health lists in the same commit.
   faceless mineral-paper voice sculpture in `public/visuals/v6/`, with separate
   desktop/mobile compositions. Carbon/eucalyptus ribbons balance the magenta
   waveform. A matching graphite pair in `public/visuals/v5/` registers the
-  final transition. Six additional art-directed `public/visuals/v6/` story
-  beats show two equal, faceless paper figures arriving from organic and
-  geometric worlds; their voice-lines meet, the boundary dissolves, and the
-  shared ribbons wind continuously into Mila. The silent entrance is 9.6s
-  desktop / 8.4s mobile, runs once per session, exposes a visible bilingual
-  Skip control, and never loops, blocks interaction, or runs under Reduced
-  Motion / Save Data. It borrows no character, portal, shot, or narrative
-  sequence from another work. The prior
+  final transition. The v7 origin film in `public/visuals/v7/` uses 12
+  registered narrative anchors plus curated AI-authored geometric in-betweens:
+  53 landscape drawings and 51 portrait drawings, both held across 141
+  hard-cut exposures at 12 fps. The complete workshop remains versioned. Two equal,
+  faceless paper figures arrive from organic and geometric worlds; their voice
+  lines meet and their shared ribbons wind continuously into Mila. The silent
+  film is 11.75s followed by a 600ms registered graphite-to-mineral release. It
+  runs once per session, exposes a visible bilingual Skip control, and never
+  loops, crossfades drawings, uses optical flow, blocks interaction, or runs
+  under Reduced Motion, Save Data, or a constrained effective network. It
+  borrows no character, portal, shot, or
+  narrative sequence from another work. The prior
   woman portrait remains untouched in `public/visuals/v3/` as backup only. City
   cards crop one connected abstract rhythm strip rather than literal destination
   photography. **Never use faces,

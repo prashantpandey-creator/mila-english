@@ -1,8 +1,11 @@
 // Run: npx tsx src/lib/visualScenes.test.ts
 import assert from 'node:assert';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   MILA_ATELIER,
-  MILA_VOICE_ORIGIN_STORY,
+  MILA_VOICE_ORIGIN_FILM,
   visualScenesForRoute,
 } from './visualScenes';
 
@@ -11,52 +14,129 @@ assert.equal(MILA_ATELIER.stillMobile, '/visuals/v6/mila-mineral-voice-mobile-v1
 assert.equal(MILA_ATELIER.sketchDesktop, '/visuals/v5/mila-graphite-voice-desktop-v1.webp');
 assert.equal(MILA_ATELIER.sketchMobile, '/visuals/v5/mila-graphite-voice-mobile-v1.webp');
 
-assert.deepEqual(
-  MILA_VOICE_ORIGIN_STORY.map((frame) => frame.id),
-  ['quiet', 'apart', 'listen', 'weave', 'fold', 'converge', 'final'],
+assert.equal(
+  MILA_VOICE_ORIGIN_FILM.desktop,
+  '/visuals/v7/mila-origin-film-desktop-v1.mp4',
 );
-assert.equal(MILA_VOICE_ORIGIN_STORY.length, 7);
+assert.equal(
+  MILA_VOICE_ORIGIN_FILM.mobile,
+  '/visuals/v7/mila-origin-film-mobile-v1.mp4',
+);
+assert.equal(
+  MILA_VOICE_ORIGIN_FILM.posterDesktop,
+  '/visuals/v7/mila-origin-poster-desktop-v1.webp',
+);
+assert.equal(
+  MILA_VOICE_ORIGIN_FILM.posterMobile,
+  '/visuals/v7/mila-origin-poster-mobile-v1.webp',
+);
 
-const generatedFrames = MILA_VOICE_ORIGIN_STORY.slice(0, 6);
-for (const frame of generatedFrames) {
-  assert.match(frame.desktop, /^\/visuals\/v6\/.*-desktop-v1\.webp$/);
-  assert.match(frame.mobile, /^\/visuals\/v6\/.*-mobile-v1\.webp$/);
+assert.match(MILA_VOICE_ORIGIN_FILM.desktop, /^\/visuals\/v7\/.*-desktop-v1\.mp4$/);
+assert.match(MILA_VOICE_ORIGIN_FILM.mobile, /^\/visuals\/v7\/.*-mobile-v1\.mp4$/);
+assert.match(MILA_VOICE_ORIGIN_FILM.posterDesktop, /^\/visuals\/v7\/.*-desktop-v1\.webp$/);
+assert.match(MILA_VOICE_ORIGIN_FILM.posterMobile, /^\/visuals\/v7\/.*-mobile-v1\.webp$/);
+
+for (const source of Object.values(MILA_VOICE_ORIGIN_FILM)) {
+  const runtimePath = resolve('public', source.slice(1));
+  assert.ok(existsSync(runtimePath), `${source} must exist in the production public tree`);
+  assert.ok(statSync(runtimePath).size > 100_000, `${source} must not be an empty placeholder`);
 }
 
-assert.deepEqual(
-  generatedFrames.map((frame) => frame.desktop),
+function assertFilm(source: string, width: number, height: number): void {
+  const runtimePath = resolve('public', source.slice(1));
+  const verified = JSON.parse(execFileSync(
+    process.execPath,
+    [
+      resolve('scripts/verify-mila-story-film.mjs'),
+      runtimePath,
+      source,
+      String(width),
+      String(height),
+      '141',
+      '11.75',
+    ],
+    { encoding: 'utf8' },
+  )) as { frames: number; duration: number };
+  assert.equal(verified.frames, 141);
+  assert.equal(verified.duration, 11.75);
+}
+
+assertFilm(MILA_VOICE_ORIGIN_FILM.desktop, 2048, 978);
+assertFilm(MILA_VOICE_ORIGIN_FILM.mobile, 960, 2024);
+
+const continuity = JSON.parse(execFileSync(
+  process.execPath,
+  [resolve('scripts/audit-mila-story-continuity.mjs')],
+  { encoding: 'utf8' },
+)) as Array<{
+  mode: string;
+  registration?: {
+    drawings: number;
+    maxCentroidStepPx: number;
+    maxAreaScaleStepPercent: number;
+    encodedAreaLimit: number;
+    monotonic: Record<string, boolean>;
+  };
+}>;
+const mobileRegistration = continuity.find(({ mode }) => mode === 'mobile')?.registration;
+assert.ok(mobileRegistration, 'checked-in mobile film must expose its registration audit');
+assert.equal(mobileRegistration.drawings, 21);
+assert.ok(Object.values(mobileRegistration.monotonic).every(Boolean));
+assert.ok(mobileRegistration.maxCentroidStepPx <= 8);
+assert.ok(mobileRegistration.maxAreaScaleStepPercent <= mobileRegistration.encodedAreaLimit);
+
+const desktopPulse = JSON.parse(execFileSync(
+  process.execPath,
   [
-    '/visuals/v6/mila-story-00-quiet-desktop-v1.webp',
-    '/visuals/v6/mila-story-01-apart-desktop-v1.webp',
-    '/visuals/v6/mila-story-02-listen-desktop-v1.webp',
-    '/visuals/v6/mila-story-03-weave-desktop-v1.webp',
-    '/visuals/v6/mila-story-04-fold-desktop-v1.webp',
-    '/visuals/v6/mila-story-05-converge-desktop-v1.webp',
+    resolve('scripts/audit-mila-story-desktop-pulse.mjs'),
+    resolve('public/visuals/v7/mila-origin-film-desktop-v1.mp4'),
   ],
-);
+  { encoding: 'utf8' },
+)) as {
+  labels: string[];
+  maxCentroidStepPx: number;
+  maxAreaScaleStepPercent: number;
+  maxCentroidTrajectoryErrorPx: number;
+  maxAreaTrajectoryErrorPercent: number;
+  monotonic: Record<string, boolean>;
+};
+assert.deepEqual(desktopPulse.labels, ['p76', 'p80', 'p825', 'p85', 'p90']);
+assert.ok(Object.values(desktopPulse.monotonic).every(Boolean));
+assert.ok(desktopPulse.maxCentroidStepPx <= 12.5);
+assert.ok(desktopPulse.maxAreaScaleStepPercent <= 0.8);
+assert.ok(desktopPulse.maxCentroidTrajectoryErrorPx <= 1.5);
+assert.ok(desktopPulse.maxAreaTrajectoryErrorPercent <= 0.8);
 
+const portraitRegistrar = readFileSync(resolve('scripts/register-mila-story-mobile.mjs'), 'utf8');
+assert.match(portraitRegistrar, /const PAPER_RAIL_LOCK_PX = 64;/);
+assert.match(portraitRegistrar, /maxPaperRailMad: 0,/);
+assert.match(portraitRegistrar, /maxPaperRailPixelDelta: 0,/);
+assert.match(portraitRegistrar, /maxTaperColumnResidualStep: 1\.45,/);
+
+assert.deepEqual(readdirSync(resolve('public/visuals/v7')).sort(), [
+  'mila-origin-film-desktop-v1.mp4',
+  'mila-origin-film-mobile-v1.mp4',
+  'mila-origin-poster-desktop-v1.webp',
+  'mila-origin-poster-mobile-v1.webp',
+]);
+assert.equal(readdirSync(resolve('artwork/mila-story/v7/keyframes')).length, 24);
+assert.equal(readdirSync(resolve('artwork/mila-story/v7/inbetweens')).length, 82);
 assert.deepEqual(
-  generatedFrames.map((frame) => frame.mobile),
-  [
-    '/visuals/v6/mila-story-00-quiet-mobile-v1.webp',
-    '/visuals/v6/mila-story-01-apart-mobile-v1.webp',
-    '/visuals/v6/mila-story-02-listen-mobile-v1.webp',
-    '/visuals/v6/mila-story-03-weave-mobile-v1.webp',
-    '/visuals/v6/mila-story-04-fold-mobile-v1.webp',
-    '/visuals/v6/mila-story-05-converge-mobile-v1.webp',
-  ],
+  readFileSync(resolve('public/visuals/v7/mila-origin-poster-desktop-v1.webp')),
+  readFileSync(resolve('artwork/mila-story/v7/keyframes/mila-film-00-quiet-desktop-v1.webp')),
 );
-
-const finalFrame = MILA_VOICE_ORIGIN_STORY[6];
-assert.equal(finalFrame.id, 'final');
-assert.equal(finalFrame.desktop, MILA_ATELIER.sketchDesktop);
-assert.equal(finalFrame.mobile, MILA_ATELIER.sketchMobile);
-assert.match(finalFrame.desktop, /^\/visuals\/v5\//);
-assert.match(finalFrame.mobile, /^\/visuals\/v5\//);
-
-assert.equal(new Set(MILA_VOICE_ORIGIN_STORY.map((frame) => frame.id)).size, 7);
-assert.equal(new Set(MILA_VOICE_ORIGIN_STORY.map((frame) => frame.desktop)).size, 7);
-assert.equal(new Set(MILA_VOICE_ORIGIN_STORY.map((frame) => frame.mobile)).size, 7);
+assert.deepEqual(
+  readFileSync(resolve('public/visuals/v7/mila-origin-poster-mobile-v1.webp')),
+  readFileSync(resolve('artwork/mila-story/v7/keyframes/mila-film-00-quiet-mobile-v1.webp')),
+);
+assert.deepEqual(
+  readFileSync(resolve('artwork/mila-story/v7/keyframes/mila-film-11-final-desktop-v1.webp')),
+  readFileSync(resolve('public/visuals/v5/mila-graphite-voice-desktop-v1.webp')),
+);
+assert.deepEqual(
+  readFileSync(resolve('artwork/mila-story/v7/keyframes/mila-film-11-final-mobile-v1.webp')),
+  readFileSync(resolve('public/visuals/v5/mila-graphite-voice-mobile-v1.webp')),
+);
 
 const frontDoor = visualScenesForRoute('/');
 assert.equal(frontDoor.length, 1);
@@ -68,4 +148,4 @@ for (const route of ['/dashboard', '/listen', '/assessment', '/darshan', '/start
   assert.deepEqual(visualScenesForRoute(route), [], `${route} must not load hero media`);
 }
 
-console.log('visual scenes: route-safe mineral hero and seven-frame origin story');
+console.log('visual scenes: route-safe mineral hero and responsive v7 origin film');

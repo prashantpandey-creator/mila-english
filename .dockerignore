@@ -4,3 +4,7 @@ node_modules
 .env
 .env.local
 *.db
+
+# Editable ImageGen renderer masters are versioned in git but never needed by
+# the production image; the two delivery films and posters live in public/.
+artwork/mila-story/
