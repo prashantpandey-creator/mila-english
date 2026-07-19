@@ -52,4 +52,10 @@ jobs:
             docker logs --tail 60 mila-llm 2>&1 | tail -60
             echo "=== mila-voice-llm recent logs ==="
             docker logs --tail 60 mila-voice-llm 2>&1 | tail -60
+            echo "=== mila APP container logs (errors only) ==="
+            docker logs --tail 400 mila 2>&1 | grep -iE 'error|fail|exception|unhandled|throw|quota|429|401|402|rate|provider|prisma|column|no such|ECONN|ENOTFOUND|timeout|abort|refus|invalid|undefined' | tail -70
+            echo "=== mila APP logs (raw tail) ==="
+            docker logs --tail 40 mila 2>&1 | tail -40
+            echo "=== does mila reach its model provider? (env presence, no secrets) ==="
+            docker exec mila sh -lc 'echo OPENAI=${OPENAI_API_KEY:+set} OPENROUTER=${OPENROUTER_API_KEY:+set} OPENAI_CHAT_MODEL=$OPENAI_CHAT_MODEL OPENROUTER_CHAT_MODEL=$OPENROUTER_CHAT_MODEL LOCAL_LLM_URL=$LOCAL_LLM_URL' 2>&1 || true
             echo "=== done (read-only) ==="
