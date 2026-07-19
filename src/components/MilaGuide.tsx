@@ -801,6 +801,11 @@ export default function MilaGuide() {
       >
         <span className="mila-guide__orbit" aria-hidden><i /><i /></span>
         <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
+        <span className="mila-guide__launcher-label" aria-hidden>
+          <strong>{voiceMode ? (lang === 'ru' ? 'Стоп' : 'Stop') : (lang === 'ru' ? 'Говорить' : 'Talk')}</strong>
+          <small>{voiceMode ? status : (lang === 'ru' ? 'с Милой' : 'with Mila')}</small>
+        </span>
+        <span className="mila-guide__launcher-wave" aria-hidden><i /><i /><i /></span>
         <span className="mila-guide__state" aria-hidden />
       </button>
 
@@ -818,6 +823,7 @@ export default function MilaGuide() {
           title={lang === 'ru' ? 'Написать Миле' : 'Type to Mila'}
         >
           <svg viewBox="0 0 24 24" aria-hidden><path d="M5 5.5h14v10H9l-4 3v-13Z" /><path d="M8 9h8M8 12h5" /></svg>
+          <span>{lang === 'ru' ? 'Чат' : 'Chat'}</span>
         </button>
       )}
     </aside>

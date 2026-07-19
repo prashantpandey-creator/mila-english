@@ -1305,6 +1305,177 @@
   }
 }
 
+/* ── Mila conversation rail ────────────────────────────────────────────────
+   On the front door the assistant reads as one of the two conversation
+   entrances, using the same Electric Paper furniture as the hero. */
+.mila-surface--front .mila-guide__panel {
+  width: min(410px, calc(100vw - 28px));
+  height: min(650px, calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  border-radius: 20px 20px 7px 20px !important;
+  box-shadow: 5px 6px 0 rgba(117,0,63,.11), 0 26px 70px rgba(117,0,63,.16) !important;
+}
+html .mila-surface--front .mila-guide .mila-guide__panel {
+  box-shadow: 5px 6px 0 rgba(117,0,63,.11), 0 26px 70px rgba(117,0,63,.16) !important;
+}
+.mila-surface--front .mila-guide__header { min-height: 66px; padding-block: 9px; }
+.mila-surface--front .mila-guide__portrait {
+  width: 44px;
+  height: 44px;
+  flex-basis: 44px;
+  border-radius: 15px 15px 5px 15px !important;
+}
+.mila-surface--front .mila-guide__portrait img { width: 52px; height: 52px; }
+.mila-surface--front .mila-guide__identity strong {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 17px;
+  font-weight: 400;
+}
+.mila-surface--front .mila-guide__identity span,
+.mila-surface--front .mila-guide__page { font-family: var(--font-mono), monospace; }
+.mila-surface--front .mila-guide__messages { gap: 11px; padding: 15px 14px 11px; }
+.mila-surface--front .mila-guide__message { max-width: 90%; }
+.mila-surface--front .mila-guide__message p,
+.mila-surface--front .mila-guide__welcome p { font-size: 13px; line-height: 1.55; }
+.mila-surface--front .mila-guide__welcome,
+.mila-surface--front .mila-guide__message.is-assistant {
+  border-radius: 16px 16px 16px 5px !important;
+  box-shadow: inset 3px 0 0 #d9006c !important;
+}
+.mila-surface--front .mila-guide__message.is-user { border-radius: 16px 16px 5px 16px !important; }
+.mila-surface--front .mila-guide__actions {
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  padding: 9px 12px 8px;
+  border-top: 1px solid #f0c7da;
+  background: #fff4fa;
+}
+.mila-surface--front .mila-guide__actions button {
+  min-height: 36px;
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  background: #ffffff !important;
+}
+.mila-surface--front .mila-guide__composer {
+  min-height: 56px;
+  margin: 8px 12px 12px;
+  background: #ffffff !important;
+}
+
+@media (min-width: 641px) {
+  .mila-surface--front .mila-guide.is-home .mila-guide__panel {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    height: min(650px, calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  }
+  .mila-surface--front .mila-guide.is-home:not(.is-open) {
+    width: 222px;
+    height: 62px;
+  }
+  .mila-surface--front .mila-guide.is-home .mila-guide__launcher {
+    right: 58px;
+    width: 156px;
+    height: 62px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 7px;
+    padding: 5px 11px 5px 5px;
+    overflow: hidden !important;
+    border-radius: 31px 12px 12px 31px !important;
+    box-shadow: 4px 5px 0 rgba(117,0,63,.11), 0 16px 38px rgba(117,0,63,.12) !important;
+  }
+  .mila-surface--front .mila-guide.is-home .mila-guide__launcher:hover {
+    box-shadow: 4px 5px 0 rgba(117,0,63,.14), 0 20px 44px rgba(117,0,63,.16) !important;
+  }
+  html .mila-surface--front .mila-guide[data-state] .mila-guide__launcher {
+    box-shadow: 4px 5px 0 rgba(117,0,63,.11), 0 16px 38px rgba(117,0,63,.12) !important;
+  }
+  .mila-surface--front .mila-guide.is-home .mila-guide__launcher > img {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    filter: none;
+  }
+  .mila-surface--front .mila-guide__launcher-label,
+  .mila-surface--front .mila-guide__launcher-wave { display: flex; }
+  .mila-surface--front .mila-guide__launcher-label strong { color: #26131f; }
+  .mila-surface--front .mila-guide__launcher-label small { color: #65535f; }
+  .mila-surface--front .mila-guide__launcher-wave { color: #d9006c; }
+  .mila-surface--front .mila-guide__state {
+    top: 5px;
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    border-width: 2px;
+  }
+  .mila-surface--front .mila-guide[data-voice="1"] .mila-guide__launcher {
+    right: 0;
+    width: 214px;
+    transform: none !important;
+  }
+  .mila-surface--front .mila-guide.is-home .mila-guide__textchip {
+    right: 0;
+    bottom: 0;
+    width: 50px;
+    height: 62px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 12px 26px 26px 12px !important;
+    box-shadow: 3px 4px 0 rgba(117,0,63,.16) !important;
+  }
+  .mila-surface--front .mila-guide__textchip > span {
+    display: block;
+    font-family: var(--font-mono), monospace;
+    font-size: 8px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .mila-surface--front .mila-guide__nudge { right: 232px; }
+}
+
+@media (max-width: 640px) {
+  .mila-surface--front .mila-guide.is-home .mila-guide__launcher {
+    overflow: hidden !important;
+    border-radius: 18px 18px 6px 18px !important;
+    box-shadow: 3px 4px 0 rgba(117,0,63,.14), 0 14px 30px rgba(117,0,63,.13) !important;
+  }
+  html .mila-surface--front .mila-guide.is-home[data-state] .mila-guide__launcher {
+    box-shadow: 3px 4px 0 rgba(117,0,63,.14), 0 14px 30px rgba(117,0,63,.13) !important;
+  }
+  .mila-surface--front .mila-guide.is-home .mila-guide__textchip {
+    border-radius: 10px 10px 4px 10px !important;
+    box-shadow: 2px 3px 0 rgba(117,0,63,.17) !important;
+  }
+  .mila-surface--front .mila-guide.is-home .mila-guide__nudge {
+    position: fixed;
+    top: calc(94px + env(safe-area-inset-top));
+    right: 70px;
+    bottom: auto;
+    width: min(236px, calc(100vw - 86px));
+    border-radius: 16px 16px 5px 16px !important;
+  }
+  .mila-surface--front .mila-guide.is-home .mila-guide__panel {
+    top: calc(72px + env(safe-area-inset-top));
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: 8px;
+    width: auto;
+    height: auto;
+    max-height: none;
+    border-radius: 18px 18px 6px 18px !important;
+  }
+  .mila-surface--front .mila-guide__header { min-height: 62px; }
+  .mila-surface--front .mila-guide__messages { padding-inline: 12px; }
+  .mila-surface--front .mila-guide__actions { padding-inline: 10px; }
+  .mila-surface--front .mila-guide__composer { margin-inline: 10px; }
+}
+
 @media (max-width: 640px) {
   .mila-surface--front .lp-nav { background: rgba(255, 255, 255, 0.94); }
   .mila-surface--front .lp-brand__tag { display: none; }
