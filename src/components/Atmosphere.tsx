@@ -6,10 +6,10 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { usePathname } from 'next/navigation';
 import AtmosphereStory, {
-  STORY_SESSION_KEY,
+  hasSeenAtmosphereStory,
   type AtmosphereStoryHandle,
 } from '@/components/AtmosphereStory';
-import { MILA_ATELIER, MILA_VOICE_ORIGIN_STORY } from '@/lib/visualScenes';
+import { MILA_ATELIER, MILA_VOICE_ORIGIN_FILM } from '@/lib/visualScenes';
 import { routeSurfaceForPath } from '@/lib/routeSurface';
 
 type MotionMode = 'pending' | 'on' | 'off';
@@ -37,12 +37,23 @@ export default function Atmosphere() {
     const connection = (navigator as Navigator & {
       connection?: {
         saveData?: boolean;
+        effectiveType?: string;
+        downlink?: number;
         addEventListener?: (type: string, callback: () => void) => void;
         removeEventListener?: (type: string, callback: () => void) => void;
       };
     }).connection;
     const sync = () => {
-      const enabled = !query.matches && !connection?.saveData;
+      const reportedDownlink = connection?.downlink;
+      const slowConnection = (
+        ['slow-2g', '2g', '3g'].includes(connection?.effectiveType ?? '')
+        || (
+          typeof reportedDownlink === 'number'
+          && reportedDownlink > 0
+          && reportedDownlink < 4.5
+        )
+      );
+      const enabled = !query.matches && !connection?.saveData && !slowConnection;
       setMotionMode(enabled ? 'on' : 'off');
 
       if (pathname !== '/' || !enabled) {
@@ -51,8 +62,7 @@ export default function Atmosphere() {
       }
 
       const forceReplay = new URLSearchParams(window.location.search).get('replay') === 'rotoscope';
-      let seen = false;
-      try { seen = window.sessionStorage.getItem(STORY_SESSION_KEY) === '1'; } catch { /* privacy mode */ }
+      const seen = hasSeenAtmosphereStory();
       setStoryEligibility(forceReplay || !seen ? 'play' : 'skip');
     };
     sync();
@@ -125,10 +135,15 @@ export default function Atmosphere() {
       >
         <div className="atmosphere__still-stack">
           <picture className="atmosphere__layer atmosphere__layer--electric" key={colorFailed ? 'graphite-fallback' : 'electric'}>
-            {mobileSource && <source media="(max-width: 640px)" srcSet={mobileSource} />}
+            {mobileSource && (
+              <source
+                media="(max-width: 1100px) and (orientation: portrait)"
+                srcSet={mobileSource}
+              />
+            )}
             <img
               ref={imageRef}
-              className={imageReady ? 'is-on' : ''}
+              className={imageReady && storyEligibility !== 'pending' ? 'is-on' : ''}
               style={sceneStyle}
               onLoad={() => setImageReady(true)}
               onError={() => {
@@ -149,7 +164,7 @@ export default function Atmosphere() {
           {playStory && (
             <AtmosphereStory
               ref={storyRef}
-              frames={MILA_VOICE_ORIGIN_STORY}
+              film={MILA_VOICE_ORIGIN_FILM}
               onActiveChange={onStoryActiveChange}
             />
           )}

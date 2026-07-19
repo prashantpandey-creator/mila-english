@@ -69,11 +69,15 @@ without becoming noisy. There is no second route-specific colour story.
   session, two equal faceless paper figures begin inside different visual
   languages: one organic, one geometric. Their separate voice-lines meet, the
   boundary between the worlds dissolves, and the shared folds become Mila's
-  voice sculpture before Mila's mineral colour arrives. The original seven-state
-  silent story is slow (9.6s desktop / 8.4s mobile), runs once, has a visible
-  bilingual Skip control, settles permanently into colour, yields to deliberate
-  page interaction or a meaningful scroll, and is skipped for Reduced Motion or
-  Save Data. It never copies characters, footage,
+  voice sculpture before Mila's mineral colour arrives. The v7 silent film has
+  12 narrative anchors and curated genuine geometric in-betweens: 53 landscape
+  drawings and 51 portrait drawings, both held across 141 stepped exposures at
+  12 fps. The full workshop stays versioned. Its 11.75-second graphite story ends in
+  a 600ms registered colour release. It runs once, has a visible bilingual Skip
+  control, yields to deliberate page interaction or meaningful scroll, and is
+  skipped for Reduced Motion, Save Data, or a constrained effective network. It
+  never dissolves incompatible
+  drawings, applies optical-flow morphing, or copies characters, footage,
   portals, shots, or narrative sequences from another work and never becomes a
   persistent background loop.
 

@@ -12,10 +12,11 @@ export type VisualScene = {
   grade?: VisualSceneGrade;
 };
 
-export type VisualStoryFrame = {
-  id: 'quiet' | 'apart' | 'listen' | 'weave' | 'fold' | 'converge' | 'final';
+export type VisualStoryFilm = {
   desktop: string;
   mobile: string;
+  posterDesktop: string;
+  posterMobile: string;
 };
 
 // Commissioned front-door artwork: a faceless mineral-paper voice sculpture.
@@ -35,47 +36,16 @@ export const MILA_ATELIER: VisualScene = {
 
 // An original, silent entrance story: two equal paper figures arrive from
 // different visual worlds, find a shared voice, and the line they make together
-// becomes Mila. These are deliberately separate desktop and mobile compositions
-// rather than a responsive crop.
-// The final graphite frame is the exact registered pair for the permanent
-// mineral artwork, so the last reveal never jumps.
-export const MILA_VOICE_ORIGIN_STORY: readonly VisualStoryFrame[] = [
-  {
-    id: 'quiet',
-    desktop: '/visuals/v6/mila-story-00-quiet-desktop-v1.webp',
-    mobile: '/visuals/v6/mila-story-00-quiet-mobile-v1.webp',
-  },
-  {
-    id: 'apart',
-    desktop: '/visuals/v6/mila-story-01-apart-desktop-v1.webp',
-    mobile: '/visuals/v6/mila-story-01-apart-mobile-v1.webp',
-  },
-  {
-    id: 'listen',
-    desktop: '/visuals/v6/mila-story-02-listen-desktop-v1.webp',
-    mobile: '/visuals/v6/mila-story-02-listen-mobile-v1.webp',
-  },
-  {
-    id: 'weave',
-    desktop: '/visuals/v6/mila-story-03-weave-desktop-v1.webp',
-    mobile: '/visuals/v6/mila-story-03-weave-mobile-v1.webp',
-  },
-  {
-    id: 'fold',
-    desktop: '/visuals/v6/mila-story-04-fold-desktop-v1.webp',
-    mobile: '/visuals/v6/mila-story-04-fold-mobile-v1.webp',
-  },
-  {
-    id: 'converge',
-    desktop: '/visuals/v6/mila-story-05-converge-desktop-v1.webp',
-    mobile: '/visuals/v6/mila-story-05-converge-mobile-v1.webp',
-  },
-  {
-    id: 'final',
-    desktop: '/visuals/v5/mila-graphite-voice-desktop-v1.webp',
-    mobile: '/visuals/v5/mila-graphite-voice-mobile-v1.webp',
-  },
-] as const;
+// becomes Mila. Landscape and portrait are separately art-directed films, not
+// responsive crops. Landscape contains 53 real drawings and portrait 51
+// curated drawings; both use 141 hard-cut graphite exposures at 12 fps. The
+// final exposure is registered to the permanent mineral artwork beneath it.
+export const MILA_VOICE_ORIGIN_FILM: VisualStoryFilm = {
+  desktop: '/visuals/v7/mila-origin-film-desktop-v1.mp4',
+  mobile: '/visuals/v7/mila-origin-film-mobile-v1.mp4',
+  posterDesktop: '/visuals/v7/mila-origin-poster-desktop-v1.webp',
+  posterMobile: '/visuals/v7/mila-origin-poster-mobile-v1.webp',
+};
 
 export function visualScenesForRoute(path: string): VisualScene[] {
   return path === '/' ? [MILA_ATELIER] : [];
