@@ -66,11 +66,16 @@ without becoming noisy. There is no second route-specific colour story.
   comes from scale, hard shadow, tactile edges, and asymmetrical rhythm—not
   faces, stock travel cards, flags, devices, glass thumbnails, or tech clichés.
 - **Graphite entrance.** On a learner's first homepage view in a browser
-  session, Mila's waveform develops the faceless sculpture from an original
-  graphite drawing into electric material. It runs once, settles permanently
-  into colour, stops immediately on interaction, and is skipped for Reduced
-  Motion or Save Data. It never copies characters, footage, or narrative from
-  another work and never becomes a persistent background loop.
+  session, two equal faceless paper figures begin inside different visual
+  languages: one organic, one geometric. Their separate voice-lines meet, the
+  boundary between the worlds dissolves, and the shared folds become Mila's
+  voice sculpture before Mila's mineral colour arrives. The original seven-state
+  silent story is slow (9.6s desktop / 8.4s mobile), runs once, has a visible
+  bilingual Skip control, settles permanently into colour, yields to deliberate
+  page interaction or a meaningful scroll, and is skipped for Reduced Motion or
+  Save Data. It never copies characters, footage,
+  portals, shots, or narrative sequences from another work and never becomes a
+  persistent background loop.
 
 **Banned:** dusty rose, mauve, per-category rainbow coding, black route
 surfaces, coloured glass, indiscriminate neon glow, gradient orbs/blobs,
