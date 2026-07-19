@@ -8,6 +8,8 @@ import { MilaOrb, type OrbState } from "@/components/voice/MilaOrb";
 import { useI18n } from "@/lib/i18n-provider";
 import { startLocalTranscription, type LocalTranscript, type TranscriptionSession } from "@/lib/localTranscription";
 import { connectRealtimeVoice, type RealtimeVoiceSession } from "@/lib/realtimeVoice";
+import { microphoneErrorMessage, primeMicrophoneAudioContext } from "@/lib/microphone";
+import { ensureGuestSession } from "@/lib/guestSession";
 import { createStreamingTtsSession, spokenLocaleForText, ttsSpeak, type StreamingTtsSession } from "@/lib/tts";
 import { toSpokenText } from "@/lib/spokenText";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
@@ -48,6 +50,7 @@ export default function VoicePage() {
   const engineRef = useRef<"realtime" | "local" | null>(null);
   const speechSessionRef = useRef<Promise<StreamingTtsSession> | null>(null);
   const listeningStartRef = useRef(false);
+  const connectingRef = useRef(false);
   const loadingRef = useRef(false);
   const turnRef = useRef(0);
   const requestTurnRef = useRef<number | null>(null);
@@ -55,7 +58,19 @@ export default function VoicePage() {
   const assistantMessageIdRef = useRef<string | null>(null);
   const restartTimerRef = useRef<number | null>(null);
   const activeRef = useRef(false);
+  const mountedRef = useRef(false);
+  const connectionAttemptRef = useRef(0);
+  const voiceConnectAbortRef = useRef<AbortController | null>(null);
   const startListeningRef = useRef<() => Promise<void>>(async () => {});
+  const guestSessionRef = useRef<Promise<boolean> | null>(null);
+
+  // Seat first-time visitors while they read the invitation. Realtime and its
+  // local fallback then share one unique guest identity instead of placing all
+  // Android Chrome visitors in the same user-agent rate-limit bucket.
+  useEffect(() => {
+    if (!freeMode) return;
+    guestSessionRef.current = ensureGuestSession();
+  }, [freeMode]);
 
   const clearRestartTimer = useCallback(() => {
     if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
@@ -183,7 +198,13 @@ export default function VoicePage() {
   }, [phase]);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
+      connectionAttemptRef.current += 1;
+      voiceConnectAbortRef.current?.abort();
+      voiceConnectAbortRef.current = null;
+      connectingRef.current = false;
       activeRef.current = false;
       turnRef.current += 1;
       requestTurnRef.current = null;
@@ -257,6 +278,19 @@ export default function VoicePage() {
             scheduleListening(turnRef.current, 500);
             return;
           }
+          if (error.message === "auth-required") {
+            activeRef.current = false;
+            setIsConnected(false);
+            setVoiceError(freeMode
+              ? (lang === "ru"
+                  ? "Не удалось запустить бесплатную голосовую сессию. Обнови страницу и попробуй снова."
+                  : "The free voice session could not start. Reload the page and try again.")
+              : (lang === "ru"
+                  ? "Войди в аккаунт, чтобы говорить с Милой голосом."
+                  : "Sign in to talk with Mila by voice."));
+            setPhase("resting");
+            return;
+          }
           setVoiceError(lang === "ru"
             ? "Не удалось распознать речь. Проверь микрофон и попробуй снова."
             : "I could not transcribe that. Check the microphone and try again.");
@@ -272,15 +306,13 @@ export default function VoicePage() {
       console.error("Could not start local voice transcription", error);
       activeRef.current = false;
       setIsConnected(false);
-      setVoiceError(lang === "ru"
-        ? "Нет доступа к микрофону или локальному распознаванию речи."
-        : "Microphone access or local speech recognition is unavailable.");
+      setVoiceError(microphoneErrorMessage(error, lang === "ru" ? "ru" : "en"));
       setPhase("resting");
       throw error;
     } finally {
       listeningStartRef.current = false;
     }
-  }, [lang, scheduleListening, submitTranscript]);
+  }, [freeMode, lang, scheduleListening, submitTranscript]);
 
   useEffect(() => {
     startListeningRef.current = startListening;
@@ -293,10 +325,11 @@ export default function VoicePage() {
    * history. Throws when unreachable so the caller falls back to the local
    * cascade without the learner noticing anything except a slower Mila.
    */
-  const startRealtimeVoice = useCallback(async () => {
+  const startRealtimeVoice = useCallback(async (connectionAttempt: number, signal: AbortSignal) => {
     const session = await connectRealtimeVoice({
       lang: lang === "ru" ? "ru" : "en",
       mode: freeMode ? "companion" : "tutor",
+      signal,
       events: {
         onListening: () => {
           if (!activeRef.current || engineRef.current !== "realtime") return;
@@ -347,6 +380,10 @@ export default function VoicePage() {
         },
       },
     });
+    if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) {
+      session.close();
+      throw new Error("voice-connect-cancelled");
+    }
     realtimeRef.current = session;
     engineRef.current = "realtime";
     activeRef.current = true;
@@ -356,7 +393,12 @@ export default function VoicePage() {
   }, [lang, scheduleListening, freeMode]);
 
   const connectToVoice = async () => {
-    if (isConnecting) return;
+    if (isConnecting || connectingRef.current) return;
+
+    // Must run synchronously inside the tap. If a later permission or network
+    // await consumes Android's transient activation, the shared audio context
+    // remains unlocked for local fallback and automatic following turns.
+    primeMicrophoneAudioContext();
 
     // Flagship realtime session: tap only ever means "interrupt Mila" —
     // turn-taking itself is handled by voice (semantic VAD + barge-in).
@@ -398,32 +440,61 @@ export default function VoicePage() {
       return;
     }
 
+    const connectionAttempt = connectionAttemptRef.current + 1;
+    connectionAttemptRef.current = connectionAttempt;
+    const connectAbort = new AbortController();
+    voiceConnectAbortRef.current?.abort();
+    voiceConnectAbortRef.current = connectAbort;
+    connectingRef.current = true;
     setIsConnecting(true);
+    let freeSessionReady = !freeMode;
     try {
-      // Perfect voice first: OpenAI Realtime wherever it can reach.
-      await startRealtimeVoice();
-      return;
-    } catch (error) {
-      // Region, network, or configuration — the local cascade is the net.
-      console.info("Realtime voice unavailable, using the local voice path", error);
-    } finally {
-      setIsConnecting(false);
-    }
+      if (freeMode) {
+        const seated = await (guestSessionRef.current ?? ensureGuestSession());
+        guestSessionRef.current = seated ? Promise.resolve(true) : null;
+        freeSessionReady = seated;
+        if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) return;
+      }
 
-    setIsConnecting(true);
-    activeRef.current = true;
-    engineRef.current = "local";
-    setIsConnected(true);
-    try {
-      await startListening();
-    } catch {
-      // startListening exposes a useful in-page error and resets the connection.
+      try {
+        // Perfect voice first: OpenAI Realtime wherever it can reach.
+        await startRealtimeVoice(connectionAttempt, connectAbort.signal);
+        return;
+      } catch (error) {
+        // Region, network, or configuration — the local cascade is the net.
+        console.info("Realtime voice unavailable, using the local voice path", error);
+      }
+      if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) return;
+      if (!freeSessionReady) {
+        setVoiceError(lang === "ru"
+          ? "Не удалось запустить бесплатную голосовую сессию. Обнови страницу и попробуй снова."
+          : "The free voice session could not start. Reload the page and try again.");
+        setPhase("resting");
+        return;
+      }
+
+      activeRef.current = true;
+      engineRef.current = "local";
+      setIsConnected(true);
+      try {
+        await startListening();
+      } catch {
+        // startListening exposes a useful in-page error and resets the connection.
+      }
     } finally {
-      setIsConnecting(false);
+      if (voiceConnectAbortRef.current === connectAbort) voiceConnectAbortRef.current = null;
+      if (connectionAttemptRef.current === connectionAttempt) {
+        connectingRef.current = false;
+        if (mountedRef.current) setIsConnecting(false);
+      }
     }
   };
 
   const exit = useCallback(() => {
+    connectionAttemptRef.current += 1;
+    voiceConnectAbortRef.current?.abort();
+    voiceConnectAbortRef.current = null;
+    connectingRef.current = false;
     activeRef.current = false;
     turnRef.current += 1;
     requestTurnRef.current = null;
@@ -438,6 +509,7 @@ export default function VoicePage() {
     engineRef.current = null;
     cancelSpeechSession();
     setIsConnected(false);
+    setIsConnecting(false);
     router.push('/chat');
   }, [cancelSpeechSession, clearRestartTimer, router, stop]);
 

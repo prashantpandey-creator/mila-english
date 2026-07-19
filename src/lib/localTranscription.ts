@@ -1,3 +1,5 @@
+import { createMicrophoneCapture, startMicrophoneRecorder } from './microphone';
+
 export type LocalTranscript = {
   text: string;
   durationSeconds: number;
@@ -59,22 +61,12 @@ export async function startLocalTranscription(args: {
   /** Pause length that triggers a mid-speech partial transcription. 0/undefined disables partials. */
   partialAfterMs?: number;
 } = {}): Promise<TranscriptionSession> {
-  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-    throw new Error('unsupported');
-  }
-
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const recorder = new MediaRecorder(stream);
+  const capture = await createMicrophoneCapture();
+  const { recorder, analyser } = capture;
   const chunks: Blob[] = [];
   recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
   const stopped = new Promise<void>((resolve) => { recorder.onstop = () => resolve(); });
-  recorder.start(250);
-
-  const AudioContextClass: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
-  const audioContext = new AudioContextClass();
-  const analyser = audioContext.createAnalyser();
-  analyser.fftSize = 512;
-  audioContext.createMediaStreamSource(stream).connect(analyser);
+  startMicrophoneRecorder(capture, 250);
   const samples = new Float32Array(analyser.fftSize);
 
   const startedAt = performance.now();
@@ -84,7 +76,10 @@ export async function startLocalTranscription(args: {
   // still leaves room for a natural pause; callers can adapt it per partial
   // transcript (complete sentence → shorter, trailing connector → longer).
   const SILENCE_MS = 1_200;
-  const THRESHOLD = 0.008;
+  // Android handset microphones can expose materially lower Web Audio levels
+  // than desktop microphones. Keep this above common room noise while no
+  // longer classifying a quiet but clear phone voice as silence.
+  const THRESHOLD = 0.004;
   const PARTIAL_MS = args.partialAfterMs && args.partialAfterMs > 0
     ? Math.max(300, args.partialAfterMs)
     : 0;
@@ -99,6 +94,18 @@ export async function startLocalTranscription(args: {
   const result = new Promise<LocalTranscript>((resolve, reject) => {
     resolveResult = resolve;
     rejectResult = reject;
+  });
+  // Auto-stop callers consume errors through onError; manual-stop callers
+  // consume this original promise. Mark it observed without changing either.
+  void result.catch(() => {});
+  capture.onFailure((error) => {
+    if (finalized) return;
+    finalized = true;
+    cancelAnimationFrame(frame);
+    try { if (recorder.state !== 'inactive') recorder.stop(); } catch {}
+    capture.release();
+    rejectResult(error);
+    args.onError?.(error);
   });
 
   // ── Mid-speech partials ────────────────────────────────────────────────────
@@ -133,8 +140,7 @@ export async function startLocalTranscription(args: {
   const cleanup = () => {
     cancelAnimationFrame(frame);
     try { if (recorder.state !== 'inactive') recorder.stop(); } catch {}
-    stream.getTracks().forEach((track) => track.stop());
-    void audioContext.close().catch(() => {});
+    capture.release();
   };
 
   const finish = (): Promise<LocalTranscript> => {
@@ -142,8 +148,7 @@ export async function startLocalTranscription(args: {
     finalized = true;
     cancelAnimationFrame(frame);
     try { if (recorder.state !== 'inactive') recorder.stop(); } catch {}
-    stream.getTracks().forEach((track) => track.stop());
-    void audioContext.close().catch(() => {});
+    capture.release();
     args.onScoring?.();
     void (async () => {
       try {

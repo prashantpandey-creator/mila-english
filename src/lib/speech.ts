@@ -6,6 +6,7 @@
 //   startListening() — record with VAD auto-stop OR manual stop, score server-side.
 
 import { ttsSpeak } from './tts';
+import { createMicrophoneCapture, startMicrophoneRecorder } from './microphone';
 
 export type Accent = { id: string; label: string; flag: string; locale: string; azureVoice: string };
 
@@ -74,23 +75,15 @@ export async function startListening(
   onSilenceDetected?: () => void,
   onAutoError?: (e: Error) => void,
 ): Promise<Session> {
-  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
-
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const rec = new MediaRecorder(stream);
+  const capture = await createMicrophoneCapture();
+  const { recorder: rec, analyser } = capture;
   const chunks: Blob[] = [];
   rec.ondataavailable = (e) => { if (e.data.size) { chunks.push(e.data); chunkCount++; } };
   const recStopped = new Promise<void>((res) => { rec.onstop = () => res(); });
-  rec.start();
-
-  const AC: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
-  const actx = new AC();
-  const analyser = actx.createAnalyser();
-  analyser.fftSize = 512;
-  actx.createMediaStreamSource(stream).connect(analyser);
+  startMicrophoneRecorder(capture);
   const buf = new Float32Array(analyser.fftSize);
 
-  const THRESH = 0.008, SILENCE_MS = 1100, MIN_MS = 500, MAX_MS = 9000;
+  const THRESH = 0.004, SILENCE_MS = 1100, MIN_MS = 500, MAX_MS = 9000;
   const t0 = performance.now();
   // If mic stays silent for the entire MAX_MS, we skip scoring and treat as empty
   let spoke = false, lastVoice = t0, raf = 0;
@@ -101,14 +94,23 @@ export async function startListening(
   let resolveResult!: (a: Assessment) => void;
   let rejectResult!: (e: Error) => void;
   const resultP = new Promise<Assessment>((res, rej) => { resolveResult = res; rejectResult = rej; });
+  void resultP.catch(() => {});
+  capture.onFailure((error) => {
+    if (finalized) return;
+    finalized = true;
+    cancelAnimationFrame(raf);
+    try { if (rec.state !== 'inactive') rec.stop(); } catch { /* no-op */ }
+    capture.release();
+    rejectResult(error);
+    onAutoError?.(error);
+  });
 
   const finalize = (): Promise<Assessment> => {
     if (finalized) return resultP;
     finalized = true;
     cancelAnimationFrame(raf);
-    try { rec.stop(); } catch { /* no-op */ }
-    stream.getTracks().forEach((t) => t.stop());
-    actx.close().catch(() => {});
+    try { if (rec.state !== 'inactive') rec.stop(); } catch { /* no-op */ }
+    capture.release();
     (async () => {
       try {
         await recStopped;
@@ -148,8 +150,7 @@ export async function startListening(
       finalized = true;
       cancelAnimationFrame(raf);
       try { if (rec.state !== 'inactive') rec.stop(); } catch { /* no-op */ }
-      stream.getTracks().forEach((track) => track.stop());
-      actx.close().catch(() => {});
+      capture.release();
       resultP.catch(() => {});
       rejectResult(new Error('cancelled'));
     },
