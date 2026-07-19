@@ -4,9 +4,8 @@
 // A focused, self-contained funnel for PAID traffic — deliberately separate
 // from the flagship cinematic landing at "/". Same brand (Yeseva One + Manrope,
 // Mila rose), direct-response structure. No testimonials yet (a real, consented
-// set can be added later). Prices are owner-approved estimates (2026-07-18),
-// anchored to the "3 cups of coffee a month" framing / RU market — change the
-// `price` field on each plan to update them.
+// set can be added later). The plan cards mirror the real Free + one-time Pro
+// catalog; checkout and provider availability live on the canonical /pricing page.
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -56,7 +55,8 @@ export default function StartPage() {
     return () => controller.abort();
   }, []);
 
-  const start = () => router.push(isLoggedIn ? '/dashboard' : '/register');
+  const start = () => router.push(isLoggedIn ? '/dashboard' : '/register?returnTo=%2Fdashboard');
+  const goPricing = () => router.push('/pricing');
 
   const problems: { icon: Ico; title: string; copy: string }[] = [
     { icon: 'shield', title: T('Языковой барьер', 'The language barrier'), copy: T('Вы боитесь сделать ошибку и выглядеть глупо перед живым преподавателем.', 'You are afraid to make a mistake and look foolish in front of a real teacher.') },
@@ -69,33 +69,32 @@ export default function StartPage() {
     { icon: 'heart', title: T('Полный психологический комфорт', 'Total psychological comfort'), copy: T('Робот не осудит за плохой акцент или забытое слово. Ошибайтесь сколько угодно.', 'The AI never judges a rough accent or a forgotten word. Make as many mistakes as you need.') },
     { icon: 'spark', title: T('Моментальный разбор ошибок', 'Instant feedback on mistakes'), copy: T('ИИ не прерывает вас, а сразу после реплики мягко подсказывает, как сказать естественнее.', 'The AI never interrupts you — the moment you finish, it gently shows you how to say it more naturally.') },
     { icon: 'target', title: T('Подстройка под ваши интересы', 'Built around your interests'), copy: T('Обсуждайте то, что любите: от блокбастеров Marvel и кулинарии до подготовки к собеседованию.', 'Talk about what you love — from Marvel blockbusters and cooking to interview prep.') },
-    { icon: 'ear', title: T('Интерактивное распознавание речи', 'Interactive speech recognition'), copy: T('Система оценивает произношение и помогает звучать как native speaker.', 'It scores your pronunciation and helps you sound like a native speaker.') },
+    { icon: 'ear', title: T('Интерактивное распознавание речи', 'Interactive speech recognition'), copy: T('Система оценивает произношение и показывает один конкретный звук или ритм для следующей практики.', 'It scores your pronunciation and shows one concrete sound or rhythm for your next practice.') },
   ];
 
   const steps: { n: string; title: string; copy: string }[] = [
     { n: '01', title: T('Выберите сценарий', 'Choose a scenario'), copy: T('Реальная ситуация: «В аэропорту», «Презентация продукта», «Разговор в баре» — или свободный диалог.', 'A real-life situation — “At the airport”, “Product presentation”, “Conversation at a bar” — or just free talk.') },
     { n: '02', title: T('Говорите вслух', 'Speak out loud'), copy: T('Нажмите кнопку и общайтесь с ИИ, как по телефону. Он подстраивает сложность речи под ваш уровень.', 'Tap the button and talk to the AI like a phone call. It adjusts its language to your level.') },
-    { n: '03', title: T('Получите отчёт', 'Get your report'), copy: T('После каждой сессии — прогресс, новые слова и топ-3 правил, которые стоит подтянуть.', 'After every session — your progress, new words, and a personal top-3 of grammar points to work on.') },
+    { n: '03', title: T('Продолжайте с понятным шагом', 'Continue with a clear next step'), copy: T('Уровень, прогресс и сохранённые слова помогают выбрать следующую подходящую практику.', 'Your level, progress, and saved words help you choose the right next practice.') },
   ];
 
-  // Prices are owner-approved estimates (see file header). `price` is the number;
-  // the currency + period label is localised below.
-  const plans: { name: string; featured: boolean; price: string; badge?: string; features: string[] }[] = [
+  const plans: { name: string; featured: boolean; price: string; period: string; badge?: string; cta: string; features: string[] }[] = [
     {
-      name: 'START', featured: false, price: '590',
+      name: 'FREE', featured: false, price: '₽0', period: T('навсегда', 'always'), cta: T('Посмотреть бесплатный план', 'See the Free plan'),
       features: [
-        T('15 минут разговоров с ИИ в день', '15 minutes of AI conversation a day'),
-        T('Доступ к 20 базовым сценариям', 'Access to 20 starter scenarios'),
-        T('Базовая статистика ошибок', 'Basic error tracking'),
+        T('Проверка уровня и стартовый план', 'Level check and starter plan'),
+        T('Базовые уроки, слова и грамматика', 'Starter lessons, vocabulary, and grammar'),
+        T('Приватный голосовой путь Mila', 'Mila’s private voice path'),
+        T('Чат и отслеживание прогресса', 'Chat and learning progress'),
       ],
     },
     {
-      name: 'UNLIMITED', featured: true, price: '1490', badge: T('Хит продаж', 'Bestseller'),
+      name: 'MILA PRO', featured: true, price: '₽1 490', period: T('за 30 дней', 'for 30 days'), badge: T('30 дней', '30 days'), cta: T('Посмотреть Mila Pro', 'See Mila Pro'),
       features: [
-        T('Безлимитные разговоры 24/7', 'Unlimited conversation, 24/7'),
-        T('Все сценарии + генерация своих тем', 'Every scenario, plus your own generated topics'),
-        T('Глубокий ИИ-анализ произношения и грамматики', 'In-depth AI analysis of pronunciation and grammar'),
-        T('Доступ в закрытый клуб студентов', 'Access to a private student community'),
+        T('Всё из бесплатного плана', 'Everything in Free'),
+        T('Быстрый живой голос — только с явного согласия', 'Fast live voice—only with explicit consent'),
+        T('Уроки по твоей цели и теме', 'Custom lessons for your goal and topic'),
+        T('Один платёж, без автопродления', 'One payment, no automatic renewal'),
       ],
     },
   ];
@@ -116,8 +115,8 @@ export default function StartPage() {
           </button>
           <div className="ad-nav__actions">
             <LangToggle />
-            <button className="ad-signin" disabled={!authReady} onClick={() => router.push(isLoggedIn ? '/dashboard' : '/login')}>
-              {!authReady ? '•••' : isLoggedIn ? T('Кабинет', 'Dashboard') : T('Войти', 'Sign in')}
+            <button className="ad-signin" disabled={!authReady} onClick={() => router.push(isLoggedIn ? '/account' : '/login?returnTo=%2Faccount')}>
+              {!authReady ? '•••' : isLoggedIn ? T('Аккаунт', 'Account') : T('Войти', 'Sign in')}
             </button>
           </div>
         </div>
@@ -133,8 +132,8 @@ export default function StartPage() {
               ? <>Заговорите по-английски <em>без страха и барьера.</em></>
               : <>Speak English <em>without fear or a barrier.</em></>}</h1>
             <p className="ad-hero__lede">{T(
-              'Персональный ИИ-тренажёр: доступен 24/7, подстраивается под ваш темп и выводит в свободную речь за 2 месяца. Без репетиторов и стыда за ошибки.',
-              'A personal AI trainer — available 24/7, adapts to your pace, and gets you speaking fluently in 2 months. No tutors, no shame in mistakes.',
+              'Персональный ИИ-тренажёр, который подстраивается под ваш темп и помогает регулярно говорить вслух. Без репетитора и стыда за ошибки.',
+              'A personal AI trainer that adapts to your pace and helps you practise speaking regularly. No tutor, no shame in mistakes.',
             )}</p>
             <div className="ad-hero__actions">
               <button className="ad-btn ad-btn--primary" disabled={!authReady} onClick={start}>
@@ -145,7 +144,7 @@ export default function StartPage() {
             <div className="ad-chips" aria-label={T('Условия старта', 'Getting started')}>
               <span><Icon name="check" size={13} />{T('Без карты', 'No card')}</span>
               <span><Icon name="check" size={13} />{T('Без VPN', 'No VPN')}</span>
-              <span><Icon name="lock" size={13} />{T('Голос остаётся у Mila', 'Your voice stays with Mila')}</span>
+              <span><Icon name="lock" size={13} />{T('Приватный голос остаётся у Mila', 'Private voice stays with Mila')}</span>
             </div>
           </div>
         </section>
@@ -175,7 +174,7 @@ export default function StartPage() {
             <div className="ad-head ad-head--center">
               <span className="ad-label">{T('Сила нашего ИИ', 'The power of our AI')}</span>
               <h2>{T('Идеальный собеседник — всегда под рукой', 'Your perfect conversation partner — always within reach')}</h2>
-              <p>{T('Не просто чат-бот, а полноценный ментор, созданный лингвистами и методистами.', 'Not just a chatbot — a full-fledged mentor, built by linguists and learning designers.')}</p>
+              <p>{T('Разговор, произношение и практика в одном спокойном учебном пути.', 'Conversation, pronunciation, and practice in one calm learning path.')}</p>
             </div>
             <div className="ad-grid ad-grid--4">
               {benefits.map((b) => (
@@ -214,7 +213,7 @@ export default function StartPage() {
             <div className="ad-head ad-head--center">
               <span className="ad-label">{T('Тарифы', 'Pricing')}</span>
               <h2>{T('Инвестируйте в свой английский', 'Invest in your English')}</h2>
-              <p>{T('По цене трёх чашек кофе в месяц.', 'For the price of three cups of coffee a month.')}</p>
+              <p>{T('Начните бесплатно. Pro — один прозрачный доступ на 30 дней без автопродления.', 'Start free. Pro is one transparent 30-day pass with no automatic renewal.')}</p>
             </div>
             <div className="ad-plans">
               {plans.map((plan) => (
@@ -223,15 +222,15 @@ export default function StartPage() {
                   <span className="ad-plan__name">{plan.name}</span>
                   <div className="ad-plan__price">
                     <span className="ad-plan__amount">{plan.price}</span>
-                    <small>{T('₽ / мес', '₽ / mo')}</small>
+                    <small>{plan.period}</small>
                   </div>
                   <ul className="ad-plan__features">
                     {plan.features.map((f) => (
                       <li key={f}><Icon name="check" size={15} />{f}</li>
                     ))}
                   </ul>
-                  <button className={`ad-btn ${plan.featured ? 'ad-btn--primary' : 'ad-btn--ghost'} ad-plan__cta`} disabled={!authReady} onClick={start}>
-                    {plan.featured ? T('Начать безлимит', 'Start unlimited') : T('Выбрать тариф', 'Choose this plan')}
+                  <button className={`ad-btn ${plan.featured ? 'ad-btn--primary' : 'ad-btn--ghost'} ad-plan__cta`} onClick={goPricing}>
+                    {plan.cta}
                   </button>
                 </article>
               ))}
@@ -258,6 +257,10 @@ export default function StartPage() {
         <div className="ad-shell ad-foot__inner">
           <span className="ad-brand__mark ad-brand__mark--sm">M</span>
           <span>© {new Date().getFullYear()} Mila</span>
+          <a href="/pricing">{T('Тарифы', 'Plans')}</a>
+          <a href="/terms">{T('Условия', 'Terms')}</a>
+          <a href="/privacy">{T('Конфиденциальность', 'Privacy')}</a>
+          <a href="/refunds">{T('Возвраты', 'Refunds')}</a>
         </div>
       </footer>
     </div>

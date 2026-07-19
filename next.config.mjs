@@ -12,6 +12,24 @@ const PIA_HOST = process.env.PIA_HOST || 'pia.purangpt.com';
 
 const config = {
   images: { unoptimized: true },
+  async headers() {
+    return [
+      {
+        source: '/reset-password',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+        ],
+      },
+      {
+        source: '/verify-email',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

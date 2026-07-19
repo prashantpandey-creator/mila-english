@@ -27,6 +27,7 @@ export default function PiaPage() {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState("");
+  const [showOpenAIConsent, setShowOpenAIConsent] = useState(false);
   const [liveText, setLiveText] = useState("");
   const [answer, setAnswer] = useState("");
   const [invI, setInvI] = useState(0);
@@ -34,6 +35,7 @@ export default function PiaPage() {
 
   const realtimeRef = useRef<RealtimeVoiceSession | null>(null);
   const activeRef = useRef(false);
+  const openAIConsentRef = useRef(false);
 
   // Responsive orb sizing, mirrored from the companion room.
   useEffect(() => {
@@ -62,13 +64,22 @@ export default function PiaPage() {
   useEffect(() => teardown, [teardown]);
 
   const startVoice = useCallback(async () => {
+    if (!openAIConsentRef.current) {
+      setShowOpenAIConsent(true);
+      return;
+    }
     setIsConnecting(true);
     setError("");
     try {
+      // Check entitlement before asking the browser for microphone access.
+      const accountResponse = await fetch('/api/users/me', { cache: 'no-store' });
+      const account = accountResponse.ok ? await accountResponse.json() : null;
+      if (!account?.subscription?.isPaid) throw new Error('VOICE_PAID_FEATURE');
       const session = await connectRealtimeVoice({
         // `lang` is inert server-side — Pia's language is set by her persona.
         lang: "en",
         mode: "pia",
+        openAIAudioConsent: true,
         events: {
           onListening: () => { if (activeRef.current) setPhase("listening"); },
           onUserTranscript: (text) => { if (activeRef.current) setLiveText(text); },
@@ -99,11 +110,19 @@ export default function PiaPage() {
       teardown();
       setIsConnected(false);
       setPhase("resting");
-      setError("Pia abhi aa nahi paa rahi. Ek pal ruk ke orb ko phir chhuo.");
+      setError(e instanceof Error && e.message === "VOICE_PAID_FEATURE"
+        ? "Pia live voice needs an active Mila Pro account."
+        : "Pia abhi aa nahi paa rahi. Ek pal ruk ke orb ko phir chhuo.");
     } finally {
       setIsConnecting(false);
     }
   }, [teardown]);
+
+  const confirmOpenAIConsent = useCallback(() => {
+    openAIConsentRef.current = true;
+    setShowOpenAIConsent(false);
+    void startVoice();
+  }, [startVoice]);
 
   const onOrb = useCallback(() => {
     if (isConnecting) return;
@@ -131,6 +150,41 @@ export default function PiaPage() {
   return (
     <div className="voice-stage fixed inset-0 overflow-hidden" data-phase={phase}>
       <MilaAurora phase={phase} />
+
+      {showOpenAIConsent && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/55 p-5" role="presentation">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pia-openai-consent-title"
+            aria-describedby="pia-openai-consent-description"
+            className="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl"
+          >
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-pink-700">OPTIONAL PRO VOICE</p>
+            <h1 id="pia-openai-consent-title" className="mb-3 text-xl font-semibold">Talk with Pia through OpenAI?</h1>
+            <p id="pia-openai-consent-description" className="mb-6 text-sm leading-6 text-slate-600">
+              Pia’s live Hindi voice sends microphone audio and its transcript to OpenAI for real-time processing. Nothing is sent until you agree. This external live voice requires an active Mila Pro account.
+            </p>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                autoFocus
+                className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-800"
+                onClick={() => setShowOpenAIConsent(false)}
+              >
+                Not now
+              </button>
+              <button
+                type="button"
+                className="rounded-xl bg-pink-700 px-4 py-2.5 text-sm font-semibold text-white"
+                onClick={confirmOpenAIConsent}
+              >
+                I agree — start live
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       <button
         onClick={exit}

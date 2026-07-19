@@ -28,6 +28,7 @@ export type PlanState = {
 /** Features that a paid plan unlocks. Extend as more get gated. */
 export const FEATURES = {
   REALTIME_VOICE: 'realtime_voice',
+  CUSTOM_LESSONS: 'custom_lessons',
 } as const;
 export type Feature = (typeof FEATURES)[keyof typeof FEATURES];
 

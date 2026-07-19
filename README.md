@@ -6,9 +6,101 @@
 
 ```bash
 npm install
+cp .env.local.example .env.local
 npx prisma db push
 npm run dev
 ```
+
+Set a unique `JWT_SECRET` before creating accounts. `APP_URL` may use
+`http://localhost:3000` locally, but production billing, email-verification, and
+password-recovery links must use the public HTTPS origin.
+
+## Accounts and paid access
+
+Mila has two honest access levels:
+
+- **Free** includes the level check, starter plan and lessons, vocabulary and
+  grammar practice, Mila's private voice path, Chat, and learning progress.
+- **Mila Pro — 30 days** costs **1 490 ₽** as a one-time pass. It adds custom
+  lessons and the optional fast live-voice path. It does **not** renew
+  automatically. A learner must convert a guest profile into an account before
+  buying so access and progress are not tied to one browser or device.
+
+The web app uses YooKassa's hosted redirect checkout. Mila creates an immutable
+local order, sends the learner to YooKassa, and grants access only after it
+fetches the payment from YooKassa and verifies the payment ID, amount, currency,
+product, and order metadata. Callback payloads and browser return parameters are
+never treated as proof of payment, and Mila never receives card details.
+
+Paid checkout is deliberately fail-closed. If either YooKassa credential is
+missing, `/pricing` still shows Free and Pro accurately but the purchase button
+says that checkout is opening soon and cannot create an order. Free learning
+continues to work.
+
+### Production setup
+
+1. Complete YooKassa merchant onboarding and use the shop's own test credentials
+   for an end-to-end test before switching to live credentials.
+2. Put these values in the server-side `.env` (never in browser code or Git):
+
+   ```dotenv
+   APP_URL=https://mila.purangpt.com
+   YOOKASSA_SHOP_ID=...
+   YOOKASSA_SECRET_KEY=...
+   # Optional; set only to the VAT code required by the merchant configuration.
+   YOOKASSA_VAT_CODE=...
+   ```
+
+3. In YooKassa, register the HTTPS webhook URL
+   `https://mila.purangpt.com/api/billing/webhooks/yookassa` for
+   `payment.succeeded`, `payment.canceled`, and `refund.succeeded` events.
+4. Configure account-verification and password-recovery delivery with a
+   verified Resend sender:
+
+   ```dotenv
+   RESEND_API_KEY=re_...
+   AUTH_EMAIL_FROM=Mila <support@your-verified-domain.example>
+   ```
+
+5. Production forces `VOICE_REALTIME_PAID_ONLY=true`, and the server independently
+   enforces the same invariant even if an old environment file says otherwise.
+   The self-hosted Mila voice path is the private default; an eligible Pro learner
+   must explicitly choose the external live-voice path before audio is sent to
+   that provider.
+6. Test the complete path with a new registered account: hosted checkout,
+   provider return, webhook delivery, Pro expiry date in Account, a repeated
+   callback, cancellation, and a full refund. A full refund revokes the pass
+   unless another paid pass is still active.
+
+The iOS build remains purchase-free for this launch. Paid access is bought on
+the web and follows the same Mila account; do not add an in-app web purchase
+link or claim iOS in-app purchasing until a StoreKit flow has been reviewed and
+implemented.
+
+### Production database safety
+
+The deploy workflow takes a consistent SQLite snapshot before the replacement
+image can run `prisma db push`. For a running production container it writes
+`/data/backups/mila-<UTC timestamp>.db` inside the `mila_data` volume, runs
+`PRAGMA quick_check` against that snapshot, and aborts without replacing the
+current service if either step fails. A true first deploy has no running
+container and therefore no existing database to snapshot.
+
+After the new snapshot passes `quick_check`, the workflow keeps at most 14
+on-volume backups. It always preserves the snapshot verified for the current
+deploy, then retains the newest timestamped snapshots. Pruning considers only
+regular files whose names exactly match `mila-YYYYMMDDTHHMMSSZ.db` inside
+`/data/backups`, validates every target, and unlinks files individually. An
+unexpected path, filename, link, missing current snapshot, or deletion failure
+aborts before the running service is replaced; no recursive or broad deletion
+is used.
+
+These snapshots protect the additive schema-sync step, but a copy in the same
+Docker volume does not protect against host or volume loss. Operations should
+copy verified snapshots to encrypted off-host storage and apply a documented
+retention policy there. The 14-snapshot on-volume limit is only a bounded deploy
+rollback window and is not a substitute for independently retained off-host
+backups.
 
 The primary voice assessment is self-hosted. One read-aloud phrase is scored by
 `pron-service`, and four spontaneous answers are transcribed by the offline
@@ -124,11 +216,11 @@ environment, webhook, privacy, and quality-benchmark setup.
 ## Architecture
 
 - **Stack:** nextjs
-- **Entities:** User, Lesson, Exercise, Progress, Word, Achievement, Assessment, StudySession, PhonemeStat
-- **Routes:** 29 API endpoints
-- **Pages:** 15 pages
+- **Entities:** User, AccountToken, Payment, PaymentEvent, Lesson, Exercise, Progress, Word, Achievement, Assessment, StudySession, PhonemeStat
+- **Routes:** Next.js API routes for accounts, learning, speech, billing, and support services
+- **Pages:** Public acquisition and legal pages plus authenticated learning, account, and billing flows
 - **Components:** 44 components
-- **Auth:** jwt
+- **Auth:** signed JWT sessions with database-backed revocation
 
 ### Data Model
 - **User** — Learner with category-based personalization
@@ -139,6 +231,9 @@ environment, webhook, privacy, and quality-benchmark setup.
   - nativeLanguage: string (required)
   - level: string
   - joinDate: datetime (required)
+- **AccountToken** — Hashed, expiring, single-use email-verification or password-recovery token
+- **Payment** — Durable hosted-checkout order and verified Pro access period
+- **PaymentEvent** — Idempotent provider callback-processing record
 - **Lesson** — Personalized lesson for specific learner category and skill
   - id: integer (required)
   - title: string (required)
@@ -209,7 +304,16 @@ environment, webhook, privacy, and quality-benchmark setup.
 ### API Routes
 - `POST /api/auth/register` — Register new learner
 - `POST /api/auth/login` — Login
+- `POST /api/auth/send-verification` 🔒 — Send a single-use email-verification link
+- `POST /api/auth/verify-email` — Verify control of a registered email
+- `POST /api/auth/forgot-password` — Send a single-use password-reset link
+- `POST /api/auth/reset-password` — Reset a password and revoke older sessions
 - `GET /api/users/me` 🔒 — Get current user
+- `DELETE /api/users/me` 🔒 — Delete an account and learning data
+- `GET /api/billing/catalog` — Get the public Free/Pro offer and availability
+- `POST /api/billing/checkout` 🔒 — Create a hosted YooKassa checkout
+- `GET /api/billing/status` 🔒 — Reconcile an order and get entitlement
+- `POST /api/billing/webhooks/yookassa` — Reconcile a YooKassa callback
 - `GET /api/lessons` 🔒 — Get personalized lessons
 - `GET /api/lessons/:id` 🔒 — Get lesson with exercises
 - `POST /api/exercises/:id/check` 🔒 — Submit exercise answer

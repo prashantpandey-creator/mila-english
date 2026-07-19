@@ -96,16 +96,28 @@ async function run() {
     };
 
     const cancelled = new AbortController();
-    const pending = connectRealtimeVoice({ lang: 'en', mode: 'companion', events: {}, signal: cancelled.signal });
+    const pending = connectRealtimeVoice({
+      lang: 'en',
+      mode: 'companion',
+      events: {},
+      signal: cancelled.signal,
+      openAIAudioConsent: true,
+    });
     cancelled.abort();
     await assert.rejects(pending, /voice-connect-cancelled/);
     assert.equal(stopped, 1, 'a mic that resolves after cancellation is still stopped');
     assert.equal(FakePeerConnection.instances[0].closed, true);
 
     openDataChannel = true;
-    const session = await connectRealtimeVoice({ lang: 'en', mode: 'companion', events: {} });
+    const session = await connectRealtimeVoice({
+      lang: 'en',
+      mode: 'companion',
+      events: {},
+      openAIAudioConsent: true,
+    });
     const headers = lastRequest?.headers as Record<string, string>;
     assert.match(headers['X-Device-Id'], /^[a-zA-Z0-9-]{16,80}$/);
+    assert.equal(headers['X-Mila-OpenAI-Audio-Consent'], 'v1');
     assert.equal(session.isOpen(), true);
     session.close();
     assert.equal(session.isOpen(), false);

@@ -11,6 +11,10 @@ services:
       - .env
     environment:
       - DATABASE_URL=file:/data/mila.db
+      - APP_URL=${APP_URL:-https://mila.purangpt.com}
+      # Product invariant: external Realtime voice is never a free production
+      # fallback. The application enforces this too; compose makes drift visible.
+      - VOICE_REALTIME_PAID_ONLY=true
       - PRON_URL=http://mila-pron:8000
       - ASR_URL=http://mila-asr:8001
       - TTS_URL=http://mila-tts:8002

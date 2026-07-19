@@ -40,8 +40,8 @@ export async function applySubscriptionUpdate(userId: number, update: Subscripti
       planStatus: update.status ?? 'active',
       planRenewsAt: update.renewsAt ?? null,
       planProvider: update.provider ?? null,
-      planCustomerId: update.customerId ?? undefined,
-      planSubscriptionId: update.subscriptionId ?? undefined,
+      planCustomerId: Object.prototype.hasOwnProperty.call(update, 'customerId') ? update.customerId : undefined,
+      planSubscriptionId: Object.prototype.hasOwnProperty.call(update, 'subscriptionId') ? update.subscriptionId : undefined,
       planUpdatedAt: new Date(),
     },
   });

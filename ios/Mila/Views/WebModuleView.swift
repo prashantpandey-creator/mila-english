@@ -71,17 +71,103 @@ private struct MilaWebView: UIViewRepresentable {
         context.coordinator.observation = view.observe(\.estimatedProgress, options: [.new]) { _, change in
             Task { @MainActor in self.progress = change.newValue ?? 0 }
         }
-        view.load(URLRequest(url: url, cachePolicy: .reloadRevalidatingCacheData))
+        context.coordinator.loadAuthenticatedModule(url, in: view)
         return view
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 
     final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
+        private static let allowedRoutePrefixes = [
+            "/achievements",
+            "/assessment",
+            "/chat",
+            "/darshan",
+            "/dashboard",
+            "/grammar",
+            "/lessons",
+            "/listen",
+            "/phonetics",
+            "/practice",
+            "/privacy",
+            "/progress",
+            "/support",
+            "/terms",
+            "/vocabulary",
+            "/voice-lab",
+        ]
+
         var parent: MilaWebView
         var observation: NSKeyValueObservation?
 
         init(_ parent: MilaWebView) { self.parent = parent }
+
+        /// URLSession and WKWebView intentionally use separate cookie stores on
+        /// iOS. Mila authenticates in URLSession, so copy the current first-party
+        /// session into WebKit before loading a protected learning module. Delete
+        /// any older WebKit token first so sign-out or account switching cannot
+        /// reopen a previous learner's web session.
+        func loadAuthenticatedModule(_ url: URL, in webView: WKWebView) {
+            guard Self.isAllowedModuleURL(url) else {
+                parent.loading = false
+                parent.error = "This page is not available inside the Mila app."
+                return
+            }
+
+            let cookieStore = webView.configuration.websiteDataStore.httpCookieStore
+            let nativeToken = HTTPCookieStorage.shared.cookies(for: MilaAPI.baseURL)?
+                .first(where: { $0.name == "token" && Self.cookieBelongsToMila($0) })
+
+            cookieStore.getAllCookies { cookies in
+                let staleTokens = cookies.filter { $0.name == "token" && Self.cookieBelongsToMila($0) }
+                let deletion = DispatchGroup()
+                for cookie in staleTokens {
+                    deletion.enter()
+                    cookieStore.delete(cookie) { deletion.leave() }
+                }
+
+                deletion.notify(queue: .main) {
+                    guard let nativeToken else {
+                        if Self.isPublicModuleURL(url) {
+                            webView.load(URLRequest(url: url, cachePolicy: .reloadRevalidatingCacheData))
+                        } else {
+                            self.parent.loading = false
+                            self.parent.error = "Your Mila session expired. Close this window and sign in again."
+                        }
+                        return
+                    }
+                    cookieStore.setCookie(nativeToken) {
+                        DispatchQueue.main.async {
+                            webView.load(URLRequest(url: url, cachePolicy: .reloadRevalidatingCacheData))
+                        }
+                    }
+                }
+            }
+        }
+
+        private static func cookieBelongsToMila(_ cookie: HTTPCookie) -> Bool {
+            guard let host = MilaAPI.baseURL.host?.lowercased() else { return false }
+            let domain = cookie.domain.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "."))
+            return domain == host || host.hasSuffix(".\(domain)")
+        }
+
+        private static func isPublicModuleURL(_ url: URL) -> Bool {
+            ["/privacy", "/support", "/terms"].contains(url.path)
+        }
+
+        private static func isAllowedModuleURL(_ url: URL) -> Bool {
+            guard
+                let baseHost = MilaAPI.baseURL.host?.lowercased(),
+                url.host?.lowercased() == baseHost,
+                url.scheme?.lowercased() == MilaAPI.baseURL.scheme?.lowercased(),
+                url.port == MilaAPI.baseURL.port
+            else { return false }
+
+            let path = url.path.isEmpty ? "/" : url.path
+            return allowedRoutePrefixes.contains { prefix in
+                path == prefix || path.hasPrefix("\(prefix)/")
+            }
+        }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
             parent.loading = true
@@ -112,11 +198,16 @@ private struct MilaWebView: UIViewRepresentable {
                 decisionHandler(.cancel)
                 return
             }
-            if target.host == MilaAPI.baseURL.host || target.scheme == "about" {
+            if target.scheme == "about" || Self.isAllowedModuleURL(target) {
                 decisionHandler(.allow)
-            } else {
+            } else if target.scheme == "mailto" {
                 decisionHandler(.cancel)
                 Task { @MainActor in UIApplication.shared.open(target) }
+            } else {
+                decisionHandler(.cancel)
+                // Native Mila intentionally contains no route to web checkout,
+                // account acquisition, or an external purchase page. Authentication
+                // and account management stay in the native Account sheet.
             }
         }
 

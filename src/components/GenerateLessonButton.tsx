@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n-provider';
 import MilaIcon from '@/components/ui/MilaIcon';
@@ -12,24 +12,36 @@ export default function GenerateLessonButton() {
   const { lang } = useI18n();
   const [topic, setTopic] = useState('');
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState(false);
+  const [err, setErr] = useState<'generic' | 'pro' | null>(null);
+  const [accessChecked, setAccessChecked] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    fetch('/api/users/me', { cache: 'no-store' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((user) => {
+        if (user && !user.subscription?.isPaid) setErr('pro');
+      })
+      .catch(() => null)
+      .finally(() => setAccessChecked(true));
+  }, []);
 
   const handleGenerate = async () => {
     if (!topic.trim() || loading) return;
-    setLoading(true); setErr(false);
+    setLoading(true); setErr(null);
     try {
       const res = await fetch('/api/lessons/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic }),
       });
-      const d = res.ok ? await res.json() : null;
+      const d = await res.json().catch(() => null);
       if (d?.lessonId) {
         setTopic('');
         router.push(`/lessons/ai-${d.lessonId}`);
-      } else setErr(true);
-    } catch { setErr(true); }
+      } else if (res.status === 402 && d?.code === 'PRO_REQUIRED') setErr('pro');
+      else setErr('generic');
+    } catch { setErr('generic'); }
     finally { setLoading(false); }
   };
 
@@ -37,8 +49,18 @@ export default function GenerateLessonButton() {
     <div className="lesson-generator">
       <div className="lesson-generator__label">
         <MilaIcon name="sparkle" size={15}/>
-        <span>{lang==='ru'?'Урок по твоему запросу':'Made for your moment'}</span>
+        <span>{lang==='ru'?'Урок по твоему запросу · PRO':'Made for your moment · PRO'}</span>
       </div>
+      {accessChecked && err === 'pro' ? (
+        <Card className="lesson-generator__upgrade" padding="0">
+          <span className="lesson-generator__upgrade-icon"><MilaIcon name="lock" size={20}/></span>
+          <span>
+            <strong>{lang === 'ru' ? 'Личные уроки входят в Mila Pro' : 'Custom lessons are part of Mila Pro'}</strong>
+            <small>{lang === 'ru' ? 'Один доступ на 30 дней, без автопродления.' : 'One 30-day pass, with no automatic renewal.'}</small>
+          </span>
+          <button type="button" onClick={() => router.push('/pricing')}>{lang === 'ru' ? 'Посмотреть Pro' : 'See Mila Pro'}<MilaIcon name="arrow" size={16}/></button>
+        </Card>
+      ) : (
       <Card className="lesson-generator__control" padding="0">
         <input
           type="text"
@@ -56,7 +78,8 @@ export default function GenerateLessonButton() {
           <MilaIcon name="sparkle" size={16}/>{loading ? (lang==='ru'?'Мила пишет…':'Mila is writing…') : (lang==='ru'?'Создать урок':'Commission it')}
         </button>
       </Card>
-      {err && (
+      )}
+      {err === 'generic' && (
         <div className="product-feedback is-error">
           {lang==='ru'?'Не получилось — попробуй ещё раз.':'Something failed — try once more.'}
         </div>

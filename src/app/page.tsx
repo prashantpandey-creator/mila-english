@@ -130,10 +130,11 @@ export default function HomePage() {
     }
   };
 
-  const startCta = () => router.push(isLoggedIn ? '/dashboard' : '/register');
+  const authHref = (route: '/login' | '/register', returnTo: string) => `${route}?returnTo=${encodeURIComponent(returnTo)}`;
+  const startCta = () => router.push(isLoggedIn ? '/dashboard' : authHref('/register', '/dashboard'));
   // The free front-door conversation: guest-open, playful companion Mila. No wall.
   const startFreeTalk = () => router.push('/darshan?free=1');
-  const openDoor = (href: string) => router.push(isLoggedIn ? href : '/register');
+  const openDoor = (href: string) => router.push(isLoggedIn ? href : authHref('/register', href));
 
   const selectDemo = (key: DemoKey) => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -224,12 +225,12 @@ export default function HomePage() {
     {
       icon: 'home' as IconName,
       title: T('Работает в России', 'Works in Russia'),
-      copy: T('Распознавание речи, оценка произношения и наставница живут на собственных серверах Mila — не у сторонних AI-провайдеров. Поэтому VPN не нужен.', 'Speech recognition, pronunciation scoring, and the mentor live on Mila’s own servers — not with third-party AI providers. That is why no VPN is needed.'),
+      copy: T('В стандартном приватном режиме распознавание речи, оценка произношения и наставница работают на собственных серверах Mila. Поэтому для этого пути VPN не нужен.', 'In the standard Private mode, speech recognition, pronunciation scoring, and the mentor run on Mila’s own servers. That path does not need a VPN.'),
     },
     {
       icon: 'shield' as IconName,
       title: T('Приватно по построению', 'Private by construction'),
-      copy: T('Запись обрабатывается на серверах Mila для оценки и удаляется после запроса. Твой голос не передаётся большим AI-компаниям.', 'Recordings are processed on Mila’s servers for scoring and deleted after the request. Your voice is not handed to big AI companies.'),
+      copy: T('В приватном режиме запись обрабатывается на серверах Mila и удаляется после запроса. Необязательные живые режимы заранее объясняют передачу аудио и текста в OpenAI и запускаются только после твоего согласия.', 'In Private mode, recordings are processed on Mila’s servers and deleted after the request. Optional live modes explain the OpenAI audio and transcript transfer first and start only with your consent.'),
     },
     {
       icon: 'phone' as IconName,
@@ -253,7 +254,7 @@ export default function HomePage() {
     },
     {
       q: T('Что происходит с моими записями?', 'What happens to my recordings?'),
-      a: T('Они обрабатываются на серверах Mila только для оценки и удаляются после запроса. Необязательный режим живого AI-интервью использует внешнего провайдера и доступен только в поддерживаемых регионах — по твоему выбору.', 'They are processed on Mila’s servers only for scoring and deleted after the request. The optional live AI-interview mode uses an external provider and is available only in supported regions — your choice.'),
+      a: T('В приватном режиме они обрабатываются на серверах Mila для оценки и удаляются после запроса. Необязательное живое AI-собеседование и быстрый голос Pro отправляют аудио и расшифровку в OpenAI только после отдельного явного согласия.', 'In Private mode, they are processed on Mila’s servers for scoring and deleted after the request. The optional live AI assessment and Pro Fast voice send audio and transcripts to OpenAI only after separate, explicit consent.'),
     },
     {
       q: T('Можно ли поставить Mila на телефон?', 'Can I install Mila on my phone?'),
@@ -273,9 +274,10 @@ export default function HomePage() {
             <span className="lp-brand__tag">{T('английский, который слышит', 'English that listens back')}</span>
           </button>
           <div className="lp-nav__actions">
+            <a className="lp-nav__link" href="/pricing">{T('Тарифы', 'Plans')}</a>
             <LangToggle />
-            <button className="lp-signin" disabled={!authReady} aria-busy={!authReady} onClick={() => router.push(isLoggedIn ? '/dashboard' : '/login')}>
-              {!authReady ? '•••' : isLoggedIn ? T('Кабинет', 'Dashboard') : T('Войти', 'Sign in')}
+            <button className="lp-signin" disabled={!authReady} aria-busy={!authReady} onClick={() => router.push(isLoggedIn ? '/account' : authHref('/login', '/account'))}>
+              {!authReady ? '•••' : isLoggedIn ? T('Аккаунт', 'Account') : T('Войти', 'Sign in')}
             </button>
           </div>
         </nav>
@@ -590,10 +592,14 @@ export default function HomePage() {
             <span className="lp-brand__mark">M</span>
             <span><strong>Mila</strong><small>{T('Персональный английский', 'Personal English practice')}</small></span>
           </div>
-          <div className="lp-footer__links">
-            <button type="button" onClick={() => router.push('/support')}>{T('Сообщить об ошибке', 'Report a bug')}</button>
-            <span>© {new Date().getFullYear()} Mila</span>
-          </div>
+          <nav className="lp-footer__links" aria-label={T('Ссылки продукта', 'Product links')}>
+            <a href="/pricing">{T('Тарифы', 'Plans')}</a>
+            <a href="/support">{T('Поддержка и ошибки', 'Support & bug reports')}</a>
+            <a href="/terms">{T('Условия', 'Terms')}</a>
+            <a href="/privacy">{T('Конфиденциальность', 'Privacy')}</a>
+            <a href="/refunds">{T('Возвраты', 'Refunds')}</a>
+          </nav>
+          <span>© {new Date().getFullYear()} Mila</span>
         </div>
       </footer>
 

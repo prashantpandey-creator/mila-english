@@ -7,14 +7,15 @@ import { z } from 'zod'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await authenticate(request)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const wordId = parseInt(params.id)
+  const { id } = await params
+  const wordId = parseInt(id)
 
   const word = await prisma.word.findUnique({
     where: { id: wordId }

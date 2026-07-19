@@ -1,10 +1,11 @@
 // @ts-nocheck
 'use client';
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import LangToggle from '@/components/LangToggle';
 import { useI18n } from '@/lib/i18n-provider';
+import { safeReturnTo } from '@/lib/navigation';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -25,15 +26,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [returnTo, setReturnTo] = useState('/dashboard');
+
+  useEffect(() => {
+    setReturnTo(safeReturnTo(new URLSearchParams(window.location.search).get('returnTo')));
+  }, []);
+
+  const messageFor = (code?: string, fallback?: string) => {
+    if (code === 'INVALID_CREDENTIALS') return lang === 'ru' ? 'Неверный email или пароль.' : 'That email or password is not correct.';
+    if (code === 'INVALID_INPUT') return lang === 'ru' ? 'Проверь email и пароль.' : 'Check your email and password.';
+    if (code === 'RATE_LIMITED') return lang === 'ru' ? 'Слишком много попыток. Попробуй позже.' : 'Too many attempts. Please try again later.';
+    return fallback || t('error_try_again');
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true); setError('');
     try {
       const res = await fetch('/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
-      if (!res.ok) throw new Error('');
-      router.push('/dashboard');
+      const body = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(messageFor(body?.code, body?.error));
+      router.push(returnTo);
       router.refresh();
-    } catch { setError(t('error_try_again')); }
+    } catch (nextError) { setError(nextError instanceof Error && nextError.message ? nextError.message : t('error_try_again')); }
     finally { setLoading(false); }
   };
 
@@ -41,11 +55,12 @@ export default function LoginPage() {
     setLoading(true); setError('');
     try {
       const res = await fetch('/api/auth/guest', { method: 'POST' });
-      if (!res.ok) throw new Error('');
-      router.push('/dashboard');
+      const body = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(messageFor(body?.code, body?.error));
+      router.push(returnTo);
       router.refresh();
-    } catch {
-      setError(t('error_try_again'));
+    } catch (nextError) {
+      setError(nextError instanceof Error && nextError.message ? nextError.message : t('error_try_again'));
     } finally {
       setLoading(false);
     }
@@ -74,12 +89,13 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="welcome-auth__form">
             {error && <div className="welcome-auth__error" role="alert">{error}</div>}
             <div className="welcome-auth__field">
-              <label className="welcome-auth__label">{t('login_email')}</label>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} className="welcome-auth__input" placeholder="anna@example.com" required />
+              <label className="welcome-auth__label" htmlFor="login-email">{t('login_email')}</label>
+              <input id="login-email" name="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} className="welcome-auth__input" placeholder="anna@example.com" autoComplete="email" maxLength={254} required />
             </div>
             <div className="welcome-auth__field">
-              <label className="welcome-auth__label">{t('login_password')}</label>
-              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} className="welcome-auth__input" placeholder="••••••••" required />
+              <label className="welcome-auth__label" htmlFor="login-password">{t('login_password')}</label>
+              <input id="login-password" name="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="welcome-auth__input" placeholder="••••••••" autoComplete="current-password" maxLength={128} required />
+              <a href="/forgot-password" className="welcome-auth__field-link">{lang === 'ru' ? 'Забыли пароль?' : 'Forgot password?'}</a>
             </div>
             <button type="submit" disabled={loading} className="welcome-auth__button welcome-auth__button--primary">{loading ? '...' : t('login_btn')}</button>
             <div className="welcome-auth__separator">{lang==='ru'?'или':'or'}</div>
@@ -89,8 +105,9 @@ export default function LoginPage() {
             </button>
           </form>
           <p className="welcome-auth__footer">
-            {t('login_no_account')} <a href="/register" className="welcome-auth__link">{t('login_create')}</a>
+            {t('login_no_account')} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="welcome-auth__link">{t('login_create')}</a>
           </p>
+          <p className="welcome-auth__legal"><a href="/terms">{lang === 'ru' ? 'Условия' : 'Terms'}</a><span>·</span><a href="/privacy">{lang === 'ru' ? 'Конфиденциальность' : 'Privacy'}</a></p>
         </div>
       </main>
       <style jsx>{`
@@ -226,6 +243,8 @@ export default function LoginPage() {
         .welcome-auth__form { display: flex; flex-direction: column; gap: 1rem; }
         .welcome-auth__field { display: grid; gap: .45rem; }
         .welcome-auth__label { color: var(--auth-ink); font-size: .86rem; font-weight: 700; }
+        .welcome-auth__field-link { justify-self: end; color: var(--auth-pink-deep); font-size: .78rem; font-weight: 700; text-decoration: none; }
+        .welcome-auth__field-link:hover { text-decoration: underline; text-underline-offset: 3px; }
         .welcome-auth__input {
           width: 100%;
           min-height: 3.15rem;
@@ -298,6 +317,9 @@ export default function LoginPage() {
         .welcome-auth__separator::before,
         .welcome-auth__separator::after { content: ''; height: 1px; flex: 1; background: rgba(217,0,108, .14); }
         .welcome-auth__footer { margin: 1.5rem 0 0; color: var(--auth-muted); font-size: .88rem; line-height: 1.5; text-align: center; }
+        .welcome-auth__legal { display: flex; justify-content: center; gap: .55rem; margin: .75rem 0 0; color: var(--auth-muted); font-size: .72rem; }
+        .welcome-auth__legal a { color: inherit; text-decoration: none; }
+        .welcome-auth__legal a:hover { color: var(--auth-pink-deep); text-decoration: underline; text-underline-offset: 3px; }
         .welcome-auth__link { color: var(--auth-pink-deep); font-weight: 750; text-decoration: none; }
         .welcome-auth__link:hover { text-decoration: underline; text-underline-offset: 3px; }
         @media (max-width: 480px) {

@@ -14,6 +14,8 @@ type Learner = {
   name?: string;
   streakDays?: number;
   level?: string;
+  isGuest?: boolean;
+  subscription?: { plan: 'free' | 'pro'; isPaid: boolean; status: string; renewsAt: string | null };
 };
 
 type Progress = {
@@ -28,6 +30,8 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<Learner | null>(null);
   const [stats, setStats] = useState<Progress | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
+  const [logoutError, setLogoutError] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -47,19 +51,24 @@ export default function DashboardPage() {
   };
 
   const handleLogout = async () => {
+    setSigningOut(true);
+    setLogoutError('');
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      const response = await fetch('/api/auth/logout', { method: 'POST' });
+      if (!response.ok) throw new Error('logout failed');
+      router.push('/');
+      router.refresh();
     } catch {
-      // The public front door is still the safe destination if logout fails.
+      setLogoutError(lang === 'ru' ? 'Не удалось выйти. Проверь соединение и попробуй ещё раз.' : 'Could not sign out. Check your connection and try again.');
+      setSigningOut(false);
     }
-    router.push('/');
-    router.refresh();
   };
 
   if (!mounted) return null;
 
   const firstNameCandidate = user?.name?.trim().split(/\s+/)[0];
   const firstName = firstNameCandidate && !/^(?:guest|гость)$/iu.test(firstNameCandidate) ? firstNameCandidate : '';
+  const isPro = !!user?.subscription?.isPaid;
   const practiceRoutes: Array<{
     icon: MilaIconName;
     labelEn: string;
@@ -111,14 +120,19 @@ export default function DashboardPage() {
           <>
             <LangToggle />
             <ThemeToggle />
-            <button className="welcome-toolbar__quiet dashboard-toolbar__signout" onClick={handleLogout} type="button">
-              {lang === 'ru' ? 'Выйти' : 'Sign out'}
+            <button className="welcome-toolbar__quiet dashboard-toolbar__account" onClick={() => router.push('/account')} type="button">
+              <span>{!user ? '···' : isPro ? 'PRO' : 'FREE'}</span>
+              {lang === 'ru' ? 'Аккаунт' : 'Account'}
+            </button>
+            <button className="welcome-toolbar__quiet dashboard-toolbar__signout" onClick={handleLogout} type="button" disabled={signingOut}>
+              {signingOut ? (lang === 'ru' ? 'Выходим…' : 'Signing out…') : (lang === 'ru' ? 'Выйти' : 'Sign out')}
             </button>
           </>
         )}
       />
 
       <AppMain width="wide" className="dashboard-page__main dashboard-conversation__main">
+        {logoutError ? <p className="product-status" role="alert">{logoutError}</p> : null}
         <div className="dashboard-intro">
           <p>
             {greeting()}{firstName ? `, ${firstName}` : ''}

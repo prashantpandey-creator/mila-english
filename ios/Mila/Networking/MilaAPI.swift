@@ -71,11 +71,20 @@ actor MilaAPI {
                 "name": name,
                 "email": email,
                 "password": password,
-                "learnerCategory": "adult_beginner",
+                "learnerCategory": "adult_learner",
                 "nativeLanguage": "ru",
                 "level": "pending",
             ]
         )
+    }
+
+    func requestPasswordReset(email: String) async throws {
+        let (data, response) = try await dataRequest(
+            path: "/api/auth/forgot-password",
+            method: "POST",
+            body: ["email": email]
+        )
+        try validate(response: response, data: data)
     }
 
     func logout() async throws {

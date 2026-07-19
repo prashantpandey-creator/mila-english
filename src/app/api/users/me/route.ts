@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { authenticate } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { resolvePlan, isPaid } from '@/lib/subscription'
+import { publicUser } from '@/lib/publicUser'
 
 export async function GET(request: NextRequest) {
   const user = await authenticate(request)
@@ -20,17 +21,28 @@ export async function GET(request: NextRequest) {
       streakDays: true,
       learnerProfile: true,
       learnerProfileAt: true,
+      accountType: true,
+      emailVerifiedAt: true,
       plan: true,
       planStatus: true,
       planRenewsAt: true,
     },
   })
   if (!profile) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  // Surface a resolved subscription block the UI can trust (raw fields kept too).
+  // Surface only the learner-safe account contract plus resolved entitlement.
+  // Provider/customer identifiers never belong in a browser response.
   const state = resolvePlan(profile)
   return NextResponse.json({
-    ...profile,
-    subscription: { plan: state.plan, active: state.active, isPaid: isPaid(state), renewsAt: state.renewsAt },
+    ...publicUser(profile),
+    learnerProfile: profile.learnerProfile,
+    learnerProfileAt: profile.learnerProfileAt,
+    subscription: {
+      plan: state.plan,
+      status: state.status,
+      active: state.active,
+      isPaid: isPaid(state),
+      renewsAt: state.renewsAt,
+    },
   })
 }
 
@@ -47,6 +59,13 @@ export async function DELETE(request: NextRequest) {
   }
 
   await prisma.$transaction(async (tx) => {
+    // A 30-day pass never auto-renews, so there is no remote subscription to
+    // cancel. Abandon unpaid checkout attempts; paid financial records are
+    // retained without the learner relation for accounting/reconciliation.
+    await tx.payment.updateMany({
+      where: { userId, status: { in: ['created', 'pending'] } },
+      data: { status: 'abandoned' },
+    })
     await tx.companionMessage.deleteMany({ where: { Thread: { userId } } })
     await tx.companionThread.deleteMany({ where: { userId } })
     await tx.companionMemory.deleteMany({ where: { userId } })

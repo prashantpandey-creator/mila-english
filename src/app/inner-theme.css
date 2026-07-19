@@ -234,6 +234,22 @@ html[data-mila-app="app"] .atmosphere { display: none; }
   font-size: .76rem;
   font-weight: 650;
 }
+.mila-surface--app .dashboard-toolbar__account {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px !important;
+  font-size: .76rem;
+  font-weight: 700;
+}
+.mila-surface--app .dashboard-toolbar__account span {
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: var(--mila-action-ink);
+  background: var(--mila-action);
+  font-size: .58rem;
+  letter-spacing: .08em;
+}
 .mila-surface--app .dashboard-intro {
   display: flex;
   align-items: center;
@@ -1313,6 +1329,20 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
 .mila-surface--app .lesson-generator__input { min-width: 0; min-height: 46px; padding: 0 13px; outline: none; font-size: 13px; }
 .mila-surface--app .lesson-generator__button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 17px; font-size: 12px; font-weight: 750; cursor: pointer; }
 .mila-surface--app .lesson-generator__button:disabled { cursor: default; opacity: .42; }
+.mila-surface--app .lesson-generator__upgrade {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px !important;
+  border-color: var(--mila-line-strong) !important;
+  background: var(--mila-raised) !important;
+}
+.mila-surface--app .lesson-generator__upgrade-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; color: var(--mila-measure); background: var(--mila-panel); }
+.mila-surface--app .lesson-generator__upgrade strong, .mila-surface--app .lesson-generator__upgrade small { display: block; }
+.mila-surface--app .lesson-generator__upgrade strong { color: var(--mila-ink); font-size: .84rem; }
+.mila-surface--app .lesson-generator__upgrade small { margin-top: 4px; color: var(--mila-muted); font-size: .72rem; }
+.mila-surface--app .lesson-generator__upgrade button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 14px; border: 1px solid var(--mila-action); border-radius: 999px; color: var(--mila-action-ink); background: var(--mila-action); font: inherit; font-size: .72rem; font-weight: 800; cursor: pointer; }
 .mila-surface--app .category-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
 .mila-surface--app .category-filter__button { min-height: 38px; padding: 0 13px; font-size: 12px; font-weight: 650; cursor: pointer; }
 .mila-surface--app .lesson-stack { display: grid; gap: 8px; }
@@ -1483,6 +1513,8 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
   .mila-surface--app .product-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .mila-surface--app .lesson-generator__control { grid-template-columns: 1fr; }
   .mila-surface--app .lesson-generator__button { min-height: 44px; }
+  .mila-surface--app .lesson-generator__upgrade { grid-template-columns: auto minmax(0, 1fr); }
+  .mila-surface--app .lesson-generator__upgrade button { grid-column: 1 / -1; width: 100%; }
   .mila-surface--app .category-filter { flex-wrap: nowrap; margin-right: -14px; padding-right: 14px; overflow-x: auto; scrollbar-width: none; }
   .mila-surface--app .category-filter::-webkit-scrollbar { display: none; }
   .mila-surface--app .lesson-card { grid-template-columns: 40px minmax(0, 1fr) 18px; gap: 11px; padding: 13px 12px !important; }
