@@ -590,7 +590,10 @@ export default function HomePage() {
             <span className="lp-brand__mark">M</span>
             <span><strong>Mila</strong><small>{T('Персональный английский', 'Personal English practice')}</small></span>
           </div>
-          <span>© {new Date().getFullYear()} Mila</span>
+          <div className="lp-footer__links">
+            <button type="button" onClick={() => router.push('/support')}>{T('Сообщить об ошибке', 'Report a bug')}</button>
+            <span>© {new Date().getFullYear()} Mila</span>
+          </div>
         </div>
       </footer>
 

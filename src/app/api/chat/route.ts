@@ -29,6 +29,8 @@ import { readLearnerProfile } from '@/lib/learnerProfile';
 import { personaBlock, type PersonaId } from '@/lib/personas';
 import { prisma } from '@/lib/prisma';
 import { builtinLessonContent, getBuiltinLesson } from '@/lib/builtinLessons';
+import { bugReportSchema, parseBugReportRequest } from '@/lib/bugReport';
+import { reserveBugReportDelivery, sendBugReportEmail } from '@/lib/sendBugReportEmail';
 
 export const maxDuration = 60;
 
@@ -225,6 +227,46 @@ export async function POST(request: NextRequest) {
   // Speculative voice drafts run against partial transcripts: they must never
   // persist a turn or execute a memory command heard mid-sentence.
   const speculative = surfaceKind === 'voice' && payload?.context?.speculative === true;
+
+  const bugReportDescription = parseBugReportRequest(latestUserMessage);
+  if (bugReportDescription !== null && speculative) {
+    return dataStreamText('', 'speculative-skip');
+  }
+  if (bugReportDescription !== null) {
+    let reply: string;
+    if (!bugReportDescription) {
+      reply = locale === 'ru'
+        ? 'Опиши, что сломалось, одной фразой: «Сообщи об ошибке: …». Или открой раздел «Поддержка», чтобы добавить шаги и данные устройства.'
+        : 'Tell me what broke in one line: “Report this bug: …”. Or open Support to add steps and device details.';
+    } else if (!reserveBugReportDelivery(`chat-user:${userId}`)) {
+      reply = locale === 'ru'
+        ? 'За последний час уже отправлено несколько отчётов. Открой «Поддержка», чтобы подготовить письмо вручную.'
+        : 'Several reports were already sent this hour. Open Support to prepare an email manually.';
+    } else {
+      const report = bugReportSchema.parse({
+        area: `Mila ${pathname}`,
+        description: bugReportDescription,
+        diagnostics: {
+          page: pathname,
+          userAgent: request.headers.get('user-agent') || '',
+          language: locale,
+        },
+      });
+      const delivery = await sendBugReportEmail(report, {
+        receivedAt: new Date().toISOString(),
+        requestUserAgent: request.headers.get('user-agent') || undefined,
+      });
+      reply = delivery.sent
+        ? (locale === 'ru'
+            ? 'Готово — я отправила отчёт владельцу Mila по электронной почте.'
+            : 'Done — I emailed the bug report to Mila’s owner.')
+        : (locale === 'ru'
+            ? 'Я не смогла отправить отчёт напрямую. Открой «Поддержка»: там сохранится готовое письмо с данными устройства.'
+            : 'I could not send it directly. Open Support for a ready-to-send email with device details.');
+    }
+    await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
+    return dataStreamText(reply, 'bug-report');
+  }
 
   const command = parseMemoryCommand(latestUserMessage);
   if (command && speculative) {

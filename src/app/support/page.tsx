@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import BugReportForm from '@/components/BugReportForm'
+import LangToggle from '@/components/LangToggle'
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell'
 
 export const metadata: Metadata = {
@@ -9,14 +11,14 @@ export const metadata: Metadata = {
 export default function SupportPage() {
   return (
     <AppShell className="legal-page support-page">
-      <AppHeader backHref="/" title="Support" eyebrow="Mila · help" />
+      <AppHeader backHref="/" title="Support" eyebrow="Mila · help" actions={<LangToggle />} />
       <AppMain width="work" className="legal-page__main">
       <article className="legal-page__article">
         <p className="legal-page__kicker">SUPPORT · ПОДДЕРЖКА</p>
         <h1>We’ll help you keep learning.</h1>
-        <p className="legal-page__lede">Tell us what happened, which device you use, and what you expected Mila to do.</p>
+        <p className="legal-page__lede">Report a problem inside Mila and the owner will receive it by email, with useful device details attached automatically.</p>
 
-        <a className="legal-page__button" href="mailto:fcpuru95@gmail.com?subject=Mila%20iOS%20Support">Email Mila support</a>
+        <BugReportForm />
 
         <section className="legal-page__cards">
           {[

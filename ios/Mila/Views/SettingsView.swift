@@ -150,8 +150,8 @@ struct SettingsView: View {
                 icon: "hand.raised.fill"
             ) { webDestination = .init(title: language == .ru ? "Конфиденциальность" : "Privacy", path: "/privacy") }
             settingsRow(
-                title: language == .ru ? "Поддержка" : "Support",
-                icon: "questionmark.circle.fill"
+                title: language == .ru ? "Сообщить об ошибке" : "Report a problem",
+                icon: "exclamationmark.bubble.fill"
             ) { webDestination = .init(title: language == .ru ? "Поддержка" : "Support", path: "/support") }
         }
         .milaCard()

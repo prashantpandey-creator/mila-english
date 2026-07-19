@@ -25,6 +25,9 @@ services:
       - TTS_URL=${TTS_URL:-http://mila-tts:8002}
       - TELEGRAM_TRANSLATOR_BOT_TOKEN=${TELEGRAM_TRANSLATOR_BOT_TOKEN:-}
       - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET:-}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - BUG_REPORT_RECIPIENT_EMAIL=${BUG_REPORT_RECIPIENT_EMAIL:-fcpuru95@gmail.com}
+      - BUG_REPORT_FROM_EMAIL=${BUG_REPORT_FROM_EMAIL:-Mila Bug Reports <onboarding@resend.dev>}
     volumes:
       - mila_data:/data
     networks:

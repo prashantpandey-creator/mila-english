@@ -224,6 +224,10 @@ export default function DashboardPage() {
               <span className="dashboard-level-check__action">{lang === 'ru' ? 'Проверить' : 'Check my level'} <MilaIcon name="arrow" size={17} /></span>
             </button>
           ) : null}
+          <button className="dashboard-bug-report" type="button" onClick={() => router.push('/support')}>
+            <span aria-hidden>↗</span>
+            {lang === 'ru' ? 'Сообщить об ошибке в Mila' : 'Report a problem with Mila'}
+          </button>
         </section>
       </AppMain>
     </AppShell>

@@ -25,6 +25,7 @@ export default function PrivacyPage() {
             <li><strong>Optional account:</strong> name, email address, and a one-way password hash when you choose to register.</li>
             <li><strong>Learning data:</strong> level, lesson progress, answers, vocabulary reviews, pronunciation measurements, assessments, and study streaks.</li>
             <li><strong>Conversations:</strong> chat messages, voice transcripts, and only the facts you explicitly ask Mila to remember.</li>
+            <li><strong>Bug reports:</strong> the description and reply email you choose to provide, plus the current page, device/browser, screen size, language, and timezone. Chat history and audio are not attached.</li>
           </ul>
         </section>
 
@@ -36,7 +37,8 @@ export default function PrivacyPage() {
 
         <section>
           <h2>Why data is used</h2>
-          <p>Mila uses this data only to operate the service: authenticate learners, personalize lessons, measure learning progress, transcribe requested recordings, generate tutoring replies, prevent abuse, and diagnose technical failures.</p>
+          <p>Mila uses this data only to operate the service: authenticate learners, personalize lessons, measure learning progress, transcribe requested recordings, generate tutoring replies, prevent abuse, deliver requested bug reports to Mila’s owner, and diagnose technical failures.</p>
+          <p>When direct bug-report delivery is enabled, Mila’s email delivery and mailbox providers process the report only to deliver and store that support email.</p>
         </section>
 
         <section>
@@ -57,7 +59,7 @@ export default function PrivacyPage() {
 
         <section className="legal-page__note">
           <h2>Коротко по-русски</h2>
-          <p>Аудиозапись используется только для расшифровки и удаляется после запроса. Текст, прогресс и история обучения сохраняются в профиле. Mila не продаёт данные, не показывает рекламу и не использует межсайтовый трекинг. Все данные можно удалить в приложении: <strong>Аккаунт → Удалить аккаунт и данные</strong>.</p>
+          <p>Аудиозапись используется только для расшифровки и удаляется после запроса. Текст, прогресс и история обучения сохраняются в профиле. В отчёт об ошибке входят только введённое описание и технические данные, перечисленные выше; история чата и аудио не прикладываются. Mila не продаёт данные, не показывает рекламу и не использует межсайтовый трекинг. Все данные можно удалить в приложении: <strong>Аккаунт → Удалить аккаунт и данные</strong>.</p>
         </section>
       </article>
       </AppMain>

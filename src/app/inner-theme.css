@@ -862,6 +862,72 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 .mila-surface--app .legal-page__card { padding: 20px; }
 .mila-surface--app .legal-page__card h2 { margin: 0 0 7px; font-size: 18px; }
 .mila-surface--app .legal-page__card p { margin: 0; color: var(--mila-muted); }
+.mila-surface--app .bug-report {
+  max-width: 760px;
+  margin-top: 34px;
+  padding: clamp(22px, 4vw, 34px);
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius);
+  background: var(--mila-panel);
+}
+.mila-surface--app .bug-report__intro h2 { margin: 7px 0 8px; font-size: clamp(1.65rem, 3vw, 2.25rem); }
+.mila-surface--app .bug-report__intro > p:last-child { max-width: 64ch; margin: 0; color: var(--mila-muted); }
+.mila-surface--app .bug-report__form { display: grid; gap: 18px; margin-top: 26px; }
+.mila-surface--app .bug-report__field { display: grid; gap: 7px; }
+.mila-surface--app .bug-report__field label {
+  color: var(--mila-ink);
+  font: 500 11px/1.25 var(--font-mono), monospace;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+.mila-surface--app .bug-report__field :is(input, textarea) {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius-sm);
+  outline: 0;
+  color: var(--mila-ink);
+  background: var(--mila-raised);
+  font: 500 15px/1.55 var(--font-sans), Manrope, sans-serif;
+  resize: vertical;
+}
+.mila-surface--app .bug-report__field :is(input, textarea)::placeholder { color: var(--mila-subtle); }
+.mila-surface--app .bug-report__field :is(input, textarea):focus-visible { border-color: var(--mila-action); box-shadow: 0 0 0 3px var(--mila-action-soft); }
+.mila-surface--app .bug-report__trap { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+.mila-surface--app .bug-report__privacy { margin: 0; color: var(--mila-muted); font-size: 12px; line-height: 1.55; }
+.mila-surface--app .bug-report__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.mila-surface--app .bug-report__submit {
+  min-height: 48px;
+  padding: 12px 18px;
+  border: 1px solid var(--mila-action);
+  border-radius: var(--mila-radius-sm);
+  color: var(--mila-action-ink);
+  background: var(--mila-action);
+  font: 750 14px/1 var(--font-sans), Manrope, sans-serif;
+  cursor: pointer;
+}
+.mila-surface--app .bug-report__submit:hover { background: var(--mila-action-deep); }
+.mila-surface--app .bug-report__submit:focus-visible { outline: 3px solid var(--mila-action-soft); outline-offset: 2px; }
+.mila-surface--app .bug-report__submit:disabled { cursor: wait; opacity: .7; }
+.mila-surface--app .bug-report__email { font-size: 13px; }
+.mila-surface--app .bug-report__status { min-height: 1.55em; margin: -4px 0 0; color: var(--mila-muted); font-size: 13px; }
+.mila-surface--app .bug-report__status--sent { color: var(--mila-measure); font-weight: 700; }
+.mila-surface--app .bug-report__status--error,
+.mila-surface--app .bug-report__status--fallback,
+.mila-surface--app .bug-report__status--rate-limited { color: var(--mila-action); }
+.mila-surface--app .dashboard-bug-report {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 8px 0;
+  border: 0;
+  color: var(--mila-muted);
+  background: transparent;
+  font: 650 12px/1.2 var(--font-sans), Manrope, sans-serif;
+  cursor: pointer;
+}
+.mila-surface--app .dashboard-bug-report:hover { color: var(--mila-action); }
 
 /* Voice is a light listening atelier inside the same Mila product. */
 .mila-surface--app .voice-stage {
@@ -1066,6 +1132,9 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
   .mila-surface--app .dashboard-practice-card { min-height: 82px; }
   .mila-surface--app .dashboard-level-check { grid-template-columns: 42px minmax(0, 1fr); }
   .mila-surface--app .dashboard-level-check__action { grid-column: 2; }
+  .mila-surface--app .bug-report { margin-inline: -2px; padding: 20px 16px; }
+  .mila-surface--app .bug-report__actions { align-items: stretch; flex-direction: column; }
+  .mila-surface--app .bug-report__submit { width: 100%; }
   .mila-surface--app .chat-page__empty { padding: 24px 4px 30px; }
   .mila-surface--app .chat-page__empty-presence { width: 92px; height: 92px; margin-bottom: 14px; }
   .mila-surface--app .chat-page__empty-title { font-size: 2.35rem !important; }
