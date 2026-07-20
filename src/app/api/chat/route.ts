@@ -35,8 +35,17 @@ import { reserveBugReportDelivery, sendBugReportEmail } from '@/lib/sendBugRepor
 
 export const maxDuration = 60;
 
-const LOCAL_HEALTH_TTL_MS = 15_000;
-const localHealthCache = new Map<string, { ready: boolean; expiresAt: number }>();
+// Resident local models (OLLAMA_KEEP_ALIVE=-1) stay loaded, so a success is
+// trustworthy for a while; a failure is re-probed quickly so one slow /api/tags
+// on a busy CPU box can't black out the local model for everyone. Fail-soft: a
+// model confirmed ready within the grace window is still treated as ready
+// through a brief missed probe (it is busy generating, not gone) — the
+// difference between "Mila thinks for a beat" and "local model not accessible".
+const LOCAL_HEALTH_OK_TTL_MS = 30_000;
+const LOCAL_HEALTH_FAIL_TTL_MS = 3_000;
+const LOCAL_HEALTH_GRACE_MS = 45_000;
+const LOCAL_HEALTH_TIMEOUT_MS = 6_000;
+const localHealthCache = new Map<string, { ready: boolean; expiresAt: number; lastOkAt: number }>();
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 type ModelChoice = {
@@ -85,21 +94,27 @@ async function localLlmReady(config: ReturnType<typeof getLocalLlmConfig>): Prom
   if (cached && cached.expiresAt > now) return cached.ready;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 2500);
-  let ready = false;
+  const timeout = setTimeout(() => controller.abort(), LOCAL_HEALTH_TIMEOUT_MS);
+  let probeOk = false;
   try {
     const response = await fetch(`${config.url}/api/tags`, {
       cache: 'no-store',
       signal: controller.signal,
     });
-    ready = response.ok && ollamaHasModel(await response.json(), config.model);
+    probeOk = response.ok && ollamaHasModel(await response.json(), config.model);
   } catch {
-    ready = false;
+    probeOk = false;
   } finally {
     clearTimeout(timeout);
   }
 
-  localHealthCache.set(key, { ready, expiresAt: now + LOCAL_HEALTH_TTL_MS });
+  const lastOkAt = probeOk ? now : (cached?.lastOkAt ?? 0);
+  // A resident model that just missed one probe is busy, not gone — keep
+  // trusting a success confirmed within the grace window rather than telling
+  // the learner the local model is unavailable.
+  const ready = probeOk || (now - lastOkAt < LOCAL_HEALTH_GRACE_MS);
+  const ttl = ready ? LOCAL_HEALTH_OK_TTL_MS : LOCAL_HEALTH_FAIL_TTL_MS;
+  localHealthCache.set(key, { ready, expiresAt: now + ttl, lastOkAt });
   if (localHealthCache.size > 4) {
     for (const [cacheKey, entry] of localHealthCache) {
       if (entry.expiresAt <= now) localHealthCache.delete(cacheKey);
