@@ -73,10 +73,71 @@ services:
       timeout: 5s
       retries: 3
 
+  # Resident brains restored 2026-07-19 (were retired 07-18 for co-tenancy on a
+  # 15GiB box; the box now has 31GiB / ~23GiB free). Bounded so they can never
+  # starve PuranGPT again — change limits HERE in git, never via `docker update`.
+  mila-llm:
+    image: ollama/ollama:0.32.0
+    container_name: mila-llm
+    restart: unless-stopped
+    # GPT-OSS is capped at half of the 8-vCPU host so model warm-up and Chat
+    # cannot starve the web origin or Darshan. The 20b needs ~14GiB anon.
+    cpus: 4.0
+    cpu_shares: 256
+    mem_limit: 16g
+    memswap_limit: 16g
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_CONTEXT_LENGTH=${OLLAMA_CONTEXT_LENGTH:-4096}
+      - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:--1}
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_PARALLEL=1
+    volumes:
+      - mila_llm:/root/.ollama
+    expose:
+      - "11434"
+    networks:
+      - mila_private
+    healthcheck:
+      test: ["CMD-SHELL", "OLLAMA_HOST=127.0.0.1:11434 ollama list >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
+  mila-voice-llm:
+    image: ollama/ollama:0.32.0
+    container_name: mila-voice-llm
+    restart: unless-stopped
+    cpu_shares: 1024
+    # qwen3:4b q4_K_M is ~2.5GiB loaded; 6g leaves KV-cache + runner headroom.
+    mem_limit: 6g
+    memswap_limit: 6g
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_CONTEXT_LENGTH=4096
+      - OLLAMA_KEEP_ALIVE=-1
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_PARALLEL=1
+    volumes:
+      - mila_voice_llm:/root/.ollama
+    expose:
+      - "11434"
+    networks:
+      - mila_private
+    healthcheck:
+      test: ["CMD-SHELL", "OLLAMA_HOST=127.0.0.1:11434 ollama list >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
 volumes:
   mila_data:
+    driver: local
+  mila_llm:
+    driver: local
+  mila_voice_llm:
     driver: local
 
 networks:

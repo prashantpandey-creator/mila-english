@@ -37,11 +37,10 @@ jobs:
             # Evaluation runtimes are never part of production. Remove any
             # interrupted benchmark before builds can compete with the app.
             docker rm -f mila-model-eval mila-llm-bench >/dev/null 2>&1 || true
-            # RETIREMENT (one-time, then no-ops): the local Ollama brains are
-            # gone from compose; remove their containers and model volumes so
-            # the 16.5GiB of RAM and ~19GiB of disk return to PuranGPT.
-            docker rm -f mila-llm mila-voice-llm >/dev/null 2>&1 || true
-            docker volume rm mila_mila_llm mila_mila_voice_llm >/dev/null 2>&1 || true
+            # 2026-07-19: resident brains RESTORED (see docker-compose.prod.yml).
+            # Do NOT delete mila-llm/mila-voice-llm or their volumes here — that
+            # would wipe the pulled models every deploy. They are bounded in
+            # compose so they can't starve PuranGPT again.
             test -f pron-service/model.onnx || { echo "model.onnx missing — see pron-service/README.md"; exit 1; }
             # Take a transactionally consistent SQLite snapshot before the new
             # image can run `prisma db push`. VACUUM INTO reads the live database
@@ -195,6 +194,31 @@ jobs:
             else
               echo "TTS warning: Piper unavailable — browser speech fallback stays active"
             fi
+            # --- Local brains RESTORED 2026-07-19: bring up the resident Ollama
+            # chat + voice models (bounded in compose), pull, and list. The private
+            # Darshan voice REQUIRES the local voice model (privacyMode=local
+            # refuses the cloud); cloud stays the fallback for non-private chat.
+            # Best-effort: a slow/failed pull warns, it does not fail the deploy.
+            docker compose -f docker-compose.prod.yml up -d --no-deps mila-llm mila-voice-llm
+            wait_for_ollama() {
+              for attempt in $(seq 1 30); do
+                if docker exec -e OLLAMA_HOST=127.0.0.1:11434 "$1" ollama list >/dev/null 2>&1; then return 0; fi
+                sleep 2
+              done
+              docker logs --tail 50 "$1" || true; return 1
+            }
+            local_llm_model="${LOCAL_LLM_MODEL:-gpt-oss:20b}"
+            voice_llm_model="${LOCAL_VOICE_LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}"
+            chat_ready=false; voice_ready=false
+            if wait_for_ollama mila-llm; then
+              if docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama pull "$local_llm_model"; then chat_ready=true; else echo "::warning::chat model pull failed — local /chat degraded, cloud fallback active"; fi
+            else echo "::warning::mila-llm did not become healthy"; fi
+            if wait_for_ollama mila-voice-llm; then
+              if docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama pull "$voice_llm_model"; then voice_ready=true; else echo "::warning::voice model pull failed — private Darshan voice still degraded"; fi
+            else echo "::warning::mila-voice-llm did not become healthy"; fi
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama list 2>/dev/null || true
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama list 2>/dev/null || true
+            echo "local brains restored: chat=$chat_ready voice=$voice_ready"
             # --- Cloud brain check: the chat model now lives with a provider.
             # A dead key means dead chat, so this is a HARD gate (the app 200
             # check above already proved the site itself serves).
@@ -213,4 +237,4 @@ jobs:
               }).catch(e=>{console.error(e.message);process.exit(1)});
             "
             docker exec mila node -e "require('http').get('http://localhost:3000/',r=>{console.log('status',r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"
-            echo "✅ Mila deployed — cloud brain, local voice; PuranGPT's RAM restored"
+            echo "✅ Mila deployed — local brains restored (chat=$chat_ready voice=$voice_ready) + cloud fallback; models bounded for PuranGPT co-tenancy"
