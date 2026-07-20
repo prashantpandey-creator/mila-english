@@ -467,6 +467,12 @@ export async function POST(request: NextRequest) {
     const emptyFallback = locale === 'ru'
       ? 'Я могу ответить по тексту, но не буду выдумывать то, чего не слышала или не видела.'
       : 'I can respond to the text, but I will not invent anything I did not hear or see.';
+    // A genuine technical failure (the model errored — not a content/evidence
+    // decision) must sound like an honest hiccup, NOT the refusal above, which
+    // reads to the learner as "Mila is broken / won't answer me".
+    const technicalFallback = locale === 'ru'
+      ? 'Кажется, у меня заминка с ответом. Коснись круга и попробуй ещё раз.'
+      : 'I hit a snag answering that — tap the orb and try again.';
     const encoder = new TextEncoder();
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
@@ -480,6 +486,7 @@ export async function POST(request: NextRequest) {
         };
         let buffer = '';
         let failedClosed = false;
+        let streamErrored = false;
         const consume = async (source: { textStream: AsyncIterable<string> }) => {
           for await (const delta of source.textStream) {
             buffer += delta;
@@ -503,29 +510,39 @@ export async function POST(request: NextRequest) {
         try {
           await consume(result);
         } catch (error) {
-          // An external brain can die before a single word arrives. Fall back
-          // to the local model once, transparently — degraded is acceptable,
-          // a dead turn is not. (Headers already sent name the first choice.)
-          if (!request.signal.aborted && !emitted && choice.runtime === 'external') {
-            console.error('External voice model failed before first sentence; retrying locally', error);
+          streamErrored = true;
+          // A brain can die before a single word arrives — retry ONCE, then
+          // give up honestly. Degraded is acceptable; a dead turn is not. The
+          // LOCAL (ollama) runtime now retries too: before, only an external
+          // first-choice failed over, so a transient CPU hiccup on a private
+          // turn fell straight through to the evidence-flavoured refusal and
+          // read as "Mila is broken".
+          if (!request.signal.aborted && !emitted) {
+            console.error(`${choice.runtime} voice model failed before first sentence; retrying`, error);
             buffer = '';
             failedClosed = false;
             try {
-              const fallback = await chooseModel('voice', false);
-              if (fallback && fallback.runtime !== 'external') {
+              // External died → try the local model; local died → re-run the
+              // same resident model once (transient CPU stalls often clear).
+              const fallback = choice.runtime === 'external' ? await chooseModel('voice', false) : choice;
+              if (fallback) {
                 const retry = await streamText({ model: fallback.model, maxRetries: 0, ...generationOptions });
                 await consume(retry);
+                streamErrored = false;
               }
             } catch (retryError) {
-              if (!request.signal.aborted) console.error('Local fallback voice stream failed', retryError);
+              if (!request.signal.aborted) console.error('Voice retry stream failed', retryError);
             }
           } else if (!request.signal.aborted) {
             console.error('Voice reply stream failed', error);
           }
         }
-        // An unsupported claim with nothing spoken yet → speak the safe line.
+        // An unsupported claim with nothing spoken → the evidence line. A genuine
+        // stream error with nothing spoken → the honest technical line (NOT the
+        // refusal-flavoured emptyFallback). Anything else empty → neutral line.
         // With clean sentences already spoken → stop silently at the claim.
         if (failedClosed && !emitted) emit(voiceEvidenceFallbackLine(buffer));
+        if (streamErrored && !emitted && !request.signal.aborted) emit(technicalFallback);
         if (!emitted && !request.signal.aborted) emit(emptyFallback);
         if (!speculative && !request.signal.aborted && emitted.trim()) {
           try {
