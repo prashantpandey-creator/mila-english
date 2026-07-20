@@ -52,4 +52,21 @@ jobs:
             docker logs --tail 60 mila-llm 2>&1 | tail -60
             echo "=== mila-voice-llm recent logs ==="
             docker logs --tail 60 mila-voice-llm 2>&1 | tail -60
+            echo "=== ollama ps: are the models actually LOADED (not just downloaded)? ==="
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama ps 2>&1 || true
+            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama ps 2>&1 || true
+            echo "=== dmesg OOM (last 24h) ==="
+            dmesg -T 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' | tail -15 || true
+            echo "=== THE REAL TEST: can the mila app REACH the local models? ==="
+            docker exec mila node -e "fetch('http://mila-llm:11434/api/tags').then(r=>r.json()).then(d=>console.log('chat-llm REACHABLE, models:',JSON.stringify((d.models||[]).map(m=>m.name)))).catch(e=>console.log('chat-llm UNREACHABLE from mila:',e.message))" 2>&1 || true
+            docker exec mila node -e "fetch('http://mila-voice-llm:11434/api/tags').then(r=>r.json()).then(d=>console.log('voice-llm REACHABLE, models:',JSON.stringify((d.models||[]).map(m=>m.name)))).catch(e=>console.log('voice-llm UNREACHABLE from mila:',e.message))" 2>&1 || true
+            echo "=== THE EXACT DARSHAN PATH: mila -> mila-voice-llm chat completion ==="
+            docker exec mila node -e "fetch('http://mila-voice-llm:11434/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({model:'qwen3:4b-instruct-2507-q4_K_M',messages:[{role:'user',content:'Reply with OK'}],stream:false,keep_alive:-1,options:{num_predict:3}})}).then(async r=>{const d=await r.json();console.log('voice-llm CHAT status',r.status,'->',JSON.stringify(d.message&&d.message.content||d.error||d))}).catch(e=>console.log('voice-llm CHAT FAILED:',e.message))" 2>&1 || true
+            echo "=== app env the route reads for local voice ==="
+            docker exec mila sh -lc 'echo LOCAL_VOICE_LLM_URL=$LOCAL_VOICE_LLM_URL LOCAL_VOICE_LLM_MODEL=$LOCAL_VOICE_LLM_MODEL LOCAL_LLM_URL=$LOCAL_LLM_URL LOCAL_LLM_MODEL=$LOCAL_LLM_MODEL' 2>&1 || true
+            echo "=== are mila + the llms on the same docker network? ==="
+            docker inspect -f '{{range $n,$_ := .NetworkSettings.Networks}}{{$n}} {{end}}' mila 2>&1 || true
+            docker inspect -f '{{range $n,$_ := .NetworkSettings.Networks}}{{$n}} {{end}}' mila-voice-llm 2>&1 || true
+            echo "=== mila app logs: recent errors ==="
+            docker logs --tail 300 mila 2>&1 | grep -iE 'error|fail|unreachable|ECONN|ENOTFOUND|timeout|local model|not accessible|ollama|choose' | tail -40
             echo "=== done (read-only) ==="
