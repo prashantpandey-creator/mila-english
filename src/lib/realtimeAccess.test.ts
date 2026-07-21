@@ -2,19 +2,21 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { realtimeModeRequiresPaid } from './realtimeAccess';
 
-test('production Realtime voice stays paid even when a stale env says false', () => {
+test('production Realtime voice stays paid for the daily-use tutor even when a stale env says false', () => {
   assert.equal(realtimeModeRequiresPaid('tutor', {
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'false',
   }), true);
-  assert.equal(realtimeModeRequiresPaid('companion', {
-    NODE_ENV: 'production',
-    VOICE_REALTIME_PAID_ONLY: '',
-  }), true);
 });
 
-test('assessment remains outside the product paywall', () => {
+test('assessment and the free front-door companion remain outside the product paywall', () => {
   assert.equal(realtimeModeRequiresPaid('assessment', {
+    NODE_ENV: 'production',
+    VOICE_REALTIME_PAID_ONLY: 'true',
+  }), false);
+  // The "first conversation" is the acquisition hook — it stays free even
+  // if a stale prod .env tries to force VOICE_REALTIME_PAID_ONLY on.
+  assert.equal(realtimeModeRequiresPaid('companion', {
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'true',
   }), false);
