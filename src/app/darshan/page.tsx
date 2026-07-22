@@ -5,6 +5,7 @@ import { useChat } from "ai/react";
 import { useRouter } from "next/navigation";
 import { MilaAurora } from "@/components/voice/MilaAurora";
 import { MilaOrb, type OrbState } from "@/components/voice/MilaOrb";
+import { MilaKid } from "@/components/voice/MilaKid";
 import { useI18n } from "@/lib/i18n-provider";
 import { startLocalTranscription, type LocalTranscript, type TranscriptionSession } from "@/lib/localTranscription";
 import { connectRealtimeVoice, type RealtimeVoiceSession } from "@/lib/realtimeVoice";
@@ -62,6 +63,10 @@ export default function VoicePage() {
   // (guest-open, free — realtimeAccess.ts), Realtime-first in connectToVoice, the
   // guest-session seat, and no privacy toggle rendered.
   const [freeMode] = useState(true);
+  // Kids learning mode (?kids=1): the sweet children's persona + the animated
+  // MilaKid buddy instead of the abstract orb. Rides the same free, guest-open,
+  // Realtime-first plumbing as the companion.
+  const [kidsMode] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("kids") === "1");
 
   const transcriptionRef = useRef<TranscriptionSession | null>(null);
   const realtimeRef = useRef<RealtimeVoiceSession | null>(null);
@@ -382,7 +387,7 @@ export default function VoicePage() {
   const startRealtimeVoice = useCallback(async (connectionAttempt: number, signal: AbortSignal) => {
     const session = await connectRealtimeVoice({
       lang: lang === "ru" ? "ru" : "en",
-      mode: freeMode ? "companion" : "tutor",
+      mode: kidsMode ? "kids" : freeMode ? "companion" : "tutor",
       signal,
       openAIAudioConsent: true,
       events: {
@@ -714,7 +719,7 @@ export default function VoicePage() {
            <div className="voice-connecting absolute inset-0 rounded-full border-2 border-t-transparent animate-spin z-20 pointer-events-none" style={{ width: orbSize, height: orbSize, left: '50%', top: '50%', marginLeft: -orbSize/2, marginTop: -orbSize/2 }}></div>
         )}
 
-        <MilaOrb state={phase} size={orbSize} />
+        {kidsMode ? <MilaKid state={phase} size={orbSize} /> : <MilaOrb state={phase} size={orbSize} />}
       </button>
 
       {/* The invitation the orb breathes at rest */}

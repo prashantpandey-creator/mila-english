@@ -1,4 +1,4 @@
-export type RealtimeMode = 'assessment' | 'companion' | 'pia' | 'tutor';
+export type RealtimeMode = 'assessment' | 'companion' | 'pia' | 'tutor' | 'kids';
 
 /**
  * Production speech-to-speech sessions are paid except for two free doors:
@@ -12,7 +12,7 @@ export function realtimeModeRequiresPaid(
   mode: RealtimeMode,
   environment: { NODE_ENV?: string; VOICE_REALTIME_PAID_ONLY?: string } = process.env,
 ): boolean {
-  if (mode === 'assessment' || mode === 'companion') return false;
+  if (mode === 'assessment' || mode === 'companion' || mode === 'kids') return false;
   if (environment.NODE_ENV === 'production') return true;
   return /^(?:1|true|yes)$/i.test(environment.VOICE_REALTIME_PAID_ONLY || '');
 }

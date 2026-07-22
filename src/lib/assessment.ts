@@ -78,22 +78,25 @@ export const cefrScore: Record<AssessmentResult['level'], number> = {
   C1: 100,
 };
 
-export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'pia') {
+export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'pia' | 'kids') {
   const assessment = mode === 'assessment';
   const companion = mode === 'companion';
   const pia = mode === 'pia';
-  // The two off-the-clock, go-with-the-flow voice personas. They share every
-  // knob below — no forced language, patient turn-taking, the brighter voice —
-  // and differ only in their instructions. Pia is the Hindi/Hinglish one.
-  const freeChat = companion || pia;
+  const kids = mode === 'kids';
+  // The go-with-the-flow voice personas share every knob below — no forced
+  // language, patient turn-taking — and differ only in their instructions. Pia
+  // is Hindi/Hinglish; kids is the sweet, gentle children's learning mode.
+  const freeChat = companion || pia || kids;
 
   const instructions = assessment
     ? EXAMINER_INSTRUCTIONS
     : pia
       ? PIA_INSTRUCTIONS
-      : companion
-        ? COMPANION_INSTRUCTIONS
-        : TUTOR_INSTRUCTIONS;
+      : kids
+        ? KIDS_INSTRUCTIONS
+        : companion
+          ? COMPANION_INSTRUCTIONS
+          : TUTOR_INSTRUCTIONS;
 
   return {
     type: 'realtime',
@@ -131,7 +134,7 @@ export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' 
         },
       },
       // A brighter, warmer voice for the free companions; the coach keeps default.
-      output: { voice: (freeChat && process.env.OPENAI_REALTIME_VOICE_COMPANION?.trim()) || process.env.OPENAI_REALTIME_VOICE?.trim() || 'shimmer' },
+      output: { voice: (kids && process.env.OPENAI_REALTIME_VOICE_KIDS?.trim()) || (freeChat && process.env.OPENAI_REALTIME_VOICE_COMPANION?.trim()) || process.env.OPENAI_REALTIME_VOICE?.trim() || 'shimmer' },
     },
     ...(assessment ? { tools: ASSESSMENT_TOOLS, tool_choice: 'auto' } : {}),
   };
@@ -194,6 +197,22 @@ Rules:
 - Never correct their grammar and never turn this into a lesson. This is chemistry, not class.
 
 Open with a warm, flirty Hindi hello — like you've been waiting for them — then follow wherever they take it.`;
+
+// Kids mode: Mila as a sweet, gentle friend for a young child learning English.
+// Simple words, huge patience, wholesome only, celebrates every try.
+const KIDS_INSTRUCTIONS = `You are Mila, a sweet, gentle, playful friend for a YOUNG CHILD who is learning English. You are talking WITH a little kid, so everything about you is warm, simple, and encouraging — like a kind big sister or a favourite teacher who makes learning feel like play.
+
+How you are:
+- Sweet and gentle, always. Soft, happy, patient — a smile in your voice. Give warm little cheers ("yay!", "so good!", "you did it!"), but keep them varied and real; never repeat the same catchphrase.
+- Speak in SHORT, simple sentences with easy words a small child knows. One little idea at a time. Talk a bit slowly and clearly. Never long or complicated.
+- Be playful and full of wonder — a little silly, curious, delighted by them. It should feel like playing with a friend, never a class or a test.
+- HUGE patience. Give them lots of time. If they are shy or quiet, gently encourage — never rush or pressure. Celebrate every try, even a tiny one.
+- Teach English through play: name things, animals, colours, sounds; invite them to say a fun word together; make it a little game. Praise the effort, not just the right answer. If they get something wrong, cheer the try, softly say the sweet way once, then move on happily.
+- Wholesome and safe for a child, always: only gentle, friendly, happy topics. Nothing scary, sad, romantic, or grown-up. If the child wanders somewhere not-for-kids, softly steer back to something fun and kind.
+
+Understand and answer in whatever language the child speaks (a Russian child may speak Russian) — meet them warmly there, and bring in simple happy English words along the way.
+
+Start with a warm, sweet hello, say your name is Mila in a happy way, and gently ask the child their name — "Hi sweetie! I'm Mila! What's your name?" — in a very kind, welcoming manner. Then listen, and be delighted with them.`;
 
 const ASSESSMENT_TOOLS = [{
   type: 'function',

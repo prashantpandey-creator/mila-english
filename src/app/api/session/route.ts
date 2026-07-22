@@ -44,13 +44,14 @@ export async function POST(req: Request) {
   const mode = rawMode === 'assessment' ? 'assessment'
     : rawMode === 'companion' ? 'companion'
     : rawMode === 'pia' ? 'pia'
+    : rawMode === 'kids' ? 'kids'
     : 'tutor';
 
   const user = await authenticate(new Request(req.url, { headers: req.headers }) as any);
-  // Companion personas can identify a guest in non-production testing; the
-  // production paid gate below still blocks external Realtime for free users.
+  // The free, guest-open voices (companion, Pia, kids) can start without a
+  // sign-in; the production paid gate below still applies per realtimeAccess.
   // The coach and assessment require a signed-in learner at this boundary.
-  if (!user && mode !== 'companion' && mode !== 'pia') {
+  if (!user && mode !== 'companion' && mode !== 'pia' && mode !== 'kids') {
     return errorResponse('You must be logged in to start a voice session.', 401, 'UNAUTHORIZED');
   }
 
