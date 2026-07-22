@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { MilaAurora } from "@/components/voice/MilaAurora";
 import { MilaOrb, type OrbState } from "@/components/voice/MilaOrb";
 import { MilaKid } from "@/components/voice/MilaKid";
+import { MilaFace } from "@/components/voice/MilaFace";
 import { useI18n } from "@/lib/i18n-provider";
 import { startLocalTranscription, type LocalTranscript, type TranscriptionSession } from "@/lib/localTranscription";
 import { connectRealtimeVoice, type RealtimeVoiceSession } from "@/lib/realtimeVoice";
@@ -67,6 +68,12 @@ export default function VoicePage() {
   // MilaKid buddy instead of the abstract orb. Rides the same free, guest-open,
   // Realtime-first plumbing as the companion.
   const [kidsMode] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("kids") === "1");
+  // Photoreal presence (?face=1): a real-looking Mila video loop in place of the
+  // abstract orb, self-hosted (RealVisXL → LivePortrait, our own GPU). Opt-in while
+  // the real-time MuseTalk lip-sync stream that will replace the loop is built.
+  // Read after mount (not in the initializer) so the server and first client render
+  // agree on the orb — no hydration mismatch — then swap to the face.
+  const [faceMode, setFaceMode] = useState(false);
 
   const transcriptionRef = useRef<TranscriptionSession | null>(null);
   const realtimeRef = useRef<RealtimeVoiceSession | null>(null);
@@ -213,6 +220,11 @@ export default function VoicePage() {
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
+  }, []);
+
+  // Read the ?face=1 opt-in after mount, so SSR and hydration agree (see above).
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("face") === "1") setFaceMode(true);
   }, []);
 
   // A saved Realtime preference is scoped to the signed-in Pro account. A
@@ -719,7 +731,7 @@ export default function VoicePage() {
            <div className="voice-connecting absolute inset-0 rounded-full border-2 border-t-transparent animate-spin z-20 pointer-events-none" style={{ width: orbSize, height: orbSize, left: '50%', top: '50%', marginLeft: -orbSize/2, marginTop: -orbSize/2 }}></div>
         )}
 
-        {kidsMode ? <MilaKid state={phase} size={orbSize} /> : <MilaOrb state={phase} size={orbSize} />}
+        {kidsMode ? <MilaKid state={phase} size={orbSize} /> : faceMode ? <MilaFace state={phase} size={orbSize} /> : <MilaOrb state={phase} size={orbSize} />}
       </button>
 
       {/* The invitation the orb breathes at rest */}
