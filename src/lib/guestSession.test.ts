@@ -1,58 +1,61 @@
-// Runnable proof that free voice preserves signed-in users and deduplicates
-// concurrent guest seating. Run: npx tsx src/lib/guestSession.test.ts
+// Runnable proof that hasActiveSession only REPORTS session state and never
+// silently creates a guest — guests are now an explicit opt-in on the auth
+// pages. Run: npx tsx src/lib/guestSession.test.ts
 import assert from 'node:assert/strict';
-import { ensureGuestSession } from './guestSession';
+import { hasActiveSession } from './guestSession';
 
 const originalFetch = globalThis.fetch;
 
 async function run() {
   try {
-    const signedInCalls: string[] = [];
+    // An active session → true, checking only /api/users/me.
+    const okCalls: string[] = [];
     globalThis.fetch = async (input) => {
-      signedInCalls.push(String(input));
+      okCalls.push(String(input));
       return new Response('{}', { status: 200 });
     };
-    assert.equal(await ensureGuestSession(), true);
-    assert.deepEqual(signedInCalls, ['/api/users/me']);
+    assert.equal(await hasActiveSession(), true);
+    assert.deepEqual(okCalls, ['/api/users/me']);
 
-    const guestCalls: string[] = [];
+    // No session (401) → false, and CRUCIALLY no guest is created
+    // (no POST to /api/auth/guest).
+    const unauthCalls: string[] = [];
     globalThis.fetch = async (input) => {
-      const url = String(input);
-      guestCalls.push(url);
-      return new Response('{}', { status: url === '/api/users/me' ? 401 : 200 });
+      unauthCalls.push(String(input));
+      return new Response('{}', { status: 401 });
     };
-    assert.equal(await ensureGuestSession(), true);
-    assert.deepEqual(guestCalls, ['/api/users/me', '/api/auth/guest']);
+    assert.equal(await hasActiveSession(), false);
+    assert.deepEqual(unauthCalls, ['/api/users/me']);
 
-    const failedCheckCalls: string[] = [];
+    // A server/network error also reports no session without creating a guest.
+    const errorCalls: string[] = [];
     globalThis.fetch = async (input) => {
-      failedCheckCalls.push(String(input));
+      errorCalls.push(String(input));
       return new Response('{}', { status: 500 });
     };
-    assert.equal(await ensureGuestSession(), false);
-    assert.deepEqual(failedCheckCalls, ['/api/users/me']);
+    assert.equal(await hasActiveSession(), false);
+    assert.deepEqual(errorCalls, ['/api/users/me']);
 
-    let releaseCurrent!: () => void;
-    const currentGate = new Promise<void>((resolve) => { releaseCurrent = resolve; });
+    // Concurrent callers dedupe to a single check.
+    let releaseCheck!: () => void;
+    const gate = new Promise<void>((resolve) => { releaseCheck = resolve; });
     const concurrentCalls: string[] = [];
     globalThis.fetch = async (input) => {
-      const url = String(input);
-      concurrentCalls.push(url);
-      if (url === '/api/users/me') {
-        await currentGate;
-        return new Response('{}', { status: 401 });
-      }
+      concurrentCalls.push(String(input));
+      await gate;
       return new Response('{}', { status: 200 });
     };
-    const first = ensureGuestSession();
-    const second = ensureGuestSession();
+    const first = hasActiveSession();
+    const second = hasActiveSession();
     assert.deepEqual(concurrentCalls, ['/api/users/me']);
-    releaseCurrent();
+    releaseCheck();
     assert.deepEqual(await Promise.all([first, second]), [true, true]);
-    assert.deepEqual(concurrentCalls, ['/api/users/me', '/api/auth/guest']);
+    assert.deepEqual(concurrentCalls, ['/api/users/me']);
+
+    console.log('guestSession: all assertions pass');
   } finally {
     globalThis.fetch = originalFetch;
   }
 }
 
-void run().then(() => console.log('guest voice session: 8/8 pass'));
+void run();

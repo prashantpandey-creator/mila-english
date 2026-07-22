@@ -13,7 +13,7 @@ import { streamVoiceReply } from "@/lib/voiceChatStream";
 import { backchannelTexts, endpointSilenceMs, pickBackchannel } from "@/lib/voiceTurn";
 import { parseVoiceCommand } from "@/lib/voiceCommands";
 import { getBuiltinLesson } from "@/lib/builtinLessons";
-import { ensureGuestSession } from "@/lib/guestSession";
+import { hasActiveSession } from "@/lib/guestSession";
 
 // The focused speaking room. Unlike the retired Darshan room this one has a
 // job: it drills the CURRENT LESSON by voice — one small task per turn, fed
@@ -153,7 +153,7 @@ function PracticeRoom() {
           if (problem.message === "auth-required" && !guestTriedRef.current) {
             // Never dead-end on auth: seat a guest and continue the practice.
             guestTriedRef.current = true;
-            void ensureGuestSession().then((seated) => {
+            void hasActiveSession().then((seated) => {
               if (seated && activeRef.current) return scheduleListen(300);
               setError(lang === "ru" ? "Войди в аккаунт, чтобы практиковаться голосом." : "Log in to practise by voice.");
               setPhase("resting");
@@ -208,7 +208,7 @@ function PracticeRoom() {
       // Most common cause: no session yet. Seat a guest and retry once.
       if (!guestTriedRef.current) {
         guestTriedRef.current = true;
-        if (await ensureGuestSession()) {
+        if (await hasActiveSession()) {
           try {
             await speakTurn(kickoff, turnId);
             started = true;

@@ -101,8 +101,13 @@ export default function LoginPage() {
             <div className="welcome-auth__separator">{lang==='ru'?'или':'or'}</div>
             <button type="button" onClick={handleGuestLogin} disabled={loading}
               className="welcome-auth__button welcome-auth__button--secondary">
-              {lang==='ru'?'Войти как гость':'Try as Guest'}
+              {lang==='ru'?'Продолжить как гость':'Continue as guest'}
             </button>
+            <p className="welcome-auth__guest-note">
+              {lang==='ru'
+                ? 'Гостевой сеанс приватный: разговоры не сохраняются. Зарегистрируйся, чтобы сохранить прогресс и историю.'
+                : 'A guest session is private: chats aren’t saved. Sign up to keep your progress and history.'}
+            </p>
           </form>
           <p className="welcome-auth__footer">
             {t('login_no_account')} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="welcome-auth__link">{t('login_create')}</a>
@@ -317,6 +322,7 @@ export default function LoginPage() {
         .welcome-auth__separator::before,
         .welcome-auth__separator::after { content: ''; height: 1px; flex: 1; background: rgba(217,0,108, .14); }
         .welcome-auth__footer { margin: 1.5rem 0 0; color: var(--auth-muted); font-size: .88rem; line-height: 1.5; text-align: center; }
+        .welcome-auth__guest-note { margin: .6rem 0 0; color: var(--auth-muted); font-size: .78rem; line-height: 1.45; text-align: center; }
         .welcome-auth__legal { display: flex; justify-content: center; gap: .55rem; margin: .75rem 0 0; color: var(--auth-muted); font-size: .72rem; }
         .welcome-auth__legal a { color: inherit; text-decoration: none; }
         .welcome-auth__legal a:hover { color: var(--auth-pink-deep); text-decoration: underline; text-underline-offset: 3px; }

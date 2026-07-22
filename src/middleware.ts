@@ -1,12 +1,20 @@
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
+// The app is login-gated. Everything that IS the product (voice rooms, chat,
+// lessons, dashboard, account, billing…) requires a session — registered OR an
+// explicitly chosen guest. Only the marketing/legal/auth front stays public
+// (`/`, `/start`, `/pricing`, `/login`, `/register`, `/forgot-password`,
+// `/reset-password`, `/verify-email`, `/privacy`, `/terms`, `/refunds`,
+// `/support`). `/darshan` — the main voice room, previously guest-open — is now
+// behind the wall so a person must sign in or deliberately continue as a guest.
 const PROTECTED_PREFIXES = [
   '/account',
   '/achievements',
   '/assessment',
   '/billing',
   '/chat',
+  '/darshan',
   '/dashboard',
   '/grammar',
   '/lessons',
