@@ -1,0 +1,49 @@
+name: Purge Mila chat history (manual)
+
+# One-off / on-demand maintenance. Deletes companion chat threads, messages, and
+# remembered facts from the live Mila SQLite DB by running the same script that
+# ships in the image (scripts/clear-chat-history.mjs). Guarded behind an exact
+# confirmation string so it can never fire by accident, and manual-dispatch only.
+# Every normal deploy takes a verified VACUUM-INTO SQLite backup first, so a
+# recent pre-purge snapshot exists under /data/backups on the box.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type WIPE-ALL to delete ALL accounts'' chat history, or WIPE-GUESTS for guests only'
+        required: true
+        default: ''
+
+concurrency:
+  group: mila-production
+  cancel-in-progress: false
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge chat history via SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          CONFIRM: ${{ github.event.inputs.confirm }}
+        with:
+          host: 209.182.233.163
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 10m
+          envs: CONFIRM
+          script: |
+            set -e
+            case "$CONFIRM" in
+              WIPE-ALL) MODE=--all ;;
+              WIPE-GUESTS) MODE=--guests ;;
+              *) echo "Refusing: 'confirm' must be exactly WIPE-ALL or WIPE-GUESTS (got '$CONFIRM')"; exit 1 ;;
+            esac
+            if [ "$(docker inspect -f '{{.State.Running}}' mila 2>/dev/null || true)" != "true" ]; then
+              echo "mila container is not running; aborting"; exit 1
+            fi
+            echo "Running purge ($MODE) against the live Mila database..."
+            docker exec mila node scripts/clear-chat-history.mjs "$MODE"
+            echo "Post-purge companion table counts:"
+            docker exec mila node -e 'const {PrismaClient}=require("@prisma/client");const p=new PrismaClient();(async()=>{const m=await p.companionMessage.count();const t=await p.companionThread.count();const mem=await p.companionMemory.count();console.log("messages="+m+" threads="+t+" memories="+mem);await p.$disconnect();})().catch(e=>{console.error(e);process.exit(1)})'
+            echo "Purge complete."
