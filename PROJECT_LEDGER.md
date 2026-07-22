@@ -33,41 +33,13 @@ No local screenshot counts. No "LIVE" claim without both.**
 | iOS reviewer surfaces | Bilingual `/privacy`, `/support`, and permanent authenticated account/guest deletion | `18d5811` (2026-07-17) | deploy run `29580794980` green; both pages 200 with [privacy](docs/app-store-assets/1.0/live-reviewer-proof/privacy.png) and [support](docs/app-store-assets/1.0/live-reviewer-proof/support.png) screenshots; disposable guest deletion 200 then profile 401 |
 | `/pia` — Hindi/Hinglish companion | **Pia** (renamed from Pila, `6f35e4a`), Mila's flirty Hindi sister: guest-open voice room, opens in Hindi, cheesy pet names. Rides the **OpenAI Realtime** path (same as the English companion — the only Hindi-capable engine here), `mode=pia` in `buildRealtimeSession`. **No new container.** Realtime-only room (no en/ru-local fallback). | `3450b0d` + rename `6f35e4a` (2026-07-18) | rename went live via run `29624973946`; then host-split `c728a1d` landed and is serving: **on `mila.purangpt.com`, `/pia` now 307-redirects to `/` and `/pila` 404s** (verified live). Pia is reachable only once `pia.purangpt.com` DNS + Caddy vhost exist — **owner/server-side, still pending**. **NOT yet verified: the spoken Hindi audio itself (needs a mic tap on prod).** |
 | Voice examiner: one question per turn + understands Russian | The level-check EXAMINER no longer bundles 3–5 questions into one turn (`EXAMINER_INSTRUCTIONS`: "Ask ONE question at a time… never stack") and its ASR is no longer English-locked — assessment transcription auto-detects so a learner's Russian fallback is understood, while the interview is still conducted and measured in English. Coach stays English-pinned; companions already auto-detected. Guarded by `src/lib/assessment.test.ts` assertions so a concurrent reset can't silently wipe it again (that happened once). | `6504e73` (2026-07-18) | deploy run `29624973946` green — run log shows the box at `HEAD is now at 6504e73` and the final in-container `localhost:3000` check 200; `npx tsc --noEmit` clean and all `assessment.test.ts` assertions pass at that commit; live `/assessment` 200 with screenshot; unauthenticated `POST /api/session?mode=assessment` correctly 401-gates. (Instructions are server-side config sent to OpenAI Realtime — they never appear in the client bundle, so bundle-grep does not apply to this change.) |
+| Session management: login wall + guest chat isolation | **Live. Supersedes the prior guest-open `/darshan` front-door model.** The app is login-gated: `src/middleware.ts` protects `/darshan` (the main voice room) plus every product route (chat, lessons, dashboard, account, billing, voice-lab, assessment, progress…). The marketing/legal/auth front stays public: `/`, `/start`, `/pricing`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`, `/privacy`, `/terms`, `/refunds`, `/support`. Guests are no longer auto-seeded — `ensureGuestSession()` became the check-only `hasActiveSession()`; a guest exists ONLY via the deliberate "Continue as guest" control on `/login`/`/register` (which now state that guest chats aren't saved). Guest conversations are never persisted or served as history (`companionStore` `isGuestUser` guards + `/api/chat/history` returns `{"messages":[]}` for guests); a guest's in-turn context comes from the client transcript (`companionHistory.ts`, unit-tested). Registered learners keep their own isolated durable history. `scripts/clear-chat-history.mjs` (wired into the Docker CMD, no-op unless `MILA_CLEAR_CHAT_HISTORY` is `guests`/`all`) can purge already-stored rows — **NOT yet run; the read leak is already closed because guest history is never served.** `/pia` (separate hidden Hindi product on its own host) intentionally out of scope. | `ae7e98d` (PR #32, 2026-07-22) | Deploy run `29955274899` green (`Deploy via SSH` success, 20:28→20:33Z) for merge SHA `ae7e98d2e570d1445490298bcc7e84265907c725`. Live prod, no cookie: `/darshan`, `/darshan?free=1`, `/dashboard`, `/chat`, `/voice-lab` all **307 → `/login?returnTo=…`** (query preserved); `/`, `/login`, `/register`, `/pricing`, `/privacy`, `/terms`, `/support`, `/start` all **200**. An explicit `POST /api/auth/guest` returns `accountType=guest`, whose cookie then loads `/darshan` **200** and `/api/chat/history` **`{"messages":[]}`**; a no-cookie history call is **401** (no silent guest). Local `npx tsc --noEmit` clean; `guestSession` + `companionHistory` tests pass (only `visualScenes` fails — needs `ffprobe`, unrelated). |
 
 ## LOCAL / UNPUSHED
 
 - The Apple Distribution IPA remains local only because App Store Connect is
   waiting for an interactive Apple ID sign-in and app-record creation before
   validation/upload.
-- **Guest chat isolation + history clearing — on branch
-  `claude/mia-session-management-history-g6p68j`, NOT on `main`, NOT deployed.**
-  Fixes the leak where a shared browser inheriting a guest cookie could read a
-  prior guest's saved conversation. Guest turns are now never persisted server
-  side and never served as history (`src/lib/companionStore.ts` guest guards,
-  `/api/chat/history` guest short-circuit); a guest's in-conversation context is
-  sourced from the client transcript instead of the DB
-  (`src/lib/companionHistory.ts`, unit-tested). Durable, isolated history stays
-  a registered-account feature. `scripts/clear-chat-history.mjs` (wired into the
-  Docker CMD, no-op unless `MILA_CLEAR_CHAT_HISTORY` is set to `guests`/`all`)
-  purges the already-stored histories. Awaiting review → merge to `main` →
-  deploy before any of this is live; set `MILA_CLEAR_CHAT_HISTORY=all` for one
-  deploy to wipe the existing leak, then unset.
-- **Login wall + explicit-opt-in guests — same branch
-  `claude/mia-session-management-history-g6p68j`, NOT on `main`, NOT deployed.**
-  The app is now login-gated: `src/middleware.ts` adds `/darshan` (the main
-  voice room) to the protected set, so every product surface (voice, chat,
-  lessons, dashboard, account, billing…) requires a session; only the
-  marketing/legal/auth front stays public (`/`, `/start`, `/pricing`, auth
-  pages, `/privacy` `/terms` `/refunds` `/support`). Guests are no longer
-  seeded silently: `ensureGuestSession()` became `hasActiveSession()` — a
-  check-only helper that never creates a guest (removing the shared-browser
-  auto-seat vector). A guest exists ONLY via the deliberate "Continue as guest"
-  button on `/login` and `/register` (both now note that guest chats aren't
-  saved). Landing guest-open CTAs route logged-out learners through the auth
-  pages instead of pushing straight into the room. `/pia` (separate hidden
-  Hindi product on its own host) is intentionally out of scope. Tests updated
-  (`guestSession.test.ts` now proves no guest is ever auto-created);
-  `npx tsc --noEmit` clean.
 
 ## OWED (asked, NOT done — do not claim these)
 
