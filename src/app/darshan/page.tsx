@@ -527,9 +527,13 @@ export default function VoicePage() {
     connectingRef.current = true;
     setIsConnecting(true);
     try {
-      // Realtime is Pro-only and consent-only. Everyone else, including a tap
-      // while account status is still loading, stays on Mila's private path.
-      if (isPro && voicePreference === "realtime") {
+      // Realtime for two audiences: a Pro user who chose it, AND the free
+      // front-door companion (?free=1 → 'companion' mode, which is free — see
+      // realtimeAccess.ts). The good voice is the whole point of the hook, so
+      // the free companion tries it FIRST. If Realtime cannot connect (Russia /
+      // no cloud reachable), we fall through to the private on-device path
+      // below — the free companion still works with no VPN.
+      if ((isPro && voicePreference === "realtime") || freeMode) {
         try {
           await startRealtimeVoice(connectionAttempt, connectAbort.signal);
           return;
@@ -613,6 +617,7 @@ export default function VoicePage() {
         </svg>
       </button>
 
+      {!freeMode && (
       <div
         className="absolute left-4 top-4 z-30 flex max-w-[calc(100%-5.5rem)] items-center gap-1 rounded-xl border border-black/10 bg-white/90 p-1 text-[11px] shadow-sm backdrop-blur"
         style={{ marginTop: "env(safe-area-inset-top, 0px)" }}
@@ -643,6 +648,7 @@ export default function VoicePage() {
           </button>
         )}
       </div>
+      )}
 
       {showRealtimeConsent && (
         <div className="absolute inset-0 z-50 grid place-items-center bg-slate-950/45 p-5" role="presentation">
