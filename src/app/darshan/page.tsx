@@ -53,9 +53,15 @@ export default function VoicePage() {
   const [answer, setAnswer] = useState("");
   const [invI, setInvI] = useState(0);
   const [orbSize, setOrbSize] = useState(320);
-  // Free front-door companion (?free=1): the playful, guest-open general chat,
-  // not the lesson coach. Read once on mount.
-  const [freeMode] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("free") === "1");
+  // Every voice conversation is now the free, guest-open companion on the good
+  // OpenAI Realtime voice (owner decision 2026-07-21: the private/local mode and
+  // its "Private" toggle caused persistent broken-conversation confusion across
+  // every entry point). The on-device engine stays ONLY as an invisible fallback
+  // when the cloud is unreachable (Russia / no VPN). Kept named `freeMode` so all
+  // the existing free-companion wiring applies at once: 'companion' Realtime mode
+  // (guest-open, free — realtimeAccess.ts), Realtime-first in connectToVoice, the
+  // guest-session seat, and no privacy toggle rendered.
+  const [freeMode] = useState(true);
 
   const transcriptionRef = useRef<TranscriptionSession | null>(null);
   const realtimeRef = useRef<RealtimeVoiceSession | null>(null);
