@@ -26,6 +26,7 @@ import {
   rememberCompanionFact,
   saveCompanionTurn,
 } from '@/lib/companionStore';
+import { selectHistoryForModel } from '@/lib/companionHistory';
 import { readLearnerProfile } from '@/lib/learnerProfile';
 import { personaBlock, type PersonaId } from '@/lib/personas';
 import { prisma } from '@/lib/prisma';
@@ -218,6 +219,10 @@ export async function POST(request: NextRequest) {
   if (!user || !Number.isSafeInteger(userId) || userId <= 0) {
     return NextResponse.json({ error: 'Unauthorized. You must be logged in to chat.' }, { status: 401 });
   }
+  // Guest sessions are ephemeral: their turns are never persisted, and their
+  // in-conversation context comes from the client transcript, not the database.
+  // Durable, isolated history is a registered-account feature.
+  const isGuest = user.accountType === 'guest';
 
   const payload = await request.json().catch(() => null);
   const incomingMessages = normalizeIncomingMessages(payload?.messages);
@@ -339,8 +344,12 @@ export async function POST(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
       take: 3,
     }),
-    listCompanionMessages(userId, spoken ? 4 : 18, surfaceKind === 'practice' ? 'practice' : 'conversation', pathname),
-    listCompanionMemories(userId),
+    isGuest
+      ? Promise.resolve([] as Awaited<ReturnType<typeof listCompanionMessages>>)
+      : listCompanionMessages(userId, spoken ? 4 : 18, surfaceKind === 'practice' ? 'practice' : 'conversation', pathname),
+    isGuest
+      ? Promise.resolve([] as Awaited<ReturnType<typeof listCompanionMemories>>)
+      : listCompanionMemories(userId),
   ]);
 
   const learnerSummary = profile
@@ -427,12 +436,7 @@ export async function POST(request: NextRequest) {
   }
 
   const messages: ChatMessage[] = [
-    ...storedMessages
-      .filter((message): message is typeof message & { role: 'user' | 'assistant' } => message.role === 'user' || message.role === 'assistant')
-      .map((message) => ({
-        role: message.role,
-        content: spoken ? message.content.slice(0, 600) : message.content,
-      })),
+    ...selectHistoryForModel({ isGuest, incomingMessages, storedMessages, spoken }),
     { role: 'user', content: latestUserMessage },
   ];
 

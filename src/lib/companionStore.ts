@@ -1,8 +1,24 @@
 import { prisma } from '@/lib/prisma';
+import { isGuestIdentity } from '@/lib/auth';
 
 const PRIMARY_THREAD_KEY = 'primary';
 const MAX_STORED_MESSAGES = 80;
 const MAX_MEMORIES = 20;
+
+// Guest learners are ephemeral. Their conversations and remembered facts are
+// never written to (or served from) durable storage, so a shared browser that
+// inherits a guest cookie can never read a previous guest's saved chat. This is
+// the single choke point that enforces it — every read/write path routes
+// through here, so no individual caller can accidentally persist a guest turn.
+async function isGuestUser(userId: number): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { accountType: true, email: true },
+  });
+  // An id we cannot resolve is treated as ephemeral — never persist to it.
+  if (!user) return true;
+  return isGuestIdentity(user.accountType, user.email);
+}
 
 export type CompanionHistoryScope = 'all' | 'conversation' | 'practice';
 
@@ -37,6 +53,8 @@ export async function listCompanionMessages(
   scope: CompanionHistoryScope = 'all',
   pathname?: string,
 ) {
+  // Guests have no durable history to return, ever.
+  if (await isGuestUser(userId)) return [];
   const thread = await prisma.companionThread.findUnique({
     where: { userId_key: { userId, key: PRIMARY_THREAD_KEY } },
     select: { id: true },
@@ -59,6 +77,8 @@ export async function saveCompanionTurn(
   assistantContent: string,
   context: CompanionTurnContext,
 ) {
+  // Never persist a guest turn — guest conversations stay in the browser only.
+  if (await isGuestUser(userId)) return;
   const thread = await getOrCreatePrimaryThread(userId);
   const now = new Date();
 
@@ -107,6 +127,7 @@ export async function clearCompanionConversation(userId: number) {
 }
 
 export async function listCompanionMemories(userId: number) {
+  if (await isGuestUser(userId)) return [];
   const memories = await prisma.companionMemory.findMany({
     where: { userId },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -116,6 +137,9 @@ export async function listCompanionMemories(userId: number) {
 }
 
 export async function rememberCompanionFact(userId: number, content: string, locale: 'en' | 'ru') {
+  // Guests are ephemeral: an explicit "remember that…" is honoured only for the
+  // current turn's reply and is never written to durable storage.
+  if (await isGuestUser(userId)) return null;
   const existing = await listCompanionMemories(userId);
   const normalized = content.trim().toLocaleLowerCase();
   const duplicate = existing.find((memory) => memory.content.trim().toLocaleLowerCase() === normalized);

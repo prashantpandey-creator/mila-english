@@ -39,6 +39,19 @@ No local screenshot counts. No "LIVE" claim without both.**
 - The Apple Distribution IPA remains local only because App Store Connect is
   waiting for an interactive Apple ID sign-in and app-record creation before
   validation/upload.
+- **Guest chat isolation + history clearing — on branch
+  `claude/mia-session-management-history-g6p68j`, NOT on `main`, NOT deployed.**
+  Fixes the leak where a shared browser inheriting a guest cookie could read a
+  prior guest's saved conversation. Guest turns are now never persisted server
+  side and never served as history (`src/lib/companionStore.ts` guest guards,
+  `/api/chat/history` guest short-circuit); a guest's in-conversation context is
+  sourced from the client transcript instead of the DB
+  (`src/lib/companionHistory.ts`, unit-tested). Durable, isolated history stays
+  a registered-account feature. `scripts/clear-chat-history.mjs` (wired into the
+  Docker CMD, no-op unless `MILA_CLEAR_CHAT_HISTORY` is set to `guests`/`all`)
+  purges the already-stored histories. Awaiting review → merge to `main` →
+  deploy before any of this is live; set `MILA_CLEAR_CHAT_HISTORY=all` for one
+  deploy to wipe the existing leak, then unset.
 
 ## OWED (asked, NOT done — do not claim these)
 

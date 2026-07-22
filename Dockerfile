@@ -11,5 +11,6 @@ RUN npx next build
 EXPOSE 3000
 # Sync the runtime SQLite volume to the schema on every boot, then serve. Additive
 # changes (new tables/nullable columns) apply cleanly; a destructive change fails
-# loudly here rather than silently dropping data.
-CMD ["sh", "-c", "mkdir -p /data && touch /data/mila.db && npx prisma db push --skip-generate && npx next start -p 3000"]
+# loudly here rather than silently dropping data. The chat-history purge is a
+# no-op unless MILA_CLEAR_CHAT_HISTORY is set (see scripts/clear-chat-history.mjs).
+CMD ["sh", "-c", "mkdir -p /data && touch /data/mila.db && npx prisma db push --skip-generate && node scripts/clear-chat-history.mjs && npx next start -p 3000"]

@@ -9,8 +9,15 @@ function authenticatedUserId(user: { sub: string } | null): number | null {
 }
 
 export async function GET(request: NextRequest) {
-  const userId = authenticatedUserId(await authenticate(request));
+  const session = await authenticate(request);
+  const userId = authenticatedUserId(session);
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  // Guests never have durable, server-owned history. Returning empty here (in
+  // addition to the store-level guard) guarantees a guest browser session — or
+  // a shared device that inherited a guest cookie — can never read a prior
+  // guest's saved conversation.
+  if (session?.accountType === 'guest') return NextResponse.json({ messages: [] });
 
   const requestedLimit = Number(request.nextUrl.searchParams.get('limit') || 20);
   const limit = Number.isFinite(requestedLimit) ? Math.max(1, Math.min(Math.floor(requestedLimit), 80)) : 20;
