@@ -132,8 +132,10 @@ export default function HomePage() {
 
   const authHref = (route: '/login' | '/register', returnTo: string) => `${route}?returnTo=${encodeURIComponent(returnTo)}`;
   const startCta = () => router.push(isLoggedIn ? '/dashboard' : authHref('/register', '/dashboard'));
-  // The free front-door conversation: guest-open, playful companion Mila. No wall.
-  const startFreeTalk = () => router.push('/darshan?free=1');
+  // The free front-door conversation. The app is login-gated now: a logged-out
+  // learner is sent to the sign-in page, where they can log in OR deliberately
+  // "Continue as guest" before entering the voice room.
+  const startFreeTalk = () => router.push(isLoggedIn ? '/darshan?free=1' : authHref('/login', '/darshan?free=1'));
   const openDoor = (href: string) => router.push(isLoggedIn ? href : authHref('/register', href));
 
   const selectDemo = (key: DemoKey) => {
@@ -182,7 +184,7 @@ export default function HomePage() {
     },
   ];
 
-  const doors: { icon: MilaIconName; kicker: string; title: string; copy: string; href: string; cls: string; start?: boolean; guestOpen?: boolean }[] = [
+  const doors: { icon: MilaIconName; kicker: string; title: string; copy: string; href: string; cls: string; start?: boolean }[] = [
     {
       icon: 'level', cls: 'lp-door--lead', href: '/assessment', start: true,
       kicker: T('Проверка уровня', 'Level check'),
@@ -196,7 +198,7 @@ export default function HomePage() {
       copy: T('Живой голосовой диалог в спокойном пространстве. Никакого судейства — только внимание.', 'Live voice conversation in a calm, private space. No judgement — only attention.'),
     },
     {
-      icon: 'tutor', cls: 'lp-door--third', href: '/darshan?kids=1', guestOpen: true,
+      icon: 'tutor', cls: 'lp-door--third', href: '/darshan?kids=1',
       kicker: T('Для детей', 'For kids'),
       title: T('Мила для малышей', 'Mila for little ones'),
       copy: T('Милый анимированный друг: говорит просто и ласково, играет и хвалит за каждую попытку.', 'A cute animated buddy who talks simply and sweetly, plays, and cheers every little try.'),
@@ -468,7 +470,7 @@ export default function HomePage() {
                 <button
                   key={door.href}
                   className={`lp-door ${door.cls}`}
-                  onClick={() => (door.guestOpen ? router.push(door.href) : openDoor(door.href))}
+                  onClick={() => openDoor(door.href)}
                 >
                   {door.start && <span className="lp-door__start">{T('Начни здесь', 'Start here')}</span>}
                   <span className="lp-door__icon"><MilaIcon name={door.icon} size={26} /></span>

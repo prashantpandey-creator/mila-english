@@ -9,6 +9,7 @@
     "test": "node --import tsx --test src/lib/*.test.ts",
     "lint": "next lint",
     "telegram:webhook": "node scripts/telegram-webhook.mjs",
+    "clear-chat-history": "node scripts/clear-chat-history.mjs",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:seed": "prisma db seed"

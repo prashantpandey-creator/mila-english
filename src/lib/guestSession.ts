@@ -1,26 +1,25 @@
-// Voice surfaces must never dead-end an unauthenticated user with a login
-// demand — the app has instant guest sessions ("start free, no card").
-// When a voice flow hits a 401 it calls this once and retries.
-let guestSessionInFlight: Promise<boolean> | null = null;
+// The app is login-gated: a session — a registered account OR an explicitly
+// chosen guest — must already exist before a voice/chat flow runs. This helper
+// only REPORTS whether an active session exists; it never silently creates a
+// guest. Guests are created solely by the deliberate "Continue as guest"
+// control on the auth pages (POST /api/auth/guest), so a shared browser can no
+// longer be seated as a guest without a person choosing it, and a signed-in
+// learner is never replaced by a background guest cookie.
+let sessionCheckInFlight: Promise<boolean> | null = null;
 
-export async function ensureGuestSession(): Promise<boolean> {
-  if (guestSessionInFlight) return guestSessionInFlight;
-  guestSessionInFlight = (async () => {
+export async function hasActiveSession(): Promise<boolean> {
+  if (sessionCheckInFlight) return sessionCheckInFlight;
+  sessionCheckInFlight = (async () => {
     try {
-      // Never replace a signed-in learner with a new guest cookie. This also
-      // makes callers safe to run while a page is still resolving auth state.
-      const current = await fetch('/api/users/me', { cache: 'no-store' });
-      if (current.ok) return true;
-      if (current.status !== 401) return false;
-      const response = await fetch('/api/auth/guest', { method: 'POST' });
+      const response = await fetch('/api/users/me', { cache: 'no-store' });
       return response.ok;
     } catch {
       return false;
     }
   })();
   try {
-    return await guestSessionInFlight;
+    return await sessionCheckInFlight;
   } finally {
-    guestSessionInFlight = null;
+    sessionCheckInFlight = null;
   }
 }

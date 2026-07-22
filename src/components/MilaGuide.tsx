@@ -13,7 +13,7 @@ import { streamVoiceReply } from '@/lib/voiceChatStream'
 import { parseVoiceCommand } from '@/lib/voiceCommands'
 import { backchannelTexts, endpointSilenceMs, pickBackchannel } from '@/lib/voiceTurn'
 import { toSpokenText } from '@/lib/spokenText'
-import { ensureGuestSession } from '@/lib/guestSession'
+import { hasActiveSession } from '@/lib/guestSession'
 import MilaIcon from '@/components/ui/MilaIcon'
 
 type GuideContext = {
@@ -130,7 +130,7 @@ export default function MilaGuide() {
     // Text fallback must be a real conversation, including for first-time
     // visitors. Seat the private guest session in the background; if that is
     // unavailable the panel still keeps the explicit free-session controls.
-    void ensureGuestSession().then(async (seated) => {
+    void hasActiveSession().then(async (seated) => {
       if (!seated) return
       const fresh = await fetch('/api/guide/context')
         .then((response) => (response.ok ? response.json() : null))
@@ -314,7 +314,7 @@ export default function MilaGuide() {
     if (isVoiceRoom || !context || context.authenticated || guestTriedRef.current) return
     guestTriedRef.current = true
     let cancelled = false
-    void ensureGuestSession().then(async (seated) => {
+    void hasActiveSession().then(async (seated) => {
       if (cancelled) return
       if (!seated) {
         if (voiceModeRef.current) fallBackToTextChat('session')

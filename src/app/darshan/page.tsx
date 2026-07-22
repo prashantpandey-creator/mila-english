@@ -11,7 +11,7 @@ import { useI18n } from "@/lib/i18n-provider";
 import { startLocalTranscription, type LocalTranscript, type TranscriptionSession } from "@/lib/localTranscription";
 import { connectRealtimeVoice, type RealtimeVoiceSession } from "@/lib/realtimeVoice";
 import { microphoneErrorMessage, primeMicrophoneAudioContext } from "@/lib/microphone";
-import { ensureGuestSession } from "@/lib/guestSession";
+import { hasActiveSession } from "@/lib/guestSession";
 import { createStreamingTtsSession, spokenLocaleForText, ttsSpeak, type StreamingTtsSession } from "@/lib/tts";
 import { toSpokenText } from "@/lib/spokenText";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
@@ -99,7 +99,7 @@ export default function VoicePage() {
   // Android Chrome visitors in the same user-agent rate-limit bucket.
   useEffect(() => {
     if (!freeMode) return;
-    guestSessionRef.current = ensureGuestSession();
+    guestSessionRef.current = hasActiveSession();
   }, [freeMode]);
 
   const clearRestartTimer = useCallback(() => {
@@ -444,7 +444,7 @@ export default function VoicePage() {
           // chat endpoint from turning the fallback into a login dead-end.
           realtimeRef.current = null;
           if (!activeRef.current) return;
-          void ensureGuestSession().then((seated) => {
+          void hasActiveSession().then((seated) => {
             if (!activeRef.current) return;
             if (!seated) {
               activeRef.current = false;
@@ -567,8 +567,8 @@ export default function VoicePage() {
       }
 
       const seated = await (freeMode
-        ? (guestSessionRef.current ?? ensureGuestSession())
-        : ensureGuestSession());
+        ? (guestSessionRef.current ?? hasActiveSession())
+        : hasActiveSession());
       if (freeMode) guestSessionRef.current = seated ? Promise.resolve(true) : null;
       if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) return;
       if (!seated) {
