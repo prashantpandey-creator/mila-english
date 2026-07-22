@@ -182,7 +182,7 @@ export default function HomePage() {
     },
   ];
 
-  const doors: { icon: MilaIconName; kicker: string; title: string; copy: string; href: string; cls: string; start?: boolean }[] = [
+  const doors: { icon: MilaIconName; kicker: string; title: string; copy: string; href: string; cls: string; start?: boolean; guestOpen?: boolean }[] = [
     {
       icon: 'level', cls: 'lp-door--lead', href: '/assessment', start: true,
       kicker: T('Проверка уровня', 'Level check'),
@@ -194,6 +194,12 @@ export default function HomePage() {
       kicker: T('Мила-наставница', 'Mila tutor'),
       title: T('Разговаривай с Милой вслух', 'Talk it through with Mila'),
       copy: T('Живой голосовой диалог в спокойном пространстве. Никакого судейства — только внимание.', 'Live voice conversation in a calm, private space. No judgement — only attention.'),
+    },
+    {
+      icon: 'tutor', cls: 'lp-door--third', href: '/darshan?kids=1', guestOpen: true,
+      kicker: T('Для детей', 'For kids'),
+      title: T('Мила для малышей', 'Mila for little ones'),
+      copy: T('Милый анимированный друг: говорит просто и ласково, играет и хвалит за каждую попытку.', 'A cute animated buddy who talks simply and sweetly, plays, and cheers every little try.'),
     },
     {
       icon: 'listening', cls: 'lp-door--third', href: '/listen',
@@ -462,7 +468,7 @@ export default function HomePage() {
                 <button
                   key={door.href}
                   className={`lp-door ${door.cls}`}
-                  onClick={() => openDoor(door.href)}
+                  onClick={() => (door.guestOpen ? router.push(door.href) : openDoor(door.href))}
                 >
                   {door.start && <span className="lp-door__start">{T('Начни здесь', 'Start here')}</span>}
                   <span className="lp-door__icon"><MilaIcon name={door.icon} size={26} /></span>
