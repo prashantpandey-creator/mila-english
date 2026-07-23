@@ -10,7 +10,7 @@
   --mila-paper: #faf8f5; --mila-panel: #ffffff; --mila-raised: #f3f6f7; --mila-band: #dde8e3;
   --mila-ink: #26343b; --mila-muted: #5e6a6a; --mila-line: #d8e0e3; --mila-line-strong: #a9bab6;
   --mila-brand: #d9006c; --mila-brand-deep: #a40050;
-  --mila-brand-bright: #ff82c2;
+  --mila-brand-bright: #ff4f9e; --mila-brand-blush: #ff82c2;
   --mila-brand-plate: #75003f;
   --mila-brand-soft: rgba(217,0,108,.1); --mila-brand-line: rgba(217,0,108,.24);
   --mila-mineral: #26343b; --mila-mineral-mid: #40525a; --mila-mineral-soft: #d8e0e3;
@@ -4065,7 +4065,7 @@ html[data-mila-theme="dark"] .mila-showcase__nav button:hover {
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 27% 27% 27% 9%;
-  color: #ff82c2;
+  color: #ff4f9e;
   background:
     linear-gradient(145deg,rgba(255,255,255,.07),transparent 46%),
     #26343b;
@@ -4078,7 +4078,7 @@ html[data-mila-theme="dark"] .mila-showcase__nav button:hover {
   content: '';
   position: absolute;
   inset: 13%;
-  border: 1px solid rgba(255,130,194,.18);
+  border: 1px solid rgba(255,79,158,.24);
   border-radius: 21% 21% 21% 7%;
 }
 

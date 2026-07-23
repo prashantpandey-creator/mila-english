@@ -43,8 +43,10 @@ service must also be added to the workflow's up/health lists in the same commit.
 - **Palette:** linen ground `#faf8f5`, white panel `#ffffff`, mineral mist
   `#f3f6f7`, warm linen `#f1ece5`, eucalyptus mist `#dde8e3`, graphite ink
   `#26343b`, muted ink `#5e6a6a`, and neutral hairline `#d8e0e3`. Accessible
-  magenta `#d9006c`, deep action `#a40050`, and sampled bright pink `#ff82c2` remain Mila's
-  signature. Eucalyptus `#456a60`/`#5f7d72` is the supporting counterweight for
+  magenta `#d9006c`, deep action `#a40050`, and freedom pink `#ff4f9e` form
+  Mila's bold signature; the softer sampled blush `#ff82c2` carries warmth,
+  friendship, and love as a supporting tint rather than the main signal.
+  Eucalyptus `#456a60`/`#5f7d72` is the supporting counterweight for
   listening, measurement, progress, and atmosphere—not a category rainbow.
 - **Depth:** solid paper is the default, supported by broad planar gradients:
   graphite-to-eucalyptus for one anchor panel, linen-to-mist for quiet bands,

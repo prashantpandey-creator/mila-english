@@ -3,13 +3,14 @@
   --lp-ink: #26343b;
   --lp-muted: #69757a;
   --lp-line: rgba(38, 52, 59, 0.16);
-  --lp-pink: #ff82c2;
+  --lp-pink: #ff4f9e;
+  --lp-blush: #ff82c2;
   --lp-magenta: #d9006c;
   min-height: 100svh;
   overflow: hidden;
   color: var(--lp-ink);
   background:
-    radial-gradient(circle at 78% 32%, rgba(255, 130, 194, 0.12) 0, rgba(255, 130, 194, 0) 28rem),
+    radial-gradient(circle at 78% 32%, rgba(255, 79, 158, 0.14) 0, rgba(255, 79, 158, 0) 28rem),
     rgba(250, 248, 245, 0.96);
 }
 
@@ -58,7 +59,7 @@
   display: grid;
   place-items: center;
   color: #171214;
-  background: var(--lp-pink);
+  background: linear-gradient(145deg, var(--lp-pink) 0%, #ff5fa8 68%, var(--lp-blush) 100%);
   font: 800 16px/1 var(--font-sans, system-ui, sans-serif);
   border-radius: 50%;
 }
@@ -237,7 +238,7 @@
   display: flex;
   flex-direction: column;
   color: #171214;
-  background: var(--lp-pink);
+  background: linear-gradient(145deg, var(--lp-pink) 0%, #ff5fa8 68%, var(--lp-blush) 100%);
   box-shadow: 18px 18px 0 var(--lp-ink);
 }
 

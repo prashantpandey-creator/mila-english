@@ -20,7 +20,8 @@
   --mila-eucalyptus: #456a60;
   --mila-eucalyptus-mid: #5f7d72;
   --mila-eucalyptus-soft: #dde8e3;
-  --mila-accent: #ff82c2;
+  --mila-accent: #ff4f9e;
+  --mila-blush: #ff82c2;
   --mila-action: #d9006c;
   --mila-action-deep: #a40050;
   --mila-action-ink: #ffffff;
@@ -1841,7 +1842,7 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
 .mila-surface--app .chat-page__tone-toggle.is-playful {
   border-color: rgba(217,0,108,.42);
   color: var(--mila-action);
-  background: rgba(255,130,194,.13);
+  background: rgba(255,79,158,.13);
 }
 
 .mila-surface--app .chat-page__tone-toggle.is-playful::after {
