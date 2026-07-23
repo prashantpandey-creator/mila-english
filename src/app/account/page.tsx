@@ -127,7 +127,7 @@ export default function AccountPage() {
             </div>
             <p>{pro
               ? T(`Pro активен${expiry ? ` до ${expiry}` : ''}. Автопродления нет.`, `Pro is active${expiry ? ` until ${expiry}` : ''}. It does not renew automatically.`)
-              : T('Основные уроки и приватный голос остаются бесплатными. Pro добавляет быстрый живой голос и уроки по твоему запросу.', 'Core lessons and private voice stay free. Pro adds the fast live voice and custom lessons made for your goal.')}</p>
+              : T('Основные уроки и чат остаются бесплатными. Pro добавляет постоянный Live-голос и уроки по твоему запросу.', 'Core lessons and chat stay free. Pro adds ongoing Live voice and custom lessons made for your goal.')}</p>
             {purchase && ['created', 'pending'].includes(purchase.status) ? (
               <p className="account-feedback" role="status">{T('Платёж ещё проверяется. Pro включится только после подтверждения ЮKassa.', 'Payment verification is in progress. Pro activates only after YooKassa confirms it.')}</p>
             ) : purchase?.status === 'canceled' ? (

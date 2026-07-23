@@ -72,7 +72,7 @@ export default function PricingPage() {
             <ul>
               <li>{T('Проверка уровня и стартовый план', 'Level check and starter plan')}</li>
               <li>{T('Базовые уроки, слова и грамматика', 'Starter lessons, vocabulary, and grammar')}</li>
-              <li>{T('Приватный голос + Live-демо с главной страницы', 'Private voice + a live preview from the front door')}</li>
+              <li>{T('Одно Live-демо голоса с главной страницы', 'One Live voice preview from the front door')}</li>
               <li>{T('Чат и отслеживание прогресса', 'Chat and learning progress')}</li>
             </ul>
             <a className="pricing-cta" href={user ? '/dashboard' : '/register?returnTo=/dashboard'}>{T('Продолжить бесплатно', 'Continue free')}</a>

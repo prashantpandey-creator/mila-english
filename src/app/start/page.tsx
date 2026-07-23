@@ -84,7 +84,7 @@ export default function StartPage() {
       features: [
         T('Проверка уровня и стартовый план', 'Level check and starter plan'),
         T('Базовые уроки, слова и грамматика', 'Starter lessons, vocabulary, and grammar'),
-        T('Приватный голосовой путь Mila', 'Mila’s private voice path'),
+        T('Одно Live-демо голоса Mila', 'One Mila Live voice preview'),
         T('Чат и отслеживание прогресса', 'Chat and learning progress'),
       ],
     },
@@ -144,7 +144,7 @@ export default function StartPage() {
             <div className="ad-chips" aria-label={T('Условия старта', 'Getting started')}>
               <span><Icon name="check" size={13} />{T('Без карты', 'No card')}</span>
               <span><Icon name="check" size={13} />{T('Без VPN', 'No VPN')}</span>
-              <span><Icon name="lock" size={13} />{T('Приватный голос остаётся у Mila', 'Private voice stays with Mila')}</span>
+              <span><Icon name="lock" size={13} />{T('Live включается только с согласия', 'Live starts only with your consent')}</span>
             </div>
           </div>
         </section>

@@ -20,7 +20,8 @@ password-recovery links must use the public HTTPS origin.
 Mila has two honest access levels:
 
 - **Free** includes the level check, starter plan and lessons, vocabulary and
-  grammar practice, Mila's private voice path, Chat, and learning progress.
+  grammar practice, Chat, learning progress, and one consented Live voice
+  preview from the front door.
 - **Mila Pro — 30 days** costs **1 490 ₽** as a one-time pass. It adds custom
   lessons and the optional fast live-voice path. It does **not** renew
   automatically. A learner must convert a guest profile into an account before

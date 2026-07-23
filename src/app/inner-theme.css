@@ -1159,7 +1159,7 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 }
 .mila-surface--app .presence-picker {
   position: absolute;
-  top: calc(4.85rem + env(safe-area-inset-top, 0px));
+  top: calc(1rem + env(safe-area-inset-top, 0px));
   left: 1rem;
   z-index: 42;
   width: min(370px,calc(100vw - 2rem));
@@ -1364,7 +1364,7 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 
 @media (max-width: 640px) {
   .mila-surface--app .presence-picker {
-    top: calc(4.65rem + env(safe-area-inset-top, 0px));
+    top: calc(1rem + env(safe-area-inset-top, 0px));
   }
   .mila-surface--app .presence-ai-disclosure {
     top: calc(5rem + env(safe-area-inset-top, 0px));

@@ -14,8 +14,10 @@ The existing voice-state meter remains wrapped around every avatar:
 - carbon while thinking;
 - freedom pink while speaking.
 
-Private voice remains the default. Live voice keeps its separate, explicit
-OpenAI-audio consent.
+The unfinished private/local companion mode is temporarily removed from both
+the UI and runtime. Eligible preview or Pro accounts can use Live voice only
+after its separate, explicit OpenAI-audio consent; everyone else continues in
+text chat.
 
 ## Production assets
 
