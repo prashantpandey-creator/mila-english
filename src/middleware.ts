@@ -32,9 +32,8 @@ function isProtected(pathname: string) {
 }
 
 export async function middleware(request: NextRequest) {
-  // Gia's public-looking apex is internally rewritten to /darshan. Protect
-  // it here, before Next's host rewrite runs, so the new domain cannot bypass
-  // the same explicit sign-in/guest gate as the direct voice route.
+  // Gia's apex is internally rewritten to the protected voice room. Gate it
+  // before the host rewrite runs. Mia's traveler apex remains public.
   const giaApex = isGiaHostname(request.headers.get('host'))
     && request.nextUrl.pathname === '/';
   if (!isProtected(request.nextUrl.pathname) && !giaApex) return NextResponse.next();

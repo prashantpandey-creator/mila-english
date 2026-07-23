@@ -6,6 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
+import { isGiaHostname } from '@/lib/productHosts';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -25,11 +26,15 @@ export default function RegisterPage() {
   const [form, setForm] = useState({name:'',email:'',password:'',nativeLanguage:'Русский',learnerCategory:'absolute_beginner'});
   const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
   const [returnTo, setReturnTo] = useState('/dashboard');
+  const [isGia, setIsGia] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const up = (f:string) => (e:any) => setForm(p=>({...p,[f]:e.target.value}));
 
   useEffect(() => {
-    setReturnTo(safeReturnTo(new URLSearchParams(window.location.search).get('returnTo')));
+    const nextIsGia = isGiaHostname(window.location.hostname);
+    const requestedReturnTo = new URLSearchParams(window.location.search).get('returnTo');
+    setReturnTo(safeReturnTo(requestedReturnTo, nextIsGia ? '/chat' : '/dashboard'));
+    setIsGia(nextIsGia);
   }, []);
 
   const messageFor = (code?: string, fallback?: string) => {
@@ -72,8 +77,8 @@ export default function RegisterPage() {
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
           <span className="welcome-auth__brand">
-            <span className="welcome-auth__brand-mark">M</span>
-            <span className="welcome-auth__brand-name">Mila</span>
+            <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'M'}</span>
+            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila'}</span>
           </span>
           <LangToggle />
         </div>
@@ -84,8 +89,16 @@ export default function RegisterPage() {
             <div className="welcome-auth__bloom" aria-hidden="true">
               <MilaVoiceMark size={52} />
             </div>
-            <h1 className="welcome-auth__title">{t('register_title')}</h1>
-            <p className="welcome-auth__subtitle">{t('register_subtitle')}</p>
+            <h1 className="welcome-auth__title">
+              {isGia
+                ? (lang === 'ru' ? 'Присоединиться к Gia' : 'Join Gia')
+                : t('register_title')}
+            </h1>
+            <p className="welcome-auth__subtitle">
+              {isGia
+                ? (lang === 'ru' ? 'Сохраняй разговоры, языки и свой путь.' : 'Save your conversations, languages, and learning path.')
+                : t('register_subtitle')}
+            </p>
           </div>
           <form onSubmit={submit} className="welcome-auth__form">
             {error && <div className="welcome-auth__error" role="alert">{error}</div>}

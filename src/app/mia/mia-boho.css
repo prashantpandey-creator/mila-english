@@ -1,0 +1,1188 @@
+.mia-boho {
+  --mia-paper: #f5efe4;
+  --mia-paper-light: #fffaf2;
+  --mia-ink: #292521;
+  --mia-petrol: #29484b;
+  --mia-pink: #c43f70;
+  --mia-clay: #b96045;
+  --mia-moss: #74806b;
+  --mia-sand: #ddc9aa;
+  --mia-line: rgba(41, 37, 33, .16);
+  min-height: 100vh;
+  overflow: hidden;
+  color: var(--mia-ink);
+  background:
+    radial-gradient(circle at 8% 21%, rgba(196, 63, 112, .08), transparent 24rem),
+    radial-gradient(circle at 91% 62%, rgba(116, 128, 107, .13), transparent 28rem),
+    var(--mia-paper);
+  font-family: var(--font-sans), sans-serif;
+}
+
+.mia-boho,
+.mia-boho * {
+  box-sizing: border-box;
+}
+
+.mia-boho a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mia-boho__skip {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+  padding: 10px 14px;
+  color: var(--mia-paper-light) !important;
+  background: var(--mia-petrol);
+  transform: translateY(-150%);
+  transition: transform .2s ease;
+}
+
+.mia-boho__skip:focus {
+  transform: translateY(0);
+}
+
+.mia-boho :focus-visible {
+  outline: 3px solid var(--mia-pink);
+  outline-offset: 4px;
+}
+
+.mia-boho__nav {
+  position: relative;
+  z-index: 20;
+  width: min(1220px, calc(100% - 48px));
+  min-height: 84px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 28px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--mia-line);
+}
+
+.mia-boho__brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mia-boho__brand > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  border: 1px solid var(--mia-pink);
+  border-radius: 50% 44% 48% 42%;
+  color: var(--mia-pink);
+  background: rgba(255, 250, 242, .65);
+  font: 400 21px/1 var(--font-display), serif;
+  transform: rotate(-4deg);
+}
+
+.mia-boho__brand strong {
+  font: 400 25px/1 var(--font-display), serif;
+}
+
+.mia-boho__brand small {
+  max-width: 210px;
+  padding-left: 10px;
+  border-left: 1px solid var(--mia-line);
+  color: rgba(41, 37, 33, .62);
+  font: 500 9px/1.35 var(--font-mono), monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.mia-boho__nav > nav {
+  display: flex;
+  gap: 26px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mia-boho__nav > nav a,
+.mia-boho__signin {
+  position: relative;
+}
+
+.mia-boho__nav > nav a::after,
+.mia-boho__signin::after {
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -7px;
+  height: 2px;
+  content: '';
+  background: var(--mia-pink);
+  transition: right .25s ease;
+}
+
+.mia-boho__nav > nav a:hover::after,
+.mia-boho__signin:hover::after {
+  right: 0;
+}
+
+.mia-boho__nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.mia-boho__nav .lang-toggle {
+  border: 1px solid var(--mia-line);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, .65);
+}
+
+.mia-boho__nav .lang-toggle button {
+  color: rgba(41, 37, 33, .62);
+}
+
+.mia-boho__nav .lang-toggle button.active {
+  color: #fff;
+  background: var(--mia-petrol);
+}
+
+.mia-boho__signin {
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.mia-boho__hero {
+  position: relative;
+  width: min(1220px, calc(100% - 48px));
+  min-height: 690px;
+  display: grid;
+  grid-template-columns: 1.02fr .98fr;
+  align-items: center;
+  gap: clamp(36px, 6vw, 86px);
+  margin: 0 auto;
+  padding: 64px 0 80px;
+}
+
+.mia-boho__hero::before {
+  position: absolute;
+  left: -17vw;
+  right: 46%;
+  bottom: 35px;
+  height: 1px;
+  content: '';
+  background: linear-gradient(90deg, transparent, var(--mia-pink), transparent);
+  opacity: .45;
+}
+
+.mia-boho__hero-copy {
+  position: relative;
+  z-index: 3;
+  max-width: 650px;
+}
+
+.mia-boho__eyebrow,
+.mia-boho__section-label {
+  margin: 0;
+  color: var(--mia-pink);
+  font: 500 10px/1.5 var(--font-mono), monospace;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.mia-boho__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.mia-boho__eyebrow span {
+  width: 30px;
+  height: 1px;
+  background: currentColor;
+}
+
+.mia-boho__hero h1,
+.mia-boho h2,
+.mia-boho h3 {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+}
+
+.mia-boho__hero h1 {
+  max-width: 690px;
+  margin-top: 22px;
+  font-size: clamp(4rem, 7.5vw, 7.05rem);
+  line-height: .89;
+  letter-spacing: -.055em;
+}
+
+.mia-boho__hero h1 em {
+  display: block;
+  color: var(--mia-pink);
+  font-style: normal;
+}
+
+.mia-boho__hero-intro {
+  max-width: 590px;
+  margin: 28px 0 0;
+  color: rgba(41, 37, 33, .75);
+  font-size: clamp(1rem, 1.45vw, 1.18rem);
+  line-height: 1.7;
+}
+
+.mia-boho__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px;
+  margin-top: 32px;
+}
+
+.mia-boho__button {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 22px;
+  border: 1px solid var(--mia-petrol);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.mia-boho__button--primary {
+  color: #fff !important;
+  background: var(--mia-petrol);
+  box-shadow: 0 15px 34px rgba(41, 72, 75, .18);
+}
+
+.mia-boho__button--secondary {
+  background: rgba(255, 250, 242, .7);
+}
+
+.mia-boho__button:hover {
+  transform: translateY(-2px);
+}
+
+.mia-boho__button--primary:hover {
+  background: #203b3e;
+  box-shadow: 0 18px 38px rgba(41, 72, 75, .25);
+}
+
+.mia-boho__assurance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 23px 0 0;
+  padding: 0;
+  color: rgba(41, 37, 33, .56);
+  font: 500 9px/1.4 var(--font-mono), monospace;
+  letter-spacing: .08em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.mia-boho__assurance li {
+  position: relative;
+}
+
+.mia-boho__assurance li + li::before {
+  position: absolute;
+  left: -13px;
+  content: '·';
+  color: var(--mia-pink);
+}
+
+.mia-boho__hero-art {
+  position: relative;
+  align-self: stretch;
+  min-height: 550px;
+  overflow: hidden;
+  border: 1px solid rgba(41, 37, 33, .12);
+  border-radius: 48% 48% 9% 8% / 26% 23% 7% 8%;
+  background: var(--mia-paper-light);
+  box-shadow: 0 30px 75px rgba(86, 57, 39, .14);
+  clip-path: polygon(3% 2%, 98% 0, 100% 92%, 93% 98%, 6% 100%, 0 91%, 0 8%);
+  transform: rotate(.45deg);
+}
+
+.mia-boho__hero-art img {
+  object-fit: cover;
+  object-position: 72% center;
+  animation: miaBohoDrift 28s ease-in-out infinite alternate;
+}
+
+.mia-boho__hero-art::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background:
+    linear-gradient(100deg, rgba(245, 239, 228, .34), transparent 52%),
+    linear-gradient(0deg, rgba(41, 37, 33, .09), transparent 45%);
+}
+
+.mia-boho__hero-thread {
+  position: absolute;
+  top: 9%;
+  right: 8%;
+  z-index: 2;
+  width: 76px;
+  height: 76px;
+  border: 1px solid rgba(196, 63, 112, .42);
+  border-radius: 50%;
+  box-shadow: 0 0 0 13px rgba(196, 63, 112, .05), 0 0 0 26px rgba(196, 63, 112, .035);
+}
+
+.mia-boho__phrase-card {
+  position: absolute;
+  right: 26%;
+  bottom: 54px;
+  z-index: 4;
+  width: min(312px, 36vw);
+  padding: 22px 24px;
+  border: 1px solid var(--mia-line);
+  background: rgba(255, 250, 242, .96);
+  box-shadow: 0 22px 55px rgba(59, 37, 25, .17);
+  transform: rotate(-1deg);
+}
+
+.mia-boho__phrase-card::before {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 72px;
+  height: 18px;
+  content: '';
+  background: rgba(221, 201, 170, .7);
+  transform: translateX(-50%) rotate(2deg);
+}
+
+.mia-boho__phrase-card > p {
+  margin: 0 0 15px;
+  color: var(--mia-clay);
+  font: 500 9px/1.3 var(--font-mono), monospace;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.mia-boho__phrase-card strong {
+  display: block;
+  font: 400 clamp(1.25rem, 2vw, 1.65rem)/1.2 var(--font-display), serif;
+}
+
+.mia-boho__phrase-card > span {
+  display: block;
+  margin-top: 7px;
+  color: rgba(41, 37, 33, .62);
+  font-size: 12px;
+}
+
+.mia-boho__phrase-card a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--mia-line);
+  color: var(--mia-petrol);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.mia-boho__moments,
+.mia-boho__product,
+.mia-boho__culture,
+.mia-boho__languages {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.mia-boho__moments {
+  padding: clamp(78px, 10vw, 130px) 0;
+  border-top: 1px solid var(--mia-line);
+}
+
+.mia-boho__moments > div:first-child {
+  display: grid;
+  grid-template-columns: .75fr 1.25fr;
+  align-items: end;
+  gap: 40px;
+}
+
+.mia-boho__moments h2,
+.mia-boho__product h2,
+.mia-boho__culture h2,
+.mia-boho__companion h2,
+.mia-boho__languages h2,
+.mia-boho__final h2 {
+  font-size: clamp(2.7rem, 5vw, 4.65rem);
+  line-height: .98;
+  letter-spacing: -.04em;
+}
+
+.mia-boho__scenario-rail {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 48px;
+  border-top: 1px solid var(--mia-line);
+  border-bottom: 1px solid var(--mia-line);
+}
+
+.mia-boho__scenario-rail article {
+  min-height: 176px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr auto;
+  gap: 18px;
+  padding: 24px 20px;
+  border-right: 1px solid var(--mia-line);
+  transition: color .25s ease, background .25s ease, transform .25s ease;
+}
+
+.mia-boho__scenario-rail article:first-child {
+  border-left: 1px solid var(--mia-line);
+}
+
+.mia-boho__scenario-rail article > span {
+  color: rgba(41, 37, 33, .35);
+  font: 500 9px/1 var(--font-mono), monospace;
+}
+
+.mia-boho__scenario-rail article strong {
+  grid-column: 1 / -1;
+  max-width: 130px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.mia-boho__scenario-rail article:hover {
+  color: #fff;
+  background: var(--mia-petrol);
+  transform: translateY(-3px);
+}
+
+.mia-boho__scenario-rail article:hover > span {
+  color: rgba(255, 255, 255, .5);
+}
+
+.mia-boho__product {
+  display: grid;
+  grid-template-columns: 1.06fr .94fr;
+  align-items: center;
+  gap: clamp(52px, 9vw, 124px);
+  padding: clamp(90px, 13vw, 170px) 0;
+}
+
+.mia-boho__product-copy > p:not(.mia-boho__section-label) {
+  max-width: 620px;
+  margin: 25px 0 0;
+  color: rgba(41, 37, 33, .68);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.mia-boho__product-copy h2,
+.mia-boho__culture h2,
+.mia-boho__companion h2,
+.mia-boho__languages h2 {
+  margin-top: 16px;
+}
+
+.mia-boho__feature-list {
+  margin-top: 39px;
+  border-top: 1px solid var(--mia-line);
+}
+
+.mia-boho__feature-list article {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 19px;
+  padding: 21px 0;
+  border-bottom: 1px solid var(--mia-line);
+}
+
+.mia-boho__feature-list article > span {
+  color: var(--mia-clay);
+  font: 500 10px/1.5 var(--font-mono), monospace;
+}
+
+.mia-boho__feature-list strong {
+  display: block;
+  font-size: 13px;
+}
+
+.mia-boho__feature-list p {
+  margin: 5px 0 0;
+  color: rgba(41, 37, 33, .62);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.mia-boho__demo {
+  position: relative;
+  min-height: 540px;
+  padding: 29px;
+  border: 1px solid rgba(255, 255, 255, .13);
+  color: #f9f5ec;
+  background:
+    radial-gradient(circle at 74% 16%, rgba(196, 63, 112, .23), transparent 17rem),
+    linear-gradient(145deg, #29484b, #203638);
+  box-shadow: 0 35px 80px rgba(41, 72, 75, .22);
+  transform: rotate(.65deg);
+}
+
+.mia-boho__demo::after {
+  position: absolute;
+  inset: 11px;
+  content: '';
+  border: 1px solid rgba(255, 255, 255, .08);
+  pointer-events: none;
+}
+
+.mia-boho__demo-topline {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, .58);
+  font: 500 9px/1.3 var(--font-mono), monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.mia-boho__demo-topline span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mia-boho__demo-topline i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e2769d;
+  box-shadow: 0 0 0 5px rgba(226, 118, 157, .12);
+}
+
+.mia-boho__wave {
+  position: relative;
+  z-index: 1;
+  height: 102px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 68px 0 33px;
+}
+
+.mia-boho__wave i {
+  width: 3px;
+  min-height: 8px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #f4bed2, #d54d7f);
+  transform-origin: center;
+  animation: miaBohoWave 1.8s ease-in-out infinite alternate;
+}
+
+.mia-boho__wave i:nth-child(3n) {
+  animation-delay: -.8s;
+}
+
+.mia-boho__wave i:nth-child(4n + 1) {
+  animation-delay: -.35s;
+}
+
+.mia-boho__demo blockquote {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+}
+
+.mia-boho__demo blockquote p {
+  margin: 0;
+  font: 400 clamp(1.6rem, 3vw, 2.35rem)/1.22 var(--font-display), serif;
+}
+
+.mia-boho__demo blockquote footer {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, .55);
+  font-size: 11px;
+}
+
+.mia-boho__culture-note {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  margin-top: 38px;
+  padding: 17px;
+  border: 1px solid rgba(255, 255, 255, .11);
+  background: rgba(255, 255, 255, .055);
+}
+
+.mia-boho__culture-note p {
+  margin: 0;
+  color: rgba(255, 255, 255, .7);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.mia-boho__culture-note strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #f5c4d6;
+  font: 500 9px/1.4 var(--font-mono), monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.mia-boho__demo > a {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 24px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.mia-boho__culture {
+  padding: clamp(95px, 12vw, 160px) 0;
+  border-top: 1px solid var(--mia-line);
+}
+
+.mia-boho__culture > header {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  align-items: end;
+  gap: 70px;
+}
+
+.mia-boho__culture > header > p {
+  margin: 0 0 4px;
+  color: rgba(41, 37, 33, .65);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.mia-boho__stories {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
+  margin-top: 54px;
+}
+
+.mia-boho__stories article {
+  position: relative;
+  min-width: 0;
+  padding: 13px 13px 26px;
+  border: 1px solid var(--mia-line);
+  background: rgba(255, 250, 242, .65);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.mia-boho__stories article:nth-child(2) {
+  transform: translateY(25px) rotate(.45deg);
+}
+
+.mia-boho__stories article:hover {
+  z-index: 1;
+  transform: translateY(-3px);
+  box-shadow: 0 24px 58px rgba(76, 49, 32, .13);
+}
+
+.mia-boho__story-image {
+  position: relative;
+  height: 260px;
+  overflow: hidden;
+  filter: saturate(.78) sepia(.08);
+}
+
+.mia-boho__story-image img {
+  object-fit: cover;
+  transition: transform .6s ease;
+}
+
+.mia-boho__stories article:hover img {
+  transform: scale(1.025);
+}
+
+.mia-boho__stories article > p {
+  margin: 17px 0 0;
+  color: var(--mia-clay);
+  font: 500 9px/1.4 var(--font-mono), monospace;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.mia-boho__stories h3 {
+  margin-top: 10px;
+  font-size: 1.55rem;
+  line-height: 1.12;
+}
+
+.mia-boho__stories article > span {
+  display: block;
+  margin-top: 11px;
+  color: rgba(41, 37, 33, .63);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.mia-boho__text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 56px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mia-pink);
+  color: var(--mia-pink) !important;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mia-boho__companion {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 90px;
+  padding: clamp(88px, 11vw, 150px) max(24px, calc((100vw - 1180px) / 2));
+  color: #f8f1e5;
+  background:
+    radial-gradient(circle at 18% 80%, rgba(196, 63, 112, .18), transparent 25rem),
+    var(--mia-petrol);
+}
+
+.mia-boho__companion .mia-boho__section-label {
+  color: #ed9cba;
+}
+
+.mia-boho__companion > div:last-child > p {
+  max-width: 570px;
+  margin: 0;
+  color: rgba(255, 255, 255, .68);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.mia-boho__companion ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 34px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mia-boho__companion li {
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, .8);
+  font: 500 9px/1 var(--font-mono), monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.mia-boho__languages {
+  position: relative;
+  display: grid;
+  grid-template-columns: 110px 1fr 250px;
+  align-items: center;
+  gap: 42px;
+  padding: clamp(90px, 12vw, 150px) 0;
+}
+
+.mia-boho__languages > span {
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--mia-pink);
+  border-radius: 50%;
+  color: var(--mia-pink);
+  font: 400 43px/1 var(--font-display), serif;
+  transform: rotate(-5deg);
+}
+
+.mia-boho__languages > div > p:last-child {
+  max-width: 710px;
+  margin: 24px 0 0;
+  color: rgba(41, 37, 33, .66);
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.mia-boho__languages aside {
+  padding: 22px;
+  border-left: 2px solid var(--mia-clay);
+  background: rgba(221, 201, 170, .28);
+}
+
+.mia-boho__languages aside p {
+  margin: 0 0 12px;
+  color: rgba(41, 37, 33, .63);
+  font-size: 11px;
+}
+
+.mia-boho__languages aside a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--mia-petrol);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.mia-boho__final {
+  position: relative;
+  padding: clamp(110px, 16vw, 210px) 24px;
+  overflow: hidden;
+  text-align: center;
+  background:
+    linear-gradient(rgba(255, 250, 242, .84), rgba(255, 250, 242, .92)),
+    url('/ambience/stills/nature-cliff.jpg') center 56% / cover;
+}
+
+.mia-boho__final::before,
+.mia-boho__final::after {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  content: '';
+  border: 1px solid rgba(196, 63, 112, .22);
+  border-radius: 50%;
+}
+
+.mia-boho__final::before {
+  top: -75px;
+  left: 8%;
+}
+
+.mia-boho__final::after {
+  right: 7%;
+  bottom: -92px;
+  width: 240px;
+  height: 240px;
+}
+
+.mia-boho__final h2 {
+  position: relative;
+  z-index: 1;
+  margin-top: 17px;
+  font-size: clamp(3.4rem, 7vw, 6.6rem);
+}
+
+.mia-boho__final > p:not(.mia-boho__section-label) {
+  position: relative;
+  z-index: 1;
+  margin: 22px auto 0;
+  color: rgba(41, 37, 33, .67);
+  font-size: 15px;
+}
+
+.mia-boho__final .mia-boho__button {
+  position: relative;
+  z-index: 1;
+  margin-top: 32px;
+}
+
+.mia-boho__footer {
+  min-height: 116px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 30px;
+  padding: 24px max(24px, calc((100vw - 1180px) / 2));
+  border-top: 1px solid var(--mia-line);
+  background: var(--mia-paper-light);
+}
+
+.mia-boho__footer .mia-boho__brand small {
+  max-width: 320px;
+}
+
+.mia-boho__footer nav {
+  display: flex;
+  gap: 22px;
+  color: rgba(41, 37, 33, .62);
+  font-size: 10px;
+}
+
+.mia-boho__footer > span {
+  justify-self: end;
+  color: rgba(41, 37, 33, .46);
+  font: 500 9px/1 var(--font-mono), monospace;
+}
+
+@keyframes miaBohoDrift {
+  from { transform: scale(1.015); }
+  to { transform: scale(1.05); }
+}
+
+@keyframes miaBohoWave {
+  from { transform: scaleY(.78); opacity: .72; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+@media (max-width: 960px) {
+  .mia-boho__nav {
+    grid-template-columns: 1fr auto;
+  }
+
+  .mia-boho__nav > nav {
+    display: none;
+  }
+
+  .mia-boho__hero {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .mia-boho__hero h1 {
+    font-size: clamp(3.9rem, 8.7vw, 5.5rem);
+  }
+
+  .mia-boho__phrase-card {
+    right: 13%;
+    width: 290px;
+  }
+
+  .mia-boho__moments > div:first-child {
+    grid-template-columns: 1fr;
+  }
+
+  .mia-boho__scenario-rail {
+    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .mia-boho__scenario-rail article {
+    scroll-snap-align: start;
+  }
+
+  .mia-boho__product {
+    grid-template-columns: 1fr;
+  }
+
+  .mia-boho__demo {
+    width: min(620px, 100%);
+    margin: 0 auto;
+    transform: none;
+  }
+
+  .mia-boho__stories {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mia-boho__stories article:last-child {
+    grid-column: 1 / -1;
+    width: calc(50% - 8px);
+    justify-self: center;
+  }
+
+  .mia-boho__companion {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .mia-boho__languages {
+    grid-template-columns: 90px 1fr;
+  }
+
+  .mia-boho__languages aside {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 700px) {
+  .mia-boho__nav,
+  .mia-boho__hero,
+  .mia-boho__moments,
+  .mia-boho__product,
+  .mia-boho__culture,
+  .mia-boho__languages {
+    width: min(100% - 30px, 1180px);
+  }
+
+  .mia-boho__nav {
+    min-height: 70px;
+    gap: 12px;
+  }
+
+  .mia-boho__brand small,
+  .mia-boho__signin {
+    display: none;
+  }
+
+  .mia-boho__nav-actions {
+    gap: 6px;
+  }
+
+  .mia-boho__hero {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding: 55px 0 96px;
+  }
+
+  .mia-boho__hero-copy {
+    order: 1;
+  }
+
+  .mia-boho__hero h1 {
+    font-size: clamp(3.45rem, 16.5vw, 5rem);
+  }
+
+  .mia-boho__hero-intro {
+    margin-top: 22px;
+    font-size: .95rem;
+  }
+
+  .mia-boho__hero-art {
+    order: 2;
+    min-height: 390px;
+    border-radius: 48% 48% 7% 7% / 22% 22% 5% 5%;
+  }
+
+  .mia-boho__phrase-card {
+    right: 12px;
+    bottom: 34px;
+    width: min(285px, calc(100% - 24px));
+  }
+
+  .mia-boho__actions {
+    flex-direction: column;
+  }
+
+  .mia-boho__button {
+    width: 100%;
+  }
+
+  .mia-boho__assurance {
+    gap: 8px 18px;
+  }
+
+  .mia-boho__moments {
+    padding: 80px 0;
+  }
+
+  .mia-boho__moments h2,
+  .mia-boho__product h2,
+  .mia-boho__culture h2,
+  .mia-boho__companion h2,
+  .mia-boho__languages h2 {
+    font-size: 2.7rem;
+  }
+
+  .mia-boho__scenario-rail {
+    margin-top: 35px;
+  }
+
+  .mia-boho__scenario-rail article {
+    min-height: 154px;
+  }
+
+  .mia-boho__product {
+    gap: 58px;
+    padding: 94px 0;
+  }
+
+  .mia-boho__demo {
+    min-height: 500px;
+    padding: 23px;
+  }
+
+  .mia-boho__wave {
+    margin-top: 58px;
+  }
+
+  .mia-boho__culture {
+    padding: 90px 0 110px;
+  }
+
+  .mia-boho__culture > header {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .mia-boho__stories {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 40px;
+  }
+
+  .mia-boho__stories article:nth-child(2),
+  .mia-boho__stories article:last-child {
+    width: 100%;
+    grid-column: auto;
+    transform: none;
+  }
+
+  .mia-boho__story-image {
+    height: 230px;
+  }
+
+  .mia-boho__companion {
+    gap: 28px;
+    padding: 88px 20px;
+  }
+
+  .mia-boho__languages {
+    grid-template-columns: 1fr;
+    padding: 90px 0;
+  }
+
+  .mia-boho__languages > span {
+    width: 66px;
+    height: 66px;
+    font-size: 31px;
+  }
+
+  .mia-boho__languages aside {
+    grid-column: auto;
+  }
+
+  .mia-boho__final {
+    padding-block: 110px;
+  }
+
+  .mia-boho__footer {
+    grid-template-columns: 1fr auto;
+  }
+
+  .mia-boho__footer .mia-boho__brand small {
+    display: none;
+  }
+
+  .mia-boho__footer nav {
+    justify-self: end;
+  }
+
+  .mia-boho__footer > span {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mia-boho *,
+  .mia-boho *::before,
+  .mia-boho *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

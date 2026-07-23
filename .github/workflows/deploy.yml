@@ -185,17 +185,18 @@ jobs:
               }
               console.log('Realtime paid-only invariant active');
             "
-            # Gia is a second product surface served by the same application
-            # container. Install its Caddy vhost only after the new image is
+            # Gia and Mia are product surfaces served by the same application
+            # container. Install their Caddy vhosts only after the new image is
             # healthy; the script validates, reloads, and rolls back on failure.
             bash scripts/configure-gia-proxy.sh
             for attempt in $(seq 1 30); do
-              if curl -fsS --max-time 10 https://gia.purangpt.com/login >/dev/null; then
-                echo "Gia HTTPS route is live"
+              mia_status=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' https://mia.purangpt.com/ || true)
+              if [ "$mia_status" = "200" ] && curl -fsS --max-time 10 https://gia.purangpt.com/login >/dev/null; then
+                echo "Gia companion and Mia traveler routes are live"
                 break
               fi
               if [ "$attempt" -eq 30 ]; then
-                echo "Gia HTTPS route did not become ready"
+                echo "Gia or Mia HTTPS route did not become ready"
                 exit 1
               fi
               sleep 2

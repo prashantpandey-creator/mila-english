@@ -3,25 +3,28 @@
 import { useEffect, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { routeSurfaceForPath } from '@/lib/routeSurface';
+import { isMiaHostname } from '@/lib/productHosts';
 
 export default function RouteSurface({ children }: { children: ReactNode }) {
   const pathname = usePathname() || '/';
   const surface = routeSurfaceForPath(pathname);
-  const isMarketing = pathname === '/' || pathname === '/start';
+  const isMarketing = pathname === '/' || pathname === '/start' || pathname === '/mia';
 
   // Route intent is deterministic: the same mineral-paper language on every
   // page. A saved device preference must never split Mila into competing
   // palettes or make a voice room feel like a different product.
   useEffect(() => {
+    const isMia = isMiaHostname(window.location.hostname);
     document.documentElement.dataset.milaTheme = 'light';
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    if (meta) meta.content = '#faf8f5';
+    if (meta) meta.content = pathname === '/mia' || isMia ? '#f5efe4' : '#faf8f5';
   }, [pathname, surface]);
 
   useEffect(() => {
+    const effectivePathname = isMiaHostname(window.location.hostname) && pathname === '/' ? '/mia' : pathname;
     document.documentElement.dataset.milaSurface = surface;
     document.documentElement.dataset.milaApp = isMarketing ? 'marketing' : 'app';
-    document.documentElement.dataset.milaRoute = pathname;
+    document.documentElement.dataset.milaRoute = effectivePathname;
     return () => {
       delete document.documentElement.dataset.milaSurface;
       delete document.documentElement.dataset.milaApp;
@@ -31,7 +34,7 @@ export default function RouteSurface({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className={`mila-surface mila-surface--${surface} ${isMarketing ? 'mila-surface--marketing' : 'mila-surface--app'}${pathname === '/' ? ' mila-surface--front' : ''}`}
+      className={`mila-surface mila-surface--${surface} ${isMarketing ? 'mila-surface--marketing' : 'mila-surface--app'}${pathname === '/' || pathname === '/mia' ? ' mila-surface--front' : ''}`}
       data-surface={surface}
       data-route={pathname}
     >

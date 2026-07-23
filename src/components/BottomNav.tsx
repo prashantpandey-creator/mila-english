@@ -18,7 +18,7 @@ const TABS: Tab[] = [
   { href: '/progress', icon: 'progress', ru: 'Прогресс', en: 'Progress', routes: ['/progress'] },
 ];
 
-const HIDDEN = ['/', '/start', '/login', '/register', '/darshan', '/chat', '/pia', '/practice', '/voice-lab', '/privacy', '/support'];
+const HIDDEN = ['/', '/start', '/mia', '/login', '/register', '/darshan', '/chat', '/pia', '/practice', '/voice-lab', '/privacy', '/support'];
 
 function HomeGlyph() {
   return (

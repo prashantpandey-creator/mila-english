@@ -24,9 +24,12 @@ test('production services and ordinary deploy builds stay bounded', () => {
   assert.doesNotMatch(workflow, /docker compose -f docker-compose\.prod\.yml build\s*$/m);
 });
 
-test('production provisions Gia while preserving the legacy hostname in the app', () => {
+test('production provisions Gia and Mia while preserving the legacy hostname in the app', () => {
   assert.match(workflow, /bash scripts\/configure-gia-proxy\.sh/);
   assert.match(workflow, /https:\/\/gia\.purangpt\.com\/login/);
+  assert.match(workflow, /mia_status=.*https:\/\/mia\.purangpt\.com\//);
+  assert.match(workflow, /Gia companion and Mia traveler routes are live/);
   assert.match(giaProxy, /gia\.purangpt\.com/);
+  assert.match(giaProxy, /mia\.purangpt\.com/);
   assert.doesNotMatch(giaProxy, /miachat\.purangpt\.com/);
 });

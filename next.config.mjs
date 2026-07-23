@@ -2,7 +2,9 @@
 //   • on pia.purangpt.com  → her voice room sits at the apex (/ → /pia)
 //   • on mila.purangpt.com → /pia does not exist; a stray poke lands on the
 //     front door, revealing nothing.
-//   • on gia.purangpt.com → the synthetic companion sits at the apex
+//   • on gia.purangpt.com → Gia's companion voice room sits at the apex.
+//   • on mia.purangpt.com → Mia's public travel/culture front door sits at
+//     the apex and hands conversation to Gia.
 //   • on mila.purangpt.com → voice/chat routes move to Gia, while the
 //     learning product keeps its dashboard, curriculum, and progress.
 //   • on miachat.purangpt.com → legacy links redirect to Gia.
@@ -11,6 +13,7 @@
 const MILA_HOST = process.env.MILA_HOST || 'mila.purangpt.com';
 const PIA_HOST = process.env.PIA_HOST || 'pia.purangpt.com';
 const GIA_HOST = process.env.GIA_HOST || 'gia.purangpt.com';
+const MIA_HOST = process.env.MIA_HOST || 'mia.purangpt.com';
 const LEGACY_MIACHAT_HOST = process.env.LEGACY_MIACHAT_HOST || 'miachat.purangpt.com';
 const MILA_LEARNING_ROUTES = [
   '/dashboard',
@@ -70,16 +73,21 @@ const config = {
         has: [{ type: 'host', value: GIA_HOST }],
         destination: '/darshan',
       },
+      {
+        source: '/',
+        has: [{ type: 'host', value: MIA_HOST }],
+        destination: '/mia',
+      },
     ];
   },
   async redirects() {
     return [
-      ...MILA_LEARNING_ROUTES.map((source) => ({
-        source,
-        has: [{ type: 'host', value: GIA_HOST }],
-        destination: `https://${MILA_HOST}${source}`,
-        permanent: false,
-      })),
+      ...[GIA_HOST, MIA_HOST].flatMap((host) => MILA_LEARNING_ROUTES.map((source) => ({
+          source,
+          has: [{ type: 'host', value: host }],
+          destination: `https://${MILA_HOST}${source}`,
+          permanent: false,
+        }))),
       {
         source: '/:path*',
         has: [{ type: 'host', value: LEGACY_MIACHAT_HOST }],
@@ -105,7 +113,43 @@ const config = {
         permanent: false,
       },
       {
+        source: '/chat',
+        has: [{ type: 'host', value: MIA_HOST }],
+        destination: `https://${GIA_HOST}/chat`,
+        permanent: false,
+      },
+      {
         source: '/darshan',
+        has: [{ type: 'host', value: MIA_HOST }],
+        destination: `https://${GIA_HOST}/`,
+        permanent: false,
+      },
+      ...['/login', '/register', '/account'].map((source) => ({
+        source,
+        has: [{ type: 'host', value: MIA_HOST }],
+        destination: `https://${GIA_HOST}${source}`,
+        permanent: false,
+      })),
+      {
+        source: '/darshan',
+        has: [{ type: 'host', value: GIA_HOST }],
+        destination: `https://${GIA_HOST}/`,
+        permanent: false,
+      },
+      {
+        source: '/mia',
+        has: [{ type: 'host', value: MIA_HOST }],
+        destination: `https://${MIA_HOST}/`,
+        permanent: true,
+      },
+      {
+        source: '/mia',
+        has: [{ type: 'host', value: MILA_HOST }],
+        destination: `https://${MILA_HOST}/`,
+        permanent: false,
+      },
+      {
+        source: '/mia',
         has: [{ type: 'host', value: GIA_HOST }],
         destination: `https://${GIA_HOST}/`,
         permanent: false,

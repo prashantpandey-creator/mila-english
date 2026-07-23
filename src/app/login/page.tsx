@@ -31,8 +31,10 @@ export default function LoginPage() {
   const [isGia, setIsGia] = useState(false);
 
   useEffect(() => {
-    setReturnTo(safeReturnTo(new URLSearchParams(window.location.search).get('returnTo')));
-    setIsGia(isGiaHostname(window.location.hostname));
+    const nextIsGia = isGiaHostname(window.location.hostname);
+    const requestedReturnTo = new URLSearchParams(window.location.search).get('returnTo');
+    setReturnTo(safeReturnTo(requestedReturnTo, nextIsGia ? '/chat' : '/dashboard'));
+    setIsGia(nextIsGia);
   }, []);
 
   const messageFor = (code?: string, fallback?: string) => {

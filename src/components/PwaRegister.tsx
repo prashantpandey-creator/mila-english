@@ -8,6 +8,7 @@
 // uses (getLangFromStorage) rather than the hook.
 import { useEffect, useState } from 'react'
 import { getLangFromStorage } from '@/lib/i18n'
+import { isGiaHostname, isMiaHostname } from '@/lib/productHosts'
 
 const DISMISS_KEY = 'mila_install_dismissed'
 
@@ -29,6 +30,7 @@ export default function PwaRegister() {
   const [installEvent, setInstallEvent] = useState<any>(null)
   const [showIOSHint, setShowIOSHint] = useState(false)
   const [lang, setLang] = useState<'ru' | 'en'>('ru')
+  const [productName, setProductName] = useState<'Mila' | 'Gia' | 'Mia'>('Mila')
 
   useEffect(() => {
     // Production only: dev chunks have STABLE names (layout.js), so the SW's
@@ -41,6 +43,13 @@ export default function PwaRegister() {
     }
 
     setLang(getLangFromStorage())
+    setProductName(
+      isGiaHostname(window.location.hostname)
+        ? 'Gia'
+        : isMiaHostname(window.location.hostname)
+          ? 'Mia'
+          : 'Mila',
+    )
     if (localStorage.getItem(DISMISS_KEY) || isStandalone()) return
 
     // Android/Chrome path: the browser tells us installation is possible.
@@ -103,8 +112,8 @@ export default function PwaRegister() {
     >
       <span style={{ flex: 1 }}>
         {installEvent
-          ? (ru ? 'Установить Mila на телефон — как обычное приложение' : 'Install Mila on your phone — like a real app')
-          : (ru ? 'Добавь Mila на экран: Поделиться → «На экран “Домой”»' : 'Add Mila to your home screen: Share → “Add to Home Screen”')}
+          ? (ru ? `Установить ${productName} на телефон — как обычное приложение` : `Install ${productName} on your phone — like a real app`)
+          : (ru ? `Добавь ${productName} на экран: Поделиться → «На экран “Домой”»` : `Add ${productName} to your home screen: Share → “Add to Home Screen”`)}
       </span>
       {installEvent && (
         <button

@@ -15,6 +15,7 @@ import { toSpokenText } from '@/lib/spokenText'
 import { hasActiveSession } from '@/lib/guestSession'
 import MilaIcon from '@/components/ui/MilaIcon'
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark'
+import { isMiaHostname } from '@/lib/productHosts'
 
 type GuideContext = {
   authenticated: boolean
@@ -47,7 +48,7 @@ const PAGE_LABELS: Record<string, { en: string; ru: string }> = {
   '/darshan': { en: 'Voice room', ru: 'Голосовая комната' },
 }
 
-const COMPANION_INTEGRATED_ROUTES = ['/assessment', '/chat', '/listen', '/phonetics', '/practice', '/voice-lab', '/darshan', '/pia', '/login', '/register', '/privacy', '/support']
+const COMPANION_INTEGRATED_ROUTES = ['/assessment', '/chat', '/listen', '/phonetics', '/practice', '/voice-lab', '/darshan', '/mia', '/pia', '/login', '/register', '/privacy', '/support']
 
 function pageKey(pathname: string) {
   if (pathname.startsWith('/lessons/')) return '/lessons'
@@ -184,7 +185,9 @@ export default function MilaGuide() {
 
   const page = PAGE_LABELS[pageKey(pathname)]
   const agentState = listening ? 'listening' : isLoading || voicePending ? 'thinking' : speaking ? 'speaking' : 'idle'
-  const isVoiceRoom = COMPANION_INTEGRATED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
+  const isMiaApex = mounted && typeof window !== 'undefined' && isMiaHostname(window.location.hostname) && pathname === '/'
+  const isVoiceRoom = isMiaApex
+    || COMPANION_INTEGRATED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
 
   const welcome = useMemo(() => {
     if (pathname === '/') return lang === 'ru'

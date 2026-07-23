@@ -1,8 +1,10 @@
 export const MILA_HOST = 'mila.purangpt.com';
 export const GIA_HOST = 'gia.purangpt.com';
+export const MIA_HOST = 'mia.purangpt.com';
 export const LEGACY_MIACHAT_HOST = 'miachat.purangpt.com';
 export const MILA_ORIGIN = `https://${MILA_HOST}`;
 export const GIA_ORIGIN = `https://${GIA_HOST}`;
+export const MIA_ORIGIN = `https://${MIA_HOST}`;
 
 export function normalizeHostname(value: string | null | undefined): string {
   return (value || '')
@@ -14,4 +16,8 @@ export function normalizeHostname(value: string | null | undefined): string {
 
 export function isGiaHostname(value: string | null | undefined): boolean {
   return normalizeHostname(value) === GIA_HOST;
+}
+
+export function isMiaHostname(value: string | null | undefined): boolean {
+  return normalizeHostname(value) === MIA_HOST;
 }
