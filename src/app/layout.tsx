@@ -31,11 +31,25 @@ const monoFont = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Mila — the English atelier',
-  description: 'Английский как искусство: живые уроки, ИИ-наставница, произношение до фонемы. Private-club English for Russian speakers.',
+  metadataBase: new URL('https://mila.purangpt.com'),
+  title: 'Mila — English, in your own voice',
+  description: 'Private English-speaking practice with clear, personal feedback. Speak freely and sound like yourself.',
   manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, title: 'Mila', statusBarStyle: 'default' },
   icons: { icon: '/icon', apple: '/apple-icon' },
+  openGraph: {
+    title: 'Mila — English, in your own voice',
+    description: 'Private English-speaking practice with clear, personal feedback.',
+    type: 'website',
+    url: '/',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Mila — English, in your own voice' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mila — English, in your own voice',
+    description: 'Private English-speaking practice with clear, personal feedback.',
+    images: ['/og.png'],
+  },
 }
 
 export const viewport: Viewport = {
