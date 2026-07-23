@@ -4052,3 +4052,89 @@ html[data-mila-theme="dark"] .mila-showcase__nav button:hover {
   border-color: #d9006c;
   background: #d9006c;
 }
+
+/* Mila's adult identity is a voice signal, not a character mascot. */
+.mila-voice-mark {
+  --mila-voice-mark-size: 56px;
+  position: relative;
+  width: var(--mila-voice-mark-size);
+  height: var(--mila-voice-mark-size);
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 var(--mila-voice-mark-size);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 27% 27% 27% 9%;
+  color: #ff82c2;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.07),transparent 46%),
+    #26343b;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.11);
+  box-sizing: border-box;
+  isolation: isolate;
+}
+
+.mila-voice-mark::before {
+  content: '';
+  position: absolute;
+  inset: 13%;
+  border: 1px solid rgba(255,130,194,.18);
+  border-radius: 21% 21% 21% 7%;
+}
+
+.mila-voice-mark__bars {
+  position: relative;
+  z-index: 1;
+  height: 42%;
+  display: flex;
+  align-items: center;
+  gap: max(2px,calc(var(--mila-voice-mark-size) * .045));
+}
+
+.mila-voice-mark__bars i {
+  width: max(2px,calc(var(--mila-voice-mark-size) * .035));
+  height: 42%;
+  display: block;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: center;
+}
+
+.mila-voice-mark__bars i:nth-child(2),
+.mila-voice-mark__bars i:nth-child(6) { height: 72%; }
+.mila-voice-mark__bars i:nth-child(3),
+.mila-voice-mark__bars i:nth-child(5) { height: 100%; }
+.mila-voice-mark__bars i:nth-child(4) { height: 58%; }
+
+.mila-voice-mark__dot {
+  position: absolute;
+  right: 11%;
+  top: 11%;
+  z-index: 2;
+  width: 8%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #d9006c;
+}
+
+.mila-voice-mark[data-state="thinking"] .mila-voice-mark__dot {
+  animation: milaVoiceMarkPulse 1s ease-in-out infinite;
+}
+
+.mila-voice-mark[data-state="listening"] .mila-voice-mark__bars i,
+.mila-voice-mark[data-state="speaking"] .mila-voice-mark__bars i {
+  animation: milaVoiceMarkWave .72s ease-in-out infinite alternate;
+}
+
+.mila-voice-mark[data-state="listening"] .mila-voice-mark__bars i:nth-child(2n),
+.mila-voice-mark[data-state="speaking"] .mila-voice-mark__bars i:nth-child(2n) {
+  animation-delay: -.34s;
+}
+
+@keyframes milaVoiceMarkPulse {
+  50% { opacity: .38; transform: scale(.72); }
+}
+
+@keyframes milaVoiceMarkWave {
+  to { transform: scaleY(.42); opacity: .58; }
+}

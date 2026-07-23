@@ -2,8 +2,8 @@
 'use client';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import LangToggle from '@/components/LangToggle';
+import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
 
@@ -81,7 +81,7 @@ export default function LoginPage() {
         <div className="welcome-auth__card">
           <div className="welcome-auth__intro">
             <div className="welcome-auth__bloom" aria-hidden="true">
-              <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
+              <MilaVoiceMark size={52} />
             </div>
             <h1 className="welcome-auth__title">{t('login_title')}</h1>
             <p className="welcome-auth__subtitle">{t('login_subtitle')}</p>

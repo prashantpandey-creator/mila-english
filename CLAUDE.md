@@ -71,6 +71,16 @@ service must also be added to the workflow's up/health lists in the same commit.
 - **One identity:** `src/lib/routeSurface.ts` resolves every route to the same
   light mineral atelier. Voice state is expressed with labels, motion, rings,
   waveform geometry, and the shared material palette—not a route-specific skin.
+- **Adult Mila has no mascot:** the launcher, chat, dashboard, login, and
+  registration use `MilaVoiceMark`, an abstract graphite-and-pink signal. The
+  rose character file remains versioned only as a possible asset for a future,
+  separately branded children's app; do not put it back into the adult product.
+- **Personality:** default Mila has grounded girl-next-door ease: attentive,
+  witty, unpretentious, and user-led. Full text chat may expose the device-local
+  `Playful · 18+` choice, but consent must be explicit while the expression
+  stays subtle. Light swearing and suggestive banter mirror the learner rather
+  than leading them; never use explicit sexual role-play, love-bombing,
+  possessiveness, exclusivity, submission, or dependency tactics.
 
 ## Where things live
 - Front door: `src/app/page.tsx` + `src/app/landing.css` (`.lp-*` namespace).

@@ -85,7 +85,7 @@ function safeContextValue(value: string | null | undefined, fallback: string, ma
 }
 
 function isPersonaId(value: string | null | undefined): value is PersonaId {
-  return value === 'teacher' || value === 'friend' || value === 'guide';
+  return value === 'teacher' || value === 'friend' || value === 'guide' || value === 'playful';
 }
 
 async function localLlmReady(config: ReturnType<typeof getLocalLlmConfig>): Promise<boolean> {
@@ -372,8 +372,13 @@ export async function POST(request: NextRequest) {
   const beginner = levelTag === '' || levelTag === 'PENDING' || levelTag === 'A1';
   const freeConversationRequested = requestsFreeConversation(latestUserMessage);
   const inLesson = (surfaceKind === 'practice' || Boolean(currentLesson)) && !freeConversationRequested;
+  const playfulConversation = surfaceKind === 'chat' && payload?.context?.conversationStyle === 'playful';
   const persona = personaBlock(
-    isPersonaId(profile?.tonePreference) ? profile.tonePreference : 'friend',
+    playfulConversation
+      ? 'playful'
+      : isPersonaId(profile?.tonePreference)
+        ? profile.tonePreference
+        : 'friend',
     learnerProfile,
     inLesson ? 'lesson' : 'conversation',
   );

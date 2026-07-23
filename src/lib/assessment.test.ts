@@ -33,6 +33,15 @@ assert.match(examiner.instructions, /priority/i);
 assert.strictEqual(buildRealtimeSession('tutor').audio.input.transcription.language, 'en', 'coach still pins English');
 assert.ok(!('language' in buildRealtimeSession('companion').audio.input.transcription), 'free companion auto-detects');
 assert.ok(!('language' in buildRealtimeSession('pia').audio.input.transcription), 'Pia auto-detects');
+const companion = buildRealtimeSession('companion');
+assert.match(companion.instructions, /girl-next-door warmth/i);
+assert.match(companion.instructions, /full attention and care/i);
+assert.match(companion.instructions, /do not encourage dependency/i);
+assert.match(companion.instructions, /chemistry between the lines/i);
+assert.match(companion.instructions, /do not initiate flirting/i);
+assert.match(companion.instructions, /light swearing is fine/i);
+assert.match(companion.instructions, /never become explicit, graphic, crude, or sexual role-play/i);
+assert.doesNotMatch(companion.instructions, /clearly a bit into them/i);
 
 assert.deepStrictEqual(assessmentResultSchema.parse({
   level: 'B1',

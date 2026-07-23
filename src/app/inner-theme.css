@@ -610,7 +610,7 @@ html[data-mila-app="app"] .atmosphere { display: none; }
   box-sizing: border-box;
 }
 .mila-surface--app .chat-page__empty-presence img { width: 100%; height: 100%; object-fit: contain; }
-.mila-surface--app .chat-page__empty-presence span {
+.mila-surface--app .chat-page__empty-presence > .chat-page__status-dot {
   position: absolute;
   right: 5px;
   bottom: 8px;
@@ -1700,7 +1700,7 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
     padding: 4px 7px 4px 4px;
     border-radius: 26px 10px 10px 26px !important;
   }
-  body[data-bottom-nav] .mila-surface--app .mila-guide__launcher > img {
+  body[data-bottom-nav] .mila-surface--app .mila-guide__launcher > .mila-voice-mark {
     width: 44px !important;
     height: 44px !important;
     flex-basis: 44px;
@@ -1733,4 +1733,207 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
   .mila-surface--app .mila-guide__messages { padding-inline: 12px; }
   .mila-surface--app .mila-guide__actions { padding-inline: 10px; }
   .mila-surface--app .mila-guide__composer { margin-inline: 10px; }
+}
+
+/* Mature Mila presence: one abstract graphite-and-pink voice signature across
+   the adult product. The rose character asset is reserved for a future,
+   separately branded children's experience. */
+.mila-surface--app .mila-voice-mark {
+  color: var(--mila-action);
+  border-color: rgba(255,255,255,.18);
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.08),transparent 50%),
+    var(--mila-graphite);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.mila-surface--app .mila-guide__launcher > .mila-voice-mark {
+  position: relative;
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+}
+
+.mila-surface--app .mila-guide__portrait .mila-voice-mark {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+}
+
+.mila-surface--app .welcome-auth__bloom .mila-voice-mark {
+  width: 52px;
+  height: 52px;
+  flex-basis: 52px;
+}
+
+.mila-surface--app .conversation-stage__portrait {
+  width: min(58%, 230px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  animation: none;
+}
+
+.mila-surface--app .conversation-stage__portrait .mila-voice-mark {
+  width: 100%;
+  height: 100%;
+  border-color: rgba(255,255,255,.22);
+  border-radius: 24% 24% 24% 7%;
+  box-shadow: 18px 18px 0 rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.13);
+}
+
+.mila-surface--app .chat-page__empty-presence {
+  padding: 9px;
+  border-radius: 24px 24px 24px 7px;
+  background: var(--mila-paper);
+}
+
+.mila-surface--app .chat-page__empty-presence .mila-voice-mark {
+  width: 92px;
+  height: 92px;
+}
+
+.mila-surface--app .chat-page__empty-presence > .chat-page__status-dot {
+  position: absolute;
+  right: 5px;
+  bottom: 8px;
+  width: 13px;
+  height: 13px;
+  border: 3px solid var(--mila-paper);
+  border-radius: 50%;
+  background: var(--mila-signal);
+}
+
+.mila-surface--app .chat-page__mila-avatar {
+  padding: 2px;
+  border-radius: 11px 11px 11px 4px;
+}
+
+.mila-surface--app .chat-page__mila-avatar .mila-voice-mark {
+  width: 29px;
+  height: 29px;
+  flex-basis: 29px;
+}
+
+.mila-surface--app .chat-page__tone-toggle {
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid var(--mila-line-strong);
+  border-radius: 999px;
+  color: var(--mila-muted);
+  background: var(--mila-panel);
+  font: 600 10px/1 var(--font-mono), monospace;
+  letter-spacing: .04em;
+  cursor: pointer;
+}
+
+.mila-surface--app .chat-page__tone-toggle.is-playful {
+  border-color: var(--mila-action);
+  color: var(--mila-action-ink);
+  background: var(--mila-action);
+}
+
+.chat-tone-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.chat-tone-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(38,52,59,.56);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  cursor: default;
+}
+
+.chat-tone-dialog__card {
+  position: relative;
+  width: min(470px, 100%);
+  padding: clamp(28px, 5vw, 42px);
+  border: 1px solid var(--mila-line);
+  border-radius: 26px 26px 26px 8px;
+  color: var(--mila-ink);
+  background:
+    linear-gradient(155deg,rgba(255,255,255,.98),rgba(241,236,229,.98)),
+    var(--mila-paper);
+  box-shadow: 14px 14px 0 rgba(38,52,59,.24), 0 28px 90px rgba(38,52,59,.24);
+}
+
+.chat-tone-dialog__card > p {
+  margin: 0 0 13px;
+  color: var(--mila-action);
+  font: 600 10px/1.2 var(--font-mono), monospace;
+  letter-spacing: .12em;
+}
+
+.chat-tone-dialog__card h2 {
+  margin: 0;
+  color: var(--mila-ink);
+  font: 500 clamp(30px, 5vw, 43px)/1.02 var(--font-serif), Georgia, serif;
+  letter-spacing: -.04em;
+}
+
+.chat-tone-dialog__card > div:not(.chat-tone-dialog__actions) {
+  margin-top: 19px;
+  color: var(--mila-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.chat-tone-dialog__actions {
+  margin-top: 27px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chat-tone-dialog__actions button {
+  min-height: 46px;
+  padding: 0 17px;
+  border: 1px solid var(--mila-line-strong);
+  border-radius: 12px 12px 12px 4px;
+  color: var(--mila-ink);
+  background: var(--mila-panel);
+  font: 700 12px/1.2 var(--font-sans), Manrope, sans-serif;
+  cursor: pointer;
+}
+
+.chat-tone-dialog__actions button.is-primary {
+  border-color: var(--mila-action);
+  color: var(--mila-action-ink);
+  background: var(--mila-action);
+  box-shadow: 4px 4px 0 var(--mila-graphite);
+}
+
+@media (max-width: 640px) {
+  .mila-surface--app .chat-page__tone-toggle {
+    min-height: 32px;
+    padding-inline: 8px;
+    font-size: 8px;
+  }
+
+  .chat-tone-dialog {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .chat-tone-dialog__card {
+    width: 100%;
+    border-radius: 24px 24px 8px 24px;
+    box-shadow: 8px 8px 0 rgba(38,52,59,.24);
+  }
+
+  .chat-tone-dialog__actions {
+    flex-direction: column;
+  }
 }

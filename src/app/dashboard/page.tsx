@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
@@ -8,6 +7,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import StreakCounter from '@/components/StreakCounter';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
+import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 
 type Learner = {
@@ -185,13 +185,7 @@ export default function DashboardPage() {
 
           <div className="conversation-stage__presence" aria-hidden="true">
             <div className="conversation-stage__portrait">
-              <Image
-                src="/mascot/mila-mascot-rose.png"
-                alt=""
-                width={1254}
-                height={1254}
-                priority
-              />
+              <MilaVoiceMark size={220} />
             </div>
             <div className="conversation-stage__signal">
               <span className="conversation-stage__signal-dot" />

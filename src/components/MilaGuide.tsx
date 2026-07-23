@@ -1,7 +1,6 @@
 // @ts-nocheck
 'use client'
 
-import Image from 'next/image'
 import { FormEvent, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useChat } from 'ai/react'
@@ -15,6 +14,7 @@ import { backchannelTexts, endpointSilenceMs, pickBackchannel } from '@/lib/voic
 import { toSpokenText } from '@/lib/spokenText'
 import { hasActiveSession } from '@/lib/guestSession'
 import MilaIcon from '@/components/ui/MilaIcon'
+import MilaVoiceMark from '@/components/ui/MilaVoiceMark'
 
 type GuideContext = {
   authenticated: boolean
@@ -655,7 +655,7 @@ export default function MilaGuide() {
         <section id="mila-guide-text-panel" className="mila-guide__panel" data-mila-surface="text-chat" role="dialog" aria-modal="false" aria-label={lang === 'ru' ? 'Чат с Милой' : 'Chat with Mila'}>
           <header className="mila-guide__header">
             <div className="mila-guide__portrait" aria-hidden>
-              <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
+              <MilaVoiceMark size={38} state={agentState} />
               <i />
             </div>
             <div className="mila-guide__identity">
@@ -767,7 +767,7 @@ export default function MilaGuide() {
       )}
 
       {/* Voice-mode caption — what she heard and what she is saying, floating
-          above the mascot while the panel stays closed. */}
+          above the voice mark while the panel stays closed. */}
       {voiceMode && !open && voiceCaption && (
         <div className="mila-guide__caption" aria-live="polite">{voiceCaption}</div>
       )}
@@ -800,7 +800,7 @@ export default function MilaGuide() {
             : (lang === 'ru' ? 'Один клик — говорить · двойной — писать' : 'Click to talk · double-click to type')}
       >
         <span className="mila-guide__orbit" aria-hidden><i /><i /></span>
-        <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
+        <MilaVoiceMark size={52} state={agentState} />
         <span className="mila-guide__launcher-label" aria-hidden>
           <strong>{voiceMode ? (lang === 'ru' ? 'Стоп' : 'Stop') : (lang === 'ru' ? 'Говорить' : 'Talk')}</strong>
           <small>{voiceMode ? status : (lang === 'ru' ? 'с Милой' : 'with Mila')}</small>

@@ -1,22 +1,24 @@
 'use client';
 
 import { useChat } from 'ai/react';
-import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import { AppHeader, AppShell } from '@/components/ui/AppShell';
 import MilaIcon from '@/components/ui/MilaIcon';
+import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { announceCompanionHistoryCleared, announceCompanionHistoryUpdated, useCompanionHistory } from '@/lib/use-companion-history';
 
 export default function Chat() {
   const { lang } = useI18n();
   const router = useRouter();
+  const [conversationStyle, setConversationStyle] = useState<'natural' | 'playful'>('natural');
+  const [toneDialogOpen, setToneDialogOpen] = useState(false);
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput } = useChat({
     id: 'mila-full-chat',
     api: '/api/chat',
-    body: { context: { pathname: '/chat', lang, surface: 'chat' } },
+    body: { context: { pathname: '/chat', lang, surface: 'chat', conversationStyle } },
     onFinish: () => announceCompanionHistoryUpdated(),
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -28,7 +30,12 @@ export default function Chat() {
   const { isHydrating, historyError } = useCompanionHistory({ limit: 40, setMessages });
   const latestMessageContent = messages[messages.length - 1]?.content ?? '';
 
-  useEffect(() => { setM(true); }, []);
+  useEffect(() => {
+    setM(true);
+    if (window.localStorage.getItem('mila-chat-style-v1') === 'playful') {
+      setConversationStyle('playful');
+    }
+  }, []);
   useEffect(() => {
     const viewport = messagesViewportRef.current;
     if (!viewport) return;
@@ -82,6 +89,21 @@ export default function Chat() {
     window.requestAnimationFrame(() => inputRef.current?.focus());
   };
 
+  const toggleConversationStyle = () => {
+    if (conversationStyle === 'playful') {
+      setConversationStyle('natural');
+      window.localStorage.setItem('mila-chat-style-v1', 'natural');
+      return;
+    }
+    setToneDialogOpen(true);
+  };
+
+  const enablePlayfulStyle = () => {
+    setConversationStyle('playful');
+    window.localStorage.setItem('mila-chat-style-v1', 'playful');
+    setToneDialogOpen(false);
+  };
+
   if (!m) return null;
 
   return (
@@ -101,10 +123,49 @@ export default function Chat() {
           >
             {isClearing ? (lang==='ru' ? 'Очищаю…' : 'Clearing…') : (lang==='ru' ? 'Новый чат' : 'New chat')}
           </button>
+          <button
+            type="button"
+            className={`chat-page__tone-toggle${conversationStyle === 'playful' ? ' is-playful' : ''}`}
+            onClick={toggleConversationStyle}
+            aria-pressed={conversationStyle === 'playful'}
+            title={lang === 'ru' ? 'Стиль разговора' : 'Conversation style'}
+          >
+            {conversationStyle === 'playful'
+              ? (lang === 'ru' ? 'Игриво · 18+' : 'Playful · 18+')
+              : (lang === 'ru' ? 'Естественно' : 'Natural')}
+          </button>
           <LangToggle/>
           </>
         }
       />
+
+      {toneDialogOpen && (
+        <div className="chat-tone-dialog" role="dialog" aria-modal="true" aria-labelledby="chat-tone-title">
+          <button
+            type="button"
+            className="chat-tone-dialog__backdrop"
+            onClick={() => setToneDialogOpen(false)}
+            aria-label={lang === 'ru' ? 'Закрыть' : 'Close'}
+          />
+          <section className="chat-tone-dialog__card">
+            <p>{lang === 'ru' ? 'ИГРИВЫЙ РЕЖИМ · 18+' : 'PLAYFUL MODE · 18+'}</p>
+            <h2 id="chat-tone-title">{lang === 'ru' ? 'Искра — между строк.' : 'Keep the spark between the lines.'}</h2>
+            <div>
+              {lang === 'ru'
+                ? 'Mila может шутить смелее, слегка дразнить, естественно ругнуться и поддержать намёк, который вы начали намеренно. Без откровенных ролевых сцен и без притворства, что она человек.'
+                : 'Mila can be wittier, tease a little, swear when it feels natural, and mirror suggestive banter you intentionally begin. No explicit role-play, and no pretending she is human.'}
+            </div>
+            <div className="chat-tone-dialog__actions">
+              <button type="button" className="is-primary" onClick={enablePlayfulStyle}>
+                {lang === 'ru' ? 'Мне 18+ — добавить искру' : 'I’m 18+ — make it playful'}
+              </button>
+              <button type="button" onClick={() => setToneDialogOpen(false)}>
+                {lang === 'ru' ? 'Оставить естественно' : 'Keep it natural'}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       <main ref={messagesViewportRef} className="chat-page__messages" aria-live="polite">
         <div className="chat-page__stream">
@@ -117,8 +178,8 @@ export default function Chat() {
         {!isHydrating && messages.length === 0 && (
           <div className="chat-page__empty">
             <div className="chat-page__empty-presence" aria-hidden="true">
-              <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} priority />
-              <span />
+              <MilaVoiceMark size={92} />
+              <span className="chat-page__status-dot" />
             </div>
             <p className="chat-page__empty-kicker">{lang === 'ru' ? 'Мила здесь' : 'Mila is here'}</p>
             <h1 className="chat-page__empty-title">
@@ -143,7 +204,7 @@ export default function Chat() {
           <div key={m.id} className={`chat-page__row ${m.role === 'user' ? 'is-user' : 'is-assistant'}`}>
             {m.role !== 'user' ? (
               <span className="chat-page__mila-avatar" aria-label="Mila">
-                <Image src="/mascot/mila-mascot-rose.png" alt="" width={1254} height={1254} />
+                <MilaVoiceMark size={29} />
               </span>
             ) : null}
             <div className="chat-page__bubble">
