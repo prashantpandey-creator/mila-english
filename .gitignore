@@ -10,6 +10,8 @@ MILA_*AGREEMENT*.txt
 mary-*.txt
 output/
 tmp/
+# Reference-derived campaign concepts; never publish without releases.
+campaigns/private-concepts/
 ios/build/
 ios/*.xcarchive
 ios/export/

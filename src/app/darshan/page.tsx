@@ -4,14 +4,20 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useChat } from "ai/react";
 import { useRouter } from "next/navigation";
 import { MilaAurora } from "@/components/voice/MilaAurora";
-import { MilaOrb, type OrbState } from "@/components/voice/MilaOrb";
-import { MilaKid } from "@/components/voice/MilaKid";
-import { MilaFace } from "@/components/voice/MilaFace";
+import type { OrbState } from "@/components/voice/MilaOrb";
+import { MilaPresence } from "@/components/voice/MilaPresence";
+import { PresencePicker } from "@/components/voice/PresencePicker";
 import { useI18n } from "@/lib/i18n-provider";
 import { startLocalTranscription, type LocalTranscript, type TranscriptionSession } from "@/lib/localTranscription";
 import { connectRealtimeVoice, type RealtimeVoiceSession } from "@/lib/realtimeVoice";
 import { microphoneErrorMessage, primeMicrophoneAudioContext } from "@/lib/microphone";
 import { hasActiveSession } from "@/lib/guestSession";
+import {
+  isPresenceId,
+  normalizePresenceId,
+  PRESENCE_STORAGE_KEY,
+  type PresenceId,
+} from "@/lib/presences";
 import { createStreamingTtsSession, spokenLocaleForText, ttsSpeak, type StreamingTtsSession } from "@/lib/tts";
 import { toSpokenText } from "@/lib/spokenText";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
@@ -46,34 +52,22 @@ export default function VoicePage() {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [voiceError, setVoiceError] = useState("");
-  const [isPro, setIsPro] = useState(false);
   const [voicePreference, setVoicePreference] = useState<VoicePreference>("private");
   const [preferenceUserId, setPreferenceUserId] = useState<number | null>(null);
+  const [preferenceLoaded, setPreferenceLoaded] = useState(false);
+  const [routeModeReady, setRouteModeReady] = useState(false);
+  const [freePreview, setFreePreview] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const [previewAvailable, setPreviewAvailable] = useState(false);
   const [showRealtimeConsent, setShowRealtimeConsent] = useState(false);
 
   const [liveText, setLiveText] = useState("");
   const [answer, setAnswer] = useState("");
   const [invI, setInvI] = useState(0);
   const [orbSize, setOrbSize] = useState(320);
-  // Every voice conversation is now the free, guest-open companion on the good
-  // OpenAI Realtime voice (owner decision 2026-07-21: the private/local mode and
-  // its "Private" toggle caused persistent broken-conversation confusion across
-  // every entry point). The on-device engine stays ONLY as an invisible fallback
-  // when the cloud is unreachable (Russia / no VPN). Kept named `freeMode` so all
-  // the existing free-companion wiring applies at once: 'companion' Realtime mode
-  // (guest-open, free — realtimeAccess.ts), Realtime-first in connectToVoice, the
-  // guest-session seat, and no privacy toggle rendered.
-  const [freeMode] = useState(true);
-  // Kids learning mode (?kids=1): the sweet children's persona + the animated
-  // MilaKid buddy instead of the abstract orb. Rides the same free, guest-open,
-  // Realtime-first plumbing as the companion.
-  const [kidsMode] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("kids") === "1");
-  // Photoreal presence (?face=1): a real-looking Mila video loop in place of the
-  // abstract orb, self-hosted (RealVisXL → LivePortrait, our own GPU). Opt-in while
-  // the real-time MuseTalk lip-sync stream that will replace the loop is built.
-  // Read after mount (not in the initializer) so the server and first client render
-  // agree on the orb — no hydration mismatch — then swap to the face.
-  const [faceMode, setFaceMode] = useState(false);
+  // Presence changes only Mila's visual window. It never selects an LLM,
+  // conversation style, or adult mode. Signal remains the faceless default.
+  const [presenceId, setPresenceId] = useState<PresenceId>("signal");
 
   const transcriptionRef = useRef<TranscriptionSession | null>(null);
   const realtimeRef = useRef<RealtimeVoiceSession | null>(null);
@@ -95,12 +89,10 @@ export default function VoicePage() {
   const guestSessionRef = useRef<Promise<boolean> | null>(null);
 
   // Seat first-time visitors while they read the invitation. Realtime and its
-  // local fallback then share one unique guest identity instead of placing all
-  // Android Chrome visitors in the same user-agent rate-limit bucket.
+  // private fallback then share one isolated identity.
   useEffect(() => {
-    if (!freeMode) return;
     guestSessionRef.current = hasActiveSession();
-  }, [freeMode]);
+  }, []);
 
   const clearRestartTimer = useCallback(() => {
     if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
@@ -222,45 +214,73 @@ export default function VoicePage() {
     return () => window.removeEventListener("resize", fit);
   }, []);
 
-  // Read the ?face=1 opt-in after mount, so SSR and hydration agree (see above).
+  // Query params are a QA override; ordinary users keep a device-local visual
+  // preference. The retired ?face=1 flag maps to the original fictional Ember
+  // portrait instead of restoring an unlicensed or real-person likeness.
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("face") === "1") setFaceMode(true);
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("presence");
+    const stored = window.localStorage.getItem(PRESENCE_STORAGE_KEY);
+    const next = isPresenceId(requested)
+      ? requested
+      : params.get("face") === "1"
+        ? "ember"
+        : normalizePresenceId(stored);
+    setPresenceId(next);
+    setFreePreview(params.get("free") === "1");
+    setRouteModeReady(true);
   }, []);
 
-  // A saved Realtime preference is scoped to the signed-in Pro account. A
-  // guest, free account, signed-out browser, or a different account always
-  // starts in private mode.
+  // A saved Realtime choice is scoped to a signed-in Pro account. The free
+  // front-door preview always begins in Private and asks again before sending
+  // microphone audio to OpenAI.
   useEffect(() => {
+    if (!routeModeReady) return;
     let cancelled = false;
-    void fetch("/api/users/me", { cache: "no-store" })
-      .then(async (response) => response.ok ? response.json() : null)
-      .then((data) => {
-        if (cancelled) return;
-        const userId = Number(data?.id);
-        const paid = data?.subscription?.isPaid === true
-          && data?.isGuest !== true
-          && Number.isSafeInteger(userId)
-          && userId > 0;
-        setIsPro(paid);
-        setPreferenceUserId(paid ? userId : null);
-        if (!paid) {
-          setVoicePreference("private");
-          return;
-        }
-        const stored = window.localStorage.getItem(voicePreferenceKey(userId));
-        setVoicePreference(stored === REALTIME_CONSENT_VALUE ? "realtime" : "private");
-      })
+    setPreferenceLoaded(false);
+
+    void (async () => {
+      const seated = await (guestSessionRef.current ?? hasActiveSession());
+      if (cancelled) return;
+      guestSessionRef.current = seated ? Promise.resolve(true) : null;
+
+      const response = await fetch("/api/users/me", { cache: "no-store" });
+      const data = response.ok ? await response.json() : null;
+      if (cancelled) return;
+
+      const userId = Number(data?.id);
+      const hasIdentity = Number.isSafeInteger(userId) && userId > 0;
+      const paid = hasIdentity
+        && data?.isGuest !== true
+        && data?.subscription?.isPaid === true;
+      const available = hasIdentity && data?.liveVoicePreviewAvailable === true;
+
+      setIsPro(paid);
+      setPreviewAvailable(available);
+      setPreferenceUserId(hasIdentity ? userId : null);
+      if (!hasIdentity || !paid) {
+        setVoicePreference("private");
+        return;
+      }
+
+      const stored = window.localStorage.getItem(voicePreferenceKey(userId));
+      setVoicePreference(stored === REALTIME_CONSENT_VALUE ? "realtime" : "private");
+    })()
       .catch(() => {
-        if (!cancelled) {
-          setIsPro(false);
-          setPreferenceUserId(null);
-          setVoicePreference("private");
-        }
+        if (cancelled) return;
+        setIsPro(false);
+        setPreviewAvailable(false);
+        setPreferenceUserId(null);
+        setVoicePreference("private");
+      })
+      .finally(() => {
+        if (!cancelled) setPreferenceLoaded(true);
       });
+
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [routeModeReady]);
 
   // Invocation drift
   useEffect(() => {
@@ -353,13 +373,9 @@ export default function VoicePage() {
           if (error.message === "auth-required") {
             activeRef.current = false;
             setIsConnected(false);
-            setVoiceError(freeMode
-              ? (lang === "ru"
-                  ? "Не удалось запустить бесплатную голосовую сессию. Обнови страницу и попробуй снова."
-                  : "The free voice session could not start. Reload the page and try again.")
-              : (lang === "ru"
-                  ? "Войди в аккаунт, чтобы говорить с Милой голосом."
-                  : "Sign in to talk with Mila by voice."));
+            setVoiceError(lang === "ru"
+              ? "Войди в аккаунт, чтобы говорить с Милой голосом."
+              : "Sign in to talk with Mila by voice.");
             setPhase("resting");
             return;
           }
@@ -384,7 +400,7 @@ export default function VoicePage() {
     } finally {
       listeningStartRef.current = false;
     }
-  }, [freeMode, lang, scheduleListening, submitTranscript]);
+  }, [lang, scheduleListening, submitTranscript]);
 
   useEffect(() => {
     startListeningRef.current = startListening;
@@ -399,7 +415,7 @@ export default function VoicePage() {
   const startRealtimeVoice = useCallback(async (connectionAttempt: number, signal: AbortSignal) => {
     const session = await connectRealtimeVoice({
       lang: lang === "ru" ? "ru" : "en",
-      mode: kidsMode ? "kids" : freeMode ? "companion" : "tutor",
+      mode: freePreview && !isPro ? "companion" : "tutor",
       signal,
       openAIAudioConsent: true,
       events: {
@@ -477,25 +493,28 @@ export default function VoicePage() {
     setIsConnected(true);
     setVoiceError("");
     setPhase("listening");
-  }, [freeMode, lang, scheduleListening]);
+  }, [freePreview, isPro, lang, scheduleListening]);
 
   const selectPrivateVoice = useCallback(() => {
     setShowRealtimeConsent(false);
     setVoicePreference("private");
-    if (preferenceUserId) {
+    if ((!freePreview || isPro) && preferenceUserId) {
       window.localStorage.setItem(voicePreferenceKey(preferenceUserId), "private");
     }
-  }, [preferenceUserId]);
+  }, [freePreview, isPro, preferenceUserId]);
 
   const confirmRealtimeVoice = useCallback(() => {
-    if (!isPro || !preferenceUserId) return;
-    window.localStorage.setItem(voicePreferenceKey(preferenceUserId), REALTIME_CONSENT_VALUE);
+    const isPreview = freePreview && !isPro;
+    if (!preferenceLoaded || (!isPreview && !preferenceUserId)) return;
+    if (!isPreview && preferenceUserId) {
+      window.localStorage.setItem(voicePreferenceKey(preferenceUserId), REALTIME_CONSENT_VALUE);
+    }
     setVoicePreference("realtime");
     setShowRealtimeConsent(false);
-  }, [isPro, preferenceUserId]);
+  }, [freePreview, isPro, preferenceLoaded, preferenceUserId]);
 
   const connectToVoice = async () => {
-    if (isConnecting || connectingRef.current) return;
+    if (!preferenceLoaded || isConnecting || connectingRef.current) return;
 
     // Must run synchronously inside the tap. If a later permission or network
     // await consumes Android's transient activation, the shared audio context
@@ -550,13 +569,10 @@ export default function VoicePage() {
     connectingRef.current = true;
     setIsConnecting(true);
     try {
-      // Realtime for two audiences: a Pro user who chose it, AND the free
-      // front-door companion (?free=1 → 'companion' mode, which is free — see
-      // realtimeAccess.ts). The good voice is the whole point of the hook, so
-      // the free companion tries it FIRST. If Realtime cannot connect (Russia /
-      // no cloud reachable), we fall through to the private on-device path
-      // below — the free companion still works with no VPN.
-      if ((isPro && voicePreference === "realtime") || freeMode) {
+      // Realtime is used only after this account has accepted the visible audio
+      // disclosure. If it is unavailable, the call falls back to Mila's private
+      // self-hosted voice path.
+      if (voicePreference === "realtime") {
         try {
           await startRealtimeVoice(connectionAttempt, connectAbort.signal);
           return;
@@ -566,10 +582,8 @@ export default function VoicePage() {
         if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) return;
       }
 
-      const seated = await (freeMode
-        ? (guestSessionRef.current ?? hasActiveSession())
-        : hasActiveSession());
-      if (freeMode) guestSessionRef.current = seated ? Promise.resolve(true) : null;
+      const seated = await (guestSessionRef.current ?? hasActiveSession());
+      guestSessionRef.current = seated ? Promise.resolve(true) : null;
       if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) return;
       if (!seated) {
         setVoiceError(lang === "ru"
@@ -619,8 +633,15 @@ export default function VoicePage() {
     router.push('/chat');
   }, [cancelSpeechSession, clearRestartTimer, router, stop]);
 
+  const choosePresence = useCallback((next: PresenceId) => {
+    setPresenceId(next);
+    window.localStorage.setItem(PRESENCE_STORAGE_KEY, next);
+  }, []);
+
   const showInvocation = phase === "resting";
   const showQuestion = (phase === "listening" || phase === "thinking") && !!liveText;
+  const isLivePreview = freePreview && !isPro;
+  const canUseLiveVoice = isPro || (isLivePreview && previewAvailable);
 
   return (
     <div className="voice-stage fixed inset-0 overflow-hidden" data-phase={phase}>
@@ -640,7 +661,6 @@ export default function VoicePage() {
         </svg>
       </button>
 
-      {!freeMode && (
       <div
         className="absolute left-4 top-4 z-30 flex max-w-[calc(100%-5.5rem)] items-center gap-1 rounded-xl border border-black/10 bg-white/90 p-1 text-[11px] shadow-sm backdrop-blur"
         style={{ marginTop: "env(safe-area-inset-top, 0px)" }}
@@ -653,25 +673,34 @@ export default function VoicePage() {
           type="button"
           className={`rounded-lg px-2.5 py-1.5 font-semibold transition ${voicePreference === "private" ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"}`}
           aria-pressed={voicePreference === "private"}
-          disabled={isConnected}
+          disabled={isConnected || !preferenceLoaded}
           onClick={selectPrivateVoice}
           title={lang === "ru" ? "Аудио микрофона не отправляется в OpenAI" : "Microphone audio is not sent to OpenAI"}
         >
           {lang === "ru" ? "Приватный" : "Private"}
         </button>
-        {isPro && (
+        {canUseLiveVoice ? (
           <button
             type="button"
             className={`rounded-lg px-2.5 py-1.5 font-semibold transition ${voicePreference === "realtime" ? "bg-pink-700 text-white" : "text-slate-700 hover:bg-slate-100"}`}
             aria-pressed={voicePreference === "realtime"}
-            disabled={isConnected}
+            disabled={isConnected || !preferenceLoaded}
             onClick={() => setShowRealtimeConsent(true)}
           >
-            {lang === "ru" ? "Быстрый Pro" : "Fast Pro"}
+            {isLivePreview
+              ? (lang === "ru" ? "Демо Live" : "Live preview")
+              : (lang === "ru" ? "Live Pro" : "Live Pro")}
           </button>
-        )}
+        ) : null}
       </div>
-      )}
+
+      {!isConnected && !isConnecting ? (
+        <PresencePicker value={presenceId} lang={lang} onChange={choosePresence} />
+      ) : null}
+
+      <p className="presence-ai-disclosure">
+        {lang === "ru" ? "ИИ-персонаж · синтетический образ и голос" : "AI character · synthetic image and voice"}
+      </p>
 
       {showRealtimeConsent && (
         <div className="absolute inset-0 z-50 grid place-items-center bg-slate-950/45 p-5" role="presentation">
@@ -682,14 +711,20 @@ export default function VoicePage() {
             aria-describedby="realtime-consent-description"
             className="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl"
           >
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-pink-700">Mila Pro</p>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-pink-700">
+              {isLivePreview ? "Mila live preview" : "Mila Pro · live voice"}
+            </p>
             <h2 id="realtime-consent-title" className="mb-3 text-xl font-semibold">
-              {lang === "ru" ? "Включить быстрый голос?" : "Use fast live voice?"}
+              {lang === "ru" ? "Начать живой разговор?" : "Start live voice?"}
             </h2>
             <p id="realtime-consent-description" className="mb-6 text-sm leading-6 text-slate-600">
-              {lang === "ru"
-                ? "В быстром режиме звук с микрофона и расшифровка отправляются в OpenAI для обработки разговора в реальном времени. Выбирай этот режим, только если согласен. Настройка сохранится для этого аккаунта; перед звонком всегда можно вернуться в приватный режим."
-                : "Fast mode sends your microphone audio and transcript to OpenAI for live processing. Choose it only if you consent. This preference is saved for this account, and you can switch back to Private before any call."}
+              {isLivePreview
+                ? (lang === "ru"
+                    ? "Для этого демо звук с микрофона и расшифровка будут отправлены в OpenAI, чтобы провести разговор в реальном времени. Согласие действует только для текущего посещения; можно оставить приватный режим."
+                    : "For this preview, your microphone audio and transcript will be sent to OpenAI to run the live conversation. Your choice applies only to this visit, and you can keep Private instead.")
+                : (lang === "ru"
+                    ? "В Live-режиме звук с микрофона и расшифровка отправляются в OpenAI для разговора в реальном времени. Выбирай его, только если согласен. Настройка сохранится для этого Pro-аккаунта; перед звонком всегда можно вернуться в приватный режим."
+                    : "Live mode sends your microphone audio and transcript to OpenAI for real-time conversation. Choose it only if you consent. This preference is saved for this Pro account, and you can switch back to Private before any call.")}
             </p>
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <button
@@ -702,9 +737,10 @@ export default function VoicePage() {
               <button
                 type="button"
                 className="rounded-xl bg-pink-700 px-4 py-2.5 text-sm font-semibold text-white"
+                disabled={!preferenceLoaded}
                 onClick={confirmRealtimeVoice}
               >
-                {lang === "ru" ? "Согласен — включить" : "I agree — use fast voice"}
+                {lang === "ru" ? "Согласен — начать Live" : "I agree — start live voice"}
               </button>
             </div>
           </section>
@@ -715,6 +751,7 @@ export default function VoicePage() {
       <button
         type="button"
         onClick={connectToVoice}
+        disabled={!preferenceLoaded}
         aria-label={!isConnected ? "Touch to begin" : phase === "manifesting" ? "Interrupt" : "Speak or stop recording"}
         className="voice-orb absolute left-1/2 z-10 outline-none"
         style={{ top: "42%", transform: "translate(-50%, -50%)", background: "transparent", border: "none", cursor: "pointer" }}
@@ -731,7 +768,7 @@ export default function VoicePage() {
            <div className="voice-connecting absolute inset-0 rounded-full border-2 border-t-transparent animate-spin z-20 pointer-events-none" style={{ width: orbSize, height: orbSize, left: '50%', top: '50%', marginLeft: -orbSize/2, marginTop: -orbSize/2 }}></div>
         )}
 
-        {kidsMode ? <MilaKid state={phase} size={orbSize} /> : faceMode ? <MilaFace state={phase} size={orbSize} /> : <MilaOrb state={phase} size={orbSize} />}
+        <MilaPresence presenceId={presenceId} state={phase} size={orbSize} />
       </button>
 
       {/* The invitation the orb breathes at rest */}

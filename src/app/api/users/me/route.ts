@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
       plan: true,
       planStatus: true,
       planRenewsAt: true,
+      voicePreviewUsedAt: true,
     },
   })
   if (!profile) return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -43,6 +44,7 @@ export async function GET(request: NextRequest) {
       isPaid: isPaid(state),
       renewsAt: state.renewsAt,
     },
+    liveVoicePreviewAvailable: profile.voicePreviewUsedAt === null,
   })
 }
 

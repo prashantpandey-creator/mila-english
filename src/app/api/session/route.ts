@@ -5,6 +5,12 @@ import { buildRealtimeSession } from '@/lib/assessment';
 import { getUserPlan } from '@/lib/subscriptionStore';
 import { FEATURES, planUnlocks, resolvePlan } from '@/lib/subscription';
 import { realtimeModeRequiresPaid } from '@/lib/realtimeAccess';
+import { prisma } from '@/lib/prisma';
+import {
+  releaseVoicePreview,
+  reserveVoicePreview,
+  type VoicePreviewReservation,
+} from '@/lib/realtimePreview';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -48,10 +54,10 @@ export async function POST(req: Request) {
     : 'tutor';
 
   const user = await authenticate(new Request(req.url, { headers: req.headers }) as any);
-  // The free, guest-open voices (companion, Pia, kids) can start without a
-  // sign-in; the production paid gate below still applies per realtimeAccess.
-  // The coach and assessment require a signed-in learner at this boundary.
-  if (!user && mode !== 'companion' && mode !== 'pia' && mode !== 'kids') {
+  // Companion preview is tied to a durable registered/explicit-guest identity.
+  // Pia and the legacy kids mode remain separate guest-open products. The
+  // coach and assessment also require a signed-in learner at this boundary.
+  if (!user && mode !== 'pia' && mode !== 'kids') {
     return errorResponse('You must be logged in to start a voice session.', 401, 'UNAUTHORIZED');
   }
 
@@ -100,6 +106,31 @@ export async function POST(req: Request) {
     return errorResponse('The WebRTC SDP offer is invalid.', 400, 'INVALID_SDP');
   }
 
+  // The URL is UI intent, never entitlement. Atomically consume exactly one
+  // preview for this durable account before provisioning OpenAI. A failed
+  // provider request releases the reservation so an outage cannot burn it.
+  let previewReservation: VoicePreviewReservation | null = null;
+  if (mode === 'companion') {
+    const userId = Number(user?.sub);
+    if (!Number.isSafeInteger(userId) || userId <= 0) {
+      return errorResponse('A Mila account is required for the live preview.', 401, 'UNAUTHORIZED');
+    }
+    previewReservation = await reserveVoicePreview(prisma.user, userId);
+    if (!previewReservation) {
+      return errorResponse('Your live voice preview has already been used.', 402, 'VOICE_PREVIEW_USED');
+    }
+  }
+
+  const releasePreviewReservation = async () => {
+    const reservation = previewReservation;
+    if (!reservation) return;
+    try {
+      await releaseVoicePreview(prisma.user, reservation);
+    } catch (error) {
+      console.error('Could not release failed live voice preview reservation', error);
+    }
+  };
+
   const form = new FormData();
   form.set('sdp', sdp);
   form.set('session', JSON.stringify(buildRealtimeSession(mode)));
@@ -121,6 +152,7 @@ export async function POST(req: Request) {
 
     const body = await response.text();
     if (!response.ok) {
+      await releasePreviewReservation();
       console.error('OpenAI Realtime session failed', response.status, body);
       return errorResponse('OpenAI could not start the voice assessment.', 502, 'OPENAI_SESSION_FAILED');
     }
@@ -130,6 +162,7 @@ export async function POST(req: Request) {
       headers: { 'Content-Type': 'application/sdp' },
     });
   } catch (error) {
+    await releasePreviewReservation();
     console.error('OpenAI Realtime session request failed', error);
     return errorResponse('The voice service is temporarily unavailable.', 502, 'OPENAI_UNAVAILABLE');
   }

@@ -1094,6 +1094,235 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   color: var(--mila-action-deep);
   background: rgba(255, 255, 255, .9);
 }
+.mila-surface--app .mila-portrait-presence {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  overflow: hidden;
+  border: 5px solid rgba(250,248,245,.94);
+  border-radius: 50%;
+  background: var(--mila-raised);
+  box-shadow:
+    0 0 0 3px var(--presence-ring),
+    0 28px 80px -34px rgba(38,52,59,.74);
+  transition: box-shadow .45s ease, transform .45s cubic-bezier(.2,.8,.2,1);
+}
+.mila-surface--app .mila-portrait-presence > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transform: scale(1.015);
+  transition: filter .5s ease, transform .7s cubic-bezier(.2,.8,.2,1);
+  user-select: none;
+}
+.mila-surface--app .mila-portrait-presence__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg,transparent 58%,rgba(38,52,59,.16)),
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.08),transparent 48%);
+  pointer-events: none;
+}
+.mila-surface--app .mila-portrait-presence__signal {
+  position: absolute;
+  right: 11%;
+  bottom: 11%;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  border: 3px solid rgba(250,248,245,.95);
+  border-radius: 50%;
+  background: var(--mila-muted);
+  box-shadow: 0 5px 16px rgba(38,52,59,.32);
+  transition: background .3s ease, transform .3s ease;
+}
+.mila-surface--app .mila-portrait-presence--listening {
+  transform: scale(1.018);
+  animation: milaPresenceListen 1.55s ease-in-out infinite;
+}
+.mila-surface--app .mila-portrait-presence--listening .mila-portrait-presence__signal {
+  background: var(--mila-measure);
+}
+.mila-surface--app .mila-portrait-presence--thinking > img {
+  filter: saturate(.78);
+  transform: scale(1.035);
+}
+.mila-surface--app .mila-portrait-presence--thinking .mila-portrait-presence__signal {
+  background: var(--mila-ink);
+}
+.mila-surface--app .mila-portrait-presence--manifesting .mila-portrait-presence__signal {
+  background: var(--mila-action);
+  animation: milaPresenceSpeak .9s ease-in-out infinite;
+}
+.mila-surface--app .presence-picker {
+  position: absolute;
+  top: calc(4.85rem + env(safe-area-inset-top, 0px));
+  left: 1rem;
+  z-index: 42;
+  width: min(370px,calc(100vw - 2rem));
+  color: var(--mila-ink);
+  font-family: var(--font-sans), Manrope, sans-serif;
+}
+.mila-surface--app .presence-picker__trigger {
+  min-height: 42px;
+  display: inline-grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius-sm);
+  color: var(--mila-muted);
+  background: rgba(255,255,255,.9);
+  box-shadow: var(--mila-shadow);
+  cursor: pointer;
+}
+.mila-surface--app .presence-picker__trigger > span:first-child {
+  font: 600 .6rem/1 var(--font-mono), monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.mila-surface--app .presence-picker__trigger strong {
+  color: var(--mila-ink);
+  font-size: .74rem;
+}
+.mila-surface--app .presence-picker__trigger > span:last-child {
+  color: var(--mila-action);
+  font-size: 1rem;
+}
+.mila-surface--app .presence-picker__trigger:hover {
+  border-color: var(--mila-line-strong);
+}
+.mila-surface--app .presence-picker__trigger:focus-visible,
+.mila-surface--app .presence-picker__intro button:focus-visible,
+.mila-surface--app .presence-picker__options > button:focus-visible {
+  outline: 3px solid var(--mila-action);
+  outline-offset: 2px;
+}
+.mila-surface--app .presence-picker__panel {
+  margin-top: 8px;
+  padding: 14px;
+  border: 1px solid var(--mila-line);
+  border-radius: var(--mila-radius);
+  background: rgba(250,248,245,.98);
+  box-shadow: 0 24px 70px rgba(38,52,59,.2);
+}
+.mila-surface--app .presence-picker__intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.mila-surface--app .presence-picker__intro p {
+  margin: 0;
+  color: var(--mila-ink);
+  font-size: .85rem;
+  font-weight: 760;
+}
+.mila-surface--app .presence-picker__intro span {
+  display: block;
+  margin-top: 3px;
+  color: var(--mila-muted);
+  font-size: .68rem;
+  line-height: 1.4;
+}
+.mila-surface--app .presence-picker__intro button {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  color: var(--mila-muted);
+  background: transparent;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+.mila-surface--app .presence-picker__options {
+  display: grid;
+  gap: 7px;
+}
+.mila-surface--app .presence-picker__options > button {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr) 20px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px 7px 7px;
+  border: 1px solid var(--mila-line);
+  border-radius: 10px;
+  color: var(--mila-ink);
+  background: var(--mila-panel);
+  text-align: left;
+  cursor: pointer;
+}
+.mila-surface--app .presence-picker__options > button:hover,
+.mila-surface--app .presence-picker__options > button:focus-visible {
+  border-color: var(--mila-line-strong);
+}
+.mila-surface--app .presence-picker__options > button.is-selected {
+  border-color: var(--mila-action);
+  box-shadow: inset 3px 0 0 var(--mila-action);
+}
+.mila-surface--app .presence-picker__thumb {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--mila-line);
+  border-radius: 50%;
+  background: var(--mila-raised);
+}
+.mila-surface--app .presence-picker__thumb > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.mila-surface--app .presence-picker__copy {
+  min-width: 0;
+}
+.mila-surface--app .presence-picker__copy strong,
+.mila-surface--app .presence-picker__copy small {
+  display: block;
+}
+.mila-surface--app .presence-picker__copy strong {
+  font-size: .78rem;
+}
+.mila-surface--app .presence-picker__copy small {
+  margin-top: 3px;
+  color: var(--mila-muted);
+  font-size: .64rem;
+  line-height: 1.3;
+}
+.mila-surface--app .presence-picker__check {
+  color: var(--mila-action);
+  font-size: .85rem;
+  font-weight: 800;
+  text-align: center;
+}
+.mila-surface--app .presence-picker__disclosure {
+  margin: 10px 2px 0;
+  color: var(--mila-muted);
+  font: 500 .58rem/1.45 var(--font-mono), monospace;
+  letter-spacing: .02em;
+}
+.mila-surface--app .presence-ai-disclosure {
+  position: absolute;
+  top: calc(5rem + env(safe-area-inset-top, 0px));
+  right: max(1.1rem,env(safe-area-inset-right,0px));
+  z-index: 25;
+  max-width: 180px;
+  margin: 0;
+  color: var(--mila-muted);
+  font: 600 .58rem/1.35 var(--font-mono), monospace;
+  letter-spacing: .05em;
+  text-align: right;
+  text-transform: uppercase;
+  pointer-events: none;
+}
 .mila-surface--app :is(.voice-invoke, .voice-q) { color: var(--mila-muted) !important; font-family: var(--font-mono), monospace; letter-spacing: .08em; }
 .mila-surface--app .voice-ripple { border-color: rgba(69,106,96,.42) !important; }
 .mila-surface--app .voice-a { color: var(--mila-ink) !important; text-shadow: none !important; }
@@ -1124,6 +1353,33 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 @keyframes milaVoiceThink { to { transform: rotate(360deg); } }
 @keyframes milaVoiceLineIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 @keyframes milaVoiceWordIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes milaPresenceListen {
+  0%,100% { box-shadow: 0 0 0 3px var(--presence-ring),0 28px 80px -34px rgba(38,52,59,.74); }
+  50% { box-shadow: 0 0 0 5px var(--presence-ring),0 28px 88px -28px rgba(38,52,59,.62); }
+}
+@keyframes milaPresenceSpeak {
+  0%,100% { transform: scale(.88); box-shadow: 0 0 0 0 rgba(217,0,108,.22); }
+  50% { transform: scale(1.12); box-shadow: 0 0 0 9px rgba(217,0,108,0); }
+}
+
+@media (max-width: 640px) {
+  .mila-surface--app .presence-picker {
+    top: calc(4.65rem + env(safe-area-inset-top, 0px));
+  }
+  .mila-surface--app .presence-ai-disclosure {
+    top: calc(5rem + env(safe-area-inset-top, 0px));
+    max-width: 132px;
+    font-size: .58rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mila-surface--app .mila-portrait-presence,
+  .mila-surface--app .mila-portrait-presence__signal {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 
 body[data-bottom-nav] .mila-surface--app .mila-guide {
   bottom: calc(86px + env(safe-area-inset-bottom)) !important;

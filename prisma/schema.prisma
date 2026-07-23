@@ -54,6 +54,9 @@ model User {
   planCustomerId     String? // provider customer id
   planSubscriptionId String? // provider subscription id
   planUpdatedAt      DateTime?
+  // One durable, server-consumed OpenAI Realtime preview per explicit account
+  // (including isolated guest accounts). The public query string never grants it.
+  voicePreviewUsedAt DateTime?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 }
