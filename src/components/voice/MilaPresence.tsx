@@ -1,6 +1,6 @@
 "use client";
 
-import { MilaOrb, type OrbState } from "./MilaOrb";
+import type { OrbState } from "./MilaOrb";
 import { presenceById, type PresenceId } from "@/lib/presences";
 
 const RING: Record<OrbState, string> = {
@@ -19,10 +19,6 @@ export function MilaPresence({
   state?: OrbState;
   size?: number;
 }) {
-  if (presenceId === "signal") {
-    return <MilaOrb state={state} size={size} ariaLabel="Mila AI signal" />;
-  }
-
   const presence = presenceById(presenceId);
   const ring = RING[state];
 
@@ -37,7 +33,7 @@ export function MilaPresence({
       role="img"
       aria-label={`Mila · ${presence.name.en}, a synthetic AI character`}
     >
-      {/* Generated, fictional portrait. See docs/design/2026-07-23-mila-presence-v1.md. */}
+      {/* Generated fictional avatar. See docs/design/2026-07-23-mila-avatar-presence-v2.md. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={presence.poster ?? ""}

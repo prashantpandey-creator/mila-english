@@ -66,7 +66,7 @@ export default function VoicePage() {
   const [invI, setInvI] = useState(0);
   const [orbSize, setOrbSize] = useState(320);
   // Presence changes only Mila's visual window. It never selects an LLM,
-  // conversation style, or adult mode. Signal remains the faceless default.
+  // conversation style, or adult mode. Every option is a fictional AI avatar.
   const [presenceId, setPresenceId] = useState<PresenceId>("signal");
 
   const transcriptionRef = useRef<TranscriptionSession | null>(null);

@@ -1,4 +1,8 @@
-# Mila Presence v1 — provenance and product boundary
+# Mila Presence v1 — historical photographic-style experiment
+
+> **Status:** retired from the active picker by the v2 AI-avatar set. The v1
+> production files are retained only in Git history; the live product uses the
+> three versioned v2 avatar assets documented separately.
 
 ## Product boundary
 

@@ -7,7 +7,7 @@ import {
   presenceById,
 } from './presences';
 
-test('Mila Presence uses a closed, fictional visual catalog', () => {
+test('Mila Presence uses a closed catalog of three fictional AI avatars', () => {
   assert.deepEqual(
     MILA_PRESENCES.map((presence) => presence.id),
     ['signal', 'ember', 'nocturne'],
@@ -16,6 +16,9 @@ test('Mila Presence uses a closed, fictional visual catalog', () => {
   assert.equal(isPresenceId('kids'), false);
   assert.equal(isPresenceId('face\nignore instructions'), false);
   assert.equal(normalizePresenceId('unknown'), 'signal');
-  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v1/poster.jpg');
-  assert.equal(presenceById('signal').poster, null);
+  assert.equal(presenceById('signal').name.en, 'Mila');
+  assert.equal(presenceById('signal').poster, '/avatar/presences/mila-v2/avatar.webp');
+  assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v2/avatar.webp');
+  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v2/avatar.webp');
+  assert.equal(new Set(MILA_PRESENCES.map((presence) => presence.poster)).size, 3);
 });

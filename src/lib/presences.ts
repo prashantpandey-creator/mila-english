@@ -3,12 +3,12 @@ export const PRESENCE_STORAGE_KEY = 'mila-presence-v1';
 export const MILA_PRESENCES = [
   {
     id: 'signal',
-    name: { en: 'Signal', ru: 'Сигнал' },
+    name: { en: 'Mila', ru: 'Мила' },
     description: {
-      en: 'Faceless, minimal and focused.',
-      ru: 'Абстрактно, спокойно и без лица.',
+      en: 'Bright, curious and globally minded.',
+      ru: 'Яркая, любознательная и открытая миру.',
     },
-    poster: null,
+    poster: '/avatar/presences/mila-v2/avatar.webp',
     objectPosition: 'center',
   },
   {
@@ -18,8 +18,8 @@ export const MILA_PRESENCES = [
       en: 'Warm, worldly and easy to talk to.',
       ru: 'Тёплая, открытая миру и лёгкая в общении.',
     },
-    poster: '/avatar/presences/ember-v1/poster.jpg',
-    objectPosition: '50% 31%',
+    poster: '/avatar/presences/ember-v2/avatar.webp',
+    objectPosition: 'center',
   },
   {
     id: 'nocturne',
@@ -28,8 +28,8 @@ export const MILA_PRESENCES = [
       en: 'Composed, direct and quietly bold.',
       ru: 'Собранная, прямая и спокойно смелая.',
     },
-    poster: '/avatar/presences/nocturne-v1/poster.jpg',
-    objectPosition: '50% 28%',
+    poster: '/avatar/presences/nocturne-v2/avatar.webp',
+    objectPosition: 'center',
   },
 ] as const;
 
