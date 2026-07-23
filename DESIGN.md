@@ -42,7 +42,7 @@ without becoming noisy. There is no second route-specific colour story.
 | Muted ink | `#5e6a6a` |
 | Border | mineral hairline `#d8e0e3`; strong line `#a9bab6` |
 | Calm counterweight | eucalyptus `#456a60`; mid `#5f7d72` |
-| Interaction signal | accessible magenta `#d9006c`; deep action `#a40050`; decorative flare `#ff2d95`; plum plate `#75003f` |
+| Interaction signal | accessible magenta `#d9006c`; deep action `#a40050`; sampled bright pink `#ff82c2`; plum plate `#75003f` |
 
 - **Type.** Yeseva One (`--font-display`) carries the wordmark and rare
   editorial phrases. Manrope (`--font-sans`) carries product headings,

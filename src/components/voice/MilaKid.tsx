@@ -104,7 +104,7 @@ export function MilaKid({
           <g className={`mk-tilt-${uid}`}>
             {/* heart sprout on top */}
             <g className={`mk-x-sprout-${uid}`} style={{ transformOrigin: "100px 58px" }}>
-              <path d="M100 58 Q97 44 100 34" stroke="#ff77bd" strokeWidth="5" strokeLinecap="round" fill="none" />
+              <path d="M100 58 Q97 44 100 34" stroke="#ff82c2" strokeWidth="5" strokeLinecap="round" fill="none" />
               <path d="M100 40 C96 33 87 34 88 42 C89 49 100 55 100 55 C100 55 111 49 112 42 C113 34 104 33 100 40 Z" fill="#ff5fa8" />
             </g>
 
@@ -143,7 +143,7 @@ export function MilaKid({
             <g className={`mk-x-spark-${uid}`}>
               <circle cx="152" cy="72" r="3.6" fill="#ffcf3f" />
               <circle cx="166" cy="86" r="2.4" fill="#ff9d2f" />
-              <circle cx="158" cy="58" r="2" fill="#ff77bd" />
+              <circle cx="158" cy="58" r="2" fill="#ff82c2" />
             </g>
           </g>
         </g>

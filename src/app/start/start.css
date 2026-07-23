@@ -112,18 +112,18 @@
   --ad-strong: #ffffff;
   --ad-faint: #f0c7da;
   --ad-line: rgba(255,255,255,.2);
-  --ad-terra: #ff2d95;
-  --ad-line-terra: #ff2d95;
+  --ad-terra: #ff82c2;
+  --ad-line-terra: #ff82c2;
   color: #ffffff;
-  border-color: #ff2d95;
+  border-color: #ff82c2;
   background: #75003f;
-  box-shadow: 8px 8px 0 rgba(255,45,149,.24), 0 28px 64px rgba(117,0,63,.22);
+  box-shadow: 8px 8px 0 rgba(255,130,194,.24), 0 28px 64px rgba(117,0,63,.22);
 }
 .ad-plan--featured .ad-plan__badge { color: #75003f; background: #ffffff; }
 .ad-plan--featured .ad-plan__features svg { color: #ff8fc4; }
 .ad-plan--featured .ad-plan__name { color: #ffffff; }
 .ad-plan--featured .ad-btn--primary {
-  border-color: #ff2d95;
+  border-color: #ff82c2;
   background: linear-gradient(135deg, #d9006c, #a40050);
   box-shadow: 0 5px 0 #26131f, 0 18px 36px rgba(38,19,31,.28);
 }

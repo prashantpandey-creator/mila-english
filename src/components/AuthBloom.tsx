@@ -4,7 +4,7 @@ export default function AuthBloom() {
       <defs>
         <linearGradient id="mila-bloom-petal" x1="16" y1="10" x2="47" y2="52" gradientUnits="userSpaceOnUse">
           <stop stopColor="#ffe8f3" />
-          <stop offset="1" stopColor="#ff2d95" />
+          <stop offset="1" stopColor="#ff82c2" />
         </linearGradient>
         <linearGradient id="mila-bloom-leaf" x1="31" y1="38" x2="51" y2="58" gradientUnits="userSpaceOnUse">
           <stop stopColor="#F7A6BD" />

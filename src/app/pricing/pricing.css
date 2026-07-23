@@ -6,7 +6,7 @@
 .pricing-intro p { color: #65535f; font-size: 17px; line-height: 1.65; }
 .pricing-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; max-width: 900px; margin: 0 auto; }
 .pricing-card { display: flex; flex-direction: column; min-height: 460px; padding: clamp(26px,4vw,38px); border: 1px solid #f0c7da; border-radius: 24px; background: #fff; }
-.pricing-card--pro { color: #fff; border-color: #ff2d95; background: #75003f; box-shadow: 9px 9px 0 rgba(255,45,149,.2),0 30px 70px rgba(117,0,63,.2); }
+.pricing-card--pro { color: #fff; border-color: #ff82c2; background: #75003f; box-shadow: 9px 9px 0 rgba(255,130,194,.2),0 30px 70px rgba(117,0,63,.2); }
 .mila-surface--app .pricing-card--pro h2 { color: #fff !important; }
 .pricing-card__label { font-size: 12px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
 .pricing-card h2 { margin: 13px 0 0; font-size: 30px; }
