@@ -188,6 +188,21 @@ assert.match(mirrorPrompt, /flip roles/i);
 assert.match(mirrorPrompt, /defaults to genuine conversation/i);
 assert.match(mirrorPrompt, /do not start exercises/i);
 
+const spanishTargetPrompt = buildCompanionSystemPrompt({
+  persona: 'You are Mila as the Friend.',
+  pathname: '/chat',
+  locale: 'en',
+  surface: 'full tutor chat',
+  learnerSummary: 'Learner: Anna; level: B1.',
+  recentSummary: 'No recorded lesson progress yet.',
+  memories: [],
+  languageMode: 'mirror',
+  targetLanguage: 'Spanish',
+});
+assert.match(spanishTargetPrompt, /Learner-selected language: Spanish/);
+assert.match(spanishTargetPrompt, /Ordinary conversation should still follow/i);
+assert.match(spanishTargetPrompt, /Never force a lesson/i);
+
 const justTalkPrompt = buildCompanionSystemPrompt({
   persona: 'You are Mila as the Friend.',
   pathname: '/chat',

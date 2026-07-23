@@ -8,6 +8,7 @@ import { AppHeader, AppShell } from '@/components/ui/AppShell';
 import MilaIcon from '@/components/ui/MilaIcon';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
+import { isTargetLanguageId, TARGET_LANGUAGES, type TargetLanguageId } from '@/lib/languages';
 import { announceCompanionHistoryCleared, announceCompanionHistoryUpdated, useCompanionHistory } from '@/lib/use-companion-history';
 
 export default function Chat() {
@@ -15,10 +16,11 @@ export default function Chat() {
   const router = useRouter();
   const [conversationStyle, setConversationStyle] = useState<'natural' | 'playful'>('natural');
   const [toneDialogOpen, setToneDialogOpen] = useState(false);
+  const [targetLanguage, setTargetLanguage] = useState<TargetLanguageId>('auto');
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput } = useChat({
     id: 'mila-full-chat',
     api: '/api/chat',
-    body: { context: { pathname: '/chat', lang, surface: 'chat', conversationStyle } },
+    body: { context: { pathname: '/chat', lang, surface: 'chat', conversationStyle, targetLanguage } },
     onFinish: () => announceCompanionHistoryUpdated(),
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -35,6 +37,8 @@ export default function Chat() {
     if (window.localStorage.getItem('mila-chat-style-v1') === 'playful') {
       setConversationStyle('playful');
     }
+    const savedLanguage = window.localStorage.getItem('mila-target-language-v1');
+    if (isTargetLanguageId(savedLanguage)) setTargetLanguage(savedLanguage);
   }, []);
   useEffect(() => {
     const viewport = messagesViewportRef.current;
@@ -74,14 +78,18 @@ export default function Chat() {
 
   const starterPrompts = lang === 'ru'
     ? [
-        'Давай потренируем живой разговор',
-        'Помоги сказать это естественно',
-        'Мягко объясни мою ошибку',
+        'Давай просто поговорим',
+        targetLanguage === 'auto'
+          ? 'Помоги сказать это на другом языке'
+          : `Помоги сказать это на ${TARGET_LANGUAGES.find((item) => item.id === targetLanguage)?.ru ?? 'другом языке'}`,
+        'Научи меня одной полезной фразе',
       ]
     : [
-        'Let’s practise a real conversation',
-        'Help me say this naturally',
-        'Explain my mistake gently',
+        'Let’s talk naturally',
+        targetLanguage === 'auto'
+          ? 'Help me say this in another language'
+          : `Help me say this in ${TARGET_LANGUAGES.find((item) => item.id === targetLanguage)?.en ?? 'another language'}`,
+        'Teach me one useful phrase',
       ];
 
   const chooseStarter = (prompt: string) => {
@@ -104,6 +112,15 @@ export default function Chat() {
     setToneDialogOpen(false);
   };
 
+  const chooseLanguage = (value: string) => {
+    if (!isTargetLanguageId(value)) return;
+    setTargetLanguage(value);
+    window.localStorage.setItem('mila-target-language-v1', value);
+  };
+
+  const selectedLanguage = TARGET_LANGUAGES.find((item) => item.id === targetLanguage)
+    ?? TARGET_LANGUAGES[0];
+
   if (!m) return null;
 
   return (
@@ -113,6 +130,20 @@ export default function Chat() {
         eyebrow={lang==='ru' ? 'Текстовый разговор' : 'Text conversation'}
         actions={
           <>
+          <label className="chat-page__language">
+            <span>{lang === 'ru' ? 'Язык' : 'Language'}</span>
+            <select
+              value={targetLanguage}
+              onChange={(event) => chooseLanguage(event.target.value)}
+              aria-label={lang === 'ru' ? 'Язык для изучения' : 'Language to learn'}
+            >
+              {TARGET_LANGUAGES.map((language) => (
+                <option key={language.id} value={language.id}>
+                  {language[lang]}
+                </option>
+              ))}
+            </select>
+          </label>
           <button
             type="button"
             onClick={clearConversation}
@@ -121,18 +152,17 @@ export default function Chat() {
             title={lang==='ru' ? 'Новый разговор' : 'New conversation'}
             className="app-header__button"
           >
-            {isClearing ? (lang==='ru' ? 'Очищаю…' : 'Clearing…') : (lang==='ru' ? 'Новый чат' : 'New chat')}
+            <MilaIcon name="conversation" size={17} />
           </button>
           <button
             type="button"
             className={`chat-page__tone-toggle${conversationStyle === 'playful' ? ' is-playful' : ''}`}
             onClick={toggleConversationStyle}
             aria-pressed={conversationStyle === 'playful'}
+            aria-label={lang === 'ru' ? 'Настроение разговора' : 'Conversation mood'}
             title={lang === 'ru' ? 'Стиль разговора' : 'Conversation style'}
           >
-            {conversationStyle === 'playful'
-              ? (lang === 'ru' ? 'Игриво · 18+' : 'Playful · 18+')
-              : (lang === 'ru' ? 'Естественно' : 'Natural')}
+            <MilaIcon name="sparkle" size={17} />
           </button>
           <LangToggle/>
           </>
@@ -186,9 +216,13 @@ export default function Chat() {
               {lang==='ru' ? 'О чём думаешь?' : 'What’s on your mind?'}
             </h1>
             <p className="chat-page__empty-copy">
-              {lang==='ru'
-                ? 'Пиши как есть — на русском или английском. Я помогу продолжить мысль и, если нужно, подскажу более естественную английскую фразу.'
-                : 'Write naturally—in Russian or English. I’ll follow your meaning and, when useful, offer a more natural English phrase.'}
+              {targetLanguage === 'auto'
+                ? (lang === 'ru'
+                    ? 'Пиши естественно на любом языке. Mila поймёт смысл и поможет найти нужные слова, когда тебе это понадобится.'
+                    : 'Write naturally in any language. Mila follows your meaning and helps you find the words when you want them.')
+                : (lang === 'ru'
+                    ? `Пиши как есть. Mila поможет тебе говорить на ${selectedLanguage.ru.toLowerCase()}, но легко продолжит на любом языке, который ты используешь.`
+                    : `Write naturally. Mila can help you speak ${selectedLanguage.en}, or follow whatever language you use.`)}
             </p>
             <div className="chat-page__starters" aria-label={lang === 'ru' ? 'Начать с подсказки' : 'Start with a prompt'}>
               {starterPrompts.map((prompt) => (
@@ -246,7 +280,7 @@ export default function Chat() {
             ref={inputRef}
             value={input}
             onChange={handleInputChange}
-            placeholder={lang==='ru' ? 'Спроси Милу или попрактикуйся…' : 'Ask Mila anything or practise English…'}
+            placeholder={lang==='ru' ? 'Спроси Mila или начни разговор…' : 'Ask Mila anything or start a conversation…'}
             disabled={isLoading || isHydrating || isClearing}
             aria-label={lang==='ru' ? 'Сообщение для Милы' : 'Message Mila'}
           />

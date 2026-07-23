@@ -28,6 +28,7 @@ import {
 } from '@/lib/companionStore';
 import { selectHistoryForModel } from '@/lib/companionHistory';
 import { readLearnerProfile } from '@/lib/learnerProfile';
+import { isTargetLanguageId, targetLanguagePrompt } from '@/lib/languages';
 import { personaBlock, type PersonaId } from '@/lib/personas';
 import { prisma } from '@/lib/prisma';
 import { builtinLessonContent, getBuiltinLesson } from '@/lib/builtinLessons';
@@ -373,6 +374,9 @@ export async function POST(request: NextRequest) {
   const freeConversationRequested = requestsFreeConversation(latestUserMessage);
   const inLesson = (surfaceKind === 'practice' || Boolean(currentLesson)) && !freeConversationRequested;
   const playfulConversation = surfaceKind === 'chat' && payload?.context?.conversationStyle === 'playful';
+  const targetLanguage = isTargetLanguageId(payload?.context?.targetLanguage)
+    ? targetLanguagePrompt(payload.context.targetLanguage)
+    : undefined;
   const persona = personaBlock(
     playfulConversation
       ? 'playful'
@@ -401,6 +405,7 @@ export async function POST(request: NextRequest) {
       .filter(Boolean),
     learningContext,
     languageMode,
+    targetLanguage,
     freeConversationRequested,
   });
 

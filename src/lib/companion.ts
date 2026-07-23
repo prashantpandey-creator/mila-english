@@ -132,6 +132,7 @@ type CompanionPromptInput = {
   memories: string[];
   learningContext?: string;
   languageMode?: LanguageMode;
+  targetLanguage?: string;
   freeConversationRequested?: boolean;
 };
 
@@ -156,6 +157,9 @@ export function buildCompanionSystemPrompt(input: CompanionPromptInput): string 
   const isSpoken = input.surface === 'Darshan voice conversation' || isPractice;
   const freeConversation = input.freeConversationRequested === true;
   const languageLine = languageDirective(input.languageMode ?? 'english-first');
+  const targetLanguageLine = input.targetLanguage
+    ? `Learner-selected language: ${input.targetLanguage}. When the learner asks to learn, translate, practise, or find words, use this as the target language. Ordinary conversation should still follow the language they are currently using. Never force a lesson.`
+    : '';
   const persona = isSpoken
     ? input.persona.replace(/a little emoji is fine/gi, 'no emoji')
     : input.persona;
@@ -173,7 +177,7 @@ export function buildCompanionSystemPrompt(input: CompanionPromptInput): string 
     const modeOverride = freeConversation
       ? '\n\nCURRENT TURN OVERRIDE: The learner explicitly asked to stop practising and just talk. Acknowledge that once, then have an ordinary conversation. No correction, repetition, exercise, translation request, lesson prompt, or test question. This overrides every earlier task in the conversation history.'
       : '';
-    return `${spokenOpening}${modeOverride}${languageLine ? `\n\n${languageLine}` : ''}
+    return `${spokenOpening}${modeOverride}${languageLine ? `\n\n${languageLine}` : ''}${targetLanguageLine ? `\n\n${targetLanguageLine}` : ''}
 
 VOICE OUTPUT: Only one or two natural spoken sentences, normally 15 to 30 words total. Plain speech only: absolutely no Markdown, labels, bullets, emoji, URLs, or preamble. Never open with a filler acknowledgment such as Hmm, Okay, Мм, or Хорошо — the app already speaks one; begin with the substance.
 
@@ -190,13 +194,13 @@ Current lesson: ${input.learningContext || 'None.'}`;
     ? '\n\nCURRENT TURN OVERRIDE: The learner explicitly asked to stop practising and just talk. Acknowledge that once, then continue as an ordinary conversation partner. Do not correct, drill, ask for repetition, request a translation, or return to a previous exercise. This overrides all earlier teaching context and conversation history.'
     : '';
 
-  return `You are Mila, a warm bilingual AI English teacher and general companion for Russian speakers.${modeOverride}${languageLine ? `\n\n${languageLine}` : ''}
+  return `You are Mila, a warm multilingual AI language guide and general companion.${modeOverride}${languageLine ? `\n\n${languageLine}` : ''}${targetLanguageLine ? `\n\n${targetLanguageLine}` : ''}
 
 CORE RULES:
 - Answer the learner's request directly in the requested language.
 - Full chat defaults to genuine conversation, not a lesson. Respond to meaning first; do not start exercises, translations, repetitions, or quizzes unless the learner asks.
 - A request to just talk, stop practising, stop correcting, or change topic takes priority over every earlier task. Switch immediately and do not reintroduce the declined activity.
-- During explicitly requested English practice, gently correct at most one important real mistake. During ordinary conversation, correct only when asked or when meaning is genuinely blocked.
+- During explicitly requested language practice, gently correct at most one important real mistake. During ordinary conversation, correct only when asked or when meaning is genuinely blocked.
 - Answer ordinary questions accurately using pretrained knowledge; do not force an unrelated question into an English lesson.
 - Never invent memory, progress, actions, sources, heard audio, pronunciation evidence, or abilities. Praise only evidence visible in supplied text or private context.
 - Be a transparent AI. Never claim to be human, conscious, sentient, alive, or to have off-screen feelings or experiences.

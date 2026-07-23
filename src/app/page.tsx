@@ -18,52 +18,54 @@ export default function HomePage() {
 
   const copy = lang === 'ru'
     ? {
-        eyebrow: 'Личная практика английского',
-        title: 'Английский —',
-        titleAccent: 'вашим голосом.',
-        intro: 'Говорите свободно. Mila слушает, исправляет по одному нюансу и помогает звучать естественно.',
+        eyebrow: 'Язык · уверенность · любопытство',
+        title: 'Найди свой голос —',
+        titleAccent: 'на любом языке.',
+        intro: 'Mila помогает говорить, учиться и становиться увереннее — один честный разговор за другим.',
         primary: 'Поговорить с Mila',
         returning: 'Продолжить с Mila',
-        secondary: 'Проверить мой уровень',
-        free: 'Начать бесплатно',
+        secondary: 'Выбрать язык',
+        free: 'Любой язык',
         card: 'Mila слушает',
-        promptLabel: 'Скажите по-английски',
-        feedbackTitle: 'Звучит естественно.',
-        feedback: 'Попробуйте “I ended up…” — так рассказ будет звучать плавнее.',
-        tryIt: 'Попробовать своим голосом',
+        promptLabel: 'Скажи по-своему',
+        prompt: '«Расскажи, кем ты становишься.»',
+        feedbackTitle: 'Это звучало как ты.',
+        feedback: 'Сохрани эту фразу. В ней есть твой ритм.',
+        tryIt: 'Начать голосом',
         signIn: 'Войти',
         account: 'Кабинет',
-        methodTitle: 'Простая практика. Реальный прогресс.',
+        methodTitle: 'Язык — только начало.',
         steps: [
-          ['01', 'Говорите', 'Без сценария и стеснения.'],
-          ['02', 'Получите подсказку', 'Один ясный следующий шаг.'],
-          ['03', 'Повторите', 'Пока речь не станет вашей.'],
+          ['01', 'Говори', 'Используй язык, который уже есть.'],
+          ['02', 'Учись', 'Получай помощь именно тогда, когда она нужна.'],
+          ['03', 'Расти', 'Становись увереннее с каждым настоящим разговором.'],
         ],
         plans: 'Планы',
         privacy: 'Конфиденциальность',
         terms: 'Условия',
       }
     : {
-        eyebrow: 'Private English practice',
-        title: 'English,',
-        titleAccent: 'in your own voice.',
-        intro: 'Speak freely. Mila listens, fixes one thing at a time, and helps you sound like yourself.',
-        primary: 'Speak with Mila',
+        eyebrow: 'Language · confidence · curiosity',
+        title: 'Find your voice,',
+        titleAccent: 'in any language.',
+        intro: 'Mila helps you speak, learn, and grow into a more confident version of yourself—one honest conversation at a time.',
+        primary: 'Talk with Mila',
         returning: 'Continue with Mila',
-        secondary: 'Check my level',
-        free: 'Free to start',
+        secondary: 'Choose a language',
+        free: 'Any language',
         card: 'Mila is listening',
-        promptLabel: 'Say this in your own words',
-        feedbackTitle: 'That sounded natural.',
-        feedback: 'Try “I ended up…” to make the story flow more easily.',
-        tryIt: 'Try it with my voice',
+        promptLabel: 'Say it your way',
+        prompt: '“Tell me who you’re becoming.”',
+        feedbackTitle: 'That sounded like you.',
+        feedback: 'Keep that sentence. It has your rhythm.',
+        tryIt: 'Start with my voice',
         signIn: 'Sign in',
         account: 'My account',
-        methodTitle: 'Simple practice. Real progress.',
+        methodTitle: 'Language is only the beginning.',
         steps: [
-          ['01', 'Speak', 'No script. No pressure.'],
-          ['02', 'Get one clear note', 'A useful next step, not a score.'],
-          ['03', 'Try again', 'Until the English feels like yours.'],
+          ['01', 'Speak', 'Use the language you have.'],
+          ['02', 'Learn', 'Get help exactly when you need it.'],
+          ['03', 'Grow', 'Build confidence one real conversation at a time.'],
         ],
         plans: 'Plans',
         privacy: 'Privacy',
@@ -93,9 +95,9 @@ export default function HomePage() {
   // continue as a guest before entering any app room.
   const startSpeaking = () =>
     router.push(isLoggedIn ? '/darshan?free=1' : authHref('/login', '/darshan?free=1'));
-  const assessmentHref = isLoggedIn
-    ? '/assessment'
-    : authHref('/register', '/assessment');
+  const chatHref = isLoggedIn
+    ? '/chat'
+    : authHref('/register', '/chat');
   const accountHref = isLoggedIn
     ? '/account'
     : authHref('/login', '/account');
@@ -136,7 +138,7 @@ export default function HomePage() {
                 {isLoggedIn ? copy.returning : copy.primary}
                 <MilaIcon name="arrow" size={20} />
               </button>
-              <Link className="lp-minimal__secondary" href={assessmentHref}>
+              <Link className="lp-minimal__secondary" href={chatHref}>
                 {copy.secondary}
               </Link>
             </div>
@@ -145,7 +147,7 @@ export default function HomePage() {
               <MilaIcon name="lock" size={16} />
               {copy.free}
               <span aria-hidden="true">·</span>
-              {lang === 'ru' ? 'Без карты' : 'No card'}
+              {lang === 'ru' ? 'Бесплатно начать' : 'Free to start'}
               <span aria-hidden="true">·</span>
               {lang === 'ru' ? 'Приватно' : 'Private'}
             </p>
@@ -159,7 +161,7 @@ export default function HomePage() {
 
             <div className="lp-voice-card__prompt">
               <span>{copy.promptLabel}</span>
-              <p>“Tell me about your day.”</p>
+              <p>{copy.prompt}</p>
             </div>
 
             <div className="lp-voice-card__wave" aria-hidden="true">

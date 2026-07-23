@@ -4,7 +4,11 @@ Guidance for Claude Code working in this repo. **Read `PROJECT_LEDGER.md` first*
 for the current live state.
 
 ## What Mila is
-Pronunciation-first English app for Russian speakers. Live at
+Mila is a multilingual coming-of-age companion: language, confidence,
+curiosity, and growing into your own voice through honest conversation. The
+global front door and full chat can follow any language; the existing structured
+curriculum remains a pronunciation-first English program for Russian speakers.
+Live at
 **https://mila.purangpt.com** (Mumbai box `209.182.233.163`, behind Caddy).
 Next.js 15 app + self-hosted voice stack (Piper TTS, faster-whisper ASR,
 wav2vec2 phoneme scorer, local Ollama LLM). "Works in Russia, no VPN" because
@@ -75,12 +79,17 @@ service must also be added to the workflow's up/health lists in the same commit.
   registration use `MilaVoiceMark`, an abstract graphite-and-pink signal. The
   rose character file remains versioned only as a possible asset for a future,
   separately branded children's app; do not put it back into the adult product.
+- **Global front door:** lead with finding your voice, not English proficiency.
+  Multilingual conversation is the broad entry point; structured English
+  assessment and lessons remain available inside the product. Never use flags
+  or cultural stereotypes to represent language choice.
 - **Personality:** default Mila has grounded girl-next-door ease: attentive,
   witty, unpretentious, and user-led. Full text chat may expose the device-local
-  `Playful · 18+` choice, but consent must be explicit while the expression
-  stays subtle. Light swearing and suggestive banter mirror the learner rather
-  than leading them; never use explicit sexual role-play, love-bombing,
-  possessiveness, exclusivity, submission, or dependency tactics.
+  adult mood behind a discreet control, but the consent surface must say
+  `Playful mode · 18+` explicitly while the expression stays subtle. Light
+  swearing and suggestive banter mirror the learner rather than leading them;
+  never use explicit sexual role-play, love-bombing, possessiveness,
+  exclusivity, submission, or dependency tactics.
 
 ## Where things live
 - Front door: `src/app/page.tsx` + `src/app/landing.css` (`.lp-*` namespace).
