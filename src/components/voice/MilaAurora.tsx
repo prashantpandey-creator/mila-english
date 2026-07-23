@@ -19,7 +19,7 @@ void main() {
 const FS_SRC = /*glsl*/ `#version 300 es
 precision highp float;
 in vec2 v_uv; out vec4 o;
-uniform float u_t; uniform vec2 u_res; uniform float u_lv; uniform float u_warm;
+uniform float u_t; uniform vec2 u_res; uniform float u_lv; uniform float u_warm; uniform float u_dark;
 float h2(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 p){
   vec2 i = floor(p), f = fract(p);
@@ -65,6 +65,31 @@ void main(){
   float tw = step(0.9986, sd) * (0.5 + 0.5 * sin(u_t * 1.6 + sd * 80.0));
   col = mix(col, mist, tw * 0.35);
   col = mix(base, col, mix(0.48, 1.0, smoothstep(1.18, 0.10, r)));
+
+  // Synthetic Presence mode: a graphite interface chamber with a living
+  // magenta signal, faint machine-grid telemetry and enough warmth to keep
+  // the companion emotionally present rather than clinically mechanical.
+  vec3 voidBase = vec3(0.014, 0.020, 0.027);
+  vec3 graphite = vec3(0.035, 0.047, 0.058);
+  vec3 cyanMetal = vec3(0.105, 0.225, 0.235);
+  vec3 magenta = vec3(1.000, 0.090, 0.510);
+  float chamberHalo = exp(-r * (2.2 - u_lv * 0.55));
+  float darkMist = fbm(c * 3.1 + vec2(u_t * 0.012, -u_t * 0.008));
+  vec3 darkCol = mix(voidBase, graphite, 0.32 + chamberHalo * 0.52 + darkMist * 0.10);
+  darkCol = mix(darkCol, cyanMetal, chamberHalo * (0.10 + u_lv * 0.14));
+  darkCol = mix(darkCol, magenta, (0.018 + u_warm * 0.12) * exp(-r * 3.0));
+
+  vec2 gridUv = uv * vec2(34.0 * u_res.x / max(u_res.y, 1.0), 34.0);
+  vec2 gridCell = abs(fract(gridUv - 0.5) - 0.5) / fwidth(gridUv);
+  float gridLine = 1.0 - min(min(gridCell.x, gridCell.y), 1.0);
+  darkCol += vec3(0.08, 0.16, 0.17) * gridLine * 0.055 * smoothstep(1.05, 0.32, r);
+
+  float interfaceRing = smoothstep(0.006, 0.0, abs(r - (0.305 + 0.008 * sin(u_t * 0.24))));
+  darkCol = mix(darkCol, mix(cyanMetal, magenta, u_warm), interfaceRing * (0.11 + u_lv * 0.16));
+  float scan = pow(0.5 + 0.5 * sin((uv.y * u_res.y + u_t * 28.0) * 0.075), 18.0);
+  darkCol += vec3(0.04, 0.11, 0.12) * scan * 0.05;
+  darkCol *= 1.0 - smoothstep(0.42, 1.16, r) * 0.64;
+  col = mix(col, darkCol, u_dark);
   o = vec4(col, 1.0);
 }`;
 
@@ -81,7 +106,15 @@ function compile(gl: WebGL2RenderingContext, type: number, src: string) {
   return s;
 }
 
-export function MilaAurora({ phase, className }: { phase: OrbState; className?: string }) {
+export function MilaAurora({
+  phase,
+  className,
+  variant = "atelier",
+}: {
+  phase: OrbState;
+  className?: string;
+  variant?: "atelier" | "synthetic";
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const phaseRef = useRef<OrbState>(phase);
   useEffect(() => { phaseRef.current = phase; }, [phase]);
@@ -113,6 +146,7 @@ export function MilaAurora({ phase, className }: { phase: OrbState; className?: 
     const uRes = gl.getUniformLocation(prog, "u_res");
     const uLv = gl.getUniformLocation(prog, "u_lv");
     const uWarm = gl.getUniformLocation(prog, "u_warm");
+    const uDark = gl.getUniformLocation(prog, "u_dark");
 
     const buf = gl.createBuffer()!;
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -146,6 +180,7 @@ export function MilaAurora({ phase, className }: { phase: OrbState; className?: 
       gl.uniform2f(uRes, w, h);
       gl.uniform1f(uLv, level);
       gl.uniform1f(uWarm, warm);
+      gl.uniform1f(uDark, variant === "synthetic" ? 1.0 : 0.0);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       raf = requestAnimationFrame(loop);
     };
@@ -156,7 +191,7 @@ export function MilaAurora({ phase, className }: { phase: OrbState; className?: 
       gl.deleteProgram(prog); gl.deleteShader(vs); gl.deleteShader(fs);
       gl.deleteBuffer(buf); gl.deleteVertexArray(vao);
     };
-  }, []);
+  }, [variant]);
 
   return (
     <canvas

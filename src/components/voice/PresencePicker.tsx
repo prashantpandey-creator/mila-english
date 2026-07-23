@@ -107,8 +107,8 @@ export function PresencePicker({
 
           <p className="presence-picker__disclosure">
             {lang === "ru"
-              ? "Все портреты — вымышленные синтетические персонажи."
-              : "Every portrait is an original synthetic character."}
+              ? "Все образы созданы ИИ; ни один реальный человек не говорит от их имени."
+              : "AI-generated synthetic depictions; no real person is speaking."}
           </p>
         </section>
       ) : null}

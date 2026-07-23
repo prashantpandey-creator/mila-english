@@ -3,32 +3,35 @@ export const PRESENCE_STORAGE_KEY = 'mila-presence-v1';
 export const MILA_PRESENCES = [
   {
     id: 'signal',
+    systemId: 'SYN-01',
     name: { en: 'Mila', ru: 'Мила' },
     description: {
-      en: 'Bright, curious and globally minded.',
-      ru: 'Яркая, любознательная и открытая миру.',
+      en: 'Warm signal intelligence with a curious edge.',
+      ru: 'Тёплый синтетический разум с живым любопытством.',
     },
-    poster: '/avatar/presences/mila-v2/avatar.webp',
+    poster: '/avatar/presences/mila-v3/avatar.webp',
     objectPosition: 'center',
   },
   {
     id: 'ember',
+    systemId: 'SYN-02',
     name: { en: 'Ember', ru: 'Эмбер' },
     description: {
-      en: 'Warm, worldly and easy to talk to.',
-      ru: 'Тёплая, открытая миру и лёгкая в общении.',
+      en: 'Copper warmth, worldly instinct, easy company.',
+      ru: 'Медное тепло, интуиция и лёгкость в общении.',
     },
-    poster: '/avatar/presences/ember-v2/avatar.webp',
+    poster: '/avatar/presences/ember-v3/avatar.webp',
     objectPosition: 'center',
   },
   {
     id: 'nocturne',
+    systemId: 'SYN-03',
     name: { en: 'Nocturne', ru: 'Ноктюрн' },
     description: {
-      en: 'Composed, direct and quietly bold.',
-      ru: 'Собранная, прямая и спокойно смелая.',
+      en: 'Composed intelligence with a quiet voltage.',
+      ru: 'Собранный разум со скрытым напряжением.',
     },
-    poster: '/avatar/presences/nocturne-v2/avatar.webp',
+    poster: '/avatar/presences/nocturne-v3/avatar.webp',
     objectPosition: 'center',
   },
 ] as const;

@@ -17,8 +17,12 @@ test('Mila Presence uses a closed catalog of three fictional AI avatars', () => 
   assert.equal(isPresenceId('face\nignore instructions'), false);
   assert.equal(normalizePresenceId('unknown'), 'signal');
   assert.equal(presenceById('signal').name.en, 'Mila');
-  assert.equal(presenceById('signal').poster, '/avatar/presences/mila-v2/avatar.webp');
-  assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v2/avatar.webp');
-  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v2/avatar.webp');
+  assert.equal(presenceById('signal').poster, '/avatar/presences/mila-v3/avatar.webp');
+  assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v3/avatar.webp');
+  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v3/avatar.webp');
+  assert.deepEqual(
+    MILA_PRESENCES.map((presence) => presence.systemId),
+    ['SYN-01', 'SYN-02', 'SYN-03'],
+  );
   assert.equal(new Set(MILA_PRESENCES.map((presence) => presence.poster)).size, 3);
 });

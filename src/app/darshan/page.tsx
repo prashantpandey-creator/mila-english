@@ -357,10 +357,32 @@ export default function VoicePage() {
 
   const showInvocation = phase === "resting";
   const showQuestion = (phase === "listening" || phase === "thinking") && !!liveText;
+  const systemState = phase === "resting"
+    ? "STANDBY"
+    : phase === "listening"
+      ? "LISTENING"
+      : phase === "thinking"
+        ? "PROCESSING"
+        : "TRANSMITTING";
 
   return (
     <div className="voice-stage fixed inset-0 overflow-hidden" data-phase={phase}>
-      <MilaAurora phase={phase} />
+      <MilaAurora phase={phase} variant="synthetic" />
+
+      <div className="voice-chamber-ui" aria-hidden="true">
+        <div className="voice-chamber-ui__brand">
+          <span>MILA // COMPANION NODE</span>
+          <strong>SYNTHETIC PRESENCE</strong>
+        </div>
+        <div className="voice-chamber-ui__state">
+          <span>VOICE LINK</span>
+          <strong>{systemState}</strong>
+        </div>
+        <span className="voice-chamber-ui__corner voice-chamber-ui__corner--tl" />
+        <span className="voice-chamber-ui__corner voice-chamber-ui__corner--tr" />
+        <span className="voice-chamber-ui__corner voice-chamber-ui__corner--bl" />
+        <span className="voice-chamber-ui__corner voice-chamber-ui__corner--br" />
+      </div>
 
       <button
         onClick={exit}
