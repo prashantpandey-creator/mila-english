@@ -34,7 +34,6 @@ export default function LoginPage() {
     setReturnTo(safeReturnTo(new URLSearchParams(window.location.search).get('returnTo')));
     const onMiaChat = isMiaChatHostname(window.location.hostname);
     setIsMiaChat(onMiaChat);
-    if (onMiaChat) document.title = 'Sign in to MiaChat';
   }, []);
 
   const messageFor = (code?: string, fallback?: string) => {
