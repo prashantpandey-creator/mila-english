@@ -1,7 +1,8 @@
 export const MILA_HOST = 'mila.purangpt.com';
-export const MIACHAT_HOST = 'miachat.purangpt.com';
+export const GIA_HOST = 'gia.purangpt.com';
+export const LEGACY_MIACHAT_HOST = 'miachat.purangpt.com';
 export const MILA_ORIGIN = `https://${MILA_HOST}`;
-export const MIACHAT_ORIGIN = `https://${MIACHAT_HOST}`;
+export const GIA_ORIGIN = `https://${GIA_HOST}`;
 
 export function normalizeHostname(value: string | null | undefined): string {
   return (value || '')
@@ -11,6 +12,6 @@ export function normalizeHostname(value: string | null | undefined): string {
     .replace(/:\d+$/, '');
 }
 
-export function isMiaChatHostname(value: string | null | undefined): boolean {
-  return normalizeHostname(value) === MIACHAT_HOST;
+export function isGiaHostname(value: string | null | undefined): boolean {
+  return normalizeHostname(value) === GIA_HOST;
 }

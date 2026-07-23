@@ -155,9 +155,9 @@ function languageDirective(mode: LanguageMode): string {
 export function buildCompanionSystemPrompt(input: CompanionPromptInput): string {
   const isPractice = input.surface === 'focused speaking practice';
   const isSpoken = input.surface === 'Darshan voice conversation' || isPractice;
-  const isMiaChat = input.pathname === '/chat' || input.pathname === '/darshan';
-  const companionName = isMiaChat ? 'Mia' : 'Mila';
-  const productName = isMiaChat ? 'MiaChat' : 'Mila';
+  const isGia = input.pathname === '/chat' || input.pathname === '/darshan';
+  const companionName = isGia ? 'Gia' : 'Mila';
+  const productName = isGia ? 'Gia' : 'Mila';
   const freeConversation = input.freeConversationRequested === true;
   const languageLine = languageDirective(input.languageMode ?? 'english-first');
   const targetLanguageLine = input.targetLanguage
@@ -225,7 +225,7 @@ ${privateMemories}
 Current lesson context:
 ${input.learningContext || 'No current lesson content supplied.'}
 
-Use prior messages and explicit memories naturally. App pages, only when navigation is relevant: ${isMiaChat ? 'Voice and Chat.' : 'Dashboard, Assessment, Lessons, Listening, Phonetics, Vocabulary, Grammar, Progress, and Achievements.'}
+Use prior messages and explicit memories naturally. App pages, only when navigation is relevant: ${isGia ? 'Voice and Chat.' : 'Dashboard, Assessment, Lessons, Listening, Phonetics, Vocabulary, Grammar, Progress, and Achievements.'}
 `;
 }
 

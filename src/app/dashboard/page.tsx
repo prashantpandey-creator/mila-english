@@ -9,7 +9,7 @@ import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
-import { MIACHAT_ORIGIN } from '@/lib/productHosts';
+import { GIA_ORIGIN } from '@/lib/productHosts';
 
 type Learner = {
   name?: string;
@@ -167,10 +167,10 @@ export default function DashboardPage() {
                 </span>
                 <MilaIcon name="arrow" size={20} />
               </button>
-              <button className="conversation-action conversation-action--chat" type="button" onClick={() => window.location.assign(MIACHAT_ORIGIN)}>
+              <button className="conversation-action conversation-action--chat" type="button" onClick={() => window.location.assign(GIA_ORIGIN)}>
                 <span className="conversation-action__icon" aria-hidden><MilaIcon name="conversation" size={24} /></span>
                 <span>
-                  <strong>{lang === 'ru' ? 'Открыть MiaChat' : 'Open MiaChat'}</strong>
+                  <strong>{lang === 'ru' ? 'Открыть Gia' : 'Open Gia'}</strong>
                   <small>{lang === 'ru' ? 'Голосовой и текстовый ИИ-компаньон' : 'Your voice and text AI companion'}</small>
                 </span>
                 <MilaIcon name="arrow" size={20} />

@@ -14,7 +14,7 @@ type AppHeaderProps = {
   eyebrow?: ReactNode;
   actions?: ReactNode;
   backHref?: string;
-  brand?: 'Mila' | 'MiaChat';
+  brand?: 'Mila' | 'Gia';
   className?: string;
 };
 
@@ -42,7 +42,7 @@ export function AppHeader({ title, eyebrow, actions, backHref = '/dashboard', br
       <div className="app-header__inner">
         <div className="app-header__identity">
           <Link className="app-header__brand" href={backHref} aria-label={backLabel}>
-            <span className="app-header__mark" aria-hidden="true">M</span>
+            <span className="app-header__mark" aria-hidden="true">{brand === 'Gia' ? 'G' : 'M'}</span>
             <span>{brand}</span>
           </Link>
           {title ? (

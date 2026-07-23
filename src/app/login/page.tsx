@@ -6,7 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
-import { isMiaChatHostname } from '@/lib/productHosts';
+import { isGiaHostname } from '@/lib/productHosts';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -28,12 +28,11 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [returnTo, setReturnTo] = useState('/dashboard');
-  const [isMiaChat, setIsMiaChat] = useState(false);
+  const [isGia, setIsGia] = useState(false);
 
   useEffect(() => {
     setReturnTo(safeReturnTo(new URLSearchParams(window.location.search).get('returnTo')));
-    const onMiaChat = isMiaChatHostname(window.location.hostname);
-    setIsMiaChat(onMiaChat);
+    setIsGia(isGiaHostname(window.location.hostname));
   }, []);
 
   const messageFor = (code?: string, fallback?: string) => {
@@ -75,8 +74,8 @@ export default function LoginPage() {
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
           <span className="welcome-auth__brand">
-            <span className="welcome-auth__brand-mark">M</span>
-            <span className="welcome-auth__brand-name">{isMiaChat ? 'MiaChat' : 'Mila'}</span>
+            <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'M'}</span>
+            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila'}</span>
           </span>
           <LangToggle />
         </div>
@@ -88,12 +87,12 @@ export default function LoginPage() {
               <MilaVoiceMark size={52} />
             </div>
             <h1 className="welcome-auth__title">
-              {isMiaChat
-                ? (lang === 'ru' ? 'Продолжить в MiaChat' : 'Continue to MiaChat')
+              {isGia
+                ? (lang === 'ru' ? 'Продолжить в Gia' : 'Continue to Gia')
                 : t('login_title')}
             </h1>
             <p className="welcome-auth__subtitle">
-              {isMiaChat
+              {isGia
                 ? (lang === 'ru' ? 'Войди с аккаунтом Mila или продолжи как гость.' : 'Use your Mila account, or continue as a guest.')
                 : t('login_subtitle')}
             </p>

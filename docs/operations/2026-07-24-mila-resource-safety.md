@@ -2,7 +2,8 @@
 
 ## Live diagnosis
 
-At 2026-07-23 20:04 UTC, during the MiaChat host-split deployment, the Mumbai
+At 2026-07-23 20:04 UTC, during the then-named MiaChat host-split deployment,
+the Mumbai
 origin reported:
 
 - 30 GiB physical RAM, 20 GiB available, and no swap;

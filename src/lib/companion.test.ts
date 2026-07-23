@@ -119,7 +119,7 @@ assert.match(prompt, /private learner context/i);
 assert.match(prompt, /September interview/);
 assert.match(prompt, /Tell me about yourself/);
 assert.match(prompt, /never claim to be human, conscious, sentient/i);
-assert.match(prompt, /You are Mia/);
+assert.match(prompt, /You are Gia/);
 assert.doesNotMatch(prompt, /You are Mila/);
 assert.match(prompt, /App pages.*Voice and Chat/i);
 
@@ -143,9 +143,9 @@ assert.match(voicePrompt, /Never praise a correction you supplied/i);
 assert.match(voicePrompt, /absolutely no Markdown.*emoji/i);
 assert.match(voicePrompt, /15 to 30 words/i);
 assert.doesNotMatch(voicePrompt, /40 to 80 words/i);
-assert.match(voicePrompt, /You are Mia/);
+assert.match(voicePrompt, /You are Gia/);
 assert.doesNotMatch(voicePrompt, /You are Mila/);
-assert.match(voicePrompt, /section of the MiaChat app/i);
+assert.match(voicePrompt, /section of the Gia app/i);
 
 const friendlyVoicePrompt = buildCompanionSystemPrompt({
   persona: 'Register: concise; playful; a little emoji is fine.',

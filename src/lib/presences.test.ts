@@ -16,7 +16,7 @@ test('Mila Presence uses a closed catalog of three fictional AI avatars', () => 
   assert.equal(isPresenceId('kids'), false);
   assert.equal(isPresenceId('face\nignore instructions'), false);
   assert.equal(normalizePresenceId('unknown'), 'signal');
-  assert.equal(presenceById('signal').name.en, 'Mia');
+  assert.equal(presenceById('signal').name.en, 'Gia');
   assert.equal(presenceById('signal').poster, '/avatar/presences/mila-v3/avatar.webp');
   assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v3/avatar.webp');
   assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v3/avatar.webp');

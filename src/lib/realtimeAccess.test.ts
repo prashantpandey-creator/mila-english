@@ -7,7 +7,7 @@ test('production Realtime voice stays paid for the daily-use tutor even when a s
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'false',
   }), true);
-  assert.equal(realtimeModeRequiresPaid('miachat', {
+  assert.equal(realtimeModeRequiresPaid('gia', {
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'false',
   }), true);

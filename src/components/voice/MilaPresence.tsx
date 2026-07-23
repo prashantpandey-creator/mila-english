@@ -33,7 +33,7 @@ export function MilaPresence({
         ["--presence-size" as string]: `${size}px`,
       }}
       role="img"
-      aria-label={`MiaChat · ${presence.name.en}, a synthetic AI character`}
+      aria-label={`Gia · ${presence.name.en}, a synthetic AI character`}
     >
       <span className="mila-portrait-presence__halo" aria-hidden="true" />
       <span className="mila-portrait-presence__meter" aria-hidden="true">

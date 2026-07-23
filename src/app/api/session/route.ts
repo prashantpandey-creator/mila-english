@@ -49,7 +49,7 @@ export async function POST(req: Request) {
   const rawMode = new URL(req.url).searchParams.get('mode');
   const mode = rawMode === 'assessment' ? 'assessment'
     : rawMode === 'companion' ? 'companion'
-    : rawMode === 'miachat' ? 'miachat'
+    : rawMode === 'gia' || rawMode === 'miachat' ? 'gia'
     : rawMode === 'pia' ? 'pia'
     : rawMode === 'kids' ? 'kids'
     : 'tutor';
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     const userId = Number(user?.sub);
     const plan = Number.isSafeInteger(userId) && userId > 0 ? await getUserPlan(userId) : resolvePlan({});
     if (!planUnlocks(plan, FEATURES.REALTIME_VOICE)) {
-      return errorResponse('Live voice is a Pro feature. Upgrade to talk with Mia by voice.', 402, 'VOICE_PAID_FEATURE');
+      return errorResponse('Live voice is a Pro feature. Upgrade to talk with Gia by voice.', 402, 'VOICE_PAID_FEATURE');
     }
   }
 
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
   if (mode === 'companion') {
     const userId = Number(user?.sub);
     if (!Number.isSafeInteger(userId) || userId <= 0) {
-      return errorResponse('A Mila account is required for the MiaChat live preview.', 401, 'UNAUTHORIZED');
+      return errorResponse('A Mila account is required for the Gia live preview.', 401, 'UNAUTHORIZED');
     }
     previewReservation = await reserveVoicePreview(prisma.user, userId);
     if (!previewReservation) {

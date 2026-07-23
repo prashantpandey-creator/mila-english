@@ -1,6 +1,6 @@
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
-import { isMiaChatHostname } from '@/lib/productHosts';
+import { isGiaHostname } from '@/lib/productHosts';
 
 // The app is login-gated. Everything that IS the product (voice rooms, chat,
 // lessons, dashboard, account, billing…) requires a session — registered OR an
@@ -32,12 +32,12 @@ function isProtected(pathname: string) {
 }
 
 export async function middleware(request: NextRequest) {
-  // MiaChat's public-looking apex is internally rewritten to /darshan. Protect
+  // Gia's public-looking apex is internally rewritten to /darshan. Protect
   // it here, before Next's host rewrite runs, so the new domain cannot bypass
   // the same explicit sign-in/guest gate as the direct voice route.
-  const miaChatApex = isMiaChatHostname(request.headers.get('host'))
+  const giaApex = isGiaHostname(request.headers.get('host'))
     && request.nextUrl.pathname === '/';
-  if (!isProtected(request.nextUrl.pathname) && !miaChatApex) return NextResponse.next();
+  if (!isProtected(request.nextUrl.pathname) && !giaApex) return NextResponse.next();
 
   const token = request.cookies.get('token')?.value;
   const configured = process.env.JWT_SECRET?.trim();

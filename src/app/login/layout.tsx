@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { isMiaChatHostname } from '@/lib/productHosts';
+import { isGiaHostname } from '@/lib/productHosts';
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
-  if (isMiaChatHostname(requestHeaders.get('host'))) {
+  if (isGiaHostname(requestHeaders.get('host'))) {
     return {
-      metadataBase: new URL('https://miachat.purangpt.com'),
-      title: 'Sign in to MiaChat',
-      description: 'Continue to MiaChat with your Mila account, or enter as a guest.',
+      metadataBase: new URL('https://gia.purangpt.com'),
+      title: 'Sign in to Gia',
+      description: 'Continue to Gia with your Mila account, or enter as a guest.',
       robots: { index: false, follow: false },
     };
   }

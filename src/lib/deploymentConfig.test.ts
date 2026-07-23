@@ -4,6 +4,7 @@ import test from 'node:test';
 
 const compose = readFileSync('docker-compose.prod.yml', 'utf8');
 const workflow = readFileSync('.github/workflows/deploy.yml', 'utf8');
+const giaProxy = readFileSync('scripts/configure-gia-proxy.sh', 'utf8');
 
 test('production has one compact local model and no runnable 20B service', () => {
   assert.match(compose, /LOCAL_LLM_URL=http:\/\/mila-voice-llm:11434/);
@@ -21,4 +22,11 @@ test('production services and ordinary deploy builds stay bounded', () => {
   assert.match(workflow, /speech_build_required=false/);
   assert.match(workflow, /git diff --quiet "\$previous_sha" HEAD -- pron-service asr-service tts-service/);
   assert.doesNotMatch(workflow, /docker compose -f docker-compose\.prod\.yml build\s*$/m);
+});
+
+test('production provisions Gia while preserving the legacy hostname in the app', () => {
+  assert.match(workflow, /bash scripts\/configure-gia-proxy\.sh/);
+  assert.match(workflow, /https:\/\/gia\.purangpt\.com\/login/);
+  assert.match(giaProxy, /gia\.purangpt\.com/);
+  assert.doesNotMatch(giaProxy, /miachat\.purangpt\.com/);
 });

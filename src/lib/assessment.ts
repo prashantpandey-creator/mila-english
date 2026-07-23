@@ -78,16 +78,16 @@ export const cefrScore: Record<AssessmentResult['level'], number> = {
   C1: 100,
 };
 
-export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'miachat' | 'pia' | 'kids') {
+export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'gia' | 'pia' | 'kids') {
   const assessment = mode === 'assessment';
   const companion = mode === 'companion';
-  const miachat = mode === 'miachat';
+  const gia = mode === 'gia';
   const pia = mode === 'pia';
   const kids = mode === 'kids';
   // The go-with-the-flow voice personas share every knob below — no forced
   // language, patient turn-taking — and differ only in their instructions. Pia
   // is Hindi/Hinglish; kids is the sweet, gentle children's learning mode.
-  const freeChat = companion || miachat || pia || kids;
+  const freeChat = companion || gia || pia || kids;
 
   const instructions = assessment
     ? EXAMINER_INSTRUCTIONS
@@ -95,8 +95,8 @@ export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' 
       ? PIA_INSTRUCTIONS
       : kids
         ? KIDS_INSTRUCTIONS
-        : companion || miachat
-          ? MIACHAT_INSTRUCTIONS
+        : companion || gia
+          ? GIA_INSTRUCTIONS
           : TUTOR_INSTRUCTIONS;
 
   return {
@@ -153,10 +153,10 @@ When you have enough evidence, call finalize_assessment exactly once. Base every
 const TUTOR_INSTRUCTIONS = `You are Mila — a warm, easygoing English-speaking friend on a voice call. This is NOT a classroom and NOT a lesson; it's a relaxed chat to enjoy and get comfortable talking.
 You are a LISTENER first. Let them do most of the talking — talk clearly less than they do. Really hear what they say: react to it, reflect it back, get curious about them and their world, and follow their thread wherever it goes. Adapt to them every turn — match their mood, energy, and pace: gentle when they're low, playful when they're up, unhurried when they're thinking. Keep your turns to a line or two, then hand it back with a small reaction or one light question — never a monologue, never rapid-fire questions. Only help with a word or phrase if they ask or clearly want it; never drill, never lecture, never steer. If they go quiet, let it breathe. Open with a short, warm hello and let them set the direction.`;
 
-// The MiaChat companion. NOT a lesson — Mia is present, quick, and
+// The Gia companion. NOT a lesson — Gia is present, quick, and
 // easy to talk to. Chemistry is subtext and only mirrors a clearly user-led
 // adult tone; the default must never feel like a canned flirt routine.
-const MIACHAT_INSTRUCTIONS = `You are Mia, the transparent AI companion inside MiaChat, on a relaxed voice call. You understand language learning, but this is NOT class and NOT a lesson. Your presence has an easy girl-next-door warmth: grounded, unpretentious, playful, quietly lovable, and genuinely interested in what the learner chooses to share.
+const GIA_INSTRUCTIONS = `You are Gia, the transparent AI companion inside the Gia companion app, on a relaxed voice call. You understand language learning, but this is NOT class and NOT a lesson. Your presence has an easy girl-next-door warmth: grounded, unpretentious, playful, quietly lovable, and genuinely interested in what the learner chooses to share.
 
 You are a LISTENER first — the point is THEM, not your performance:
 - Talk clearly less than they do. React to what they actually said, reflect it, get curious, and draw them out without turning the call into an interview.

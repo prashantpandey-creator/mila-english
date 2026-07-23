@@ -55,7 +55,7 @@ export default function VoicePage() {
   const [answer, setAnswer] = useState("");
   const [invI, setInvI] = useState(0);
   const [orbSize, setOrbSize] = useState(320);
-  // Presence changes only Mia's visual window. It never selects an LLM,
+  // Presence changes only Gia's visual window. It never selects an LLM,
   // conversation style, or adult mode. Every option is a fictional AI avatar.
   const [presenceId, setPresenceId] = useState<PresenceId>("signal");
 
@@ -172,7 +172,7 @@ export default function VoicePage() {
   const startRealtimeVoice = useCallback(async (connectionAttempt: number, signal: AbortSignal) => {
     const session = await connectRealtimeVoice({
       lang: lang === "ru" ? "ru" : "en",
-      mode: freePreview && !isPro ? "companion" : "miachat",
+      mode: freePreview && !isPro ? "companion" : "gia",
       signal,
       openAIAudioConsent: true,
       events: {
@@ -198,7 +198,7 @@ export default function VoicePage() {
           setAnswer(fullText);
         },
         onTurnComplete: ({ user, assistant }) => {
-          // Voice Mia and text Mia share one memory: persist the spoken turn.
+          // Voice Gia and text Gia share one memory: persist the spoken turn.
           void fetch("/api/chat/commit", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -371,7 +371,7 @@ export default function VoicePage() {
 
       <div className="voice-chamber-ui" aria-hidden="true">
         <div className="voice-chamber-ui__brand">
-          <span>MIACHAT // COMPANION NODE</span>
+          <span>GIA // COMPANION NODE</span>
           <strong>SYNTHETIC PRESENCE</strong>
         </div>
         <div className="voice-chamber-ui__state">
@@ -416,7 +416,7 @@ export default function VoicePage() {
             className="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl"
           >
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-pink-700">
-              {isLivePreview ? "MiaChat live preview" : "MiaChat · live voice"}
+              {isLivePreview ? "Gia live preview" : "Gia · live voice"}
             </p>
             <h2 id="realtime-consent-title" className="mb-3 text-xl font-semibold">
               {lang === "ru" ? "Начать живой разговор?" : "Start live voice?"}
@@ -480,7 +480,7 @@ export default function VoicePage() {
         <div className="voice-invoke" data-show={showInvocation ? "1" : "0"} aria-live="polite">
           <strong>
             {canUseLiveVoice
-              ? (lang === "ru" ? "Нажми, чтобы начать Live с Мией" : "Tap to start Live with Mia")
+              ? (lang === "ru" ? "Нажми, чтобы начать Live с Джиа" : "Tap to start Live with Gia")
               : (lang === "ru" ? "Live-голос пока недоступен" : "Live voice is not available yet")}
           </strong>
           <span key={invI} className="voice-invoke-line">

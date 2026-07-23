@@ -185,17 +185,17 @@ jobs:
               }
               console.log('Realtime paid-only invariant active');
             "
-            # MiaChat is a second product surface served by the same application
+            # Gia is a second product surface served by the same application
             # container. Install its Caddy vhost only after the new image is
             # healthy; the script validates, reloads, and rolls back on failure.
-            bash scripts/configure-miachat-proxy.sh
+            bash scripts/configure-gia-proxy.sh
             for attempt in $(seq 1 30); do
-              if curl -fsS --max-time 10 https://miachat.purangpt.com/login >/dev/null; then
-                echo "MiaChat HTTPS route is live"
+              if curl -fsS --max-time 10 https://gia.purangpt.com/login >/dev/null; then
+                echo "Gia HTTPS route is live"
                 break
               fi
               if [ "$attempt" -eq 30 ]; then
-                echo "MiaChat HTTPS route did not become ready"
+                echo "Gia HTTPS route did not become ready"
                 exit 1
               fi
               sleep 2

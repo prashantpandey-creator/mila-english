@@ -126,9 +126,9 @@ export default function Chat() {
   return (
     <AppShell className="chat-page" fullHeight>
       <AppHeader
-        brand="MiaChat"
+        brand="Gia"
         backHref="/"
-        title={lang==='ru' ? 'Чат с Мией' : 'Chat with Mia'}
+        title={lang==='ru' ? 'Чат с Джиа' : 'Chat with Gia'}
         eyebrow={lang==='ru' ? 'Текстовый разговор' : 'Text conversation'}
         actions={
           <>
@@ -184,8 +184,8 @@ export default function Chat() {
             <h2 id="chat-tone-title">{lang === 'ru' ? 'Искра — между строк.' : 'Keep the spark between the lines.'}</h2>
             <div>
               {lang === 'ru'
-                ? 'Мия может шутить смелее, слегка дразнить, естественно ругнуться и поддержать намёк, который вы начали намеренно. Без откровенных ролевых сцен и без притворства, что она человек.'
-                : 'Mia can be wittier, tease a little, swear when it feels natural, and mirror suggestive banter you intentionally begin. No explicit role-play, and no pretending she is human.'}
+                ? 'Джиа может шутить смелее, слегка дразнить, естественно ругнуться и поддержать намёк, который вы начали намеренно. Без откровенных ролевых сцен и без притворства, что она человек.'
+                : 'Gia can be wittier, tease a little, swear when it feels natural, and mirror suggestive banter you intentionally begin. No explicit role-play, and no pretending she is human.'}
             </div>
             <div className="chat-tone-dialog__actions">
               <button type="button" className="is-primary" onClick={enablePlayfulStyle}>
@@ -203,7 +203,7 @@ export default function Chat() {
         <div className="chat-page__stream">
         {isHydrating && messages.length === 0 && (
           <div className="chat-page__status">
-            {lang==='ru' ? 'Мия вспоминает ваш разговор…' : 'Mia is remembering your conversation…'}
+            {lang==='ru' ? 'Джиа вспоминает ваш разговор…' : 'Gia is remembering your conversation…'}
           </div>
         )}
 
@@ -213,18 +213,18 @@ export default function Chat() {
               <MilaVoiceMark size={92} />
               <span className="chat-page__status-dot" />
             </div>
-            <p className="chat-page__empty-kicker">{lang === 'ru' ? 'Мия здесь' : 'Mia is here'}</p>
+            <p className="chat-page__empty-kicker">{lang === 'ru' ? 'Джиа здесь' : 'Gia is here'}</p>
             <h1 className="chat-page__empty-title">
               {lang==='ru' ? 'О чём думаешь?' : 'What’s on your mind?'}
             </h1>
             <p className="chat-page__empty-copy">
               {targetLanguage === 'auto'
                 ? (lang === 'ru'
-                    ? 'Пиши естественно на любом языке. Мия поймёт смысл и поможет найти нужные слова, когда тебе это понадобится.'
-                    : 'Write naturally in any language. Mia follows your meaning and helps you find the words when you want them.')
+                    ? 'Пиши естественно на любом языке. Джиа поймёт смысл и поможет найти нужные слова, когда тебе это понадобится.'
+                    : 'Write naturally in any language. Gia follows your meaning and helps you find the words when you want them.')
                 : (lang === 'ru'
-                    ? `Пиши как есть. Мия поможет тебе говорить на ${selectedLanguage.ru.toLowerCase()}, но легко продолжит на любом языке, который ты используешь.`
-                    : `Write naturally. Mia can help you speak ${selectedLanguage.en}, or follow whatever language you use.`)}
+                    ? `Пиши как есть. Джиа поможет тебе говорить на ${selectedLanguage.ru.toLowerCase()}, но легко продолжит на любом языке, который ты используешь.`
+                    : `Write naturally. Gia can help you speak ${selectedLanguage.en}, or follow whatever language you use.`)}
             </p>
             <div className="chat-page__starters" aria-label={lang === 'ru' ? 'Начать с подсказки' : 'Start with a prompt'}>
               {starterPrompts.map((prompt) => (
@@ -239,7 +239,7 @@ export default function Chat() {
         {messages.map(m => (
           <div key={m.id} className={`chat-page__row ${m.role === 'user' ? 'is-user' : 'is-assistant'}`}>
             {m.role !== 'user' ? (
-              <span className="chat-page__mila-avatar" aria-label="Mia">
+              <span className="chat-page__mila-avatar" aria-label="Gia">
                 <MilaVoiceMark size={29} />
               </span>
             ) : null}
@@ -252,7 +252,7 @@ export default function Chat() {
         {isLoading && (
           <div className="chat-page__row is-assistant">
             <div className="chat-page__bubble chat-page__bubble--typing">
-              {lang==='ru' ? 'Мия печатает...' : 'Mia is typing...'}
+              {lang==='ru' ? 'Джиа печатает...' : 'Gia is typing...'}
             </div>
           </div>
         )}
@@ -274,7 +274,7 @@ export default function Chat() {
             className="chat-page__voice-button"
             onClick={() => router.push('/darshan')}
             aria-label={lang==='ru' ? 'Начать голосовой разговор' : 'Start a voice conversation'}
-            title={lang==='ru' ? 'Говорить с Мией' : 'Talk with Mia'}
+            title={lang==='ru' ? 'Говорить с Джиа' : 'Talk with Gia'}
           >
             <MilaIcon name="voice" size={19}/>
           </button>
@@ -282,9 +282,9 @@ export default function Chat() {
             ref={inputRef}
             value={input}
             onChange={handleInputChange}
-            placeholder={lang==='ru' ? 'Спроси Мию или начни разговор…' : 'Ask Mia anything or start a conversation…'}
+            placeholder={lang==='ru' ? 'Спроси Джиа или начни разговор…' : 'Ask Gia anything or start a conversation…'}
             disabled={isLoading || isHydrating || isClearing}
-            aria-label={lang==='ru' ? 'Сообщение для Мии' : 'Message Mia'}
+            aria-label={lang==='ru' ? 'Сообщение для Джиа' : 'Message Gia'}
           />
           <button className="chat-page__send-button" type="submit" disabled={isLoading || isHydrating || isClearing || !input.trim()} aria-label={lang==='ru' ? 'Отправить' : 'Send'}>
             <MilaIcon name="arrow" size={18}/>
