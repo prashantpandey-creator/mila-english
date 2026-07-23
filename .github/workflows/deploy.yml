@@ -20,7 +20,23 @@ jobs:
           script: |
             set -e
             cd /root/mila 2>/dev/null || git clone https://github.com/prashantpandey-creator/mila-english.git /root/mila
-            cd /root/mila && git fetch --all && git reset --hard origin/main
+            cd /root/mila
+            previous_sha="$(git rev-parse HEAD 2>/dev/null || true)"
+            git fetch --all
+            git reset --hard origin/main
+            # Speech images are expensive and almost never change. Rebuild them
+            # only when their own source changed or a required container does
+            # not exist; every release still rebuilds the small web image.
+            speech_build_required=false
+            if ! git cat-file -e "${previous_sha}^{commit}" 2>/dev/null \
+              || ! git diff --quiet "$previous_sha" HEAD -- pron-service asr-service tts-service; then
+              speech_build_required=true
+            fi
+            for speech_container in mila-pron mila-asr mila-tts; do
+              if ! docker inspect "$speech_container" >/dev/null 2>&1; then
+                speech_build_required=true
+              fi
+            done
             # Provider keys are optional and remain in the server-side .env.
             # Do not forward them through the SSH action: exported values appear
             # in the remote shell command line to privileged process inspection.
@@ -37,10 +53,9 @@ jobs:
             # Evaluation runtimes are never part of production. Remove any
             # interrupted benchmark before builds can compete with the app.
             docker rm -f mila-model-eval mila-llm-bench >/dev/null 2>&1 || true
-            # 2026-07-19: resident brains RESTORED (see docker-compose.prod.yml).
-            # Do NOT delete mila-llm/mila-voice-llm or their volumes here — that
-            # would wipe the pulled models every deploy. They are bounded in
-            # compose so they can't starve PuranGPT again.
+            # The former GPT-OSS 20B volume stays recoverable, but its container
+            # is retired below. One bounded 4B runtime now covers voice and the
+            # local fallback without a possible 16 GiB wake-up.
             test -f pron-service/model.onnx || { echo "model.onnx missing — see pron-service/README.md"; exit 1; }
             # Take a transactionally consistent SQLite snapshot before the new
             # image can run `prisma db push`. VACUUM INTO reads the live database
@@ -145,7 +160,12 @@ jobs:
             else
               echo "No running Mila container; skipping first-deploy SQLite snapshot"
             fi
-            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml build mila
+            if [ "$speech_build_required" = true ]; then
+              docker compose -f docker-compose.prod.yml build mila-pron mila-asr mila-tts
+            else
+              echo "Speech sources unchanged; reusing existing images"
+            fi
             # Public app first; speech services after it is serving.
             docker compose -f docker-compose.prod.yml up -d --no-deps mila
             for attempt in $(seq 1 30); do
@@ -209,12 +229,9 @@ jobs:
             else
               echo "TTS warning: Piper unavailable — browser speech fallback stays active"
             fi
-            # --- Local brains RESTORED 2026-07-19: bring up the resident Ollama
-            # chat + voice models (bounded in compose), pull, and list. The private
-            # Darshan voice REQUIRES the local voice model (privacyMode=local
-            # refuses the cloud); cloud stays the fallback for non-private chat.
+            # One bounded 4B Ollama runtime serves local voice and local fallback.
             # Best-effort: a slow/failed pull warns, it does not fail the deploy.
-            docker compose -f docker-compose.prod.yml up -d --no-deps mila-llm mila-voice-llm
+            docker compose -f docker-compose.prod.yml up -d --no-deps mila-voice-llm
             wait_for_ollama() {
               for attempt in $(seq 1 30); do
                 if docker exec -e OLLAMA_HOST=127.0.0.1:11434 "$1" ollama list >/dev/null 2>&1; then return 0; fi
@@ -222,18 +239,16 @@ jobs:
               done
               docker logs --tail 50 "$1" || true; return 1
             }
-            local_llm_model="${LOCAL_LLM_MODEL:-gpt-oss:20b}"
             voice_llm_model="${LOCAL_VOICE_LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}"
-            chat_ready=false; voice_ready=false
-            if wait_for_ollama mila-llm; then
-              if docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama pull "$local_llm_model"; then chat_ready=true; else echo "::warning::chat model pull failed — local /chat degraded, cloud fallback active"; fi
-            else echo "::warning::mila-llm did not become healthy"; fi
+            voice_ready=false
             if wait_for_ollama mila-voice-llm; then
-              if docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama pull "$voice_llm_model"; then voice_ready=true; else echo "::warning::voice model pull failed — private Darshan voice still degraded"; fi
+              if docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama pull "$voice_llm_model"; then voice_ready=true; else echo "::warning::compact local model pull failed — cloud chat stays active"; fi
             else echo "::warning::mila-voice-llm did not become healthy"; fi
-            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama list 2>/dev/null || true
             docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama list 2>/dev/null || true
-            echo "local brains restored: chat=$chat_ready voice=$voice_ready"
+            # Stop, but do not delete, the old 20B container. Its model volume is
+            # preserved for rollback while its ~16 GiB runtime cannot wake up.
+            docker stop mila-llm >/dev/null 2>&1 || true
+            echo "compact local brain ready=$voice_ready; legacy 20B container stopped"
             # --- Cloud brain check: the chat model now lives with a provider.
             # A dead key means dead chat, so this is a HARD gate (the app 200
             # check above already proved the site itself serves).
@@ -252,4 +267,4 @@ jobs:
               }).catch(e=>{console.error(e.message);process.exit(1)});
             "
             docker exec mila node -e "require('http').get('http://localhost:3000/',r=>{console.log('status',r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"
-            echo "✅ Mila deployed — local brains restored (chat=$chat_ready voice=$voice_ready) + cloud fallback; models bounded for PuranGPT co-tenancy"
+            echo "✅ Mila deployed — cloud-first chat + compact local fallback (ready=$voice_ready); legacy 20B stopped"

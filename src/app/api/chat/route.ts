@@ -416,7 +416,10 @@ export async function POST(request: NextRequest) {
   // privacy page discloses transcript-only provider processing; audio is not
   // sent through this route.
   const modelSurface = surfaceKind === 'practice' || surfaceKind === 'chat' ? 'voice' : surfaceKind;
-  const chatExternalFirst = surfaceKind === 'chat';
+  // Text conversation and the learning guide are cloud-first. If the provider
+  // is unavailable they share the compact local voice model; the retired 20B
+  // runtime can no longer wake up and consume half the shared host's RAM.
+  const chatExternalFirst = surfaceKind === 'chat' || surfaceKind === 'guide';
   const choice = await chooseModel(modelSurface, voiceExternalFirst || chatExternalFirst, !localOnly);
   if (!choice) {
     const reply = builtInCompanionReply(latestUserMessage, pathname, locale, profile?.level);

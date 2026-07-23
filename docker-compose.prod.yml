@@ -18,8 +18,10 @@ services:
       - PRON_URL=http://mila-pron:8000
       - ASR_URL=http://mila-asr:8001
       - TTS_URL=http://mila-tts:8002
-      - LOCAL_LLM_URL=${LOCAL_LLM_URL:-http://mila-llm:11434}
-      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-gpt-oss:20b}
+      # One compact resident model serves voice plus local fallback. The old
+      # 20B chat runtime could add ~14–16 GiB to this shared host on one request.
+      - LOCAL_LLM_URL=http://mila-voice-llm:11434
+      - LOCAL_LLM_MODEL=${LOCAL_VOICE_LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
       - LOCAL_LLM_REASONING_EFFORT=${LOCAL_LLM_REASONING_EFFORT:-low}
       - LOCAL_VOICE_LLM_URL=${LOCAL_VOICE_LLM_URL:-http://mila-voice-llm:11434}
       - LOCAL_VOICE_LLM_MODEL=${LOCAL_VOICE_LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
@@ -29,6 +31,8 @@ services:
       - NODE_ENV=production
     volumes:
       - mila_data:/data
+    mem_limit: 1g
+    cpus: 2.0
     networks:
       - root_default
       - mila_private
@@ -37,6 +41,8 @@ services:
     build: ./pron-service
     container_name: mila-pron
     restart: unless-stopped
+    mem_limit: 1g
+    cpus: 2.0
     networks:
       - root_default
 
@@ -48,6 +54,8 @@ services:
       - ASR_MODEL_PATH=/models/small
       - ASR_COMPUTE_TYPE=int8
       - ASR_CPU_THREADS=${ASR_CPU_THREADS:-4}
+    mem_limit: 2g
+    cpus: 3.0
     networks:
       - root_default
     healthcheck:
@@ -72,38 +80,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-
-  # Resident brains restored 2026-07-19 (were retired 07-18 for co-tenancy on a
-  # 15GiB box; the box now has 31GiB / ~23GiB free). Bounded so they can never
-  # starve PuranGPT again — change limits HERE in git, never via `docker update`.
-  mila-llm:
-    image: ollama/ollama:0.32.0
-    container_name: mila-llm
-    restart: unless-stopped
-    # GPT-OSS is capped at half of the 8-vCPU host so model warm-up and Chat
-    # cannot starve the web origin or Darshan. The 20b needs ~14GiB anon.
-    cpus: 4.0
-    cpu_shares: 256
-    mem_limit: 16g
-    memswap_limit: 16g
-    environment:
-      - OLLAMA_HOST=0.0.0.0:11434
-      - OLLAMA_CONTEXT_LENGTH=${OLLAMA_CONTEXT_LENGTH:-4096}
-      - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:--1}
-      - OLLAMA_MAX_LOADED_MODELS=1
-      - OLLAMA_NUM_PARALLEL=1
-    volumes:
-      - mila_llm:/root/.ollama
-    expose:
-      - "11434"
-    networks:
-      - mila_private
-    healthcheck:
-      test: ["CMD-SHELL", "OLLAMA_HOST=127.0.0.1:11434 ollama list >/dev/null 2>&1"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 10s
 
   mila-voice-llm:
     image: ollama/ollama:0.32.0
@@ -135,6 +111,8 @@ services:
 volumes:
   mila_data:
     driver: local
+  # Retained for rollback only. The former 20B container is stopped by deploy;
+  # keeping its volume makes the retirement recoverable without reserving RAM.
   mila_llm:
     driver: local
   mila_voice_llm:
