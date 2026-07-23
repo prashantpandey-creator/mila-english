@@ -4,7 +4,7 @@ export const MILA_PRESENCES = [
   {
     id: 'signal',
     systemId: 'SYN-01',
-    name: { en: 'Mila', ru: 'Мила' },
+    name: { en: 'Mia', ru: 'Мия' },
     description: {
       en: 'Warm signal intelligence with a curious edge.',
       ru: 'Тёплый синтетический разум с живым любопытством.',

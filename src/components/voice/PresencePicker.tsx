@@ -44,7 +44,7 @@ export function PresencePicker({
         <section
           id="mila-presence-options"
           className="presence-picker__panel"
-          aria-label={lang === "ru" ? "Выбрать образ Милы" : "Choose Mila's presence"}
+          aria-label={lang === "ru" ? "Выбрать образ Мии" : "Choose Mia's presence"}
           onKeyDown={(event) => {
             if (event.key === "Escape") {
               event.preventDefault();

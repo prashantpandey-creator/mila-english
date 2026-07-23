@@ -14,6 +14,7 @@ type AppHeaderProps = {
   eyebrow?: ReactNode;
   actions?: ReactNode;
   backHref?: string;
+  brand?: 'Mila' | 'MiaChat';
   className?: string;
 };
 
@@ -30,15 +31,19 @@ export function AppShell({ children, className, fullHeight = false }: AppShellPr
   return <div className={cx('app-shell', fullHeight && 'app-shell--full', className)}>{children}</div>;
 }
 
-export function AppHeader({ title, eyebrow, actions, backHref = '/dashboard', className }: AppHeaderProps) {
-  const backLabel = backHref === '/' ? 'Mila · home' : backHref === '/lessons' ? 'Mila · lessons' : 'Mila · dashboard';
+export function AppHeader({ title, eyebrow, actions, backHref = '/dashboard', brand = 'Mila', className }: AppHeaderProps) {
+  const backLabel = backHref === '/'
+    ? `${brand} · home`
+    : backHref === '/lessons'
+      ? `${brand} · lessons`
+      : `${brand} · dashboard`;
   return (
     <header className={cx('app-header', className)}>
       <div className="app-header__inner">
         <div className="app-header__identity">
           <Link className="app-header__brand" href={backHref} aria-label={backLabel}>
             <span className="app-header__mark" aria-hidden="true">M</span>
-            <span>Mila</span>
+            <span>{brand}</span>
           </Link>
           {title ? (
             <div className="app-header__heading">

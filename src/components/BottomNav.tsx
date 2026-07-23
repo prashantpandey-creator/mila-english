@@ -15,12 +15,10 @@ type Tab = { href: string; icon: MilaIconName | 'home'; ru: string; en: string; 
 const TABS: Tab[] = [
   { href: '/dashboard', icon: 'home', ru: 'Главная', en: 'Home', routes: ['/dashboard'] },
   { href: '/lessons', icon: 'lessons', ru: 'Учиться', en: 'Learn', routes: ['/lessons', '/listen', '/vocabulary', '/grammar', '/phonetics', '/assessment', '/achievements'] },
-  { href: '/darshan', icon: 'voice', ru: 'Говорить', en: 'Speak', routes: ['/darshan', '/voice-lab'] },
-  { href: '/chat', icon: 'conversation', ru: 'Чат', en: 'Chat', routes: ['/chat'] },
   { href: '/progress', icon: 'progress', ru: 'Прогресс', en: 'Progress', routes: ['/progress'] },
 ];
 
-const HIDDEN = ['/', '/start', '/login', '/register', '/darshan', '/pia', '/practice', '/voice-lab', '/privacy', '/support'];
+const HIDDEN = ['/', '/start', '/login', '/register', '/darshan', '/chat', '/pia', '/practice', '/voice-lab', '/privacy', '/support'];
 
 function HomeGlyph() {
   return (

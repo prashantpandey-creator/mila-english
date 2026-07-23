@@ -1,9 +1,13 @@
-# Mila Synthetic Presence v3
+# MiaChat Synthetic Presence v3
+
+> Product update, 2026-07-24: this chamber now belongs to MiaChat at
+> `miachat.purangpt.com`; the primary companion is named Mia. The asset path
+> retains `mila-v3` as historical provenance.
 
 ## Product direction
 
 Darshan is now a near-future companion chamber rather than a soft portrait
-atelier. Mila, Ember, and Nocturne remain visual interfaces for one adult
+atelier. Mia, Ember, and Nocturne remain visual interfaces for one adult
 language companion. Selecting a presence still changes appearance only; it
 does not select a model, persona, audio pipeline, privacy mode, or adult tone.
 

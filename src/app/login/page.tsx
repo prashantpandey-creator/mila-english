@@ -6,6 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
+import { isMiaChatHostname } from '@/lib/productHosts';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -27,9 +28,13 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [returnTo, setReturnTo] = useState('/dashboard');
+  const [isMiaChat, setIsMiaChat] = useState(false);
 
   useEffect(() => {
     setReturnTo(safeReturnTo(new URLSearchParams(window.location.search).get('returnTo')));
+    const onMiaChat = isMiaChatHostname(window.location.hostname);
+    setIsMiaChat(onMiaChat);
+    if (onMiaChat) document.title = 'Sign in to MiaChat';
   }, []);
 
   const messageFor = (code?: string, fallback?: string) => {
@@ -72,7 +77,7 @@ export default function LoginPage() {
         <div className="welcome-auth__nav-inner">
           <span className="welcome-auth__brand">
             <span className="welcome-auth__brand-mark">M</span>
-            <span className="welcome-auth__brand-name">Mila</span>
+            <span className="welcome-auth__brand-name">{isMiaChat ? 'MiaChat' : 'Mila'}</span>
           </span>
           <LangToggle />
         </div>
@@ -83,8 +88,16 @@ export default function LoginPage() {
             <div className="welcome-auth__bloom" aria-hidden="true">
               <MilaVoiceMark size={52} />
             </div>
-            <h1 className="welcome-auth__title">{t('login_title')}</h1>
-            <p className="welcome-auth__subtitle">{t('login_subtitle')}</p>
+            <h1 className="welcome-auth__title">
+              {isMiaChat
+                ? (lang === 'ru' ? 'Продолжить в MiaChat' : 'Continue to MiaChat')
+                : t('login_title')}
+            </h1>
+            <p className="welcome-auth__subtitle">
+              {isMiaChat
+                ? (lang === 'ru' ? 'Войди с аккаунтом Mila или продолжи как гость.' : 'Use your Mila account, or continue as a guest.')
+                : t('login_subtitle')}
+            </p>
           </div>
           <form onSubmit={handleLogin} className="welcome-auth__form">
             {error && <div className="welcome-auth__error" role="alert">{error}</div>}

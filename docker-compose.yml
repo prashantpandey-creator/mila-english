@@ -36,11 +36,11 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=coolify
-      - traefik.http.routers.mila-http.rule=Host(`mila.purangpt.com`)
+      - traefik.http.routers.mila-http.rule=Host(`mila.purangpt.com`) || Host(`miachat.purangpt.com`)
       - traefik.http.routers.mila-http.entrypoints=http
       - traefik.http.routers.mila-http.middlewares=mila-redirect
       - traefik.http.middlewares.mila-redirect.redirectscheme.scheme=https
-      - traefik.http.routers.mila.rule=Host(`mila.purangpt.com`)
+      - traefik.http.routers.mila.rule=Host(`mila.purangpt.com`) || Host(`miachat.purangpt.com`)
       - traefik.http.routers.mila.entrypoints=https
       - traefik.http.routers.mila.tls=true
       - traefik.http.routers.mila.tls.certresolver=letsencrypt

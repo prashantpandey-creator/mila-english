@@ -9,6 +9,7 @@ import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
+import { MIACHAT_ORIGIN } from '@/lib/productHosts';
 
 type Learner = {
   name?: string;
@@ -137,7 +138,7 @@ export default function DashboardPage() {
           <p>
             {greeting()}{firstName ? `, ${firstName}` : ''}
             <span aria-hidden> — </span>
-            <strong>{lang === 'ru' ? 'Мила рядом.' : 'Mila is here.'}</strong>
+            <strong>{lang === 'ru' ? 'Твой маршрут готов.' : 'Your learning path is ready.'}</strong>
           </p>
           <StreakCounter days={user?.streakDays || 0} lang={lang} />
         </div>
@@ -146,40 +147,40 @@ export default function DashboardPage() {
           <div className="conversation-stage__copy">
             <p className="conversation-stage__eyebrow">
               <span aria-hidden />
-              {lang === 'ru' ? 'Мила готова слушать' : 'Mila is ready to listen'}
+              {lang === 'ru' ? 'Твой путь в языке' : 'Your language path'}
             </p>
             <h1 id="conversation-stage-title">
-              {lang === 'ru' ? 'О чём хочешь поговорить?' : 'What do you want to say?'}
+              {lang === 'ru' ? 'Что хочешь освоить сегодня?' : 'What do you want to practise today?'}
             </h1>
             <p className="conversation-stage__lede">
               {lang === 'ru'
-                ? 'Говори естественно. Мила выслушает, ответит вслух и подскажет одну полезную вещь для твоего английского — без допроса и заученного сценария.'
-                : 'Talk naturally. Mila listens, answers aloud, and gives you one useful English cue—without turning every sentence into a test.'}
+                ? 'Продолжай личный маршрут: короткие уроки, тренировка слуха, произношение и слова, которые пригодятся в реальной жизни.'
+                : 'Keep building your personal path through short lessons, listening, pronunciation, and useful real-world language.'}
             </p>
 
             <div className="conversation-stage__actions">
-              <button className="conversation-action conversation-action--voice" type="button" onClick={() => router.push('/darshan')}>
-                <span className="conversation-action__icon" aria-hidden><MilaIcon name="voice" size={24} /></span>
+              <button className="conversation-action conversation-action--voice" type="button" onClick={() => router.push('/lessons')}>
+                <span className="conversation-action__icon" aria-hidden><MilaIcon name="lessons" size={24} /></span>
                 <span>
-                  <strong>{lang === 'ru' ? 'Говорить с Милой' : 'Speak with Mila'}</strong>
-                  <small>{lang === 'ru' ? 'Живой голосовой разговор' : 'A live voice conversation'}</small>
+                  <strong>{lang === 'ru' ? 'Продолжить обучение' : 'Continue learning'}</strong>
+                  <small>{lang === 'ru' ? 'Уроки по твоим целям' : 'Lessons shaped around your goals'}</small>
                 </span>
                 <MilaIcon name="arrow" size={20} />
               </button>
-              <button className="conversation-action conversation-action--chat" type="button" onClick={() => router.push('/chat')}>
+              <button className="conversation-action conversation-action--chat" type="button" onClick={() => window.location.assign(MIACHAT_ORIGIN)}>
                 <span className="conversation-action__icon" aria-hidden><MilaIcon name="conversation" size={24} /></span>
                 <span>
-                  <strong>{lang === 'ru' ? 'Написать Миле' : 'Chat with Mila'}</strong>
-                  <small>{lang === 'ru' ? 'Спокойно, в своём темпе' : 'Type at your own pace'}</small>
+                  <strong>{lang === 'ru' ? 'Открыть MiaChat' : 'Open MiaChat'}</strong>
+                  <small>{lang === 'ru' ? 'Голосовой и текстовый ИИ-компаньон' : 'Your voice and text AI companion'}</small>
                 </span>
                 <MilaIcon name="arrow" size={20} />
               </button>
             </div>
 
-            <ul className="conversation-stage__promises" aria-label={lang === 'ru' ? 'Как работает разговор' : 'How the conversation works'}>
-              <li>{lang === 'ru' ? 'Без сценария' : 'No script'}</li>
-              <li>{lang === 'ru' ? 'Можно по-русски' : 'Russian is welcome'}</li>
-              <li>{lang === 'ru' ? 'Одна полезная подсказка' : 'One useful cue'}</li>
+            <ul className="conversation-stage__promises" aria-label={lang === 'ru' ? 'Как устроено обучение' : 'How learning works'}>
+              <li>{lang === 'ru' ? 'Личный маршрут' : 'Personal path'}</li>
+              <li>{lang === 'ru' ? 'Практика из жизни' : 'Real-world practice'}</li>
+              <li>{lang === 'ru' ? 'Прогресс сохраняется' : 'Progress remembered'}</li>
             </ul>
           </div>
 
@@ -189,7 +190,7 @@ export default function DashboardPage() {
             </div>
             <div className="conversation-stage__signal">
               <span className="conversation-stage__signal-dot" />
-              <span>{lang === 'ru' ? 'Можно начинать' : 'Ready when you are'}</span>
+              <span>{lang === 'ru' ? 'Следующий шаг готов' : 'Your next step is ready'}</span>
             </div>
             <div className="conversation-stage__wave" aria-hidden="true">
               {Array.from({ length: 15 }, (_, index) => <i key={index} />)}

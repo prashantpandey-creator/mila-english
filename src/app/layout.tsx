@@ -32,22 +32,22 @@ const monoFont = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://mila.purangpt.com'),
-  title: 'Mila — Find your voice, in any language',
-  description: 'A multilingual companion for language, confidence, and the person you are becoming.',
+  title: 'Mila — Learn languages for the life you want',
+  description: 'A focused multilingual learning app for lessons, real-world practice, pronunciation, vocabulary, and progress.',
   manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, title: 'Mila', statusBarStyle: 'default' },
   icons: { icon: '/icon', apple: '/apple-icon' },
   openGraph: {
-    title: 'Mila — Find your voice, in any language',
-    description: 'A multilingual companion for language, confidence, and the person you are becoming.',
+    title: 'Mila — Learn languages for the life you want',
+    description: 'A focused multilingual learning app for lessons, real-world practice, pronunciation, vocabulary, and progress.',
     type: 'website',
     url: '/',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Mila — Find your voice, in any language' }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Mila — Learn languages for the life you want' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mila — Find your voice, in any language',
-    description: 'A multilingual companion for language, confidence, and the person you are becoming.',
+    title: 'Mila — Learn languages for the life you want',
+    description: 'A focused multilingual learning app for lessons, real-world practice, pronunciation, vocabulary, and progress.',
     images: ['/og.png'],
   },
 }

@@ -7,6 +7,10 @@ test('production Realtime voice stays paid for the daily-use tutor even when a s
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'false',
   }), true);
+  assert.equal(realtimeModeRequiresPaid('miachat', {
+    NODE_ENV: 'production',
+    VOICE_REALTIME_PAID_ONLY: 'false',
+  }), true);
 });
 
 test('assessment and the free front-door companion remain outside the product paywall', () => {
