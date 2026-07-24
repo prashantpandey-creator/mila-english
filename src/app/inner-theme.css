@@ -3146,6 +3146,7 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
 
 @media (max-height: 520px) and (orientation: landscape) {
   .mila-surface--app[data-route="/darshan"] .voice-orb {
+    left: 34% !important;
     top: 37% !important;
   }
 
@@ -3154,9 +3155,9 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
   }
 
   .mila-surface--app[data-route="/darshan"] .voice-invoke {
-    right: 155px;
+    right: 16px;
     bottom: calc(12px + env(safe-area-inset-bottom,0px));
-    left: 155px;
+    left: 56%;
     gap: 6px;
   }
 
@@ -3174,6 +3175,15 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
     min-height: 38px;
     padding-inline: 10px;
     font-size: .56rem;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .voice-error {
+    right: 16px;
+    bottom: calc(12px + env(safe-area-inset-bottom,0px)) !important;
+    left: 56% !important;
+    width: auto !important;
+    max-width: none !important;
+    transform: none !important;
   }
 
   .mila-surface--app[data-route="/darshan"] .presence-ai-disclosure {
