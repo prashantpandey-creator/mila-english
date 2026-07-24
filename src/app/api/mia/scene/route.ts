@@ -34,11 +34,16 @@ function sceneModel() {
   return null;
 }
 
-function sceneResponse(object: unknown, source: string) {
+function sceneResponse(
+  object: unknown,
+  source: string,
+  extraHeaders: Record<string, string> = {},
+) {
   return NextResponse.json(object, {
     headers: {
       'Cache-Control': 'no-store',
       'X-Mia-Scene-Source': source,
+      ...extraHeaders,
     },
   });
 }
@@ -56,13 +61,20 @@ export async function POST(request: NextRequest) {
   }
 
   const fallback = buildFallbackMiaScene(parsed.data);
+  const model = sceneModel();
+  if (!model) {
+    return sceneResponse(fallback, 'curated-no-model');
+  }
+
   const allowance = consumeAuthAttempt(`mia-scene:${requestIdentity(request)}`, {
     limit: 12,
     windowMs: 60 * 60 * 1000,
   });
-  const model = sceneModel();
-  if (!allowance.allowed || !model) {
-    return sceneResponse(fallback, allowance.allowed ? 'curated' : 'curated-rate-limit');
+  if (!allowance.allowed) {
+    return sceneResponse(fallback, 'curated-rate-limit', {
+      'Retry-After': String(allowance.retryAfterSeconds),
+      'X-Mia-Retry-After': String(allowance.retryAfterSeconds),
+    });
   }
 
   const system = [
@@ -77,6 +89,8 @@ export async function POST(request: NextRequest) {
   ].join(' ');
 
   for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
     try {
       const { object } = await generateObject({
         model,
@@ -86,6 +100,7 @@ export async function POST(request: NextRequest) {
         prompt: JSON.stringify(parsed.data),
         maxTokens: 700,
         temperature: attempt === 1 ? 0.72 : 0.45,
+        abortSignal: controller.signal,
       });
       return sceneResponse(completeGeneratedMiaScene(object, fallback), 'generated');
     } catch (error) {
@@ -93,8 +108,10 @@ export async function POST(request: NextRequest) {
         attempt,
         name: error instanceof Error ? error.name : 'UnknownError',
       });
+    } finally {
+      clearTimeout(timeout);
     }
   }
 
-  return sceneResponse(fallback, 'curated-fallback');
+  return sceneResponse(fallback, 'curated-provider-fallback');
 }

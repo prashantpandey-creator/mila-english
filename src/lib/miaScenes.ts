@@ -164,12 +164,21 @@ type Phrase = Pick<
 
 type PlaceProfile = {
   matches: string[];
-  destination: string;
+  destination: (typeof MIA_SCENE_DESTINATIONS)[number];
   language: string;
   speechLocale: string;
   visual: MiaSceneResponse['visual'];
   cultureNote: string;
   phrases: Record<MiaSceneSituation, Phrase>;
+};
+
+type RussianProfileCopy = {
+  language: string;
+  cultureNote: string;
+  phrases: Record<
+    MiaSceneSituation,
+    Pick<Phrase, 'translation' | 'replyTranslation'>
+  >;
 };
 
 const englishPhrases: Record<MiaSceneSituation, Phrase> = {
@@ -371,6 +380,133 @@ const profiles: PlaceProfile[] = [
   },
 ];
 
+const russianProfileCopy: Record<
+  (typeof MIA_SCENE_DESTINATIONS)[number],
+  RussianProfileCopy
+> = {
+  Lisbon: {
+    language: 'Португальский',
+    cultureNote: 'В Португалии приветствие перед просьбой делает даже короткий разговор заметно теплее.',
+    phrases: {
+      cafe: { translation: 'Принесите мне кофе, пожалуйста.', replyTranslation: 'Конечно. Хотите с молоком?' },
+      directions: { translation: 'Извините, как пройти к станции?', replyTranslation: 'Идите всё время прямо.' },
+      arrival: { translation: 'Здравствуйте, у меня бронь.', replyTranslation: 'Добро пожаловать. На какое имя?' },
+      market: { translation: 'Это сделано здесь?', replyTranslation: 'Да, это работа местного мастера.' },
+      evening: { translation: 'Здесь поблизости есть живая музыка?', replyTranslation: 'Да, начинается в девять.' },
+    },
+  },
+  Venice: {
+    language: 'Итальянский',
+    cultureNote: 'Простое buongiorno или buonasera перед просьбой заметно меняет тон всего разговора.',
+    phrases: {
+      cafe: { translation: 'Я хотел бы столик на улице, пожалуйста.', replyTranslation: 'Конечно, сюда, пожалуйста.' },
+      directions: { translation: 'Извините, как пройти к станции?', replyTranslation: 'Всё время прямо, затем налево.' },
+      arrival: { translation: 'Добрый вечер, у меня бронь.', replyTranslation: 'Добро пожаловать. На какое имя?' },
+      market: { translation: 'Это сделано здесь?', replyTranslation: 'Да, это ручная работа.' },
+      evening: { translation: 'Здесь поблизости есть живая музыка?', replyTranslation: 'Да, начинается в девять.' },
+    },
+  },
+  Jaipur: {
+    language: 'Хинди',
+    cultureNote: 'Мягкое namaste уместно при входе в магазин или знакомстве: теплота важнее идеальной грамматики.',
+    phrases: {
+      cafe: { translation: 'Можно мне чай, пожалуйста?', replyTranslation: 'Конечно. Хотите сахар?' },
+      directions: { translation: 'Извините, в какую сторону станция?', replyTranslation: 'Идите прямо, затем налево.' },
+      arrival: { translation: 'Здравствуйте, у меня бронь.', replyTranslation: 'Добро пожаловать. На какое имя?' },
+      market: { translation: 'Это сделано здесь?', replyTranslation: 'Да, это местная работа.' },
+      evening: { translation: 'Где здесь можно послушать живую музыку?', replyTranslation: 'Поблизости, с девяти часов.' },
+    },
+  },
+  'Ubud, Bali': {
+    language: 'Индонезийский',
+    cultureNote: 'Лёгкое permisi перед вопросом и terima kasih после ответа делают практичный разговор внимательнее; в храмах следуй местным указаниям.',
+    phrases: {
+      cafe: { translation: 'Можно заказать балийский кофе?', replyTranslation: 'Конечно. Горячий или со льдом?' },
+      directions: { translation: 'Извините, как пройти к рынку Убуда?', replyTranslation: 'Идите прямо, затем поверните направо.' },
+      arrival: { translation: 'Здравствуйте, у меня бронь.', replyTranslation: 'Добро пожаловать. На какое имя?' },
+      market: { translation: 'Это сделано на Бали?', replyTranslation: 'Да, это сделал местный мастер.' },
+      evening: { translation: 'Сегодня вечером будет танцевальное представление?', replyTranslation: 'Да, оно начинается в половине восьмого.' },
+    },
+  },
+  Tokyo: {
+    language: 'Японский',
+    cultureNote: 'Короткое sumimasen помогает вежливо привлечь внимание и подходит почти перед любой просьбой в оживлённом месте.',
+    phrases: {
+      cafe: { translation: 'Столик у окна, пожалуйста.', replyTranslation: 'Да, сюда, пожалуйста.' },
+      directions: { translation: 'Извините, в какую сторону станция?', replyTranslation: 'Идите прямо, затем налево.' },
+      arrival: { translation: 'У меня есть бронь.', replyTranslation: 'Назовите, пожалуйста, ваше имя.' },
+      market: { translation: 'Это сделано здесь?', replyTranslation: 'Да, это сделано местным мастером.' },
+      evening: { translation: 'Здесь поблизости есть живая музыка?', replyTranslation: 'Да, начинается в девять.' },
+    },
+  },
+  Seoul: {
+    language: 'Корейский',
+    cultureNote: 'В корейском важны вежливые окончания; форма на -요 помогает звучать уважительно без лишней официальности.',
+    phrases: {
+      cafe: { translation: 'Столик у окна, пожалуйста.', replyTranslation: 'Да, проходите сюда, пожалуйста.' },
+      directions: { translation: 'Извините, где находится станция?', replyTranslation: 'Идите прямо, она будет слева.' },
+      arrival: { translation: 'У меня есть бронь.', replyTranslation: 'На какое имя оформлена бронь?' },
+      market: { translation: 'Это сделали здесь?', replyTranslation: 'Да, это ручная работа.' },
+      evening: { translation: 'Здесь поблизости есть живая музыка?', replyTranslation: 'Да, начинается в девять.' },
+    },
+  },
+  'Mexico City': {
+    language: 'Испанский',
+    cultureNote: 'Короткое buenos días или buenas tardes перед просьбой — простой знак уважения и дружелюбия.',
+    phrases: {
+      cafe: { translation: 'Можно столик на улице, пожалуйста?', replyTranslation: 'Конечно, сюда, пожалуйста.' },
+      directions: { translation: 'Извините, как пройти к метро?', replyTranslation: 'Идите прямо и поверните налево.' },
+      arrival: { translation: 'Здравствуйте, у меня бронь.', replyTranslation: 'Добро пожаловать. На какое имя?' },
+      market: { translation: 'Это сделано здесь?', replyTranslation: 'Да, это работа местного мастера.' },
+      evening: { translation: 'Здесь поблизости есть живая музыка?', replyTranslation: 'Да, начинается в девять.' },
+    },
+  },
+  Paris: {
+    language: 'Французский',
+    cultureNote: 'Перед любой просьбой начни с bonjour или bonsoir: без приветствия обращение во Франции может прозвучать резко.',
+    phrases: {
+      cafe: { translation: 'Столик на террасе, пожалуйста.', replyTranslation: 'Конечно, следуйте за мной.' },
+      directions: { translation: 'Извините, где находится станция?', replyTranslation: 'Идите прямо, затем налево.' },
+      arrival: { translation: 'Добрый вечер, у меня бронь.', replyTranslation: 'Добро пожаловать. На какое имя?' },
+      market: { translation: 'Это сделано здесь?', replyTranslation: 'Да, это работа мастера из этого района.' },
+      evening: { translation: 'Здесь поблизости есть живая музыка?', replyTranslation: 'Да, начинается в девять.' },
+    },
+  },
+  Marrakech: {
+    language: 'Арабский',
+    cultureNote: 'Приветствие здесь — часть разговора, а не потеря времени: тёплое salam облегчает практичные беседы.',
+    phrases: {
+      cafe: { translation: 'Я хотел бы чай, пожалуйста.', replyTranslation: 'Конечно. С мятой?' },
+      directions: { translation: 'Извините, где находится станция?', replyTranslation: 'Идите прямо, затем налево.' },
+      arrival: { translation: 'Здравствуйте, у меня бронь.', replyTranslation: 'Добро пожаловать. На какое имя?' },
+      market: { translation: 'Это сделано здесь?', replyTranslation: 'Да, это местная работа.' },
+      evening: { translation: 'Здесь поблизости есть живая музыка?', replyTranslation: 'Да, начинается примерно в девять.' },
+    },
+  },
+  London: {
+    language: 'Английский',
+    cultureNote: 'В Британии оборот could I и короткое please смягчают просьбу, не делая её слишком официальной.',
+    phrases: {
+      cafe: { translation: 'Можно столик у окна, пожалуйста?', replyTranslation: 'Конечно. Проходите, пожалуйста.' },
+      directions: { translation: 'Извините, это дорога к станции?', replyTranslation: 'Да, идите прямо, затем поверните на втором повороте налево.' },
+      arrival: { translation: 'Здравствуйте, у меня бронь на моё имя.', replyTranslation: 'Добро пожаловать. Можно посмотреть подтверждение?' },
+      market: { translation: 'Очень красиво. Это сделано здесь?', replyTranslation: 'Да, это работа местного мастера.' },
+      evening: { translation: 'Поблизости есть место с живой музыкой?', replyTranslation: 'Попробуйте небольшое место за углом — музыка начинается в девять.' },
+    },
+  },
+  'New York': {
+    language: 'Английский',
+    cultureNote: 'Жители Нью-Йорка часто говорят прямо из-за быстрого ритма города; ясная и дружелюбная просьба обычно лучше длинной.',
+    phrases: {
+      cafe: { translation: 'Можно столик у окна, пожалуйста?', replyTranslation: 'Конечно. Проходите, пожалуйста.' },
+      directions: { translation: 'Извините, это дорога к станции?', replyTranslation: 'Да, идите прямо, затем поверните на втором повороте налево.' },
+      arrival: { translation: 'Здравствуйте, у меня бронь на моё имя.', replyTranslation: 'Добро пожаловать. Можно посмотреть подтверждение?' },
+      market: { translation: 'Очень красиво. Это сделано здесь?', replyTranslation: 'Да, это работа местного мастера.' },
+      evening: { translation: 'Поблизости есть место с живой музыкой?', replyTranslation: 'Попробуйте небольшое место за углом — музыка начинается в девять.' },
+    },
+  },
+};
+
 const momentCopy: Record<MiaSceneSituation, { title: string; setting: string }> = {
   cafe: { title: 'A table worth staying for', setting: 'You step into a neighborhood café at the edge of the evening rush. The room is busy, but not hurried.' },
   directions: { title: 'Find the way without losing the moment', setting: 'Your map has stopped being helpful. A local pauses nearby, and you have one natural opening to ask.' },
@@ -395,16 +531,40 @@ const bridgePhrasesRu: Record<MiaSceneSituation, Phrase> = {
   evening: { phrase: 'Is there somewhere nearby with live music?', pronunciation: '', translation: 'Поблизости есть место с живой музыкой?', reply: 'Try the little place around the corner—it starts at nine.', replyPronunciation: '', replyTranslation: 'Попробуйте небольшое место за углом — музыка начинается в девять.' },
 };
 
+function normalizePlaceName(value: string): string {
+  return value
+    .normalize('NFKD')
+    .replace(/\p{Mark}+/gu, '')
+    .toLocaleLowerCase('en')
+    .replace(/[^\p{Letter}\p{Number}]+/gu, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
 function profileFor(destination: string): PlaceProfile | undefined {
-  const normalized = destination.toLocaleLowerCase('en');
-  return profiles.find((profile) => profile.matches.some((match) => normalized.includes(match)));
+  const normalizedDestination = normalizePlaceName(destination);
+  if (!normalizedDestination) return undefined;
+
+  const boundedDestination = ` ${normalizedDestination} `;
+  return profiles.find((profile) => profile.matches.some((match) => {
+    const normalizedMatch = normalizePlaceName(match);
+    return normalizedMatch.length > 0
+      && boundedDestination.includes(` ${normalizedMatch} `);
+  }));
 }
 
 export function buildFallbackMiaScene(input: MiaSceneRequest): MiaSceneResponse {
   const profile = profileFor(input.destination);
   const isRu = input.uiLanguage === 'ru';
   const moment = (isRu ? momentCopyRu : momentCopy)[input.situation];
-  const phrase = profile?.phrases[input.situation] ?? (isRu ? bridgePhrasesRu : englishPhrases)[input.situation];
+  const phrase = profile
+    ? (isRu
+      ? {
+          ...profile.phrases[input.situation],
+          ...russianProfileCopy[profile.destination].phrases[input.situation],
+        }
+      : profile.phrases[input.situation])
+    : (isRu ? bridgePhrasesRu : englishPhrases)[input.situation];
   const destination = input.destination.trim() || profile?.destination || 'your destination';
   const mission = input.level === 'first-words'
     ? (isRu ? 'Произнеси первую фразу один раз в своём темпе. Главное — передать смысл.' : 'Say the first line once at your own pace. Getting the meaning across is the win.')
@@ -414,13 +574,17 @@ export function buildFallbackMiaScene(input: MiaSceneRequest): MiaSceneResponse 
 
   return miaSceneResponseSchema.parse({
     destination,
-    language: profile?.language ?? (isRu ? 'Английский · запасная сцена' : 'English · bridge scene'),
+    language: profile
+      ? (isRu ? russianProfileCopy[profile.destination].language : profile.language)
+      : (isRu ? 'Английский · запасная сцена' : 'English · bridge scene'),
     title: moment.title,
     setting: `${moment.setting} ${isRu ? `Ты в городе ${destination}.` : `You are in ${destination}.`}`,
     ...phrase,
-    cultureNote: profile?.cultureNote ?? (isRu
-      ? 'Это честная запасная сцена на английском: Mia не будет выдумывать местный язык или правило этикета без генератора. Начни с приветствия и спроси, как эта фраза звучит естественно здесь.'
-      : 'This is an honest English bridge scene: Mia will not invent a local phrase or etiquette rule while generation is unavailable. Begin with a greeting and ask how people would say it naturally here.'),
+    cultureNote: profile
+      ? (isRu ? russianProfileCopy[profile.destination].cultureNote : profile.cultureNote)
+      : (isRu
+        ? 'Это честная запасная сцена на английском: Mia не будет выдумывать местный язык или правило этикета без генератора. Начни с приветствия и спроси, как эта фраза звучит естественно здесь.'
+        : 'This is an honest English bridge scene: Mia will not invent a local phrase or etiquette rule while generation is unavailable. Begin with a greeting and ask how people would say it naturally here.'),
     mission,
     speechLocale: profile?.speechLocale ?? 'en',
     visual: profile?.visual ?? 'cafe',
@@ -480,6 +644,8 @@ export function completeGeneratedMiaScene(
     || (language.length <= 3 && fallback.speechLocale !== 'en' ? fallback.language : language);
   const inferredSpeechLocale = speechLocales[normalizedLanguage.toLowerCase()];
   const generatedSpeechLocale = generated.speechLocale?.trim();
+  const destinationProfile = profileFor(generated.destination)
+    || profileFor(fallback.destination);
   const visualClues = `${generated.destination} ${generated.title} ${generated.setting}`.toLowerCase();
   const inferredVisual = /(?:\b(?:night|evening|midnight)\b|ночн|вечер)/u.test(visualClues)
     ? 'city-night'
@@ -495,7 +661,10 @@ export function completeGeneratedMiaScene(
     speechLocale: !generatedSpeechLocale || generatedSpeechLocale.length <= 3
       ? inferredSpeechLocale || generatedSpeechLocale || fallback.speechLocale
       : generatedSpeechLocale,
-    visual: generated.visual || inferredVisual,
+    // Known destinations keep their authored visual identity. A generic
+    // "evening" or "market" clue should not turn Jaipur, Bali, Lisbon, or
+    // another curated place into interchangeable city/old-town footage.
+    visual: destinationProfile?.visual || generated.visual || inferredVisual,
   });
 }
 

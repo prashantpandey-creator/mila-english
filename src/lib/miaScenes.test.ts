@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import test from 'node:test';
 import {
   MIA_DESTINATION_GUIDES,
+  MIA_SCENE_DESTINATIONS,
   MIA_SCENE_MEDIA,
   buildFallbackMiaScene,
   completeGeneratedMiaScene,
@@ -59,6 +60,68 @@ test('India and Bali lead Mia with destination-specific atmosphere and language'
   assert.equal(bali.visual, 'bali');
   assert.match(bali.phrase, /kopi Bali/i);
   assert.match(bali.cultureNote, /terima kasih/i);
+});
+
+test('destination aliases match normalized whole terms instead of unrelated substrings', () => {
+  for (const destination of ['Phuket', 'Indianapolis']) {
+    const scene = buildFallbackMiaScene({
+      destination,
+      situation: 'directions',
+      level: 'first-words',
+      uiLanguage: 'en',
+    });
+
+    assert.equal(scene.language, 'English · bridge scene', destination);
+    assert.equal(scene.speechLocale, 'en', destination);
+    assert.equal(scene.visual, 'cafe', destination);
+  }
+
+  const aliases = [
+    { destination: 'Jaipur, Rajasthan, India', language: 'Hindi', locale: 'hi-IN' },
+    { destination: 'Ubud — Bali, Indonesia', language: 'Indonesian', locale: 'id-ID' },
+    { destination: 'London, UK', language: 'English', locale: 'en-GB' },
+    { destination: 'New York City, USA', language: 'English', locale: 'en-US' },
+  ];
+
+  for (const alias of aliases) {
+    const scene = buildFallbackMiaScene({
+      destination: alias.destination,
+      situation: 'arrival',
+      level: 'first-words',
+      uiLanguage: 'en',
+    });
+
+    assert.equal(scene.language, alias.language, alias.destination);
+    assert.equal(scene.speechLocale, alias.locale, alias.destination);
+  }
+});
+
+test('every curated scene localizes its explanatory copy for Russian users', () => {
+  const situations = ['cafe', 'directions', 'arrival', 'market', 'evening'] as const;
+  const hasCyrillic = /[А-Яа-яЁё]/u;
+
+  for (const destination of MIA_SCENE_DESTINATIONS) {
+    for (const situation of situations) {
+      const scene = buildFallbackMiaScene({
+        destination,
+        situation,
+        level: 'conversational',
+        uiLanguage: 'ru',
+      });
+
+      for (const [field, value] of Object.entries({
+        language: scene.language,
+        title: scene.title,
+        setting: scene.setting,
+        translation: scene.translation,
+        replyTranslation: scene.replyTranslation,
+        cultureNote: scene.cultureNote,
+        mission: scene.mission,
+      })) {
+        assert.match(value, hasCyrillic, `${destination} ${situation} ${field}`);
+      }
+    }
+  }
 });
 
 test('unsupported destinations use an honest localized bridge instead of inventing a local language', () => {
@@ -128,6 +191,37 @@ test('generated destinations outside the curated catalog infer a native speech v
   assert.equal(scene.language, 'Thai');
   assert.equal(scene.speechLocale, 'th-TH');
   assert.equal(scene.visual, 'city-night');
+});
+
+test('curated destinations keep destination-first media despite generic generated clues', () => {
+  const destinations = [
+    { destination: 'Jaipur', visual: 'india' },
+    { destination: 'India', visual: 'india' },
+    { destination: 'Ubud, Bali', visual: 'bali' },
+    { destination: 'Bali', visual: 'bali' },
+    { destination: 'Tokyo', visual: 'city-night' },
+    { destination: 'Seoul', visual: 'city-night' },
+    { destination: 'Lisbon', visual: 'mediterranean' },
+    { destination: 'Mexico City', visual: 'cafe' },
+    { destination: 'Marrakech', visual: 'old-city' },
+  ] as const;
+
+  for (const expected of destinations) {
+    const fallback = buildFallbackMiaScene({
+      destination: expected.destination,
+      situation: 'evening',
+      level: 'first-words',
+      uiLanguage: 'en',
+    });
+    const scene = completeGeneratedMiaScene({
+      ...fallback,
+      title: 'An evening market after midnight',
+      setting: `A busy night market opens in ${expected.destination} as the evening begins.`,
+      visual: 'new-york',
+    }, fallback);
+
+    assert.equal(scene.visual, expected.visual, expected.destination);
+  }
 });
 
 test('every Mia cinematic scene has a committed poster and video', () => {

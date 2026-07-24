@@ -7,6 +7,7 @@ const middleware = readFileSync('src/middleware.ts', 'utf8');
 const miaPage = readFileSync('src/app/mia/page.tsx', 'utf8');
 const miaMetadata = readFileSync('src/app/mia/layout.tsx', 'utf8');
 const sceneStudio = readFileSync('src/components/mia/MiaSceneGenerator.tsx', 'utf8');
+const miaSceneRoute = readFileSync('src/app/api/mia/scene/route.ts', 'utf8');
 const rootLayout = readFileSync('src/app/layout.tsx', 'utf8');
 const milaHome = readFileSync('src/app/MilaHomePageClient.tsx', 'utf8');
 const milaDashboard = readFileSync('src/app/dashboard/page.tsx', 'utf8');
@@ -47,6 +48,20 @@ test('Mia is an owned travel product with an interactive scene studio', () => {
   assert.doesNotMatch(miaPage, /\bGia\b/);
   assert.doesNotMatch(miaPage, /\bMila\b/);
   assert.doesNotMatch(miaPage, /https:\/\/(?:gia|mila)\.purangpt\.com/);
+});
+
+test('Mia destination actions, continuity, and media controls are functional rather than decorative', () => {
+  assert.match(miaPage, /sceneHref\('Jaipur', 'cafe'\)/);
+  assert.match(miaPage, /MOMENT_SCENES/);
+  assert.match(miaPage, /lang="hi-IN"/);
+  assert.match(sceneStudio, /sceneStorageKey\(record\.uiLanguage\)/);
+  assert.match(sceneStudio, /miaSceneResponseSchema\.safeParse/);
+  assert.match(sceneStudio, /commitCuratedScene/);
+  assert.match(sceneStudio, /listenReply/);
+  assert.match(sceneStudio, /prefers-reduced-motion: reduce/);
+  assert.match(sceneStudio, /SCENE_REQUEST_TIMEOUT_MS/);
+  assert.match(miaSceneRoute, /X-Mia-Retry-After/);
+  assert.match(miaSceneRoute, /abortSignal: controller\.signal/);
 });
 
 test('Mia and Gia never mount Mila global chrome', () => {

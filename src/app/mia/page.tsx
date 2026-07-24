@@ -9,6 +9,17 @@ import { useI18n } from '@/lib/i18n-provider';
 import './mia-boho.css';
 
 const MOMENT_ICONS: MilaIconName[] = ['travel', 'cafe', 'conversation', 'sparkle', 'flower'];
+const MOMENT_SCENES = [
+  { place: 'Jaipur', moment: 'arrival' },
+  { place: 'Ubud, Bali', moment: 'cafe' },
+  { place: 'Jaipur', moment: 'market' },
+  { place: 'Ubud, Bali', moment: 'directions' },
+  { place: 'Ubud, Bali', moment: 'evening' },
+] as const;
+
+const sceneHref = (place: string, moment: string) => (
+  `?place=${encodeURIComponent(place)}&moment=${encodeURIComponent(moment)}#scene-studio`
+);
 
 export default function MiaBohoPage() {
   const { lang } = useI18n();
@@ -163,9 +174,9 @@ export default function MiaBohoPage() {
 
           <aside className="mia-boho__phrase-card" aria-label={copy.phraseTranslation}>
             <p>{copy.phraseLabel}</p>
-            <strong lang="pt">{copy.phrase}</strong>
+            <strong lang="hi-IN">{copy.phrase}</strong>
             <span>{copy.phraseTranslation}</span>
-            <a href="#scene-studio">{copy.phraseAction}<MilaIcon name="arrow" size={16} /></a>
+            <a href={sceneHref('Jaipur', 'cafe')}>{copy.phraseAction}<MilaIcon name="arrow" size={16} /></a>
           </aside>
         </section>
 
@@ -177,13 +188,16 @@ export default function MiaBohoPage() {
             <h2 id="mia-moments-title">{copy.momentsTitle}</h2>
           </div>
           <div className="mia-boho__scenario-rail">
-            {copy.moments.map((moment, index) => (
-              <a href="#scene-studio" key={moment}>
-                <MilaIcon name={MOMENT_ICONS[index]} size={22} />
-                <span>0{index + 1}</span>
-                <strong>{moment}</strong>
-              </a>
-            ))}
+            {copy.moments.map((moment, index) => {
+              const scene = MOMENT_SCENES[index];
+              return (
+                <a href={sceneHref(scene.place, scene.moment)} key={moment}>
+                  <MilaIcon name={MOMENT_ICONS[index]} size={22} />
+                  <span>0{index + 1}</span>
+                  <strong>{moment}</strong>
+                </a>
+              );
+            })}
           </div>
         </section>
 
