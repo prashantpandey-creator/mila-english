@@ -13,6 +13,7 @@ import {
   PRESENCE_STORAGE_KEY,
   type PresenceId,
 } from '@/lib/presences';
+import { consumeGiaGuestVoiceHandoff } from '@/lib/giaGuestHandoff';
 import { announceCompanionHistoryCleared, announceCompanionHistoryUpdated, useCompanionHistory } from '@/lib/use-companion-history';
 
 export default function Chat() {
@@ -29,6 +30,7 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesViewportRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const voiceHandoffLoadedRef = useRef(false);
   const [m, setM] = useState(false);
   const [presenceId, setPresenceId] = useState<PresenceId>('signal');
   const [isClearing, setIsClearing] = useState(false);
@@ -43,6 +45,15 @@ export default function Chat() {
       setConversationStyle('playful');
     }
   }, []);
+  useEffect(() => {
+    if (isHydrating || voiceHandoffLoadedRef.current) return;
+    voiceHandoffLoadedRef.current = true;
+    const token = new URLSearchParams(window.location.search).get('handoff') || '';
+    const handoff = consumeGiaGuestVoiceHandoff(window.sessionStorage, token);
+    if (token) window.history.replaceState(null, '', '/chat');
+    if (!handoff.length) return;
+    setMessages((current) => current.length ? current : handoff);
+  }, [isHydrating, setMessages]);
   const presence = presenceById(presenceId);
   const presenceLookName = presenceId === 'signal'
     ? (lang === 'ru' ? 'Сигнал' : 'Signal')

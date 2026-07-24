@@ -1882,6 +1882,38 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   background: #3a1028;
   transform: translateY(-1px);
 }
+.mila-surface--app[data-route="/darshan"] .voice-unavailable-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+.mila-surface--app[data-route="/darshan"] .voice-access-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 15px;
+  border: 1px solid var(--synthetic-line);
+  border-radius: 999px;
+  color: var(--synthetic-muted);
+  background: rgba(12,5,10,.72);
+  font: 650 .66rem/1 var(--font-mono), monospace;
+  letter-spacing: .05em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.mila-surface--app[data-route="/darshan"] .voice-access-link:hover,
+.mila-surface--app[data-route="/darshan"] .voice-access-link:focus-visible {
+  border-color: var(--synthetic-rose-gold);
+  color: var(--synthetic-ink);
+}
+.mila-surface--app[data-route="/darshan"] .voice-access-link:focus-visible {
+  outline: 2px solid var(--synthetic-rose-gold);
+  outline-offset: 3px;
+}
 
 .mila-surface--app[data-route="/darshan"] .voice-consent {
   position: absolute;
@@ -3136,6 +3168,12 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
     min-height: 38px;
     padding-inline: 10px;
     font-size: .58rem;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .voice-access-link {
+    min-height: 38px;
+    padding-inline: 10px;
+    font-size: .56rem;
   }
 
   .mila-surface--app[data-route="/darshan"] .presence-ai-disclosure {

@@ -18,6 +18,11 @@ import {
 } from "@/lib/presences";
 import { decideVoiceLaunch, hasLiveVoiceAccess } from "@/lib/voiceSurfacePolicy";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
+import {
+  appendGiaGuestVoiceTurn,
+  createGiaGuestVoiceHandoffToken,
+} from "@/lib/giaGuestHandoff";
+import { MILA_ORIGIN } from "@/lib/productHosts";
 
 const INVITES = {
   en: [
@@ -60,6 +65,18 @@ function voiceConnectionErrorMessage(problem: unknown, lang: "en" | "ru"): strin
       return ru
         ? "Микрофон занят другим приложением. Заверши звонок или запись и попробуй снова."
         : "Another app is using your microphone. End the call or recording, then try again.";
+    case "microphone-constraints":
+      return ru
+        ? "Браузер не смог открыть микрофон с настройками этого устройства. Попробуй ещё раз."
+        : "The browser could not open the microphone with this device setup. Please try again.";
+    case "audio-context-suspended":
+      return ru
+        ? "Браузер приостановил аудиовход. Нажми «Попробовать снова», чтобы запустить его."
+        : "Your browser paused audio input. Choose “Try again” to start it.";
+    case "microphone-start-failed":
+      return ru
+        ? "Не удалось запустить микрофон. Перезагрузи страницу или продолжи в текстовом чате."
+        : "The microphone could not start. Reload the page or continue in text chat.";
     case "unsupported":
     case "insecure-context":
     case "recorder-unsupported":
@@ -103,7 +120,9 @@ export default function VoicePage() {
   const [routeModeReady, setRouteModeReady] = useState(false);
   const [freePreview, setFreePreview] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
   const [previewAvailable, setPreviewAvailable] = useState(false);
+  const [accessCheckFailed, setAccessCheckFailed] = useState(false);
   const [showRealtimeConsent, setShowRealtimeConsent] = useState(false);
 
   const [liveText, setLiveText] = useState("");
@@ -125,6 +144,7 @@ export default function VoicePage() {
   const voiceOrbRef = useRef<HTMLButtonElement>(null);
   const consentCancelRef = useRef<HTMLButtonElement>(null);
   const consentConfirmRef = useRef<HTMLButtonElement>(null);
+  const guestVoiceHandoffTokenRef = useRef<string | null>(null);
 
   // Responsive orb sizing
   useEffect(() => {
@@ -162,6 +182,7 @@ export default function VoicePage() {
     if (!routeModeReady) return;
     let cancelled = false;
     setPreferenceLoaded(false);
+    setAccessCheckFailed(false);
 
     void (async () => {
       const response = await fetch("/api/users/me", { cache: "no-store" });
@@ -176,7 +197,9 @@ export default function VoicePage() {
       const available = hasIdentity && data?.liveVoicePreviewAvailable === true;
 
       setIsPro(paid);
+      setIsGuest(data?.isGuest === true);
       setPreviewAvailable(available);
+      setAccessCheckFailed(false);
       // An unused preview is a real entitlement, not a hidden query-string
       // mode. Discover it automatically so Gia's front door is actionable.
       if (!paid && available) setFreePreview(true);
@@ -192,7 +215,9 @@ export default function VoicePage() {
       .catch(() => {
         if (cancelled) return;
         setIsPro(false);
+        setIsGuest(false);
         setPreviewAvailable(false);
+        setAccessCheckFailed(true);
         setPreferenceUserId(null);
         setVoicePreference("idle");
       })
@@ -263,6 +288,11 @@ export default function VoicePage() {
         },
         onTurnComplete: ({ user, assistant }) => {
           setAnswerAnnouncement(assistant);
+          if (isGuest) {
+            const token = guestVoiceHandoffTokenRef.current ?? createGiaGuestVoiceHandoffToken();
+            guestVoiceHandoffTokenRef.current = token;
+            appendGiaGuestVoiceTurn(window.sessionStorage, token, { user, assistant });
+          }
           // Voice Gia and text Gia share one memory: persist the spoken turn.
           void fetch("/api/chat/commit", {
             method: "POST",
@@ -308,7 +338,7 @@ export default function VoicePage() {
     setVoiceError("");
     setPhase("listening");
     if (freePreview && !isPro) setPreviewAvailable(false);
-  }, [freePreview, isPro, lang]);
+  }, [freePreview, isGuest, isPro, lang]);
 
   const beginLiveConnection = useCallback(async () => {
     if (isConnecting || connectingRef.current) return;
@@ -449,7 +479,8 @@ export default function VoicePage() {
     engineRef.current = null;
     setIsConnected(false);
     setIsConnecting(false);
-    router.push('/chat');
+    const handoff = guestVoiceHandoffTokenRef.current;
+    router.push(handoff ? `/chat?handoff=${encodeURIComponent(handoff)}` : '/chat');
   }, [router]);
 
   const choosePresence = useCallback((next: PresenceId) => {
@@ -563,8 +594,8 @@ export default function VoicePage() {
             <p id="realtime-consent-description" className="voice-consent__description">
               {isLivePreview
                 ? (lang === "ru"
-                    ? "Для этого демо звук с микрофона и расшифровка будут отправлены в OpenAI, чтобы провести разговор в реальном времени. Согласие действует только для текущего посещения; можно отменить и продолжить в текстовом чате."
-                    : "For this preview, your microphone audio and transcript will be sent to OpenAI to run the live conversation. Your choice applies only to this visit; you can cancel and continue in text chat.")
+                    ? "Для этого демо звук с микрофона и расшифровка будут отправлены в OpenAI, чтобы провести разговор в реальном времени. Запуск использует одно бесплатное Live-демо, даже если завершить его раньше. Согласие действует только для текущего посещения; можно отменить и продолжить в текстовом чате."
+                    : "For this preview, your microphone audio and transcript will be sent to OpenAI to run the live conversation. Starting it uses your one free Live preview, even if you leave early. Your choice applies only to this visit; you can cancel and continue in text chat.")
                 : (lang === "ru"
                     ? "В Live-режиме звук с микрофона и расшифровка отправляются в OpenAI для разговора в реальном времени. Выбирай его, только если согласен. Настройка сохранится на этом устройстве для твоего Pro-аккаунта; вместо этого можно продолжить в текстовом чате."
                     : "Live mode sends your microphone audio and transcript to OpenAI for real-time conversation. Choose it only if you consent. This preference is saved on this device for your Pro account; you can continue in text chat instead.")}
@@ -654,12 +685,35 @@ export default function VoicePage() {
             </>
           ) : (
             <>
-              <strong>{lang === "ru" ? "Live-голос пока недоступен" : "Live voice is not available yet"}</strong>
-              <button type="button" className="voice-text-handoff" onClick={exit}>
-                <MilaIcon name="conversation" size={16} />
-                <span>{lang === "ru" ? "Продолжить в текстовом чате" : "Continue in text chat"}</span>
-                <MilaIcon name="arrow" size={15} />
-              </button>
+              <strong>
+                {accessCheckFailed
+                  ? (lang === "ru" ? "Не удалось проверить доступ к Live" : "Live access could not be checked")
+                  : (lang === "ru" ? "Бесплатное Live-демо завершено" : "Your free Live preview is complete")}
+              </strong>
+              <span className="voice-invoke-line">
+                {accessCheckFailed
+                  ? (lang === "ru" ? "Текстовый чат уже готов" : "Text chat is ready")
+                  : (lang === "ru" ? "Live продолжается с FluentMitra Pro" : "Live continues with FluentMitra Pro")}
+              </span>
+              <div className="voice-unavailable-actions">
+                <button type="button" className="voice-text-handoff" onClick={exit}>
+                  <MilaIcon name="conversation" size={16} />
+                  <span>{lang === "ru" ? "Продолжить в чате" : "Continue in text chat"}</span>
+                  <MilaIcon name="arrow" size={15} />
+                </button>
+                <a
+                  className="voice-access-link"
+                  href={`${MILA_ORIGIN}/pricing`}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={lang === "ru"
+                    ? "Варианты доступа к Live на FluentMitra — откроется новая вкладка"
+                    : "Live access options on FluentMitra — opens a new tab"}
+                >
+                  <span>{lang === "ru" ? "Доступ к Live" : "Live access"}</span>
+                  <MilaIcon name="arrow" size={14} />
+                </a>
+              </div>
             </>
           )}
         </div>

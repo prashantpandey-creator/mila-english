@@ -61,6 +61,7 @@ const PUBLIC_ASSET_PREFIXES = [
   '/apple-icon',
   '/manifest.webmanifest',
   '/mascot',
+  '/gia-og-v2.jpg',
   '/mia-og.png',
   '/mia-og-v2.jpg',
   '/og.png',

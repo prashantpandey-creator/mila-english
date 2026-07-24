@@ -10,6 +10,8 @@ test('Gia discovers an unused Live preview and keeps a real text fallback', () =
 
   assert.match(voicePage, /if \(!paid && available\) setFreePreview\(true\)/);
   assert.match(voicePage, /className="voice-text-handoff"/);
+  assert.match(voicePage, /Starting it uses your one free Live preview/);
+  assert.match(voicePage, /href=\{`\$\{MILA_ORIGIN\}\/pricing`\}/);
   assert.match(voicePage, /const canOperateVoice = isConnected \|\| canUseLiveVoice/);
   assert.doesNotMatch(voicePage, /INVITES\.length/);
 });
@@ -31,4 +33,10 @@ test('Gia deletion is host-scoped and cannot fall through to account deletion', 
   assert.ok(giaBoundary >= 0);
   assert.ok(fullAccountBoundary > giaBoundary);
   assert.match(accountRoute, /return NextResponse\.json\(\{ deleted: true, scope: 'gia' \}\)/);
+});
+
+test('Gia social media assets bypass product ownership redirects', () => {
+  const middleware = readSource('src/middleware.ts');
+
+  assert.match(middleware, /'\/gia-og-v2\.jpg'/);
 });

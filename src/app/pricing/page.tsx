@@ -78,7 +78,7 @@ export default function PricingPage() {
             <a className="pricing-cta" href={user ? '/dashboard' : '/register?returnTo=/dashboard'}>{T('Продолжить бесплатно', 'Continue free')}</a>
           </article>
           <article className="pricing-card pricing-card--pro">
-            <span className="pricing-card__label">MILA ENGLISH PRO</span>
+            <span className="pricing-card__label">FLUENTMITRA PRO</span>
             <h2>{T('Быстрее и лично для тебя', 'Faster and made for you')}</h2>
             <div className="pricing-card__price">₽1 490 <small>{T('за 30 дней', 'for 30 days')}</small></div>
             <ul>
