@@ -105,6 +105,7 @@ test('generated destinations outside the curated catalog infer a native speech v
 
   assert.equal(scene.language, 'Thai');
   assert.equal(scene.speechLocale, 'th-TH');
+  assert.equal(scene.visual, 'city-night');
 });
 
 test('every Mia cinematic scene has a committed poster and video', () => {

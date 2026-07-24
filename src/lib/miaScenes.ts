@@ -357,16 +357,24 @@ export function completeGeneratedMiaScene(
   };
   const normalizedLanguage = languageNames[language.toLowerCase()]
     || (language.length <= 3 && fallback.speechLocale !== 'en' ? fallback.language : language);
+  const inferredSpeechLocale = speechLocales[normalizedLanguage.toLowerCase()];
+  const generatedSpeechLocale = generated.speechLocale?.trim();
+  const visualClues = `${generated.destination} ${generated.title} ${generated.setting}`.toLowerCase();
+  const inferredVisual = /(?:\b(?:night|evening|midnight)\b|ночн|вечер)/u.test(visualClues)
+    ? 'city-night'
+    : /(?:\b(?:market|bazaar|souk|mercado)\b|рынок|базар)/u.test(visualClues)
+      ? 'old-city'
+      : fallback.visual;
 
   return miaSceneResponseSchema.parse({
     ...generated,
     // A language name is more useful in the UI than an occasional bare model
     // code such as "ja". The destination profile already knows that name.
     language: normalizedLanguage,
-    speechLocale: generated.speechLocale?.trim()
-      || speechLocales[normalizedLanguage.toLowerCase()]
-      || fallback.speechLocale,
-    visual: generated.visual || fallback.visual,
+    speechLocale: !generatedSpeechLocale || generatedSpeechLocale.length <= 3
+      ? inferredSpeechLocale || generatedSpeechLocale || fallback.speechLocale
+      : generatedSpeechLocale,
+    visual: generated.visual || inferredVisual,
   });
 }
 
