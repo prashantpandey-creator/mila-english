@@ -333,14 +333,39 @@ export function completeGeneratedMiaScene(
     vi: 'Vietnamese',
     zh: 'Chinese',
   };
+  const speechLocales: Record<string, string> = {
+    arabic: 'ar',
+    chinese: 'zh-CN',
+    dutch: 'nl-NL',
+    english: 'en',
+    french: 'fr-FR',
+    german: 'de-DE',
+    greek: 'el-GR',
+    hindi: 'hi-IN',
+    indonesian: 'id-ID',
+    italian: 'it-IT',
+    japanese: 'ja-JP',
+    korean: 'ko-KR',
+    polish: 'pl-PL',
+    portuguese: 'pt-PT',
+    russian: 'ru-RU',
+    spanish: 'es-ES',
+    swedish: 'sv-SE',
+    thai: 'th-TH',
+    turkish: 'tr-TR',
+    vietnamese: 'vi-VN',
+  };
+  const normalizedLanguage = languageNames[language.toLowerCase()]
+    || (language.length <= 3 && fallback.speechLocale !== 'en' ? fallback.language : language);
 
   return miaSceneResponseSchema.parse({
     ...generated,
     // A language name is more useful in the UI than an occasional bare model
     // code such as "ja". The destination profile already knows that name.
-    language: languageNames[language.toLowerCase()]
-      || (language.length <= 3 && fallback.speechLocale !== 'en' ? fallback.language : language),
-    speechLocale: generated.speechLocale?.trim() || fallback.speechLocale,
+    language: normalizedLanguage,
+    speechLocale: generated.speechLocale?.trim()
+      || speechLocales[normalizedLanguage.toLowerCase()]
+      || fallback.speechLocale,
     visual: generated.visual || fallback.visual,
   });
 }

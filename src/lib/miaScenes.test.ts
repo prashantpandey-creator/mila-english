@@ -81,6 +81,32 @@ test('generated scenes recover omitted presentation fields without losing author
   assert.equal(miaSceneResponseSchema.safeParse(scene).success, true);
 });
 
+test('generated destinations outside the curated catalog infer a native speech voice', () => {
+  const fallback = buildFallbackMiaScene({
+    destination: 'Bangkok',
+    situation: 'market',
+    level: 'conversational',
+    uiLanguage: 'ru',
+  });
+  const scene = completeGeneratedMiaScene({
+    destination: 'Bangkok',
+    language: 'th',
+    title: 'Разговор на вечернем рынке',
+    setting: 'Ты останавливаешься у небольшого прилавка на вечернем рынке Бангкока.',
+    phrase: 'อันนี้ราคาเท่าไรครับ?',
+    pronunciation: 'an-nee raa-khaa thao-rai khrap?',
+    translation: 'Сколько это стоит?',
+    reply: 'สองร้อยบาทค่ะ',
+    replyPronunciation: 'song roi baat kha',
+    replyTranslation: 'Двести бат.',
+    cultureNote: 'Вежливая частица в конце фразы делает короткий вопрос мягче.',
+    mission: 'Спроси цену и повтори услышанное число.',
+  }, fallback);
+
+  assert.equal(scene.language, 'Thai');
+  assert.equal(scene.speechLocale, 'th-TH');
+});
+
 test('every Mia cinematic scene has a committed poster and video', () => {
   for (const media of Object.values(MIA_SCENE_MEDIA)) {
     assert.equal(existsSync(`public${media.poster}`), true, media.poster);
