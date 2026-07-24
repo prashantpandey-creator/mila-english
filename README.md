@@ -38,6 +38,23 @@ missing, `/pricing` still shows Free and Pro accurately but the purchase button
 says that checkout is opening soon and cannot create an order. Free learning
 continues to work.
 
+## Anonymous visitor counts
+
+The web app records privacy-preserving, first-party page counts for Mila, Gia,
+and Mia. It stores the site and path without query strings against a one-way
+hash of a random same-site cookie. It does not store IP addresses, user agents,
+referrers, or device fingerprints, and it honors Do Not Track and Global
+Privacy Control signals.
+
+To see unique visitors, page views, daily totals, and the top 20 pages for the
+last 30 days:
+
+```bash
+npm run analytics:report -- 30
+```
+
+The optional day range must be between 1 and 366.
+
 ### Production setup
 
 1. Complete YooKassa merchant onboarding and use the shop's own test credentials

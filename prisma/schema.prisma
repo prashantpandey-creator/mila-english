@@ -118,6 +118,24 @@ model PaymentEvent {
   @@index([providerPaymentId, createdAt])
 }
 
+// Privacy-preserving first-party traffic counts. The visitor hash is derived
+// from a random same-site cookie and a server secret; Mila never stores the
+// cookie value, IP address, user agent, referrer, or query string.
+model VisitorDay {
+  id          Int      @id @default(autoincrement())
+  day         String
+  site        String
+  visitorHash String
+  path        String
+  views       Int      @default(1)
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @updatedAt
+
+  @@unique([day, site, visitorHash, path])
+  @@index([day, site])
+  @@index([site, path, day])
+}
+
 // Quantified per-phoneme state — the math layer (ELO difficulty, FSRS scheduling,
 // BKT mastery) plus the substitution the learner actually produces. One row per
 // (user, phoneme); updated every scored attempt.

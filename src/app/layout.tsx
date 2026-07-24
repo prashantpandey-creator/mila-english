@@ -9,6 +9,7 @@ import PwaRegister from '@/components/PwaRegister'
 import MilaGuide from '@/components/MilaGuide'
 import BottomNav from '@/components/BottomNav'
 import RouteSurface from '@/components/RouteSurface'
+import VisitorTracker from '@/components/VisitorTracker'
 
 const serifFont = Yeseva_One({
   weight: '400',
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" data-mila-theme="light" className={`${serifFont.variable} ${sansFont.variable} ${monoFont.variable}`} suppressHydrationWarning>
       <body>
         <PwaRegister />
+        <VisitorTracker />
         <SceneProvider>
           <Atmosphere />
           <I18nProvider>
