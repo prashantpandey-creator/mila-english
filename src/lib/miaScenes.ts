@@ -37,8 +37,18 @@ export const miaSceneResponseSchema = z.object({
   visual: z.enum(['mediterranean', 'india', 'city-night', 'london', 'new-york', 'cafe', 'old-city']),
 });
 
+// Some OpenAI-compatible providers occasionally omit presentation-only fields
+// even when structured output is requested. Keep the authored language content
+// strict, but allow these two fields to be recovered from Mia's destination
+// profile instead of throwing the entire generated scene away.
+export const miaSceneModelSchema = miaSceneResponseSchema.extend({
+  speechLocale: miaSceneResponseSchema.shape.speechLocale.optional(),
+  visual: miaSceneResponseSchema.shape.visual.optional(),
+});
+
 export type MiaSceneRequest = z.infer<typeof miaSceneRequestSchema>;
 export type MiaSceneResponse = z.infer<typeof miaSceneResponseSchema>;
+export type MiaSceneModelResponse = z.infer<typeof miaSceneModelSchema>;
 export type MiaSceneSituation = MiaSceneRequest['situation'];
 
 type Phrase = Pick<
@@ -293,6 +303,45 @@ export function buildFallbackMiaScene(input: MiaSceneRequest): MiaSceneResponse 
     mission,
     speechLocale: profile?.speechLocale ?? 'en',
     visual: profile?.visual ?? 'cafe',
+  });
+}
+
+export function completeGeneratedMiaScene(
+  generated: MiaSceneModelResponse,
+  fallback: MiaSceneResponse,
+): MiaSceneResponse {
+  const language = generated.language.trim();
+  const languageNames: Record<string, string> = {
+    ar: 'Arabic',
+    de: 'German',
+    el: 'Greek',
+    en: 'English',
+    es: 'Spanish',
+    fr: 'French',
+    hi: 'Hindi',
+    id: 'Indonesian',
+    it: 'Italian',
+    ja: 'Japanese',
+    ko: 'Korean',
+    nl: 'Dutch',
+    pl: 'Polish',
+    pt: 'Portuguese',
+    ru: 'Russian',
+    sv: 'Swedish',
+    th: 'Thai',
+    tr: 'Turkish',
+    vi: 'Vietnamese',
+    zh: 'Chinese',
+  };
+
+  return miaSceneResponseSchema.parse({
+    ...generated,
+    // A language name is more useful in the UI than an occasional bare model
+    // code such as "ja". The destination profile already knows that name.
+    language: languageNames[language.toLowerCase()]
+      || (language.length <= 3 && fallback.speechLocale !== 'en' ? fallback.language : language),
+    speechLocale: generated.speechLocale?.trim() || fallback.speechLocale,
+    visual: generated.visual || fallback.visual,
   });
 }
 
