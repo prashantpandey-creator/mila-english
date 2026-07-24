@@ -10,8 +10,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const hostname = (await headers()).get('host')
 
   if (isMiaHostname(hostname)) {
-    const title = 'Mia — Meet the world in its own words'
-    const description = 'A boho travel-and-language home for travelers, learners, and people curious about the cultures behind the words.'
+    const title = 'Mia — Feel the place. Speak its language.'
+    const description = 'Step into India, Bali, and destinations around the world through atmosphere, useful local language, real replies, and cultural context.'
 
     return {
       metadataBase: new URL('https://mia.purangpt.com'),
@@ -24,9 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
         description,
         type: 'website',
         url: '/',
-        images: [{ url: '/mia-og.png', width: 1200, height: 630, alt: title }],
+        images: [{ url: '/mia-og-v2.jpg', width: 1200, height: 630, alt: title }],
       },
-      twitter: { card: 'summary_large_image', title, description, images: ['/mia-og.png'] },
+      twitter: { card: 'summary_large_image', title, description, images: ['/mia-og-v2.jpg'] },
     }
   }
 

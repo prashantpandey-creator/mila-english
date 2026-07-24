@@ -62,6 +62,7 @@ const PUBLIC_ASSET_PREFIXES = [
   '/manifest.webmanifest',
   '/mascot',
   '/mia-og.png',
+  '/mia-og-v2.jpg',
   '/og.png',
   '/sw.js',
   '/visuals',

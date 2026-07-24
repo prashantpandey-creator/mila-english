@@ -14,23 +14,23 @@ export default function MiaBohoPage() {
   const { lang } = useI18n();
   const copy = lang === 'ru'
     ? {
-        sceneNav: 'Студия сцен',
+        sceneNav: 'Места',
         cultureNav: 'Культура',
         howNav: 'Как это работает',
         eyebrow: 'ЯЗЫК ДЛЯ МЕСТ, КУДА ВЕДЁТ ЖИЗНЬ',
         title: 'Встречай мир',
         titleAccent: 'на его языке.',
-        intro: 'Mia превращает следующую поездку в живые моменты: нужные слова, возможный ответ и культурный нюанс, который помогает почувствовать место.',
-        primary: 'Создать сцену поездки',
-        secondary: 'Посмотреть моменты',
-        assurance: ['Без регистрации', 'Любой уровень', 'Работает на месте'],
-        phraseLabel: 'Лиссабон · 18:42',
-        phrase: 'Podia trazer-me um café, por favor?',
-        phraseTranslation: 'Можно мне кофе, пожалуйста?',
+        intro: 'Mia начинает не с урока, а с места. Почувствуй утро в Джайпуре, дождливый Убуд или ночной Токио — а затем выучи слова, которые действительно понадобятся там.',
+        primary: 'Выбрать место',
+        secondary: 'Посмотреть живые моменты',
+        assurance: ['Индия и Бали в фокусе', 'Любой уровень', 'Работает на месте'],
+        phraseLabel: 'Джайпур · 08:10',
+        phrase: 'नमस्ते, यहाँ की खास चाय कौन-सी है?',
+        phraseTranslation: 'Здравствуйте, какой чай здесь особенный?',
         phraseAction: 'Открыть эту сцену',
-        momentsEyebrow: 'НЕ УЧЕБНИК. НАСТОЯЩАЯ ЖИЗНЬ.',
-        momentsTitle: 'Подготовься к моментам, ради которых путешествуешь.',
-        moments: ['Найти дорогу', 'Заказать уверенно', 'Начать разговор', 'Понять ответ', 'Остаться ради истории'],
+        momentsEyebrow: 'НЕ УЧЕБНИК. ОЩУЩЕНИЕ МЕСТА.',
+        momentsTitle: 'Учись внутри моментов, ради которых путешествуешь.',
+        moments: ['Войти в ритм', 'Заказать уверенно', 'Заговорить с местными', 'Понять ответ', 'Остаться ради истории'],
         howEyebrow: 'ОДНА СЦЕНА. ТРИ СЛОЯ.',
         howTitle: 'Не заучивай фразы. Репетируй реальность.',
         howBody: 'Mia соединяет практическую речь, вероятный ответ и контекст места — чтобы фраза не исчезла в тот момент, когда она нужна.',
@@ -41,15 +41,15 @@ export default function MiaBohoPage() {
         ],
         cultureEyebrow: 'КУЛЬТУРА ЖИВЁТ МЕЖДУ СТРОК',
         cultureTitle: 'Язык — это путь внутрь места.',
-        cultureBody: 'Не коллекция стереотипов, а внимание к тому, как люди приветствуют, приглашают, шутят и делятся своим городом.',
+        cultureBody: 'Не открытки и стереотипы, а внимание к ритму дня, обычным приветствиям и тому, как люди делятся своим местом.',
         stories: [
-          ['За общим столом', 'Слова, которыми делятся едой, временем и гостеприимством.', 'Джайпур · Хинди'],
-          ['Город после заката', 'Как меняются тон и разговор, когда день становится медленнее.', 'Венеция · Итальянский'],
-          ['Новые люди, общий смысл', 'Как войти в разговор естественно, даже если язык пока неидеален.', 'Сеул · Корейский'],
+          ['Утро начинается с чая', 'Поздоровайся, спроси о местном вкусе и позволь разговору начаться естественно.', 'Джайпур · Хинди'],
+          ['После тёплого дождя', 'Слова для кофе, мастерских и неспешного разговора по дороге через Убуд.', 'Убуд · Индонезийский'],
+          ['Последний поезд, первая фраза', 'Вежливо спроси дорогу и научись узнавать ответ в ритме станции.', 'Токио · Японский'],
         ],
         languagesEyebrow: 'МИР НЕ ГОВОРИТ НА ОДНОМ ЯЗЫКЕ',
         languagesTitle: 'Начни с места. Язык появится следом.',
-        languages: 'Испанский · Французский · Хинди · Итальянский · Японский · Португальский · Корейский · Арабский · Английский · и другие',
+        languages: 'Хинди · Индонезийский · Японский · Португальский · Испанский · Корейский · Французский · Арабский · Английский · и другие',
         finalEyebrow: 'СЛЕДУЮЩЕЕ МЕСТО УЖЕ ЗОВЁТ',
         finalTitle: 'Зайди дальше, чем «привет».',
         finalBody: 'Новое место ощущается иначе, когда у тебя уже есть первая настоящая сцена.',
@@ -57,27 +57,27 @@ export default function MiaBohoPage() {
         privacy: 'Конфиденциальность',
         terms: 'Условия',
         footerLine: 'Для путешественников и любопытных к миру.',
-        heroAlt: 'Тёплая улица средиземноморского города в сумерках',
-        imageAlts: ['Силуэт дворца на закате', 'Тихая улица Венеции вечером', 'Люди встречаются за столом'],
+        heroAlt: 'Путевые впечатления из Индии, Бали и других мест мира',
+        imageAlts: ['Утренний свет во дворце Джайпура', 'Зелёный вулканический пейзаж Бали', 'Огни Токио вечером'],
       }
     : {
-        sceneNav: 'Scene studio',
+        sceneNav: 'Places',
         cultureNav: 'Culture',
         howNav: 'How it works',
         eyebrow: 'LANGUAGE FOR WHERE LIFE TAKES YOU',
         title: 'Meet the world',
         titleAccent: 'in its own words.',
-        intro: 'Mia turns your next trip into vivid, usable moments: the words to begin, the reply you may hear, and the cultural cue that helps you feel the place.',
-        primary: 'Generate a travel scene',
-        secondary: 'Explore the moments',
-        assurance: ['No sign-up', 'Any confidence level', 'Useful on the ground'],
-        phraseLabel: 'Lisbon · 18:42',
-        phrase: 'Podia trazer-me um café, por favor?',
-        phraseTranslation: 'Could you bring me a coffee, please?',
+        intro: 'Mia begins with the place, not the lesson. Feel a Jaipur morning, rain-washed Ubud, or Tokyo after dark—then learn the words you will actually need there.',
+        primary: 'Choose a place',
+        secondary: 'Explore living moments',
+        assurance: ['India & Bali in focus', 'Any confidence level', 'Useful on the ground'],
+        phraseLabel: 'Jaipur · 08:10',
+        phrase: 'नमस्ते, यहाँ की खास चाय कौन-सी है?',
+        phraseTranslation: 'Hello, which tea is special here?',
         phraseAction: 'Open this scene',
-        momentsEyebrow: 'NOT A TEXTBOOK. REAL LIFE.',
-        momentsTitle: 'Prepare for the moments you actually travel for.',
-        moments: ['Find the way', 'Order with confidence', 'Start the conversation', 'Understand the reply', 'Stay for the story'],
+        momentsEyebrow: 'NOT A TEXTBOOK. A SENSE OF PLACE.',
+        momentsTitle: 'Learn inside the moments you actually travel for.',
+        moments: ['Enter the rhythm', 'Order with confidence', 'Talk with locals', 'Understand the reply', 'Stay for the story'],
         howEyebrow: 'ONE SCENE. THREE LAYERS.',
         howTitle: 'Do not memorize phrases. Rehearse reality.',
         howBody: 'Mia brings together useful language, the likely reply, and the context of the place—so the words are still there when the moment arrives.',
@@ -88,15 +88,15 @@ export default function MiaBohoPage() {
         ],
         cultureEyebrow: 'CULTURE LIVES BETWEEN THE LINES',
         cultureTitle: 'A language is a way into a place.',
-        cultureBody: 'Not a collection of stereotypes—an invitation to notice how people welcome, invite, joke, and share their city.',
+        cultureBody: 'Not postcards or stereotypes—an invitation to notice the rhythm of a day, ordinary greetings, and how people share their place.',
         stories: [
-          ['Around the table', 'The words people use to share food, time, and hospitality.', 'Jaipur · Hindi'],
-          ['The city after dark', 'How tone and conversation change when the day slows down.', 'Venice · Italian'],
-          ['New people, shared meaning', 'How to enter a conversation naturally, even before your language is perfect.', 'Seoul · Korean'],
+          ['Morning begins with chai', 'Greet first, ask about a local flavor, and let the exchange open naturally.', 'Jaipur · Hindi'],
+          ['After the warm rain', 'Words for coffee, craft studios, and an unhurried conversation through Ubud.', 'Ubud · Indonesian'],
+          ['Last train, first phrase', 'Ask the way politely and learn to catch the answer inside station rhythm.', 'Tokyo · Japanese'],
         ],
         languagesEyebrow: 'THE WORLD DOES NOT SPEAK JUST ONE LANGUAGE',
         languagesTitle: 'Begin with the place. Let the language follow.',
-        languages: 'Spanish · French · Hindi · Italian · Japanese · Portuguese · Korean · Arabic · English · and more',
+        languages: 'Hindi · Indonesian · Japanese · Portuguese · Spanish · Korean · French · Arabic · English · and more',
         finalEyebrow: 'THE NEXT PLACE IS ALREADY CALLING',
         finalTitle: 'Go further than hello.',
         finalBody: 'The next place feels different when you already have one real scene in your pocket.',
@@ -104,14 +104,14 @@ export default function MiaBohoPage() {
         privacy: 'Privacy',
         terms: 'Terms',
         footerLine: 'For travelers and the culture-curious.',
-        heroAlt: 'A warm Mediterranean hill town at dusk',
-        imageAlts: ['A palace silhouette at sunset', 'A quiet Venice street at night', 'People meeting around a table'],
+        heroAlt: 'Travel moments from India, Bali, and places around the world',
+        imageAlts: ['Morning light inside a Jaipur palace', 'A green volcanic landscape in Bali', 'Tokyo lights after dark'],
       };
 
   const storyImages = [
     '/ambience/stills/in-palace.jpg',
-    '/ambience/stills/venice-night.jpg',
-    '/ambience/stills/woman-cafe-laptop.jpg',
+    '/ambience/stills/nature-volcano.jpg',
+    '/ambience/stills/city-night-bokeh.jpg',
   ];
 
   return (
@@ -125,7 +125,7 @@ export default function MiaBohoPage() {
           <small>{lang === 'ru' ? 'путешествия · язык · культура' : 'travel · language · culture'}</small>
         </Link>
         <nav aria-label={lang === 'ru' ? 'Навигация' : 'Primary navigation'}>
-          <a href="#scene-studio">{copy.sceneNav}</a>
+          <a href="#destinations">{copy.sceneNav}</a>
           <a href="#culture">{copy.cultureNav}</a>
           <a href="#how">{copy.howNav}</a>
         </nav>
@@ -139,7 +139,7 @@ export default function MiaBohoPage() {
             <h1 id="mia-hero-title">{copy.title}<em>{copy.titleAccent}</em></h1>
             <p className="mia-boho__hero-intro">{copy.intro}</p>
             <div className="mia-boho__actions">
-              <a className="mia-boho__button mia-boho__button--primary" href="#scene-studio">
+              <a className="mia-boho__button mia-boho__button--primary" href="#destinations">
                 {copy.primary}<MilaIcon name="arrow" size={19} />
               </a>
               <a className="mia-boho__button mia-boho__button--secondary" href="#moments">{copy.secondary}</a>
@@ -152,7 +152,7 @@ export default function MiaBohoPage() {
           <div className="mia-boho__hero-art">
             <Image
               className="mia-boho__hero-scene"
-              src="/mia-og.png"
+              src="/mia-og-v2.jpg"
               alt={copy.heroAlt}
               fill
               priority
@@ -242,7 +242,7 @@ export default function MiaBohoPage() {
           <p className="mia-boho__section-label">{copy.finalEyebrow}</p>
           <h2 id="mia-final-title">{copy.finalTitle}</h2>
           <p>{copy.finalBody}</p>
-          <a className="mia-boho__button mia-boho__button--primary" href="#scene-studio">
+          <a className="mia-boho__button mia-boho__button--primary" href="#destinations">
             {copy.finalAction}<MilaIcon name="arrow" size={19} />
           </a>
         </section>

@@ -1,15 +1,16 @@
 import { z } from 'zod';
 
 export const MIA_SCENE_DESTINATIONS = [
-  'Lisbon',
-  'Venice',
   'Jaipur',
+  'Ubud, Bali',
   'Tokyo',
-  'Seoul',
+  'Lisbon',
   'Mexico City',
+  'Seoul',
+  'Marrakech',
+  'Venice',
   'Paris',
   'London',
-  'Marrakech',
   'New York',
 ] as const;
 
@@ -34,7 +35,7 @@ export const miaSceneResponseSchema = z.object({
   cultureNote: z.string().trim().min(8).max(260),
   mission: z.string().trim().min(8).max(220),
   speechLocale: z.string().trim().min(2).max(20),
-  visual: z.enum(['mediterranean', 'india', 'city-night', 'london', 'new-york', 'cafe', 'old-city']),
+  visual: z.enum(['mediterranean', 'india', 'bali', 'city-night', 'london', 'new-york', 'cafe', 'old-city']),
 });
 
 // Some OpenAI-compatible providers occasionally omit presentation-only fields
@@ -50,6 +51,111 @@ export type MiaSceneRequest = z.infer<typeof miaSceneRequestSchema>;
 export type MiaSceneResponse = z.infer<typeof miaSceneResponseSchema>;
 export type MiaSceneModelResponse = z.infer<typeof miaSceneModelSchema>;
 export type MiaSceneSituation = MiaSceneRequest['situation'];
+
+export type MiaDestinationGuide = {
+  id: string;
+  destination: string;
+  place: string;
+  placeRu: string;
+  languages: string;
+  atmosphere: string;
+  atmosphereRu: string;
+  cue: string;
+  cueRu: string;
+  situation: MiaSceneSituation;
+  visual: MiaSceneResponse['visual'];
+  poster: string;
+  featured?: boolean;
+};
+
+export const MIA_DESTINATION_GUIDES: readonly MiaDestinationGuide[] = [
+  {
+    id: 'jaipur',
+    destination: 'Jaipur',
+    place: 'Jaipur · India',
+    placeRu: 'Джайпур · Индия',
+    languages: 'Hindi · English',
+    atmosphere: 'Morning chai · painted streets · market conversation',
+    atmosphereRu: 'Утренний чай · расписные улицы · разговор на рынке',
+    cue: 'Begin with a greeting; warmth matters more than perfect grammar.',
+    cueRu: 'Начни с приветствия: теплота важнее идеальной грамматики.',
+    situation: 'market',
+    visual: 'india',
+    poster: '/ambience/stills/in-palace.jpg',
+    featured: true,
+  },
+  {
+    id: 'bali',
+    destination: 'Ubud, Bali',
+    place: 'Ubud · Bali',
+    placeRu: 'Убуд · Бали',
+    languages: 'Indonesian · Balinese',
+    atmosphere: 'Rain-washed lanes · café mornings · craft studios',
+    atmosphereRu: 'Улицы после дождя · утро в кафе · мастерские',
+    cue: 'Use permisi before a question and terima kasih after the exchange.',
+    cueRu: 'Скажи permisi перед вопросом и terima kasih после разговора.',
+    situation: 'cafe',
+    visual: 'bali',
+    poster: '/ambience/stills/nature-volcano.jpg',
+    featured: true,
+  },
+  {
+    id: 'tokyo',
+    destination: 'Tokyo',
+    place: 'Tokyo · Japan',
+    placeRu: 'Токио · Япония',
+    languages: 'Japanese',
+    atmosphere: 'Station rhythm · quiet counters · late trains',
+    atmosphereRu: 'Ритм станций · тихие стойки · поздние поезда',
+    cue: 'Sumimasen is a useful, polite opening before a short request.',
+    cueRu: 'Sumimasen — удобное вежливое начало короткой просьбы.',
+    situation: 'directions',
+    visual: 'city-night',
+    poster: '/ambience/stills/city-night-bokeh.jpg',
+  },
+  {
+    id: 'lisbon',
+    destination: 'Lisbon',
+    place: 'Lisbon · Portugal',
+    placeRu: 'Лиссабон · Португалия',
+    languages: 'Portuguese',
+    atmosphere: 'Hill streets · tiled cafés · unhurried evenings',
+    atmosphereRu: 'Холмистые улицы · кафе с азулежу · неспешные вечера',
+    cue: 'A greeting before the request makes a short exchange feel warmer.',
+    cueRu: 'Приветствие перед просьбой делает короткий разговор теплее.',
+    situation: 'cafe',
+    visual: 'mediterranean',
+    poster: '/ambience/stills/venice-night.jpg',
+  },
+  {
+    id: 'mexico-city',
+    destination: 'Mexico City',
+    place: 'Mexico City · Mexico',
+    placeRu: 'Мехико · Мексика',
+    languages: 'Spanish',
+    atmosphere: 'Neighborhood markets · café tables · late light',
+    atmosphereRu: 'Рынки районов · столики кафе · долгий вечерний свет',
+    cue: 'Buenos días or buenas tardes is an easy, friendly first step.',
+    cueRu: 'Buenos días или buenas tardes — простой дружелюбный первый шаг.',
+    situation: 'market',
+    visual: 'cafe',
+    poster: '/ambience/stills/woman-coffee.jpg',
+  },
+  {
+    id: 'seoul',
+    destination: 'Seoul',
+    place: 'Seoul · South Korea',
+    placeRu: 'Сеул · Южная Корея',
+    languages: 'Korean',
+    atmosphere: 'Night streets · shared tables · respectful endings',
+    atmosphereRu: 'Ночные улицы · общий стол · уважительные окончания',
+    cue: 'The -요 ending keeps a useful phrase polite without sounding stiff.',
+    cueRu: 'Окончание -요 делает полезную фразу вежливой без лишней строгости.',
+    situation: 'evening',
+    visual: 'city-night',
+    poster: '/ambience/stills/city-night-bokeh.jpg',
+  },
+] as const;
 
 type Phrase = Pick<
   MiaSceneResponse,
@@ -153,6 +259,21 @@ const profiles: PlaceProfile[] = [
       arrival: { phrase: 'नमस्ते, मेरी बुकिंग है।', pronunciation: 'na-mas-tay, may-ree booking hai', translation: 'Hello, I have a booking.', reply: 'स्वागत है। किस नाम से?', replyPronunciation: 'svaa-gat hai. kis naam say?', replyTranslation: 'Welcome. Under what name?' },
       market: { phrase: 'क्या यह यहीं बना है?', pronunciation: 'kyaa yah ya-heen ba-naa hai?', translation: 'Was this made here?', reply: 'हाँ, यह स्थानीय है।', replyPronunciation: 'haan, yah sthaa-nee-y hai', replyTranslation: 'Yes, it is local.' },
       evening: { phrase: 'यहाँ लाइव संगीत कहाँ है?', pronunciation: 'ya-haan live san-geet ka-haan hai?', translation: 'Where is there live music here?', reply: 'पास में, नौ बजे से।', replyPronunciation: 'paas men, nau ba-jay say', replyTranslation: 'Nearby, from nine o’clock.' },
+    },
+  },
+  {
+    matches: ['ubud', 'bali', 'denpasar', 'indonesia'],
+    destination: 'Ubud, Bali',
+    language: 'Indonesian',
+    speechLocale: 'id-ID',
+    visual: 'bali',
+    cultureNote: 'A light permisi before a question and terima kasih afterward make a practical exchange feel considerate; at temples, follow posted guidance and local cues.',
+    phrases: {
+      cafe: { phrase: 'Boleh saya pesan kopi Bali?', pronunciation: 'bo-leh sa-ya pe-san ko-pi ba-li?', translation: 'May I order a Balinese coffee?', reply: 'Tentu. Mau panas atau dingin?', replyPronunciation: 'ten-tu. mau pa-nas a-tau ding-in?', replyTranslation: 'Of course. Would you like it hot or iced?' },
+      directions: { phrase: 'Permisi, jalan ke pasar Ubud lewat mana?', pronunciation: 'per-mi-si, ja-lan ke pa-sar oo-bood le-wat ma-na?', translation: 'Excuse me, which way is it to Ubud market?', reply: 'Lurus, lalu belok kanan.', replyPronunciation: 'loo-roos, la-loo be-lok ka-nan', replyTranslation: 'Go straight, then turn right.' },
+      arrival: { phrase: 'Halo, saya ada reservasi.', pronunciation: 'ha-lo, sa-ya a-da re-ser-va-si', translation: 'Hello, I have a reservation.', reply: 'Selamat datang. Atas nama siapa?', replyPronunciation: 'se-la-mat da-tang. a-tas na-ma si-a-pa?', replyTranslation: 'Welcome. Under what name?' },
+      market: { phrase: 'Ini dibuat di Bali?', pronunciation: 'i-ni di-boo-at di ba-li?', translation: 'Was this made in Bali?', reply: 'Iya, dibuat oleh perajin di sini.', replyPronunciation: 'ee-ya, di-boo-at o-leh pe-ra-jin di si-ni', replyTranslation: 'Yes, it was made by a craftsperson here.' },
+      evening: { phrase: 'Ada pertunjukan tari malam ini?', pronunciation: 'a-da per-toon-joo-kan ta-ri ma-lam i-ni?', translation: 'Is there a dance performance tonight?', reply: 'Ada, mulai jam tujuh tiga puluh.', replyPronunciation: 'a-da, moo-lai jam too-juh ti-ga poo-looh', replyTranslation: 'Yes, it starts at seven thirty.' },
     },
   },
   {
@@ -384,6 +505,7 @@ export const MIA_SCENE_MEDIA: Record<
 > = {
   mediterranean: { poster: '/ambience/stills/venice-night.jpg', video: '/ambience/venice-night.mp4', position: 'center center' },
   india: { poster: '/ambience/stills/in-palace.jpg', video: '/ambience/in-palace.mp4', position: 'center center' },
+  bali: { poster: '/ambience/stills/nature-volcano.jpg', video: '/ambience/nature-volcano.mp4', position: 'center center' },
   'city-night': { poster: '/ambience/stills/city-night-bokeh.jpg', video: '/ambience/city-night-bokeh.mp4', position: 'center center' },
   london: { poster: '/ambience/stills/uk-bigben-night.jpg', video: '/ambience/uk-bigben-night.mp4', position: 'center center' },
   'new-york': { poster: '/ambience/stills/us-manhattan.jpg', video: '/ambience/us-manhattan.mp4', position: 'center center' },

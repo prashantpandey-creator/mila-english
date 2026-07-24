@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import test from 'node:test';
 import {
+  MIA_DESTINATION_GUIDES,
   MIA_SCENE_MEDIA,
   buildFallbackMiaScene,
   completeGeneratedMiaScene,
@@ -37,6 +38,27 @@ test('the curated fallback is useful, product-neutral, and schema-valid', () => 
   assert.ok(scene.cultureNote.length > 20);
   assert.doesNotMatch(JSON.stringify(scene), /\b(?:Gia|Mila)\b/);
   assert.equal(miaSceneResponseSchema.safeParse(scene).success, true);
+});
+
+test('India and Bali lead Mia with destination-specific atmosphere and language', () => {
+  assert.deepEqual(
+    MIA_DESTINATION_GUIDES.slice(0, 2).map((guide) => guide.id),
+    ['jaipur', 'bali'],
+  );
+  assert.equal(MIA_DESTINATION_GUIDES[0].featured, true);
+  assert.equal(MIA_DESTINATION_GUIDES[1].featured, true);
+
+  const bali = buildFallbackMiaScene({
+    destination: 'Ubud, Bali',
+    situation: 'cafe',
+    level: 'first-words',
+    uiLanguage: 'en',
+  });
+  assert.equal(bali.language, 'Indonesian');
+  assert.equal(bali.speechLocale, 'id-ID');
+  assert.equal(bali.visual, 'bali');
+  assert.match(bali.phrase, /kopi Bali/i);
+  assert.match(bali.cultureNote, /terima kasih/i);
 });
 
 test('unsupported destinations use an honest localized bridge instead of inventing a local language', () => {

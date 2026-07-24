@@ -1,8 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import MilaIcon from '@/components/ui/MilaIcon';
 import {
+  MIA_DESTINATION_GUIDES,
   MIA_SCENE_DESTINATIONS,
   MIA_SCENE_MEDIA,
   buildFallbackMiaScene,
@@ -25,13 +27,15 @@ const confidenceLevels: Array<{ id: MiaSceneRequest['level']; en: string; ru: st
   { id: 'confident', en: 'Make it feel local', ru: 'Хочу звучать естественно' },
 ];
 
+const DEFAULT_DESTINATION = MIA_DESTINATION_GUIDES[0];
+
 export default function MiaSceneGenerator({ lang }: { lang: 'en' | 'ru' }) {
-  const [destination, setDestination] = useState('Lisbon');
-  const [situation, setSituation] = useState<MiaSceneSituation>('cafe');
+  const [destination, setDestination] = useState(DEFAULT_DESTINATION.destination);
+  const [situation, setSituation] = useState<MiaSceneSituation>(DEFAULT_DESTINATION.situation);
   const [level, setLevel] = useState<MiaSceneRequest['level']>('first-words');
   const [scene, setScene] = useState<MiaSceneResponse>(() => buildFallbackMiaScene({
-    destination: 'Lisbon',
-    situation: 'cafe',
+    destination: DEFAULT_DESTINATION.destination,
+    situation: DEFAULT_DESTINATION.situation,
     level: 'first-words',
     uiLanguage: lang,
   }));
@@ -63,6 +67,12 @@ export default function MiaSceneGenerator({ lang }: { lang: 'en' | 'ru' }) {
         copy: 'Скопировать сцену',
         copied: 'Сцена скопирована',
         unavailable: 'Сейчас показываем надёжную офлайн-сцену. Можно продолжать.',
+        destinationsLabel: 'ПОПУЛЯРНЫЕ МЕСТА',
+        destinationsTitle: 'Выбери место. Почувствуй его ритм.',
+        destinationsIntro: 'Каждое направление открывается не списком слов, а атмосферой, языком и маленьким правилом, которое помогает войти в настоящий разговор.',
+        featured: 'В фокусе',
+        enter: 'Открыть',
+        feel: 'Почувствуй место',
       }
     : {
         label: 'MIA SCENE STUDIO',
@@ -86,9 +96,22 @@ export default function MiaSceneGenerator({ lang }: { lang: 'en' | 'ru' }) {
         copy: 'Copy scene',
         copied: 'Scene copied',
         unavailable: 'Showing a reliable offline scene for now. You can keep going.',
+        destinationsLabel: 'PLACES PEOPLE ARE EXPLORING',
+        destinationsTitle: 'Choose a place. Feel its rhythm.',
+        destinationsIntro: 'Every destination opens with atmosphere, language, and one small local cue—not a generic list of words.',
+        featured: 'Featured',
+        enter: 'Enter',
+        feel: 'Feel the place',
       };
 
   const media = useMemo(() => MIA_SCENE_MEDIA[scene.visual], [scene.visual]);
+  const activeGuide = useMemo(() => {
+    const normalized = destination.toLocaleLowerCase('en');
+    return MIA_DESTINATION_GUIDES.find((guide) => (
+      normalized.includes(guide.destination.toLocaleLowerCase('en'))
+      || normalized.includes(guide.id)
+    ));
+  }, [destination]);
 
   useEffect(() => {
     setCanSpeak('speechSynthesis' in window);
@@ -120,7 +143,10 @@ export default function MiaSceneGenerator({ lang }: { lang: 'en' | 'ru' }) {
       level,
       uiLanguage: lang,
     };
+    const preview = buildFallbackMiaScene(request);
 
+    setScene(preview);
+    setSceneSource('curated');
     try {
       const response = await fetch('/api/mia/scene', {
         method: 'POST',
@@ -196,8 +222,55 @@ export default function MiaSceneGenerator({ lang }: { lang: 'en' | 'ru' }) {
         <p>{copy.intro}</p>
       </header>
 
+      <section className="mia-destinations" id="destinations" aria-labelledby="mia-destinations-title">
+        <header>
+          <div>
+            <p className="mia-boho__section-label">{copy.destinationsLabel}</p>
+            <h3 id="mia-destinations-title">{copy.destinationsTitle}</h3>
+          </div>
+          <p>{copy.destinationsIntro}</p>
+        </header>
+        <div className="mia-destinations__rail">
+          {MIA_DESTINATION_GUIDES.map((guide) => {
+            const active = activeGuide?.id === guide.id;
+            return (
+              <button
+                type="button"
+                className={active ? 'is-active' : ''}
+                aria-pressed={active}
+                onClick={() => void createScene({
+                  destination: guide.destination,
+                  situation: guide.situation,
+                })}
+                disabled={busy}
+                key={guide.id}
+              >
+                <span className="mia-destinations__image" aria-hidden="true">
+                  <Image src={guide.poster} alt="" fill sizes="(max-width: 700px) 78vw, 330px" />
+                </span>
+                <span className="mia-destinations__topline">
+                  <span>{lang === 'ru' ? guide.placeRu : guide.place}</span>
+                  {guide.featured ? <em>{copy.featured}</em> : null}
+                </span>
+                <strong>{guide.languages}</strong>
+                <small>{lang === 'ru' ? guide.atmosphereRu : guide.atmosphere}</small>
+                <span className="mia-destinations__enter">
+                  {copy.enter} <MilaIcon name="arrow" size={15} />
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
       <div className="mia-scene-studio__grid">
-        <form className="mia-scene-studio__controls" onSubmit={submit}>
+        <form
+          className="mia-scene-studio__controls"
+          onSubmit={submit}
+          style={{
+            backgroundImage: `linear-gradient(rgba(255, 250, 242, .93), rgba(255, 250, 242, .93)), url('${media.poster}')`,
+          }}
+        >
           <label className="mia-scene-studio__field">
             <span>{copy.destination}</span>
             <input
@@ -271,6 +344,13 @@ export default function MiaSceneGenerator({ lang }: { lang: 'en' | 'ru' }) {
             <span>{scene.destination} · {scene.language}</span>
           </div>
           <div className="mia-scene-card__body">
+            {activeGuide ? (
+              <aside className="mia-scene-card__sense">
+                <span>{copy.feel}</span>
+                <strong>{lang === 'ru' ? activeGuide.atmosphereRu : activeGuide.atmosphere}</strong>
+                <p>{lang === 'ru' ? activeGuide.cueRu : activeGuide.cue}</p>
+              </aside>
+            ) : null}
             <p>{scene.setting}</p>
             <h3>{scene.title}</h3>
             <div className="mia-scene-card__exchange">

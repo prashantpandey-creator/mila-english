@@ -30,11 +30,12 @@ test('Gia remains gated while Mia owns the public traveler apex', () => {
 
 test('Mia is an owned travel product with an interactive scene studio', () => {
   assert.match(miaMetadata, /https:\/\/mia\.purangpt\.com/);
-  assert.match(miaMetadata, /Mia — Meet the world in its own words/);
-  assert.match(miaMetadata, /\/mia-og\.png/);
-  assert.match(miaPage, /Generate a travel scene/);
+  assert.match(miaMetadata, /Mia — Feel the place\. Speak its language\./);
+  assert.match(miaMetadata, /\/mia-og-v2\.jpg/);
+  assert.match(miaPage, /India & Bali in focus/);
   assert.match(miaPage, /MiaSceneGenerator/);
-  assert.match(miaPage, /src="\/mia-og\.png"/);
+  assert.match(miaPage, /src="\/mia-og-v2\.jpg"/);
+  assert.match(sceneStudio, /MIA_DESTINATION_GUIDES/);
   assert.match(sceneStudio, /\/api\/mia\/scene/);
   assert.doesNotMatch(miaPage, /\bGia\b/);
   assert.doesNotMatch(miaPage, /\bMila\b/);
