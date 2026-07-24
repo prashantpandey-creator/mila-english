@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Lang, getLangFromStorage, setLangStorage, t, RU } from './i18n';
+import { useProduct } from './product-context';
 
 type I18nContextType = {
   lang: Lang;
@@ -16,18 +17,21 @@ const I18nContext = createContext<I18nContextType>({
 });
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
+  const product = useProduct();
   const [lang, setLang] = useState<Lang>('en');
 
   useEffect(() => {
-    const storedLang = getLangFromStorage();
-    setLang(storedLang);
-    document.documentElement.lang = storedLang;
-  }, []);
+    const nextLang = product === 'mila' ? 'en' : getLangFromStorage();
+    setLang(nextLang);
+    if (product === 'mila') setLangStorage('en');
+    document.documentElement.lang = nextLang;
+  }, [product]);
 
   const switchLang = (l: Lang) => {
-    setLang(l);
-    setLangStorage(l);
-    document.documentElement.lang = l;
+    const nextLang = product === 'mila' ? 'en' : l;
+    setLang(nextLang);
+    setLangStorage(nextLang);
+    document.documentElement.lang = nextLang;
   };
 
   return (
