@@ -34,6 +34,7 @@ import { prisma } from '@/lib/prisma';
 import { builtinLessonContent, getBuiltinLesson } from '@/lib/builtinLessons';
 import { bugReportSchema, parseBugReportRequest } from '@/lib/bugReport';
 import { reserveBugReportDelivery, sendBugReportEmail } from '@/lib/sendBugReportEmail';
+import { isGiaHostname, isMiaHostname } from '@/lib/productHosts';
 
 export const maxDuration = 60;
 
@@ -215,6 +216,12 @@ function memoryReply(locale: CompanionLocale, memories: Array<{ content: string 
 }
 
 export async function POST(request: NextRequest) {
+  const requestHost = request.headers.get('host');
+  if (isMiaHostname(requestHost)) {
+    return NextResponse.json({ error: 'Mia travel scenes use the Mia Scene Studio.' }, { status: 403 });
+  }
+  const giaRequest = isGiaHostname(requestHost);
+  const productScope = giaRequest ? 'gia' : 'mila';
   const user = await authenticate(request);
   const userId = Number(user?.sub);
   if (!user || !Number.isSafeInteger(userId) || userId <= 0) {
@@ -231,7 +238,12 @@ export async function POST(request: NextRequest) {
   if (!latestUserMessage) return NextResponse.json({ error: 'At least one user message is required.' }, { status: 400 });
 
   const rawPath = typeof payload?.context?.pathname === 'string' ? payload.context.pathname : '/';
-  const pathname = /^\/[a-z0-9/_-]*$/i.test(rawPath) ? rawPath.slice(0, 100) : '/';
+  const requestedPathname = /^\/[a-z0-9/_-]*$/i.test(rawPath) ? rawPath.slice(0, 100) : '/';
+  const pathname = giaRequest
+    ? (payload?.context?.surface === 'voice' ? '/darshan' : '/chat')
+    : requestedPathname === '/chat' || requestedPathname === '/darshan'
+      ? '/'
+      : requestedPathname;
   const locale: CompanionLocale = payload?.context?.lang === 'ru' ? 'ru' : 'en';
   const surfaceKind = payload?.context?.surface === 'guide'
     ? 'guide'
@@ -250,7 +262,7 @@ export async function POST(request: NextRequest) {
       : surfaceKind === 'practice'
         ? 'focused speaking practice'
         : 'full tutor chat';
-  const turnContext = { pathname, locale, surface };
+  const turnContext = { pathname, locale, surface, product: productScope } as const;
   // Speculative voice drafts run against partial transcripts: they must never
   // persist a turn or execute a memory command heard mid-sentence.
   const speculative = surfaceKind === 'voice' && payload?.context?.speculative === true;
@@ -260,22 +272,31 @@ export async function POST(request: NextRequest) {
   const localOnly = surfaceKind === 'voice' && payload?.context?.privacyMode === 'local';
 
   const bugReportDescription = parseBugReportRequest(latestUserMessage);
+  const productName = giaRequest ? 'Gia' : 'Mila';
   if (bugReportDescription !== null && speculative) {
     return dataStreamText('', 'speculative-skip');
   }
   if (bugReportDescription !== null) {
     let reply: string;
     if (!bugReportDescription) {
-      reply = locale === 'ru'
-        ? 'Опиши, что сломалось, одной фразой: «Сообщи об ошибке: …». Или открой раздел «Поддержка», чтобы добавить шаги и данные устройства.'
-        : 'Tell me what broke in one line: “Report this bug: …”. Or open Support to add steps and device details.';
+      reply = giaRequest
+        ? (locale === 'ru'
+            ? 'Опиши, что сломалось, одной фразой: «Сообщи об ошибке: …».'
+            : 'Tell me what broke in one line: “Report this bug: …”.')
+        : (locale === 'ru'
+            ? 'Опиши, что сломалось, одной фразой: «Сообщи об ошибке: …». Или открой раздел «Поддержка», чтобы добавить шаги и данные устройства.'
+            : 'Tell me what broke in one line: “Report this bug: …”. Or open Support to add steps and device details.');
     } else if (!reserveBugReportDelivery(`chat-user:${userId}`)) {
-      reply = locale === 'ru'
-        ? 'За последний час уже отправлено несколько отчётов. Открой «Поддержка», чтобы подготовить письмо вручную.'
-        : 'Several reports were already sent this hour. Open Support to prepare an email manually.';
+      reply = giaRequest
+        ? (locale === 'ru'
+            ? 'За последний час уже отправлено несколько отчётов. Попробуй ещё раз позже.'
+            : 'Several reports were already sent this hour. Try again later.')
+        : (locale === 'ru'
+            ? 'За последний час уже отправлено несколько отчётов. Открой «Поддержка», чтобы подготовить письмо вручную.'
+            : 'Several reports were already sent this hour. Open Support to prepare an email manually.');
     } else {
       const report = bugReportSchema.parse({
-        area: `Mila ${pathname}`,
+        area: `${productName} ${pathname}`,
         description: bugReportDescription,
         diagnostics: {
           page: pathname,
@@ -289,11 +310,15 @@ export async function POST(request: NextRequest) {
       });
       reply = delivery.sent
         ? (locale === 'ru'
-            ? 'Готово — я отправила отчёт владельцу Mila по электронной почте.'
-            : 'Done — I emailed the bug report to Mila’s owner.')
-        : (locale === 'ru'
-            ? 'Я не смогла отправить отчёт напрямую. Открой «Поддержка»: там сохранится готовое письмо с данными устройства.'
-            : 'I could not send it directly. Open Support for a ready-to-send email with device details.');
+            ? `Готово — я отправила отчёт владельцу ${productName} по электронной почте.`
+            : `Done — I emailed the bug report to ${productName}’s owner.`)
+        : giaRequest
+          ? (locale === 'ru'
+              ? 'Я не смогла отправить отчёт напрямую. Попробуй ещё раз позже.'
+              : 'I could not send the report directly. Try again later.')
+          : (locale === 'ru'
+              ? 'Я не смогла отправить отчёт напрямую. Открой «Поддержка»: там сохранится готовое письмо с данными устройства.'
+              : 'I could not send it directly. Open Support for a ready-to-send email with device details.');
     }
     await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
     return dataStreamText(reply, 'bug-report');
@@ -306,10 +331,10 @@ export async function POST(request: NextRequest) {
   if (command?.kind === 'remember') {
     if (isSensitiveMemory(command.content)) {
       return dataStreamText(locale === 'ru'
-        ? 'Я не буду сохранять пароли, PIN-коды, ключи или банковские данные. Можно запомнить учебную цель, интерес или предпочтение.'
-        : 'I will not store passwords, PINs, keys, or banking details. I can remember a learning goal, interest, or teaching preference instead.', 'memory-guard');
+        ? `Я не буду сохранять пароли, PIN-коды, ключи или банковские данные. Можно запомнить ${giaRequest ? 'интерес, предпочтение или что-то полезное для наших разговоров' : 'учебную цель, интерес или предпочтение'}.`
+        : `I will not store passwords, PINs, keys, or banking details. I can remember ${giaRequest ? 'an interest, preference, or something useful for our conversations' : 'a learning goal, interest, or teaching preference'} instead.`, 'memory-guard');
     }
-    await rememberCompanionFact(userId, command.content, locale);
+    await rememberCompanionFact(userId, command.content, locale, productScope);
     const reply = locale === 'ru'
       ? `Запомнила: ${command.content}. Ты всегда можешь спросить, что я помню, или попросить всё забыть.`
       : `I’ll remember: ${command.content}. You can always ask what I remember or tell me to forget it all.`;
@@ -318,14 +343,14 @@ export async function POST(request: NextRequest) {
   }
 
   if (command?.kind === 'list') {
-    const memories = await listCompanionMemories(userId);
+    const memories = await listCompanionMemories(userId, productScope);
     const reply = memoryReply(locale, memories);
     await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
     return dataStreamText(reply, 'memory');
   }
 
   if (command?.kind === 'forget-all') {
-    await forgetAllCompanionMemories(userId);
+    await forgetAllCompanionMemories(userId, productScope);
     const reply = locale === 'ru'
       ? 'Готово — я удалила все факты, сохранённые по твоей просьбе.'
       : 'Done — I deleted every fact you explicitly asked me to remember.';
@@ -347,20 +372,26 @@ export async function POST(request: NextRequest) {
     }),
     isGuest
       ? Promise.resolve([] as Awaited<ReturnType<typeof listCompanionMessages>>)
-      : listCompanionMessages(userId, spoken ? 4 : 18, surfaceKind === 'practice' ? 'practice' : 'conversation', pathname),
+      : listCompanionMessages(userId, spoken ? 4 : 18, surfaceKind === 'practice' ? 'practice' : 'conversation', pathname, productScope),
     isGuest
       ? Promise.resolve([] as Awaited<ReturnType<typeof listCompanionMemories>>)
-      : listCompanionMemories(userId),
+      : listCompanionMemories(userId, productScope),
   ]);
 
-  const learnerSummary = profile
-    ? `Learner: ${safeContextValue(profile.name, 'student')}; level: ${safeContextValue(profile.level, 'unknown')}; goal: ${safeContextValue(profile.goal, 'not set')}; streak: ${profile.streakDays}.`
-    : 'Learner profile is not available.';
-  const recentSummary = recentProgress.length
+  const learnerSummary = giaRequest
+    ? (profile
+        ? `Person: ${safeContextValue(profile.name, 'guest')}; personal context: ${safeContextValue(profile.goal, 'not set')}.`
+        : 'Personal profile is not available.')
+    : profile
+      ? `Learner: ${safeContextValue(profile.name, 'student')}; level: ${safeContextValue(profile.level, 'unknown')}; goal: ${safeContextValue(profile.goal, 'not set')}; streak: ${profile.streakDays}.`
+      : 'Learner profile is not available.';
+  const recentSummary = giaRequest
+    ? 'Structured learning progress is outside Gia.'
+    : recentProgress.length
     ? recentProgress.map((item) => `${safeContextValue(item.Lesson.title, 'Lesson')} (${item.completed ? 'complete' : 'in progress'}, score ${item.score ?? 'not scored'})`).join('; ')
     : 'No recorded lesson progress yet.';
   const lessonId = pathname.match(/^\/lessons\/([a-z0-9-]+)$/i)?.[1];
-  const currentLesson = lessonId ? getBuiltinLesson(lessonId) : null;
+  const currentLesson = !giaRequest && lessonId ? getBuiltinLesson(lessonId) : null;
   const learningContext = currentLesson
     ? `Current lesson: ${currentLesson.titleEn} / ${currentLesson.titleRu}.\nVocabulary: ${currentLesson.words.join(', ')}.\nExamples:\n${builtinLessonContent(currentLesson)}`
     : undefined;
@@ -372,9 +403,9 @@ export async function POST(request: NextRequest) {
   const levelTag = (profile?.level || '').trim().toUpperCase();
   const beginner = levelTag === '' || levelTag === 'PENDING' || levelTag === 'A1';
   const freeConversationRequested = requestsFreeConversation(latestUserMessage);
-  const inLesson = (surfaceKind === 'practice' || Boolean(currentLesson)) && !freeConversationRequested;
+  const inLesson = !giaRequest && (surfaceKind === 'practice' || Boolean(currentLesson)) && !freeConversationRequested;
   const playfulConversation = surfaceKind === 'chat' && payload?.context?.conversationStyle === 'playful';
-  const targetLanguage = isTargetLanguageId(payload?.context?.targetLanguage)
+  const targetLanguage = !giaRequest && isTargetLanguageId(payload?.context?.targetLanguage)
     ? targetLanguagePrompt(payload.context.targetLanguage)
     : undefined;
   const persona = personaBlock(
@@ -383,14 +414,16 @@ export async function POST(request: NextRequest) {
       : isPersonaId(profile?.tonePreference)
         ? profile.tonePreference
         : 'friend',
-    learnerProfile,
+    giaRequest ? undefined : learnerProfile,
     inLesson ? 'lesson' : 'conversation',
   );
   const requestedLanguageMode = payload?.context?.languageMode;
   const languageMode: LanguageMode =
     requestedLanguageMode === 'english-first' || requestedLanguageMode === 'mirror' || requestedLanguageMode === 'native-first'
       ? requestedLanguageMode
-      : inLesson
+      : giaRequest
+        ? 'mirror'
+        : inLesson
         ? (beginner ? 'native-first' : 'english-first')
         : 'mirror';
   const system = buildCompanionSystemPrompt({
@@ -422,7 +455,7 @@ export async function POST(request: NextRequest) {
   const chatExternalFirst = surfaceKind === 'chat' || surfaceKind === 'guide';
   const choice = await chooseModel(modelSurface, voiceExternalFirst || chatExternalFirst, !localOnly);
   if (!choice) {
-    const reply = builtInCompanionReply(latestUserMessage, pathname, locale, profile?.level);
+    const reply = builtInCompanionReply(latestUserMessage, pathname, locale, profile?.level, giaRequest);
     await saveCompanionTurn(userId, latestUserMessage, reply, turnContext);
     return dataStreamText(reply);
   }

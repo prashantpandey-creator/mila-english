@@ -1,8 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
-import { sendEmailVerification } from '@/lib/sendAuthEmail';
+import { sendEmailVerification, type AuthBrand } from '@/lib/sendAuthEmail';
 
-export async function issueEmailVerification(input: { userId: number; email: string; baseUrl: string }) {
+export async function issueEmailVerification(input: { userId: number; email: string; baseUrl: string; brand: AuthBrand }) {
   const token = randomBytes(32).toString('base64url');
   const tokenHash = createHash('sha256').update(token).digest('hex');
   await prisma.$transaction([
@@ -19,7 +19,7 @@ export async function issueEmailVerification(input: { userId: number; email: str
   // HTTP requests, access logs, or Referrer headers.
   const verificationUrl = `${input.baseUrl.replace(/\/$/, '')}/verify-email#token=${encodeURIComponent(token)}`;
   try {
-    await sendEmailVerification({ email: input.email, verificationUrl });
+    await sendEmailVerification({ brand: input.brand, email: input.email, verificationUrl });
     return { sent: true, verificationUrl };
   } catch (error) {
     await prisma.accountToken.updateMany({ where: { tokenHash, usedAt: null }, data: { usedAt: new Date() } });

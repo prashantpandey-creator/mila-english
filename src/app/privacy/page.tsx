@@ -13,19 +13,19 @@ export default function PrivacyPage() {
       <AppMain width="work" className="legal-page__main">
       <article className="legal-page__article">
         <p className="legal-page__kicker">PRIVACY POLICY</p>
-        <h1>Your learning is private.</h1>
-        <p className="legal-page__meta">Effective 19 July 2026 · Действует с 19 июля 2026 г.</p>
+        <h1>Your words are yours.</h1>
+        <p className="legal-page__meta">Effective 24 July 2026 · Действует с 24 июля 2026 г.</p>
 
         <p style={{fontSize:18,marginTop:30}}>This policy covers the related services at <strong>mila.purangpt.com</strong> (structured language learning), <strong>gia.purangpt.com</strong> (the Gia text-and-voice companion), and <strong>mia.purangpt.com</strong> (the public travel, language, and culture experience), plus the Mila iOS app and legacy miachat.purangpt.com links. Together they are called the Services below.</p>
-        <p>Mia’s public editorial pages do not require an account. When Mia sends you to conversation, sign-in, or account features, you move to Gia; when it sends you to structured lessons, you move to Mila. Gia and Mila use the shared account and service infrastructure described here.</p>
+        <p>Mia’s public Scene Studio does not require an account and keeps its most recent scene in your browser. Gia and Mila have separate product experiences while using related account and service infrastructure behind the scenes.</p>
 
         <section>
           <h2>What the Services store</h2>
           <ul>
-            <li><strong>Guest use:</strong> a random guest identifier and an internal placeholder email keep one learner’s progress separate from another’s.</li>
+            <li><strong>Guest use:</strong> a random guest identifier and an internal placeholder email keep one person’s activity separate from another’s.</li>
             <li><strong>Optional account:</strong> name, email address, and a one-way password hash when you choose to register.</li>
             <li><strong>Learning data:</strong> level, lesson progress, answers, vocabulary reviews, pronunciation measurements, assessments, and study streaks.</li>
-            <li><strong>Conversations:</strong> chat messages, voice transcripts, and only the facts you explicitly ask Mila to remember.</li>
+            <li><strong>Conversations:</strong> chat messages, voice transcripts, and only the facts you explicitly ask the active companion to remember.</li>
             <li><strong>Bug reports:</strong> the description and reply email you choose to provide, plus the current page, device/browser, screen size, language, and timezone. Chat history and audio are not attached.</li>
             <li><strong>Payments:</strong> provider payment ID, product, amount, currency, status, and access period. Mila does not receive or store full card details.</li>
           </ul>
@@ -52,7 +52,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2>Retention and deletion</h2>
-          <p>Learning and account data is retained while your guest profile or account remains active. On the web or in the iOS app, open <strong>Account</strong> and choose <strong>Delete account and data</strong> or <strong>Delete guest data</strong>. The Services delete the profile, progress, assessments, vocabulary reviews, companion history, and saved memories. This cannot be undone.</p>
+          <p>Learning and account data is retained while your guest profile or account remains active. Mila’s <strong>Account</strong> page can delete the shared account and its learning data. Gia’s <strong>Account</strong> page can independently delete Gia conversation history and remembered facts without touching Mila learning data. These actions cannot be undone.</p>
           <p>When an account has a payment, Mila may retain a detached record of the payment ID, amount, currency, status, and access period where required for accounting, fraud prevention, refunds, or legal compliance. The local record no longer has a direct relation to the deleted Mila profile, but it can remain linkable through processor records where required. YooKassa and other service providers may retain data under their own legal obligations.</p>
         </section>
 

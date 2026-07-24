@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { useProduct } from '@/lib/product-context';
 
 type AppShellProps = {
   children: ReactNode;
@@ -14,7 +15,7 @@ type AppHeaderProps = {
   eyebrow?: ReactNode;
   actions?: ReactNode;
   backHref?: string;
-  brand?: 'Mila' | 'Gia';
+  brand?: 'Mila' | 'Gia' | 'Mia';
   className?: string;
 };
 
@@ -31,19 +32,21 @@ export function AppShell({ children, className, fullHeight = false }: AppShellPr
   return <div className={cx('app-shell', fullHeight && 'app-shell--full', className)}>{children}</div>;
 }
 
-export function AppHeader({ title, eyebrow, actions, backHref = '/dashboard', brand = 'Mila', className }: AppHeaderProps) {
+export function AppHeader({ title, eyebrow, actions, backHref = '/dashboard', brand, className }: AppHeaderProps) {
+  const product = useProduct();
+  const resolvedBrand = brand ?? (product === 'gia' ? 'Gia' : product === 'mia' ? 'Mia' : 'Mila');
   const backLabel = backHref === '/'
-    ? `${brand} · home`
+    ? `${resolvedBrand} · home`
     : backHref === '/lessons'
-      ? `${brand} · lessons`
-      : `${brand} · dashboard`;
+      ? `${resolvedBrand} · lessons`
+      : `${resolvedBrand} · dashboard`;
   return (
     <header className={cx('app-header', className)}>
       <div className="app-header__inner">
         <div className="app-header__identity">
           <Link className="app-header__brand" href={backHref} aria-label={backLabel}>
-            <span className="app-header__mark" aria-hidden="true">{brand === 'Gia' ? 'G' : 'M'}</span>
-            <span>{brand}</span>
+            <span className="app-header__mark" aria-hidden="true">{resolvedBrand === 'Gia' ? 'G' : 'M'}</span>
+            <span>{resolvedBrand}</span>
           </Link>
           {title ? (
             <div className="app-header__heading">

@@ -1,6 +1,13 @@
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
-import { isGiaHostname } from '@/lib/productHosts';
+import {
+  GIA_ORIGIN,
+  MILA_ORIGIN,
+  MIA_ORIGIN,
+  isGiaHostname,
+  isMilaHostname,
+  isMiaHostname,
+} from '@/lib/productHosts';
 
 // The app is login-gated. Everything that IS the product (voice rooms, chat,
 // lessons, dashboard, account, billing…) requires a session — registered OR an
@@ -27,16 +34,78 @@ const PROTECTED_PREFIXES = [
   '/voice-lab',
 ];
 
+const GIA_OWNED_PREFIXES = [
+  '/account',
+  '/chat',
+  '/darshan',
+  '/forgot-password',
+  '/login',
+  '/privacy',
+  '/register',
+  '/reset-password',
+  '/terms',
+  '/verify-email',
+];
+
+const MIA_OWNED_PREFIXES = ['/privacy', '/terms'];
+
+const MILA_FOREIGN_PREFIXES = ['/chat', '/darshan', '/mia', '/pia'];
+
+const PUBLIC_ASSET_PREFIXES = [
+  '/_next',
+  '/ambience',
+  '/audio',
+  '/avatar',
+  '/favicon.ico',
+  '/icon',
+  '/apple-icon',
+  '/manifest.webmanifest',
+  '/mascot',
+  '/mia-og.png',
+  '/og.png',
+  '/sw.js',
+  '/visuals',
+];
+
+function matchesPrefix(pathname: string, prefixes: string[]) {
+  return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
 function isProtected(pathname: string) {
-  return PROTECTED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  return matchesPrefix(pathname, PROTECTED_PREFIXES);
+}
+
+function redirectToOrigin(request: NextRequest, origin: string, pathname = request.nextUrl.pathname) {
+  return NextResponse.redirect(new URL(`${pathname}${request.nextUrl.search}`, origin));
 }
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const host = request.headers.get('host');
+
+  if (matchesPrefix(pathname, PUBLIC_ASSET_PREFIXES)) return NextResponse.next();
+
+  // Product ownership is enforced before authentication. A URL on the wrong
+  // hostname must never quietly render another product's page or chrome.
+  if (isMiaHostname(host)) {
+    const owned = pathname === '/' || matchesPrefix(pathname, MIA_OWNED_PREFIXES);
+    if (!owned) return redirectToOrigin(request, MIA_ORIGIN, '/');
+  }
+
+  if (isGiaHostname(host)) {
+    if (pathname === '/darshan') return redirectToOrigin(request, GIA_ORIGIN, '/');
+    const owned = pathname === '/' || matchesPrefix(pathname, GIA_OWNED_PREFIXES);
+    if (!owned) return redirectToOrigin(request, GIA_ORIGIN, '/');
+  }
+
+  if (isMilaHostname(host) && matchesPrefix(pathname, MILA_FOREIGN_PREFIXES)) {
+    return redirectToOrigin(request, MILA_ORIGIN, '/');
+  }
+
   // Gia's apex is internally rewritten to the protected voice room. Gate it
   // before the host rewrite runs. Mia's traveler apex remains public.
-  const giaApex = isGiaHostname(request.headers.get('host'))
-    && request.nextUrl.pathname === '/';
-  if (!isProtected(request.nextUrl.pathname) && !giaApex) return NextResponse.next();
+  const giaApex = isGiaHostname(host) && pathname === '/';
+  if (!isProtected(pathname) && !giaApex) return NextResponse.next();
 
   const token = request.cookies.get('token')?.value;
   const configured = process.env.JWT_SECRET?.trim();
@@ -52,7 +121,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   } catch {
     const login = new URL('/login', request.url);
-    login.searchParams.set('returnTo', `${request.nextUrl.pathname}${request.nextUrl.search}`);
+    login.searchParams.set('returnTo', `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(login);
   }
 }

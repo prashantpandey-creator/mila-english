@@ -5,11 +5,15 @@ import { isGiaHostname } from '@/lib/productHosts';
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
   if (isGiaHostname(requestHeaders.get('host'))) {
+    const title = 'Sign in to Gia';
+    const description = 'Continue your Gia conversations, or enter as a private guest.';
     return {
       metadataBase: new URL('https://gia.purangpt.com'),
-      title: 'Sign in to Gia',
-      description: 'Continue to Gia with your Mila account, or enter as a guest.',
+      title,
+      description,
       robots: { index: false, follow: false },
+      openGraph: { title, description, type: 'website', url: '/login', images: [] },
+      twitter: { card: 'summary', title, description, images: [] },
     };
   }
 

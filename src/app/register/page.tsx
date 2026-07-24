@@ -6,7 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
-import { isGiaHostname } from '@/lib/productHosts';
+import { useProduct } from '@/lib/product-context';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -22,20 +22,25 @@ const welcomeTheme = {
 
 export default function RegisterPage() {
   const { t, lang } = useI18n();
+  const product = useProduct();
+  const isGia = product === 'gia';
   const router = useRouter();
-  const [form, setForm] = useState({name:'',email:'',password:'',nativeLanguage:'Русский',learnerCategory:'absolute_beginner'});
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    nativeLanguage: isGia ? 'Not set' : 'Русский',
+    learnerCategory: isGia ? 'pending' : 'absolute_beginner',
+  });
   const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
-  const [returnTo, setReturnTo] = useState('/dashboard');
-  const [isGia, setIsGia] = useState(false);
+  const [returnTo, setReturnTo] = useState(isGia ? '/chat' : '/dashboard');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const up = (f:string) => (e:any) => setForm(p=>({...p,[f]:e.target.value}));
 
   useEffect(() => {
-    const nextIsGia = isGiaHostname(window.location.hostname);
     const requestedReturnTo = new URLSearchParams(window.location.search).get('returnTo');
-    setReturnTo(safeReturnTo(requestedReturnTo, nextIsGia ? '/chat' : '/dashboard'));
-    setIsGia(nextIsGia);
-  }, []);
+    setReturnTo(safeReturnTo(requestedReturnTo, isGia ? '/chat' : '/dashboard'));
+  }, [isGia]);
 
   const messageFor = (code?: string, fallback?: string) => {
     if (code === 'ACCOUNT_EXISTS') return lang === 'ru' ? 'Аккаунт с этим email уже есть. Войди в него.' : 'An account already uses this email. Sign in instead.';
@@ -96,13 +101,18 @@ export default function RegisterPage() {
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
-                ? (lang === 'ru' ? 'Сохраняй разговоры, языки и свой путь.' : 'Save your conversations, languages, and learning path.')
+                ? (lang === 'ru' ? 'Сохраняй разговоры и личный контекст между устройствами.' : 'Keep your conversations and personal context across devices.')
                 : t('register_subtitle')}
             </p>
           </div>
           <form onSubmit={submit} className="welcome-auth__form">
             {error && <div className="welcome-auth__error" role="alert">{error}</div>}
-            {[{k:'name',l:'register_name',ph:'Анна'},{k:'email',l:'register_email',ph:'anna@email.com'},{k:'password',l:'register_password',ph:'••••••••'},{k:'nativeLanguage',l:'register_language',ph:'Русский'}].map(f=>{
+            {[
+              {k:'name',l:'register_name',ph:'Анна'},
+              {k:'email',l:'register_email',ph:'anna@email.com'},
+              {k:'password',l:'register_password',ph:'••••••••'},
+              ...(!isGia ? [{k:'nativeLanguage',l:'register_language',ph:'Русский'}] : []),
+            ].map(f=>{
               const fieldId = `register-${f.k}`;
               const hintId = f.k === 'password' ? 'register-password-hint' : undefined;
               return <div key={f.k} className="welcome-auth__field">
@@ -128,16 +138,26 @@ export default function RegisterPage() {
               <input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} required />
               <span>{lang === 'ru' ? 'Я принимаю ' : 'I agree to the '}<a href="/terms" target="_blank">{lang === 'ru' ? 'условия' : 'Terms'}</a>{lang === 'ru' ? ' и ' : ' and '}<a href="/privacy" target="_blank">{lang === 'ru' ? 'политику конфиденциальности' : 'Privacy Policy'}</a>.</span>
             </label>
-            <button type="submit" disabled={loading || !acceptedTerms} className="welcome-auth__button welcome-auth__button--primary">{loading ? '...' : t('register_btn')}</button>
+            <button type="submit" disabled={loading || !acceptedTerms} className="welcome-auth__button welcome-auth__button--primary">
+              {loading
+                ? '...'
+                : isGia
+                  ? (lang === 'ru' ? 'Создать аккаунт Gia' : 'Create my Gia account')
+                  : t('register_btn')}
+            </button>
             <div className="welcome-auth__separator">{lang==='ru'?'или':'or'}</div>
             <button type="button" onClick={handleGuestLogin} disabled={loading}
               className="welcome-auth__button welcome-auth__button--secondary">
               {lang==='ru'?'Продолжить как гость':'Continue as guest'}
             </button>
             <p className="welcome-auth__guest-note">
-              {lang==='ru'
-                ? 'Гостевой сеанс приватный: разговоры не сохраняются. Создай аккаунт, чтобы сохранить прогресс и историю.'
-                : 'A guest session is private: chats aren’t saved. Create an account to keep your progress and history.'}
+              {isGia
+                ? (lang === 'ru'
+                    ? 'Гостевой сеанс приватный: разговоры не сохраняются. Создай аккаунт, чтобы сохранить историю.'
+                    : 'A guest session is private: chats aren’t saved. Create an account to keep your history.')
+                : (lang === 'ru'
+                    ? 'Гостевой сеанс приватный: разговоры не сохраняются. Создай аккаунт, чтобы сохранить прогресс и историю.'
+                    : 'A guest session is private: chats aren’t saved. Create an account to keep your progress and history.')}
             </p>
           </form>
           <p className="welcome-auth__footer">

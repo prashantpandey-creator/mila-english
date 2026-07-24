@@ -5,11 +5,15 @@ import { isGiaHostname } from '@/lib/productHosts';
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
   if (isGiaHostname(requestHeaders.get('host'))) {
+    const title = 'Join Gia';
+    const description = 'Create a Gia account to keep conversations and personal context across devices.';
     return {
       metadataBase: new URL('https://gia.purangpt.com'),
-      title: 'Join Gia',
-      description: 'Create an account to save your multilingual conversations, languages, and learning path.',
+      title,
+      description,
       robots: { index: false, follow: false },
+      openGraph: { title, description, type: 'website', url: '/register', images: [] },
+      twitter: { card: 'summary', title, description, images: [] },
     };
   }
 

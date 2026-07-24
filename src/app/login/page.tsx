@@ -6,7 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
-import { isGiaHostname } from '@/lib/productHosts';
+import { useProduct } from '@/lib/product-context';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -22,20 +22,19 @@ const welcomeTheme = {
 
 export default function LoginPage() {
   const { t, lang } = useI18n();
+  const product = useProduct();
+  const isGia = product === 'gia';
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [returnTo, setReturnTo] = useState('/dashboard');
-  const [isGia, setIsGia] = useState(false);
+  const [returnTo, setReturnTo] = useState(isGia ? '/chat' : '/dashboard');
 
   useEffect(() => {
-    const nextIsGia = isGiaHostname(window.location.hostname);
     const requestedReturnTo = new URLSearchParams(window.location.search).get('returnTo');
-    setReturnTo(safeReturnTo(requestedReturnTo, nextIsGia ? '/chat' : '/dashboard'));
-    setIsGia(nextIsGia);
-  }, []);
+    setReturnTo(safeReturnTo(requestedReturnTo, isGia ? '/chat' : '/dashboard'));
+  }, [isGia]);
 
   const messageFor = (code?: string, fallback?: string) => {
     if (code === 'INVALID_CREDENTIALS') return lang === 'ru' ? 'Неверный email или пароль.' : 'That email or password is not correct.';
@@ -95,7 +94,7 @@ export default function LoginPage() {
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
-                ? (lang === 'ru' ? 'Войди с аккаунтом Mila или продолжи как гость.' : 'Use your Mila account, or continue as a guest.')
+                ? (lang === 'ru' ? 'Войди в Gia или продолжи как гость.' : 'Sign in to Gia, or continue as a guest.')
                 : t('login_subtitle')}
             </p>
           </div>
@@ -117,9 +116,13 @@ export default function LoginPage() {
               {lang==='ru'?'Продолжить как гость':'Continue as guest'}
             </button>
             <p className="welcome-auth__guest-note">
-              {lang==='ru'
-                ? 'Гостевой сеанс приватный: разговоры не сохраняются. Зарегистрируйся, чтобы сохранить прогресс и историю.'
-                : 'A guest session is private: chats aren’t saved. Sign up to keep your progress and history.'}
+              {isGia
+                ? (lang === 'ru'
+                    ? 'Гостевой сеанс приватный: разговоры не сохраняются. Зарегистрируйся, чтобы сохранить историю.'
+                    : 'A guest session is private: chats aren’t saved. Sign up to keep your history.')
+                : (lang === 'ru'
+                    ? 'Гостевой сеанс приватный: разговоры не сохраняются. Зарегистрируйся, чтобы сохранить прогресс и историю.'
+                    : 'A guest session is private: chats aren’t saved. Sign up to keep your progress and history.')}
             </p>
           </form>
           <p className="welcome-auth__footer">

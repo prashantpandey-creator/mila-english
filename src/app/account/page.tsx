@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import { useI18n } from '@/lib/i18n-provider';
+import { useProduct } from '@/lib/product-context';
 import './account.css';
 
 type Account = {
@@ -29,6 +30,8 @@ type Purchase = {
 
 export default function AccountPage() {
   const { lang } = useI18n();
+  const product = useProduct();
+  const isGia = product === 'gia';
   const router = useRouter();
   const [account, setAccount] = useState<Account | null>(null);
   const [purchase, setPurchase] = useState<Purchase | null>(null);
@@ -43,7 +46,9 @@ export default function AccountPage() {
   useEffect(() => {
     Promise.all([
       fetch('/api/users/me', { cache: 'no-store' }).then((response) => response.ok ? response.json() : Promise.reject()),
-      fetch('/api/billing/status', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null),
+      isGia
+        ? Promise.resolve(null)
+        : fetch('/api/billing/status', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null),
     ])
       .then(([profile, billing]) => {
         setAccount(profile);
@@ -51,7 +56,7 @@ export default function AccountPage() {
       })
       .catch(() => router.replace('/login?returnTo=/account'))
       .finally(() => setLoading(false));
-  }, [router]);
+  }, [isGia, router]);
 
   const signOut = async () => {
     setBusy(true); setError('');
@@ -71,10 +76,15 @@ export default function AccountPage() {
     setBusy(true); setError('');
     try {
       const response = await fetch('/api/users/me', {
-        method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ confirmation }),
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          confirmation,
+          scope: isGia ? 'gia' : 'account',
+        }),
       });
       if (!response.ok) throw new Error('deletion failed');
-      router.push('/');
+      router.push(isGia ? '/chat' : '/');
       router.refresh();
     } catch {
       setError(T('Не удалось удалить данные. Напиши в поддержку.', 'Could not delete the account. Contact support.'));
@@ -103,21 +113,27 @@ export default function AccountPage() {
 
   return (
     <AppShell className="account-page">
-      <AppHeader backHref="/dashboard" title={T('Аккаунт', 'Account')} actions={<LangToggle />} />
+      <AppHeader brand={isGia ? 'Gia' : 'Mila'} backHref={isGia ? '/chat' : '/dashboard'} title={T('Аккаунт', 'Account')} actions={<LangToggle />} />
       <AppMain width="work" className="account-page__main">
         <div className="account-stack">
           <section className="account-hero">
-            <p className="account-hero__kicker">{T('ТВОЯ MILA', 'YOUR MILA')}</p>
-            <h1>{account.isGuest ? T('Сохрани свой прогресс', 'Keep your progress') : account.name}</h1>
+            <p className="account-hero__kicker">{isGia ? 'YOUR GIA' : T('ТВОЯ MILA', 'YOUR MILA')}</p>
+            <h1>{account.isGuest
+              ? (isGia ? T('Сохрани свои разговоры', 'Keep your conversations') : T('Сохрани свой прогресс', 'Keep your progress'))
+              : account.name}</h1>
             <p>{account.isGuest
-              ? T('Сейчас это приватный гостевой профиль. Создай аккаунт — уроки, уровень и история останутся на месте и будут доступны на других устройствах.', 'This is a private guest profile. Create an account and your lessons, level, and history stay exactly where they are—then follow you to other devices.')
-              : T('Здесь живут твой доступ, данные и управление аккаунтом.', 'Your access, data, and account controls live here.')}</p>
+              ? (isGia
+                  ? T('Сейчас это приватный гостевой профиль. Создай аккаунт, чтобы история Gia была доступна на других устройствах.', 'This is a private guest profile. Create an account to keep Gia history across devices.')
+                  : T('Сейчас это приватный гостевой профиль. Создай аккаунт — уроки, уровень и история останутся на месте и будут доступны на других устройствах.', 'This is a private guest profile. Create an account and your lessons, level, and history stay exactly where they are—then follow you to other devices.'))
+              : (isGia
+                  ? T('Здесь находятся данные Gia, выход и управление историей разговоров.', 'Your Gia data, sign-out, and conversation controls live here.')
+                  : T('Здесь живут твой доступ, данные и управление аккаунтом.', 'Your access, data, and account controls live here.'))}</p>
             {account.isGuest ? (
               <div className="account-actions"><a className="account-button account-button--primary" href="/register?returnTo=/account">{T('Создать аккаунт', 'Create my account')}</a></div>
             ) : null}
           </section>
 
-          <section className="account-panel">
+          {!isGia ? <section className="account-panel">
             <div className="account-panel__row">
               <div>
                 <p className="account-panel__kicker">{T('ДОСТУП', 'ACCESS')}</p>
@@ -139,20 +155,22 @@ export default function AccountPage() {
               <a className="account-button account-button--primary" href="/pricing">{pro ? T('Посмотреть тариф', 'View plan') : T('Открыть Pro', 'See Mila Pro')}</a>
               <a className="account-button" href="/refunds">{T('Оплата и возвраты', 'Payments and refunds')}</a>
             </div>
-          </section>
+          </section> : null}
 
           <section className="account-panel">
             <p className="account-panel__kicker">{T('ПРОФИЛЬ', 'PROFILE')}</p>
             <h2>{T('Данные аккаунта', 'Account details')}</h2>
             <div className="account-details">
               <div className="account-detail"><span>Email</span><strong>{account.isGuest ? T('Гостевой профиль', 'Guest profile') : account.email}</strong></div>
-              <div className="account-detail"><span>{T('Уровень', 'Level')}</span><strong>{account.level && account.level !== 'pending' ? account.level.toUpperCase() : T('Ещё не определён', 'Not placed yet')}</strong></div>
-              <div className="account-detail"><span>{T('Родной язык', 'Learning language')}</span><strong>{account.nativeLanguage}</strong></div>
+              {!isGia ? <div className="account-detail"><span>{T('Уровень', 'Level')}</span><strong>{account.level && account.level !== 'pending' ? account.level.toUpperCase() : T('Ещё не определён', 'Not placed yet')}</strong></div> : null}
+              {!isGia ? <div className="account-detail"><span>{T('Родной язык', 'Learning language')}</span><strong>{account.nativeLanguage}</strong></div> : null}
               <div className="account-detail"><span>{T('Статус', 'Status')}</span><strong>{account.isGuest ? T('Приватный гость', 'Private guest') : T('Сохранённый аккаунт', 'Saved account')}</strong></div>
               {!account.isGuest ? <div className="account-detail"><span>{T('Статус email', 'Email status')}</span><strong>{account.emailVerified ? T('Подтверждён', 'Verified') : T('Нужно подтвердить', 'Verification needed')}</strong></div> : null}
             </div>
             {!account.isGuest && !account.emailVerified ? <div className="account-delete">
-              <p>{T('Подтверди email до покупки Pro — так доступ и чек нельзя потерять из-за опечатки.', 'Verify your email before buying Pro so access and receipts cannot be lost to a typo.')}</p>
+              <p>{isGia
+                ? T('Подтверди email, чтобы не потерять доступ к сохранённым разговорам.', 'Verify your email so saved conversations stay recoverable.')
+                : T('Подтверди email до покупки Pro — так доступ и чек нельзя потерять из-за опечатки.', 'Verify your email before buying Pro so access and receipts cannot be lost to a typo.')}</p>
               <button className="account-button account-button--primary" type="button" onClick={sendVerification} disabled={busy}>{T('Отправить письмо', 'Send verification email')}</button>
               {verificationMessage ? <p className="account-feedback" role="status">{verificationMessage}</p> : null}
             </div> : null}
@@ -163,10 +181,16 @@ export default function AccountPage() {
 
             <div className="account-delete">
               {!confirmingDelete ? (
-                <button className="account-button account-button--danger" type="button" onClick={() => setConfirmingDelete(true)}>{account.isGuest ? T('Удалить гостевые данные', 'Delete guest data') : T('Удалить аккаунт и данные', 'Delete account and data')}</button>
+                <button className="account-button account-button--danger" type="button" onClick={() => setConfirmingDelete(true)}>
+                  {isGia
+                    ? T('Удалить данные разговоров Gia', 'Delete Gia conversation data')
+                    : account.isGuest ? T('Удалить гостевые данные', 'Delete guest data') : T('Удалить аккаунт и данные', 'Delete account and data')}
+                </button>
               ) : (
                 <>
-                  <p>{T('Это навсегда удалит обучение, прогресс и историю. Введи DELETE для подтверждения. Финансовая запись об оплате может храниться отдельно, если этого требует закон.', 'This permanently deletes learning data, progress, and history. Type DELETE to confirm. A payment record may be retained separately where legally required.')}</p>
+                  <p>{isGia
+                    ? T('Это навсегда удалит историю разговоров и факты, сохранённые в Gia. Данные Mila не затрагиваются. Введи DELETE для подтверждения.', 'This permanently deletes Gia conversation history and remembered facts. Mila learning data is not touched. Type DELETE to confirm.')
+                    : T('Это навсегда удалит обучение, прогресс и историю. Введи DELETE для подтверждения. Финансовая запись об оплате может храниться отдельно, если этого требует закон.', 'This permanently deletes learning data, progress, and history. Type DELETE to confirm. A payment record may be retained separately where legally required.')}</p>
                   <input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder="DELETE" aria-label="Type DELETE to confirm" />
                   <div className="account-actions">
                     <button className="account-button account-button--danger" type="button" onClick={deleteAccount} disabled={busy || confirmation !== 'DELETE'}>{T('Удалить навсегда', 'Delete permanently')}</button>

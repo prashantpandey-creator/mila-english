@@ -48,8 +48,9 @@ assert.match(companion.instructions, /never become explicit, graphic, crude, or 
 assert.doesNotMatch(companion.instructions, /clearly a bit into them/i);
 assert.match(gia.instructions, /You are Gia/);
 assert.match(gia.instructions, /inside the Gia companion app/);
-assert.match(gia.instructions, /Travel and culture are central to Gia/);
-assert.match(gia.instructions, /Avoid stereotypes/);
+assert.match(gia.instructions, /This is conversation, not class and not a lesson/);
+assert.match(gia.instructions, /without turning the moment into a curriculum/);
+assert.doesNotMatch(gia.instructions, /Travel and culture are central/);
 
 assert.deepStrictEqual(assessmentResultSchema.parse({
   level: 'B1',

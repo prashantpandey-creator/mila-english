@@ -1,0 +1,359 @@
+/* Gia is a synthetic companion room, not a recolored Mila classroom.
+   The dark signal grid connects text, voice, auth, recovery, and account
+   surfaces without changing the shared accessible component structure. */
+
+.product-surface--gia.mila-surface--app {
+  --mila-paper: #05080d;
+  --mila-panel: #0b1119;
+  --mila-raised: #111b26;
+  --mila-band: #162431;
+  --mila-linen: #090e15;
+  --mila-line: rgba(141, 202, 214, .16);
+  --mila-line-strong: rgba(141, 202, 214, .34);
+  --mila-line-brand: rgba(255, 67, 151, .52);
+  --mila-ink: #f1f6f8;
+  --mila-muted: #9aaab5;
+  --mila-subtle: #718491;
+  --mila-mineral: #e8f2f5;
+  --mila-mineral-mid: #a8bcc6;
+  --mila-mineral-soft: #162431;
+  --mila-eucalyptus: #72dfd2;
+  --mila-eucalyptus-mid: #55bdb7;
+  --mila-eucalyptus-soft: rgba(114, 223, 210, .1);
+  --mila-accent: #ff4f9e;
+  --mila-blush: #ff79b7;
+  --mila-action: #ff2f86;
+  --mila-action-deep: #b81259;
+  --mila-action-ink: #ffffff;
+  --mila-action-soft: rgba(255, 47, 134, .12);
+  --mila-signal: #ff3f91;
+  --mila-gradient-signal: linear-gradient(135deg, #ff3f91 0%, #b81259 100%);
+  --mila-gradient-calm: linear-gradient(145deg, #111b26 0%, #080d14 100%);
+  --mila-radius: 8px;
+  --mila-radius-sm: 5px;
+  --mila-shadow: 0 22px 70px rgba(0, 0, 0, .42);
+  color: var(--mila-ink) !important;
+  background:
+    radial-gradient(circle at 76% 12%, rgba(255, 47, 134, .12), transparent 31rem),
+    radial-gradient(circle at 12% 82%, rgba(114, 223, 210, .09), transparent 32rem),
+    linear-gradient(rgba(141, 202, 214, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(141, 202, 214, .035) 1px, transparent 1px),
+    #05080d !important;
+  background-size: auto, auto, 34px 34px, 34px 34px, auto !important;
+}
+
+.product-surface--gia .app-header {
+  border-color: var(--mila-line) !important;
+  background: rgba(5, 8, 13, .9) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.2) !important;
+  backdrop-filter: blur(18px) saturate(1.2) !important;
+}
+
+.product-surface--gia .app-header__brand,
+.product-surface--gia .app-header__heading h1,
+.product-surface--gia .app-header__button {
+  color: var(--mila-ink) !important;
+}
+
+.product-surface--gia .app-header__mark {
+  border-color: rgba(114, 223, 210, .5) !important;
+  border-radius: 3px !important;
+  color: #72dfd2 !important;
+  background: #081018 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 47, 134, .2), 0 0 26px rgba(114, 223, 210, .08) !important;
+}
+
+.product-surface--gia .app-header__eyebrow {
+  color: #72dfd2 !important;
+}
+
+.product-surface--gia :is(.lang-toggle, .app-header__button, .chat-page__tone-toggle) {
+  border-color: var(--mila-line-strong) !important;
+  color: var(--mila-muted) !important;
+  background: rgba(11, 17, 25, .78) !important;
+}
+
+.product-surface--gia .lang-toggle button {
+  color: var(--mila-muted) !important;
+}
+
+.product-surface--gia .lang-toggle button.active {
+  color: #fff !important;
+  background: var(--mila-gradient-signal) !important;
+}
+
+.product-surface--gia .chat-page {
+  color: var(--mila-ink);
+  background:
+    radial-gradient(circle at 50% 26%, rgba(255, 47, 134, .075), transparent 25rem),
+    linear-gradient(180deg, rgba(5, 8, 13, .5), rgba(5, 8, 13, .94)) !important;
+}
+
+.product-surface--gia .chat-page__empty-presence {
+  border-color: rgba(114, 223, 210, .36) !important;
+  border-radius: 28px 28px 28px 4px !important;
+  background: linear-gradient(145deg, #111b26, #070b11) !important;
+  box-shadow: 18px 18px 0 rgba(0, 0, 0, .24), 0 0 50px rgba(255, 47, 134, .08) !important;
+}
+
+.product-surface--gia .mila-voice-mark {
+  color: #72dfd2 !important;
+  border-color: rgba(114, 223, 210, .22) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 47, 134, .12), transparent 50%),
+    #081018 !important;
+}
+
+.product-surface--gia .mila-voice-mark::before {
+  border-color: rgba(255, 47, 134, .45) !important;
+}
+
+.product-surface--gia .mila-voice-mark__dot,
+.product-surface--gia .chat-page__status-dot {
+  background: #ff3f91 !important;
+}
+
+.product-surface--gia .chat-page__empty-kicker {
+  color: #72dfd2 !important;
+}
+
+.product-surface--gia .chat-page__empty-title {
+  color: #f5f8fa !important;
+  font-family: var(--font-sans), Manrope, sans-serif !important;
+  font-weight: 520 !important;
+  letter-spacing: -.055em !important;
+}
+
+.product-surface--gia .chat-page__empty-copy,
+.product-surface--gia .chat-page__hint,
+.product-surface--gia .chat-page__status {
+  color: var(--mila-muted) !important;
+}
+
+.product-surface--gia .chat-page__starters button {
+  border-color: var(--mila-line) !important;
+  border-radius: 5px 14px 14px 14px !important;
+  color: var(--mila-ink) !important;
+  background: linear-gradient(145deg, rgba(17, 27, 38, .94), rgba(8, 13, 20, .96)) !important;
+}
+
+.product-surface--gia .chat-page__starters button:hover {
+  border-color: rgba(114, 223, 210, .5) !important;
+  background: #111b26 !important;
+}
+
+.product-surface--gia .chat-page__starters button svg {
+  color: #72dfd2 !important;
+}
+
+.product-surface--gia .chat-page__composer {
+  border-color: var(--mila-line) !important;
+  background: rgba(5, 8, 13, .92) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+.product-surface--gia .chat-page__form input {
+  border-color: var(--mila-line-strong) !important;
+  color: var(--mila-ink) !important;
+  background: #0b1119 !important;
+}
+
+.product-surface--gia .chat-page__form input::placeholder {
+  color: #718491 !important;
+}
+
+.product-surface--gia .chat-page__form button {
+  border-color: var(--mila-line-strong) !important;
+  color: #72dfd2 !important;
+  background: #0b1119 !important;
+}
+
+.product-surface--gia .chat-page__form .chat-page__send-button,
+.product-surface--gia .chat-page__row.is-user .chat-page__bubble {
+  border-color: #ff3f91 !important;
+  color: #fff !important;
+  background: var(--mila-gradient-signal) !important;
+}
+
+.product-surface--gia .chat-page__row.is-assistant .chat-page__bubble {
+  border-color: var(--mila-line) !important;
+  color: var(--mila-ink) !important;
+  background: #0b1119 !important;
+}
+
+.product-surface--gia .chat-page__mila-avatar {
+  border-color: rgba(114, 223, 210, .28) !important;
+  background: #081018 !important;
+}
+
+.product-surface--gia .chat-tone-dialog__backdrop {
+  background: rgba(1, 3, 6, .82) !important;
+}
+
+.product-surface--gia .chat-tone-dialog__card {
+  border-color: var(--mila-line-strong) !important;
+  color: var(--mila-ink) !important;
+  background: linear-gradient(145deg, #111b26, #070b11) !important;
+}
+
+/* Authentication and recovery retain their semantics but enter Gia's room. */
+.product-surface--gia .welcome-auth {
+  --auth-ink: #f1f6f8 !important;
+  --auth-muted: #9aaab5 !important;
+  --auth-pink: #ff3f91 !important;
+  --auth-pink-deep: #72dfd2 !important;
+  --auth-pink-soft: rgba(255, 63, 145, .12) !important;
+  --auth-cream: #05080d !important;
+  --auth-line: rgba(141, 202, 214, .18) !important;
+  --auth-shadow: rgba(0, 0, 0, .42) !important;
+  color: var(--mila-ink) !important;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(114, 223, 210, .08), transparent 28rem),
+    radial-gradient(circle at 88% 78%, rgba(255, 47, 134, .13), transparent 32rem),
+    #05080d !important;
+}
+
+.product-surface--gia .welcome-auth__nav {
+  border-color: var(--mila-line) !important;
+  background: rgba(5, 8, 13, .88) !important;
+}
+
+.product-surface--gia .welcome-auth__brand-mark {
+  border-color: rgba(114, 223, 210, .48) !important;
+  border-radius: 3px !important;
+  color: #72dfd2 !important;
+  background: #081018 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 47, 134, .2) !important;
+}
+
+.product-surface--gia .welcome-auth__brand-name,
+.product-surface--gia .welcome-auth__title,
+.product-surface--gia .welcome-auth__label {
+  color: var(--mila-ink) !important;
+}
+
+.product-surface--gia .welcome-auth__card {
+  border-color: var(--mila-line) !important;
+  border-radius: 6px 24px 24px 24px !important;
+  background: rgba(11, 17, 25, .94) !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .45) !important;
+}
+
+.product-surface--gia .welcome-auth__bloom {
+  border-color: rgba(114, 223, 210, .22) !important;
+  background: #081018 !important;
+}
+
+.product-surface--gia .welcome-auth__input {
+  border-color: var(--mila-line-strong) !important;
+  color: var(--mila-ink) !important;
+  background: #080d14 !important;
+  box-shadow: none !important;
+}
+
+.product-surface--gia .welcome-auth__button--secondary {
+  border-color: var(--mila-line-strong) !important;
+  color: var(--mila-ink) !important;
+  background: transparent !important;
+}
+
+.product-surface--gia .auth-recovery {
+  color: var(--mila-ink) !important;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(255, 47, 134, .12), transparent 28rem),
+    #05080d !important;
+}
+
+.product-surface--gia .auth-recovery__card {
+  border-color: var(--mila-line) !important;
+  border-radius: 6px 24px 24px 24px !important;
+  background: #0b1119 !important;
+  box-shadow: var(--mila-shadow) !important;
+}
+
+.product-surface--gia .auth-recovery__card p {
+  color: var(--mila-muted) !important;
+}
+
+.product-surface--gia .auth-recovery__card input {
+  border-color: var(--mila-line-strong) !important;
+  color: var(--mila-ink) !important;
+  background: #080d14 !important;
+}
+
+.product-surface--gia .auth-recovery__back {
+  color: #72dfd2 !important;
+}
+
+/* Gia account and shared policy pages use the same restrained console. */
+.product-surface--gia .account-page {
+  color: var(--mila-ink) !important;
+  background: transparent !important;
+}
+
+.product-surface--gia :is(.account-hero, .account-panel) {
+  border-color: var(--mila-line) !important;
+  border-radius: 6px 20px 20px 20px !important;
+  color: var(--mila-ink) !important;
+  background: rgba(11, 17, 25, .94) !important;
+  box-shadow: var(--mila-shadow) !important;
+}
+
+.product-surface--gia :is(.account-hero p, .account-panel p, .account-detail span) {
+  color: var(--mila-muted) !important;
+}
+
+.product-surface--gia :is(.account-hero__kicker, .account-panel__kicker) {
+  color: #72dfd2 !important;
+}
+
+.product-surface--gia .account-detail {
+  border-color: var(--mila-line) !important;
+  color: var(--mila-ink) !important;
+  background: #080d14 !important;
+}
+
+.product-surface--gia .account-button {
+  border-color: var(--mila-line-strong) !important;
+  border-radius: 5px !important;
+  color: #72dfd2 !important;
+  background: #080d14 !important;
+  box-shadow: none !important;
+}
+
+.product-surface--gia .account-button--primary {
+  border-color: #ff3f91 !important;
+  color: #fff !important;
+  background: var(--mila-gradient-signal) !important;
+}
+
+.product-surface--gia .account-button--danger {
+  border-color: rgba(255, 83, 112, .42) !important;
+  color: #ff8ca2 !important;
+}
+
+.product-surface--gia .account-delete {
+  border-color: var(--mila-line) !important;
+}
+
+.product-surface--gia .legal-page__article,
+.product-surface--gia .legal-page__article h1,
+.product-surface--gia .legal-page__article h2 {
+  color: var(--mila-ink) !important;
+}
+
+.product-surface--gia .legal-page__note {
+  border-color: var(--mila-line) !important;
+  background: #0b1119 !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-surface--gia .chat-page__empty-presence {
+    animation: gia-signal-breathe 5.2s ease-in-out infinite;
+  }
+}
+
+@keyframes gia-signal-breathe {
+  50% { box-shadow: 18px 18px 0 rgba(0, 0, 0, .24), 0 0 58px rgba(114, 223, 210, .13); }
+}

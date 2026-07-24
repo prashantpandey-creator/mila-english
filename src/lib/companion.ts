@@ -163,11 +163,19 @@ export function buildCompanionSystemPrompt(input: CompanionPromptInput): string 
   const targetLanguageLine = input.targetLanguage
     ? `Learner-selected language: ${input.targetLanguage}. When the learner asks to learn, translate, practise, or find words, use this as the target language. Ordinary conversation should still follow the language they are currently using. Never force a lesson.`
     : '';
-  const persona = isSpoken
+  const productPersona = isGia
     ? input.persona
+      .replace(
+        /You are Mila as the ([^\n]+)\. You help a Russian speaker learn English\./,
+        'You are Gia as the $1. You are a general companion, not a teacher.',
+      )
+      .replace(/You are an AI language coach/g, 'You are an AI companion')
+    : input.persona;
+  const persona = isSpoken
+    ? productPersona
       .replace(/a little emoji is fine/gi, 'no emoji')
       .replace(/\bMila\b/g, companionName)
-    : input.persona.replace(/\bMila\b/g, companionName);
+    : productPersona.replace(/\bMila\b/g, companionName);
   const privateMemories = input.memories.length
     ? input.memories.map((memory, index) => `${index + 1}. ${memory}`).join('\n')
     : 'No explicit long-term memories saved yet.';
@@ -199,7 +207,7 @@ Current lesson: ${input.learningContext || 'None.'}`;
     ? '\n\nCURRENT TURN OVERRIDE: The learner explicitly asked to stop practising and just talk. Acknowledge that once, then continue as an ordinary conversation partner. Do not correct, drill, ask for repetition, request a translation, or return to a previous exercise. This overrides all earlier teaching context and conversation history.'
     : '';
 
-  return `You are ${companionName}, a warm multilingual AI language guide and general companion.${modeOverride}${languageLine ? `\n\n${languageLine}` : ''}${targetLanguageLine ? `\n\n${targetLanguageLine}` : ''}
+  return `You are ${companionName}, ${isGia ? 'a warm multilingual AI companion for open-ended conversation' : 'a warm multilingual AI language guide'}.${modeOverride}${languageLine ? `\n\n${languageLine}` : ''}${targetLanguageLine ? `\n\n${targetLanguageLine}` : ''}
 
 CORE RULES:
 - Answer the learner's request directly in the requested language.
@@ -234,6 +242,7 @@ export function builtInCompanionReply(
   pathname: string,
   locale: CompanionLocale,
   level?: string | null,
+  isGia = false,
 ): string {
   const prompt = message.toLowerCase();
   const route = pathname.startsWith('/lessons/') ? '/lessons' : pathname;
@@ -245,6 +254,23 @@ export function builtInCompanionReply(
   if (requestsFreeConversation(message)) return locale === 'ru'
     ? 'Конечно — без упражнений и исправлений. Давай просто поговорим. О чём тебе сейчас хочется поговорить?'
     : 'Absolutely—no drills or corrections. We can simply talk. What are you in the mood to talk about?';
+  if (isGia) {
+    if (/(what.*(?:do|page)|explain|how.*work|что.*делать|объясни|как.*работ)/i.test(prompt)) return locale === 'ru'
+      ? 'Это Gia — место для свободного разговора голосом или в тексте. Можно начать с любой мысли и на любом языке.'
+      : 'This is Gia—a place for open conversation by voice or text. Begin with any thought, in any language.';
+    if (/(next|continue|recommend|след|продолж|рекоменд)/i.test(prompt)) return locale === 'ru'
+      ? 'Продолжим с того, что сейчас важно тебе. Расскажи мысль как есть — я подхвачу.'
+      : 'We can continue with whatever matters to you now. Say it as it is, and I’ll follow.';
+    if (/(practice|conversation|speak|практик|разговор|говор)/i.test(prompt)) return locale === 'ru'
+      ? 'Давай поговорим без сценария. Что у тебя сейчас в мыслях?'
+      : 'Let’s talk without a script. What is on your mind right now?';
+    if (/^(hi|hello|hey|привет|здрав)/i.test(prompt.trim())) return locale === 'ru'
+      ? 'Привет! Я здесь. Можем просто поговорить о том, что тебе интересно или важно.'
+      : 'Hi! I’m here. We can simply talk about whatever feels interesting or important to you.';
+    return locale === 'ru'
+      ? 'Моя разговорная модель сейчас недоступна, поэтому я не буду выдумывать ответ. Попробуй ещё раз через минуту.'
+      : 'My conversation model is unavailable right now, so I won’t invent an answer. Try again in a minute.';
+  }
   if (/(what.*(?:do|page)|explain|how.*work|что.*делать|объясни|как.*работ)/i.test(prompt)) return locale === 'ru' ? help.ru : help.en;
   if (/(next|continue|recommend|след|продолж|рекоменд)/i.test(prompt)) {
     if (level === 'pending') return locale === 'ru'

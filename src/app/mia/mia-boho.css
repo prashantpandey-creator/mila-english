@@ -312,7 +312,7 @@
 
 .mia-boho__hero-art img {
   object-fit: cover;
-  object-position: 72% center;
+  object-position: 86% center;
   animation: miaBohoDrift 28s ease-in-out infinite alternate;
 }
 
@@ -394,6 +394,307 @@
   font-weight: 800;
 }
 
+.mia-scene-studio {
+  width: min(1220px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: clamp(90px, 11vw, 150px) 0;
+  scroll-margin-top: 28px;
+  border-top: 1px solid var(--mia-line);
+}
+
+.mia-scene-studio__header {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  align-items: end;
+  gap: clamp(36px, 8vw, 110px);
+}
+
+.mia-scene-studio__header h2 {
+  max-width: 720px;
+  margin-top: 16px;
+  font-size: clamp(3.1rem, 6.3vw, 6.25rem);
+  line-height: .91;
+  letter-spacing: -.05em;
+}
+
+.mia-scene-studio__header > p {
+  max-width: 540px;
+  margin: 0 0 7px;
+  color: rgba(41, 37, 33, .68);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.mia-scene-studio__grid {
+  display: grid;
+  grid-template-columns: minmax(270px, .66fr) minmax(0, 1.34fr);
+  gap: 18px;
+  margin-top: 52px;
+}
+
+.mia-scene-studio__controls {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: clamp(24px, 3vw, 35px);
+  border: 1px solid var(--mia-line);
+  background:
+    linear-gradient(rgba(255, 250, 242, .93), rgba(255, 250, 242, .93)),
+    url('/ambience/stills/woman-reading.jpg') center / cover;
+}
+
+.mia-scene-studio__field {
+  display: grid;
+  gap: 9px;
+}
+
+.mia-scene-studio__field > span,
+.mia-scene-studio__moments legend {
+  color: var(--mia-clay);
+  font: 500 9px/1.4 var(--font-mono), monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.mia-scene-studio__field input,
+.mia-scene-studio__field select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid rgba(41, 37, 33, .22);
+  border-radius: 0;
+  outline: none;
+  color: var(--mia-ink);
+  background: rgba(255, 255, 255, .72);
+  font: 650 14px/1.3 var(--font-sans), sans-serif;
+}
+
+.mia-scene-studio__field input:focus,
+.mia-scene-studio__field select:focus {
+  border-color: var(--mia-pink);
+  box-shadow: 0 0 0 3px rgba(196, 63, 112, .11);
+}
+
+.mia-scene-studio__moments {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mia-scene-studio__moments > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 11px;
+}
+
+.mia-scene-studio__moments button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(41, 37, 33, .19);
+  border-radius: 999px;
+  color: rgba(41, 37, 33, .72);
+  background: rgba(255, 255, 255, .52);
+  font: 700 10px/1 var(--font-sans), sans-serif;
+  cursor: pointer;
+  transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.mia-scene-studio__moments button:hover,
+.mia-scene-studio__moments button.is-active {
+  border-color: var(--mia-petrol);
+  color: #fff;
+  background: var(--mia-petrol);
+}
+
+.mia-scene-studio__actions {
+  display: grid;
+  gap: 9px;
+  margin-top: auto;
+}
+
+.mia-scene-studio__actions button,
+.mia-scene-card__buttons button {
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid var(--mia-petrol);
+  font: 800 11px/1 var(--font-sans), sans-serif;
+  cursor: pointer;
+}
+
+.mia-scene-studio__generate {
+  color: #fff;
+  background: var(--mia-petrol);
+  box-shadow: 0 14px 30px rgba(41, 72, 75, .17);
+}
+
+.mia-scene-studio__surprise {
+  color: var(--mia-petrol);
+  background: transparent;
+}
+
+.mia-scene-studio__actions button:disabled,
+.mia-scene-card__buttons button:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.mia-scene-card {
+  position: relative;
+  min-height: 760px;
+  overflow: hidden;
+  border: 1px solid rgba(41, 37, 33, .2);
+  color: #fffaf2;
+  background: var(--mia-petrol);
+  isolation: isolate;
+  box-shadow: 0 34px 80px rgba(53, 39, 27, .18);
+}
+
+.mia-scene-card__media,
+.mia-scene-card__shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mia-scene-card__media {
+  z-index: -3;
+  object-fit: cover;
+  filter: saturate(.84) contrast(1.03);
+}
+
+.mia-scene-card__shade {
+  z-index: -2;
+  background:
+    linear-gradient(180deg, rgba(13, 20, 20, .2) 0%, rgba(18, 29, 30, .58) 35%, rgba(14, 23, 24, .94) 100%),
+    linear-gradient(90deg, rgba(13, 20, 20, .46), transparent 70%);
+}
+
+.mia-scene-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 23px 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, .17);
+  color: rgba(255, 255, 255, .72);
+  font: 500 9px/1.4 var(--font-mono), monospace;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.mia-scene-card__body {
+  min-height: 690px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(28px, 5vw, 56px);
+}
+
+.mia-scene-card__body > p {
+  max-width: 680px;
+  margin: 0 0 13px;
+  color: rgba(255, 255, 255, .68);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.mia-scene-card h3 {
+  max-width: 730px;
+  font-size: clamp(2.45rem, 5vw, 5rem);
+  line-height: .94;
+  letter-spacing: -.04em;
+}
+
+.mia-scene-card__exchange {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin-top: 34px;
+  background: rgba(255, 255, 255, .18);
+}
+
+.mia-scene-card__exchange section {
+  min-width: 0;
+  padding: 21px;
+  background: rgba(19, 31, 32, .76);
+  backdrop-filter: blur(10px);
+}
+
+.mia-scene-card__exchange span,
+.mia-scene-card__notes span {
+  display: block;
+  margin-bottom: 10px;
+  color: #f0a7c1;
+  font: 500 8px/1.3 var(--font-mono), monospace;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.mia-scene-card__exchange strong {
+  display: block;
+  font: 400 clamp(1.25rem, 2.3vw, 1.85rem)/1.23 var(--font-display), serif;
+}
+
+.mia-scene-card__exchange small {
+  display: block;
+  margin-top: 7px;
+  color: rgba(255, 255, 255, .55);
+  font: 400 10px/1.5 var(--font-mono), monospace;
+}
+
+.mia-scene-card__exchange p {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, .74);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.mia-scene-card__notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 22px;
+}
+
+.mia-scene-card__notes p {
+  margin: 0;
+  color: rgba(255, 255, 255, .74);
+  font-size: 11px;
+  line-height: 1.62;
+}
+
+.mia-scene-card__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 25px;
+}
+
+.mia-scene-card__buttons button {
+  min-height: 42px;
+  padding: 0 14px;
+  border-color: rgba(255, 255, 255, .28);
+  color: #fff;
+  background: rgba(255, 255, 255, .08);
+}
+
+.mia-scene-card__buttons button:hover {
+  background: rgba(255, 255, 255, .16);
+}
+
+.mia-scene-studio__notice {
+  margin: 14px 0 0;
+  color: rgba(41, 37, 33, .64);
+  font-size: 11px;
+}
+
 .mia-boho__moments,
 .mia-boho__product,
 .mia-boho__culture,
@@ -433,7 +734,8 @@
   border-bottom: 1px solid var(--mia-line);
 }
 
-.mia-boho__scenario-rail article {
+.mia-boho__scenario-rail article,
+.mia-boho__scenario-rail > a {
   min-height: 176px;
   display: grid;
   grid-template-columns: 1fr auto;
@@ -444,29 +746,34 @@
   transition: color .25s ease, background .25s ease, transform .25s ease;
 }
 
-.mia-boho__scenario-rail article:first-child {
+.mia-boho__scenario-rail article:first-child,
+.mia-boho__scenario-rail > a:first-child {
   border-left: 1px solid var(--mia-line);
 }
 
-.mia-boho__scenario-rail article > span {
+.mia-boho__scenario-rail article > span,
+.mia-boho__scenario-rail > a > span {
   color: rgba(41, 37, 33, .35);
   font: 500 9px/1 var(--font-mono), monospace;
 }
 
-.mia-boho__scenario-rail article strong {
+.mia-boho__scenario-rail article strong,
+.mia-boho__scenario-rail > a strong {
   grid-column: 1 / -1;
   max-width: 130px;
   font-size: 13px;
   line-height: 1.45;
 }
 
-.mia-boho__scenario-rail article:hover {
+.mia-boho__scenario-rail article:hover,
+.mia-boho__scenario-rail > a:hover {
   color: #fff;
   background: var(--mia-petrol);
   transform: translateY(-3px);
 }
 
-.mia-boho__scenario-rail article:hover > span {
+.mia-boho__scenario-rail article:hover > span,
+.mia-boho__scenario-rail > a:hover > span {
   color: rgba(255, 255, 255, .5);
 }
 
@@ -958,6 +1265,21 @@
     width: 290px;
   }
 
+  .mia-scene-studio__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mia-scene-studio__controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .mia-scene-studio__moments,
+  .mia-scene-studio__actions {
+    grid-column: 1 / -1;
+  }
+
   .mia-boho__moments > div:first-child {
     grid-template-columns: 1fr;
   }
@@ -968,7 +1290,8 @@
     scroll-snap-type: x mandatory;
   }
 
-  .mia-boho__scenario-rail article {
+  .mia-boho__scenario-rail article,
+  .mia-boho__scenario-rail > a {
     scroll-snap-align: start;
   }
 
@@ -1009,6 +1332,7 @@
 @media (max-width: 700px) {
   .mia-boho__nav,
   .mia-boho__hero,
+  .mia-scene-studio,
   .mia-boho__moments,
   .mia-boho__product,
   .mia-boho__culture,
@@ -1062,6 +1386,59 @@
     width: min(285px, calc(100% - 24px));
   }
 
+  .mia-scene-studio {
+    padding: 84px 0;
+  }
+
+  .mia-scene-studio__header {
+    grid-template-columns: 1fr;
+    gap: 21px;
+  }
+
+  .mia-scene-studio__header h2 {
+    font-size: clamp(3.35rem, 15vw, 5rem);
+  }
+
+  .mia-scene-studio__grid {
+    margin-top: 36px;
+  }
+
+  .mia-scene-studio__controls {
+    display: flex;
+  }
+
+  .mia-scene-card {
+    min-height: 880px;
+  }
+
+  .mia-scene-card__body {
+    min-height: 810px;
+    padding: 24px 19px 28px;
+  }
+
+  .mia-scene-card__topline {
+    align-items: flex-start;
+    padding: 18px 19px;
+  }
+
+  .mia-scene-card__topline span:last-child {
+    text-align: right;
+  }
+
+  .mia-scene-card__exchange,
+  .mia-scene-card__notes {
+    grid-template-columns: 1fr;
+  }
+
+  .mia-scene-card__exchange {
+    gap: 1px;
+    margin-top: 25px;
+  }
+
+  .mia-scene-card__notes {
+    gap: 14px;
+  }
+
   .mia-boho__actions {
     flex-direction: column;
   }
@@ -1090,7 +1467,8 @@
     margin-top: 35px;
   }
 
-  .mia-boho__scenario-rail article {
+  .mia-boho__scenario-rail article,
+  .mia-boho__scenario-rail > a {
     min-height: 154px;
   }
 

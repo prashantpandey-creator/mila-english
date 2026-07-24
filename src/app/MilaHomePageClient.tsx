@@ -16,22 +16,22 @@ export default function HomePage() {
 
   const copy = lang === 'ru'
     ? {
-        eyebrow: 'Язык · уверенность · любопытство',
-        title: 'Найди свой голос —',
-        titleAccent: 'на любом языке.',
-        intro: 'Mila помогает говорить, учиться и становиться увереннее — один честный разговор за другим.',
-        primary: 'Поговорить с Gia',
-        secondary: 'Выбрать язык',
-        free: 'Любой язык',
-        card: 'Gia слушает',
-        promptLabel: 'Скажи по-своему',
-        prompt: '«Расскажи, кем ты становишься.»',
-        feedbackTitle: 'Это звучало как ты.',
-        feedback: 'Сохрани эту фразу. В ней есть твой ритм.',
-        tryIt: 'Начать голосом',
+        eyebrow: 'Уроки · произношение · прогресс',
+        title: 'Учись по плану —',
+        titleAccent: 'расти с каждым уроком.',
+        intro: 'Mila превращает язык в понятный путь: проверка уровня, короткие уроки, реальная практика и прогресс, который видно.',
+        primary: 'Начать учиться',
+        secondary: 'Открыть мой путь',
+        free: 'Понятная структура',
+        card: 'Следующая практика',
+        promptLabel: 'Ситуация дня',
+        prompt: '«Заказать кофе спокойно и естественно.»',
+        feedbackTitle: 'Один ясный следующий шаг.',
+        feedback: 'Сначала фраза, потом произношение, затем короткая практика.',
+        tryIt: 'Проверить мой уровень',
         signIn: 'Войти',
         account: 'Кабинет',
-        methodTitle: 'Язык — только начало.',
+        methodTitle: 'Спокойный путь от первого шага к свободной речи.',
         steps: [
           ['01', 'Говори', 'Используй язык, который уже есть.'],
           ['02', 'Учись', 'Получай помощь именно тогда, когда она нужна.'],
@@ -42,22 +42,22 @@ export default function HomePage() {
         terms: 'Условия',
       }
     : {
-        eyebrow: 'Language · confidence · curiosity',
-        title: 'Find your voice,',
-        titleAccent: 'in any language.',
-        intro: 'Mila helps you speak, learn, and grow into a more confident version of yourself—one honest conversation at a time.',
-        primary: 'Talk with Gia',
-        secondary: 'Choose a language',
-        free: 'Any language',
-        card: 'Gia is listening',
-        promptLabel: 'Say it your way',
-        prompt: '“Tell me who you’re becoming.”',
-        feedbackTitle: 'That sounded like you.',
-        feedback: 'Keep that sentence. It has your rhythm.',
-        tryIt: 'Start with my voice',
+        eyebrow: 'Lessons · pronunciation · progress',
+        title: 'Learn with a plan,',
+        titleAccent: 'grow with every lesson.',
+        intro: 'Mila turns language learning into a clear path: find your level, practise real situations, and see what is improving.',
+        primary: 'Start learning',
+        secondary: 'Open my learning path',
+        free: 'Clear structure',
+        card: 'Your next practice',
+        promptLabel: 'Today’s situation',
+        prompt: '“Order a coffee calmly and naturally.”',
+        feedbackTitle: 'One useful next step.',
+        feedback: 'Learn the phrase, tune the pronunciation, then use it in a short practice.',
+        tryIt: 'Check my level',
         signIn: 'Sign in',
         account: 'My account',
-        methodTitle: 'Language is only the beginning.',
+        methodTitle: 'A calm path from the first step to confident speech.',
         steps: [
           ['01', 'Speak', 'Use the language you have.'],
           ['02', 'Learn', 'Get help exactly when you need it.'],
@@ -87,12 +87,13 @@ export default function HomePage() {
   const authHref = (route: '/login' | '/register', returnTo: string) =>
     `${route}?returnTo=${encodeURIComponent(returnTo)}`;
 
-  // Conversation belongs to Gia. Cross the hostname directly so Gia can seat
-  // the user in its own explicit sign-in-or-guest flow without a duplicate
-  // Mila-host authentication step.
-  const startSpeaking = () =>
-    window.location.assign('https://gia.purangpt.com/');
-  const chatHref = 'https://gia.purangpt.com/chat';
+  const startLearning = () =>
+    window.location.assign(isLoggedIn ? '/dashboard' : '/start');
+  const learningPathHref = isLoggedIn
+    ? '/lessons'
+    : authHref('/login', '/dashboard');
+  const startAssessment = () =>
+    window.location.assign(isLoggedIn ? '/assessment' : authHref('/login', '/assessment'));
   const accountHref = isLoggedIn
     ? '/account'
     : authHref('/login', '/account');
@@ -129,11 +130,11 @@ export default function HomePage() {
             <p className="lp-minimal__intro">{copy.intro}</p>
 
             <div className="lp-minimal__actions">
-              <button className="lp-minimal__primary" type="button" onClick={startSpeaking}>
+              <button className="lp-minimal__primary" type="button" onClick={startLearning}>
                 {copy.primary}
                 <MilaIcon name="arrow" size={20} />
               </button>
-              <Link className="lp-minimal__secondary" href={chatHref}>
+              <Link className="lp-minimal__secondary" href={learningPathHref}>
                 {copy.secondary}
               </Link>
             </div>
@@ -166,15 +167,15 @@ export default function HomePage() {
             </div>
 
             <div className="lp-voice-card__note">
-              <span aria-hidden="true">G</span>
+              <span aria-hidden="true">M</span>
               <p>
                 <strong>{copy.feedbackTitle}</strong>
                 {copy.feedback}
               </p>
             </div>
 
-            <button className="lp-voice-card__button" type="button" onClick={startSpeaking}>
-              <MilaIcon name="voice" size={20} />
+            <button className="lp-voice-card__button" type="button" onClick={startAssessment}>
+              <MilaIcon name="level" size={20} />
               {copy.tryIt}
             </button>
           </aside>

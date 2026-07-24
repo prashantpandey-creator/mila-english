@@ -5,6 +5,7 @@ import { registerSchema } from '@/lib/authSchemas';
 import { consumeAuthAttempt, requestIdentity } from '@/lib/authRateLimit';
 import { publicUser } from '@/lib/publicUser';
 import { issueEmailVerification } from '@/lib/emailVerification';
+import { GIA_ORIGIN, isGiaHostname } from '@/lib/productHosts';
 
 export async function POST(request: NextRequest) {
   const parsed = registerSchema.safeParse(await request.json().catch(() => null));
@@ -75,18 +76,21 @@ export async function POST(request: NextRequest) {
   }
 
   await createSession(user);
+  const isGia = isGiaHostname(request.headers.get('host'));
+  const brand = isGia ? 'Gia' : 'Mila';
   let verificationEmailSent = false;
   let verificationUrl: string | undefined;
   try {
     const issued = await issueEmailVerification({
       userId: user.id,
       email: user.email,
-      baseUrl: (process.env.APP_URL?.trim() || request.nextUrl.origin),
+      baseUrl: isGia ? GIA_ORIGIN : (process.env.APP_URL?.trim() || request.nextUrl.origin),
+      brand,
     });
     verificationEmailSent = issued.sent;
     if (process.env.NODE_ENV !== 'production') verificationUrl = issued.verificationUrl;
   } catch (error) {
-    console.error('Could not send Mila verification email', error);
+    console.error(`Could not send ${brand} verification email`, error);
   }
   return NextResponse.json({ ...publicUser(user), verificationEmailSent, ...(verificationUrl ? { verificationUrl } : {}) }, { status: current?.accountType === 'guest' ? 200 : 201 });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/auth';
 import { clearCompanionConversation, listCompanionMessages, type CompanionHistoryScope } from '@/lib/companionStore';
+import { isGiaHostname, isMiaHostname } from '@/lib/productHosts';
 
 function authenticatedUserId(user: { sub: string } | null): number | null {
   if (!user) return null;
@@ -9,6 +10,10 @@ function authenticatedUserId(user: { sub: string } | null): number | null {
 }
 
 export async function GET(request: NextRequest) {
+  if (isMiaHostname(request.headers.get('host'))) {
+    return NextResponse.json({ error: 'Mia does not use companion history.' }, { status: 403 });
+  }
+  const product = isGiaHostname(request.headers.get('host')) ? 'gia' : 'mila';
   const session = await authenticate(request);
   const userId = authenticatedUserId(session);
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -25,7 +30,7 @@ export async function GET(request: NextRequest) {
   const scope: CompanionHistoryScope = requestedScope === 'conversation' || requestedScope === 'practice'
     ? requestedScope
     : 'all';
-  const messages = await listCompanionMessages(userId, limit, scope);
+  const messages = await listCompanionMessages(userId, limit, scope, undefined, product);
 
   return NextResponse.json({
     messages: messages.map((message) => ({
@@ -38,9 +43,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  if (isMiaHostname(request.headers.get('host'))) {
+    return NextResponse.json({ error: 'Mia does not use companion history.' }, { status: 403 });
+  }
+  const product = isGiaHostname(request.headers.get('host')) ? 'gia' : 'mila';
   const userId = authenticatedUserId(await authenticate(request));
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  await clearCompanionConversation(userId);
+  await clearCompanionConversation(userId, product);
   return NextResponse.json({ ok: true });
 }

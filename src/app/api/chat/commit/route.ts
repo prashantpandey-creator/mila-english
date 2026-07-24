@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/auth';
 import { saveCompanionTurn } from '@/lib/companionStore';
+import { isGiaHostname, isMiaHostname } from '@/lib/productHosts';
 
 // Persists a committed speculative voice draft. Speculative /api/chat calls
 // deliberately skip saveCompanionTurn (they answer partial transcripts); when
 // the final transcript matches the draft, the client commits the turn here.
 export async function POST(request: NextRequest) {
+  if (isMiaHostname(request.headers.get('host'))) {
+    return NextResponse.json({ error: 'Mia does not use companion history.' }, { status: 403 });
+  }
+  const product = isGiaHostname(request.headers.get('host')) ? 'gia' : 'mila';
   const user = await authenticate(request);
   const userId = Number(user?.sub);
   if (!user || !Number.isSafeInteger(userId) || userId <= 0) {
@@ -24,6 +29,7 @@ export async function POST(request: NextRequest) {
     pathname: '/darshan',
     locale,
     surface: 'Darshan voice conversation',
+    product,
   });
   return NextResponse.json({ ok: true });
 }

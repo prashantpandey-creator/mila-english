@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import {
   applyLocalModelRequestOptions,
   buildCompanionSystemPrompt,
+  builtInCompanionReply,
   getLocalLlmConfig,
   isSensitiveMemory,
   ollamaHasModel,
@@ -266,5 +267,9 @@ const explicitEnglish = buildCompanionSystemPrompt({
   languageMode: 'english-first',
 });
 assert.strictEqual(explicitEnglish, prompt);
+
+const giaFallback = builtInCompanionReply('Recommend my next move', '/chat', 'en', 'B1', true);
+assert.match(giaFallback, /whatever matters to you/i);
+assert.doesNotMatch(giaFallback, /lesson|assessment|English practice/i);
 
 console.log('companion core: all assertions pass');

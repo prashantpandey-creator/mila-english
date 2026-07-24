@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { isGuestIdentity } from '@/lib/auth';
 
-const PRIMARY_THREAD_KEY = 'primary';
+const MILA_THREAD_KEY = 'primary';
+const GIA_THREAD_KEY = 'gia';
 const MAX_STORED_MESSAGES = 80;
 const MAX_MEMORIES = 20;
 
@@ -21,18 +22,25 @@ async function isGuestUser(userId: number): Promise<boolean> {
 }
 
 export type CompanionHistoryScope = 'all' | 'conversation' | 'practice';
+export type CompanionProductScope = 'mila' | 'gia';
 
 export type CompanionTurnContext = {
   pathname: string;
   locale: 'en' | 'ru';
   surface: string;
+  product?: CompanionProductScope;
 };
 
-async function getOrCreatePrimaryThread(userId: number) {
+function threadKey(product: CompanionProductScope) {
+  return product === 'gia' ? GIA_THREAD_KEY : MILA_THREAD_KEY;
+}
+
+async function getOrCreatePrimaryThread(userId: number, product: CompanionProductScope) {
+  const key = threadKey(product);
   return prisma.companionThread.upsert({
-    where: { userId_key: { userId, key: PRIMARY_THREAD_KEY } },
+    where: { userId_key: { userId, key } },
     update: {},
-    create: { userId, key: PRIMARY_THREAD_KEY },
+    create: { userId, key },
   });
 }
 
@@ -52,11 +60,12 @@ export async function listCompanionMessages(
   limit = 20,
   scope: CompanionHistoryScope = 'all',
   pathname?: string,
+  product: CompanionProductScope = 'mila',
 ) {
   // Guests have no durable history to return, ever.
   if (await isGuestUser(userId)) return [];
   const thread = await prisma.companionThread.findUnique({
-    where: { userId_key: { userId, key: PRIMARY_THREAD_KEY } },
+    where: { userId_key: { userId, key: threadKey(product) } },
     select: { id: true },
   });
   if (!thread) return [];
@@ -79,7 +88,7 @@ export async function saveCompanionTurn(
 ) {
   // Never persist a guest turn — guest conversations stay in the browser only.
   if (await isGuestUser(userId)) return;
-  const thread = await getOrCreatePrimaryThread(userId);
+  const thread = await getOrCreatePrimaryThread(userId, context.product ?? 'mila');
   const now = new Date();
 
   await prisma.$transaction([
@@ -122,32 +131,37 @@ export async function saveCompanionTurn(
   }
 }
 
-export async function clearCompanionConversation(userId: number) {
-  await prisma.companionThread.deleteMany({ where: { userId, key: PRIMARY_THREAD_KEY } });
+export async function clearCompanionConversation(userId: number, product: CompanionProductScope = 'mila') {
+  await prisma.companionThread.deleteMany({ where: { userId, key: threadKey(product) } });
 }
 
-export async function listCompanionMemories(userId: number) {
+export async function listCompanionMemories(userId: number, product: CompanionProductScope = 'mila') {
   if (await isGuestUser(userId)) return [];
   const memories = await prisma.companionMemory.findMany({
-    where: { userId },
+    where: { userId, product },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     take: MAX_MEMORIES,
   });
   return memories.reverse();
 }
 
-export async function rememberCompanionFact(userId: number, content: string, locale: 'en' | 'ru') {
+export async function rememberCompanionFact(
+  userId: number,
+  content: string,
+  locale: 'en' | 'ru',
+  product: CompanionProductScope = 'mila',
+) {
   // Guests are ephemeral: an explicit "remember that…" is honoured only for the
   // current turn's reply and is never written to durable storage.
   if (await isGuestUser(userId)) return null;
-  const existing = await listCompanionMemories(userId);
+  const existing = await listCompanionMemories(userId, product);
   const normalized = content.trim().toLocaleLowerCase();
   const duplicate = existing.find((memory) => memory.content.trim().toLocaleLowerCase() === normalized);
   if (duplicate) return duplicate;
 
-  const created = await prisma.companionMemory.create({ data: { userId, content, locale } });
+  const created = await prisma.companionMemory.create({ data: { userId, product, content, locale } });
   const stale = await prisma.companionMemory.findMany({
-    where: { userId },
+    where: { userId, product },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     skip: MAX_MEMORIES,
     select: { id: true },
@@ -158,6 +172,6 @@ export async function rememberCompanionFact(userId: number, content: string, loc
   return created;
 }
 
-export async function forgetAllCompanionMemories(userId: number) {
-  return prisma.companionMemory.deleteMany({ where: { userId } });
+export async function forgetAllCompanionMemories(userId: number, product: CompanionProductScope = 'mila') {
+  return prisma.companionMemory.deleteMany({ where: { userId, product } });
 }

@@ -1,9 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useProduct } from '@/lib/product-context';
 import '../auth-recovery.css';
 
 export default function VerifyEmailPage() {
+  const product = useProduct();
+  const isGia = product === 'gia';
+  const brand = isGia ? 'Gia' : 'Mila';
   const [state, setState] = useState<'checking' | 'verified' | 'error'>('checking');
   const [message, setMessage] = useState('');
   useEffect(() => {
@@ -27,7 +31,7 @@ export default function VerifyEmailPage() {
 
   return <main className="auth-recovery"><section className="auth-recovery__card">
     <h1>{state === 'verified' ? 'Email verified' : state === 'error' ? 'Link not verified' : 'Verifying your email…'}</h1>
-    <p>{state === 'verified' ? 'Your Mila account is ready for paid access and cross-device recovery.' : state === 'error' ? message : 'Mila is checking this private link.'}</p>
-    <a className="auth-recovery__back" href={state === 'verified' ? '/account' : '/account'}>{state === 'verified' ? 'Continue to my account' : 'Request another link'}</a>
+    <p>{state === 'verified' ? `Your ${brand} account is ready across devices.` : state === 'error' ? message : `${brand} is checking this private link.`}</p>
+    <a className="auth-recovery__back" href={state === 'verified' ? (isGia ? '/chat' : '/account') : '/forgot-password'}>{state === 'verified' ? `Continue to ${brand}` : 'Request another link'}</a>
   </section></main>;
 }

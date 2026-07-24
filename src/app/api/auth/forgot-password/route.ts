@@ -5,6 +5,7 @@ import { forgotPasswordSchema } from '@/lib/authSchemas';
 import { consumeAuthAttempt, requestIdentity } from '@/lib/authRateLimit';
 import { isGuestIdentity } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/sendAuthEmail';
+import { GIA_ORIGIN, isGiaHostname } from '@/lib/productHosts';
 
 export async function POST(request: NextRequest) {
   const parsed = forgotPasswordSchema.safeParse(await request.json().catch(() => null));
@@ -32,15 +33,17 @@ export async function POST(request: NextRequest) {
     }),
   ]);
 
+  const isGia = isGiaHostname(request.headers.get('host'));
+  const brand = isGia ? 'Gia' : 'Mila';
   const configuredBase = process.env.APP_URL?.trim();
-  const base = configuredBase || request.nextUrl.origin;
+  const base = isGia ? GIA_ORIGIN : configuredBase || request.nextUrl.origin;
   // Keep the bearer token in the URL fragment so it never reaches HTTP access
   // logs or Referrer headers. The client exchanges it in a POST request.
   const resetUrl = `${base.replace(/\/$/, '')}/reset-password#token=${encodeURIComponent(token)}`;
   try {
-    await sendPasswordResetEmail({ email: user.email, resetUrl });
+    await sendPasswordResetEmail({ brand, email: user.email, resetUrl });
   } catch (error) {
-    console.error('Could not send Mila password reset email', error);
+    console.error(`Could not send ${brand} password reset email`, error);
     await prisma.accountToken.updateMany({ where: { tokenHash, usedAt: null }, data: { usedAt: new Date() } });
   }
 

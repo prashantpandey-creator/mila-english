@@ -4,6 +4,7 @@ import { authenticate } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { resolvePlan, isPaid } from '@/lib/subscription'
 import { publicUser } from '@/lib/publicUser'
+import { isGiaHostname } from '@/lib/productHosts'
 
 export async function GET(request: NextRequest) {
   const user = await authenticate(request)
@@ -58,6 +59,14 @@ export async function DELETE(request: NextRequest) {
   const body = await request.json().catch(() => null)
   if (body?.confirmation !== 'DELETE') {
     return NextResponse.json({ error: 'Deletion confirmation is required' }, { status: 400 })
+  }
+
+  if (body?.scope === 'gia' && isGiaHostname(request.headers.get('host'))) {
+    await prisma.$transaction([
+      prisma.companionThread.deleteMany({ where: { userId, key: 'gia' } }),
+      prisma.companionMemory.deleteMany({ where: { userId, product: 'gia' } }),
+    ])
+    return NextResponse.json({ deleted: true, scope: 'gia' })
   }
 
   await prisma.$transaction(async (tx) => {

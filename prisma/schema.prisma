@@ -297,11 +297,12 @@ model CompanionMessage {
 model CompanionMemory {
   id        Int      @id @default(autoincrement())
   userId    Int
+  product   String   @default("mila")
   content   String
   locale    String?
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId, createdAt])
+  @@index([userId, product, createdAt])
 }

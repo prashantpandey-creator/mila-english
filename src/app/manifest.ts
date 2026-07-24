@@ -43,15 +43,15 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   }
 
   return {
-    name: 'Mila — English for Russian Speakers',
+    name: 'Mila — structured language learning',
     short_name: 'Mila',
-    description: 'Практический английский с ИИ-наставницей Милой.',
+    description: 'Focused lessons, real-world practice, pronunciation, vocabulary, and visible progress.',
     start_url: '/',
     scope: '/',
     display: 'standalone',
     background_color: '#faf8f5',
     theme_color: '#faf8f5',
-    lang: 'ru',
+    lang: 'en',
     icons: [
       { src: '/icon', sizes: '512x512', type: 'image/png', purpose: 'any' },
       { src: '/icon', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
