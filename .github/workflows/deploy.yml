@@ -25,15 +25,20 @@ jobs:
             # Do not forward them through the SSH action: exported values appear
             # in the remote shell command line to privileged process inspection.
             touch .env && chmod 600 .env
-            # The chat brain is CLOUD-FIRST as of 2026-07-17 (owner directive:
-            # the resident 20B starved PuranGPT on this shared box — see the
-            # 07-18 co-tenancy outage). The env flag must reflect that even if
-            # an old .env still says false.
-            if grep -q '^ALLOW_EXTERNAL_CHAT_FALLBACK=' .env; then
-              sed -i 's/^ALLOW_EXTERNAL_CHAT_FALLBACK=.*/ALLOW_EXTERNAL_CHAT_FALLBACK=true/' .env
-            else
-              echo 'ALLOW_EXTERNAL_CHAT_FALLBACK=true' >> .env
-            fi
+            # The brains are CLOUD-FIRST as of 2026-07-17 (owner directive:
+            # the resident Ollama pair starved this shared box). Normalize old
+            # server env files so runtime routing cannot probe retired services.
+            set_env() {
+              key="$1"
+              value="$2"
+              if grep -q "^${key}=" .env; then
+                sed -i "s|^${key}=.*|${key}=${value}|" .env
+              else
+                echo "${key}=${value}" >> .env
+              fi
+            }
+            set_env ALLOW_EXTERNAL_CHAT_FALLBACK true
+            set_env LOCAL_LLM_ENABLED false
             # Evaluation runtimes are never part of production. Remove any
             # interrupted benchmark before builds can compete with the app.
             docker rm -f mila-model-eval mila-llm-bench >/dev/null 2>&1 || true
@@ -85,23 +90,9 @@ jobs:
             else
               echo "TTS warning: Piper unavailable — browser speech fallback stays active"
             fi
-            # --- Cloud brain check: the chat model now lives with a provider.
-            # A dead key means dead chat, so this is a HARD gate (the app 200
-            # check above already proved the site itself serves).
-            docker exec mila node -e "
-              const viaOpenRouter = () => fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+process.env.OPENROUTER_API_KEY},body:JSON.stringify({model:process.env.OPENROUTER_CHAT_MODEL||'openai/gpt-4o-mini',messages:[{role:'user',content:'Say OK'}],max_tokens:3})});
-              const viaOpenAI = () => fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+process.env.OPENAI_API_KEY},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:'Say OK'}],max_tokens:3})});
-              const attempt = process.env.OPENROUTER_API_KEY ? viaOpenRouter() : viaOpenAI();
-              attempt.then(async r=>{
-                if (r.ok) { const d=await r.json(); console.log('cloud brain OK:', JSON.stringify(d.choices&&d.choices[0].message.content)); process.exit(0); }
-                if (process.env.OPENROUTER_API_KEY && process.env.OPENAI_API_KEY) {
-                  const r2 = await viaOpenAI();
-                  if (r2.ok) { console.log('cloud brain OK via OpenAI fallback'); process.exit(0); }
-                  console.error('both cloud providers failed:', r.status, r2.status); process.exit(1);
-                }
-                console.error('cloud brain failed:', r.status); process.exit(1);
-              }).catch(e=>{console.error(e.message);process.exit(1)});
-            "
+            # HARD gate the exact cloud Chat and Voice draft targets selected by
+            # runtime routing. The script checks them sequentially, so deploy
+            # verification can never recreate the old overlapping warm-up load.
+            docker exec mila node scripts/check-cloud-brains.mjs
             docker exec mila node -e "require('http').get('http://localhost:3000/',r=>{console.log('status',r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"
-            echo "✅ Mila deployed — cloud brain, local voice; PuranGPT's RAM restored"
-
+            echo "✅ Mila deployed — cloud Chat/Voice brains verified sequentially; local speech healthy"

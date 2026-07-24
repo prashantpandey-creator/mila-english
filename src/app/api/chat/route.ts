@@ -8,6 +8,7 @@ import {
   builtInCompanionReply,
   getLocalLlmConfig,
   isSensitiveMemory,
+  localLlmEnabled,
   ollamaHasModel,
   parseMemoryCommand,
   requestsFreeConversation,
@@ -135,51 +136,52 @@ function externalChoice(voice: boolean): ModelChoice | null {
 }
 
 async function chooseModel(surface: 'voice' | 'guide' | 'chat', externalFirst = false): Promise<ModelChoice | null> {
-  // VOICE_EXTERNAL_FIRST experiment: spoken turns try the fast cloud brain
-  // before the local model; the local model remains the always-there fallback
-  // (see the spoken branch's pre-first-sentence failover).
+  // Spoken turns may prefer the fast cloud brain. Native development can still
+  // fall back to Ollama when explicitly enabled; production has retired it.
   if (externalFirst) {
     const external = externalChoice(surface === 'voice');
     if (external) return external;
   }
-  const chat = getLocalLlmConfig(process.env, 'chat');
-  const preferred = surface === 'voice' ? getLocalLlmConfig(process.env, 'voice') : chat;
-  const localCandidates = [{
-    config: preferred,
-    runtime: surface === 'voice' ? 'voice' as const : 'chat' as const,
-  }];
+  if (localLlmEnabled(process.env)) {
+    const chat = getLocalLlmConfig(process.env, 'chat');
+    const preferred = surface === 'voice' ? getLocalLlmConfig(process.env, 'voice') : chat;
+    const localCandidates = [{
+      config: preferred,
+      runtime: surface === 'voice' ? 'voice' as const : 'chat' as const,
+    }];
 
-  for (const candidate of localCandidates) {
-    const local = candidate.config;
-    if (!await localLlmReady(local)) continue;
-    const provider = createOpenAI({
-      name: candidate.runtime === 'voice' ? 'mila-local-voice' : 'mila-local',
-      baseURL: local.baseURL,
-      apiKey: process.env.LOCAL_LLM_API_KEY || 'ollama',
-      compatibility: 'compatible',
-      fetch: async (input, init) => {
-        if (typeof init?.body !== 'string') return globalThis.fetch(input, init);
-        try {
-          const parsed = JSON.parse(init.body);
-          const adjusted = applyLocalModelRequestOptions(
-            local.model,
-            parsed,
-            candidate.runtime === 'voice'
-              ? process.env.LOCAL_VOICE_LLM_REASONING_EFFORT || process.env.LOCAL_LLM_REASONING_EFFORT
-              : process.env.LOCAL_LLM_REASONING_EFFORT,
-          );
-          return globalThis.fetch(input, { ...init, body: JSON.stringify(adjusted) });
-        } catch {
-          return globalThis.fetch(input, init);
-        }
-      },
-    });
-    return { model: provider(local.model), provider: 'ollama', modelId: local.model, runtime: candidate.runtime };
+    for (const candidate of localCandidates) {
+      const local = candidate.config;
+      if (!await localLlmReady(local)) continue;
+      const provider = createOpenAI({
+        name: candidate.runtime === 'voice' ? 'mila-local-voice' : 'mila-local',
+        baseURL: local.baseURL,
+        apiKey: process.env.LOCAL_LLM_API_KEY || 'ollama',
+        compatibility: 'compatible',
+        fetch: async (input, init) => {
+          if (typeof init?.body !== 'string') return globalThis.fetch(input, init);
+          try {
+            const parsed = JSON.parse(init.body);
+            const adjusted = applyLocalModelRequestOptions(
+              local.model,
+              parsed,
+              candidate.runtime === 'voice'
+                ? process.env.LOCAL_VOICE_LLM_REASONING_EFFORT || process.env.LOCAL_LLM_REASONING_EFFORT
+                : process.env.LOCAL_LLM_REASONING_EFFORT,
+            );
+            return globalThis.fetch(input, { ...init, body: JSON.stringify(adjusted) });
+          } catch {
+            return globalThis.fetch(input, init);
+          }
+        },
+      });
+      return { model: provider(local.model), provider: 'ollama', modelId: local.model, runtime: candidate.runtime };
+    }
   }
 
   const externalAllowed = /^(?:1|true|yes)$/i.test(process.env.ALLOW_EXTERNAL_CHAT_FALLBACK || '');
   if (!externalAllowed) return null;
-  return externalChoice(false);
+  return externalChoice(surface === 'voice');
 }
 
 function memoryReply(locale: CompanionLocale, memories: Array<{ content: string }>): string {
@@ -367,8 +369,8 @@ export async function POST(request: NextRequest) {
 
   const voiceExternalFirst = spoken && /^(?:1|true|yes)$/i.test(process.env.VOICE_EXTERNAL_FIRST || '');
   // Ordinary text conversation must feel live too. `/chat` tries the already
-  // configured fast external provider first, then falls back to Mila's smaller
-  // resident local conversation model when no provider is configured. The
+  // configured fast external provider first. A local model remains an explicit
+  // native-development fallback, but production skips retired Ollama probes. The
   // privacy page discloses transcript-only provider processing; audio is not
   // sent through this route.
   const modelSurface = surfaceKind === 'practice' || surfaceKind === 'chat' ? 'voice' : surfaceKind;
@@ -457,9 +459,9 @@ export async function POST(request: NextRequest) {
         try {
           await consume(result);
         } catch (error) {
-          // An external brain can die before a single word arrives. Fall back
-          // to the local model once, transparently — degraded is acceptable,
-          // a dead turn is not. (Headers already sent name the first choice.)
+          // An external brain can die before a single word arrives. Native
+          // development may fall back to explicitly enabled Ollama once.
+          // (Headers already sent name the first choice.)
           if (!request.signal.aborted && !emitted && choice.runtime === 'external') {
             console.error('External voice model failed before first sentence; retrying locally', error);
             buffer = '';

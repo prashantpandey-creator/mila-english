@@ -1,7 +1,7 @@
 name: Diagnose Mumbai box
 # Read-only vitals for the Mumbai VPS, runnable when nobody has interactive
 # SSH at hand. Uses the same deploy key/secret as deploy.yml and touches
-# nothing: no restarts, no writes, no model loads.
+# nothing: no restarts, no writes, no model or provider requests.
 on:
   workflow_dispatch:
 jobs:
@@ -30,26 +30,21 @@ jobs:
             docker ps -a --format 'table {{.Names}}\t{{.Status}}'
             echo "=== per-container memory/cpu ==="
             docker stats --no-stream
-            echo "=== ollama ps: mila-llm (chat) ==="
-            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama ps || true
-            echo "=== ollama ps: mila-voice-llm ==="
-            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama ps || true
-            echo "=== ollama models on disk ==="
-            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm ollama list || true
-            docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm ollama list || true
-            echo "=== compose drift: live container config vs repo ==="
-            docker inspect -f 'mila-llm       created={{.Created}} mem={{.HostConfig.Memory}} memswap={{.HostConfig.MemorySwap}} cpus={{.HostConfig.NanoCpus}} confighash={{index .Config.Labels "com.docker.compose.config-hash"}}' mila-llm || true
-            docker inspect -f 'mila-voice-llm created={{.Created}} mem={{.HostConfig.Memory}} memswap={{.HostConfig.MemorySwap}} cpus={{.HostConfig.NanoCpus}} confighash={{index .Config.Labels "com.docker.compose.config-hash"}}' mila-voice-llm || true
+            echo "=== Mila internal health (no provider calls) ==="
+            docker exec mila node -e "const checks=[['app','http://localhost:3000/'],['pron','http://mila-pron:8000/health'],['asr','http://mila-asr:8001/health'],['tts','http://mila-tts:8002/health']];(async()=>{for(const [name,url] of checks){try{const r=await fetch(url,{signal:AbortSignal.timeout(5000)});console.log(name,r.status)}catch(e){console.log(name,'unreachable',e.message)}}})().catch(e=>{console.error(e.message);process.exit(1)})" || true
+            echo "=== production brain routing (keys redacted; no provider calls) ==="
+            docker exec mila node -e "console.log({localLlmEnabled:process.env.LOCAL_LLM_ENABLED,externalFallback:process.env.ALLOW_EXTERNAL_CHAT_FALLBACK,openRouter:Boolean(process.env.OPENROUTER_API_KEY),openAI:Boolean(process.env.OPENAI_API_KEY),chatModel:process.env.OPENROUTER_CHAT_MODEL||process.env.OPENAI_CHAT_MODEL||'(default)',voiceModel:process.env.OPENROUTER_VOICE_MODEL||process.env.OPENAI_VOICE_MODEL||'(default)'})" || true
+            echo "=== retired local brain residue (should be empty) ==="
+            docker ps -a --filter name=mila-llm --filter name=mila-voice-llm --format 'table {{.Names}}\t{{.Status}}'
+            docker volume ls --filter name=mila_mila_llm --format 'table {{.Name}}'
+            docker volume ls --filter name=mila_mila_voice_llm --format 'table {{.Name}}'
+            echo "=== compose files and repo state ==="
             ls -la /root/mila/docker-compose.override.yml 2>/dev/null && cat /root/mila/docker-compose.override.yml || echo "no docker-compose.override.yml"
             ls /root/mila/*.yml /root/mila/*.yaml 2>/dev/null
             cd /root/mila && git log --oneline -1 && git status --short | head -5
-            echo "=== non-secret model config lines from .env ==="
-            grep -E '^(LOCAL_LLM_MODEL|LOCAL_VOICE_LLM_MODEL|OLLAMA_|LOCAL_LLM_REASONING|ALLOW_EXTERNAL_CHAT_FALLBACK)' /root/mila/.env || echo "(none set — defaults in use)"
             echo "=== kernel OOM kills (last 24h) ==="
             dmesg -T 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' | tail -25 || true
             journalctl -k --since '24 hours ago' 2>/dev/null | grep -i 'oom' | tail -25 || true
-            echo "=== mila-llm recent logs ==="
-            docker logs --tail 60 mila-llm 2>&1 | tail -60
-            echo "=== mila-voice-llm recent logs ==="
-            docker logs --tail 60 mila-voice-llm 2>&1 | tail -60
+            echo "=== Mila app recent logs ==="
+            docker logs --tail 80 mila 2>&1 | tail -80 || true
             echo "=== done (read-only) ==="

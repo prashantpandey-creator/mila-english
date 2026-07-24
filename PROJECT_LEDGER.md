@@ -16,9 +16,7 @@ No local screenshot counts. No "LIVE" claim without both.**
 
 | Area | State | Commit | Proof |
 |------|-------|--------|-------|
-| Bug reporting to owner email | **Live with an honest delivery fallback.** `/support` now has a bilingual structured bug form, automatic page/device/browser/screen/language/timezone diagnostics, spam trap, validation, and rate limiting; chat also accepts explicit English/Russian requests such as “Report this bug: …”. Reports are addressed to `fcpuru95@gmail.com`, and neither chat history nor audio is attached. The dashboard, public footer, and iOS Settings all link into the flow. **Automatic server-to-email delivery is still pending a production `RESEND_API_KEY`; until it is configured, the form returns an explicit delivery-unavailable result and opens a ready-addressed email instead of claiming success.** | `25de4ef` (2026-07-19) | Deploy run `29669283970` green in 2m54s for exact SHA `25de4ef3bc319bd9c24e452112c72ca460ac94eb`. Live `/support` DOM and mobile 390x844 screenshot verify the complete form; computed layout has `scrollWidth == clientWidth == 390`, a 366px form card, and 332px controls. Live bundles contain `/api/bug-reports`, the recipient address, `bug-report__submit`, and the no-chat/audio disclosure. A labeled production delivery probe returned the expected `503 {"error":"email_unavailable","fallback":"mailto"}`, confirming that the UI will not falsely report an email sent before the key is installed. |
 | Graphite-to-electric homepage entrance | **Live front-door motion layer.** On the first homepage view in a browser session, Mila's matched graphite voice sculpture appears first, an electric-magenta waveform develops the artwork into the permanent colour sculpture, and the page then stays still. It never loops, stops immediately on scroll/tap/key input, and skips decorative motion for Reduced Motion or Save Data. Independent image readiness keeps the colour scene usable if graphite fails and preserves graphite if the colour asset fails. No A-ha footage, people, characters, story, or composition is copied. | `a2ea21a`, merged as `1254cc8` (2026-07-19) | Deploy run `29664470530` green for exact SHA `1254cc84c85ede11374fcae622b52851e70fe049`; `Deploy via SSH` succeeded. Live CSS contains `milaElectricDevelop`, `milaElectricDevelopMobile`, `milaGraphiteRelease`, and the colour-failure guard; live JS contains the once-per-session key plus both v5 asset paths. Desktop 1440x900 and mobile 390x844 live captures verify graphite-first and final cleanup (`complete`, zero sketch layers), with zero horizontal overflow and no console warnings/errors. Both v5 WebPs return 200 at 244,376 and 261,698 bytes; seven representative routes return 200. |
-| Mila guide / conversation rail | **The old unlabeled square bot is retired.** On desktop and inner learning routes Mila is an explicit Talk + Chat rail with bilingual labels, a waveform state mark, Electric Paper hairlines, asymmetric conversation geometry, and restrained plum offset depth. The narrow front door keeps an art-safe compact tab; opening it promotes the conversation into a near-full-height sheet. Shortcut actions stay on one horizontal rail so they no longer consume multiple rows of the transcript. Voice behavior and fallbacks are unchanged. | `4dc1ee5` (2026-07-19) | Deploy run `29669033701` green in 2m27s for exact SHA `4dc1ee54d5b959766cd5e1dfe1be1ec89af2b4c9`; run log confirms `HEAD is now at 4dc1ee5`. Live hashed CSS contains `milaGuideWave`, `mila-guide__launcher-label`, `width:222px`, and `height:min(76dvh,660px)`; live layout JS contains both new rail classes. At 390x844 the compact front tab stays at `y=88`, the open panel is 359x764 and the shortcut rail is 54px; live `/grammar` shows the 178x52 labeled rail above the 65.5px bottom navigation. At 1280x720 the panel is 410x624 at `y=78`, below the header. All three live computed checks had `scrollWidth == clientWidth`, and the live console had zero warnings/errors. No physical microphone claim is included. |
 | Electric Paper Mila visual language | **Current source of truth for the whole site.** Marketing, pricing, auth, dashboard, chat, lessons, listening, assessment, voice rooms, phonetics, progress, achievements, legal pages, and companion furniture now share one stronger Electric Paper house: ground `#fffcfe`, raised paper `#fff4fa`, band `#ffe8f3`, accessible action magenta `#d9006c`, decorative flare `#ff2d95`, deep plum `#75003f`, and ink `#26131f`. Electric flare is decorative only; normal CTA and text contrast use the deeper action range. `/` uses separate desktop/mobile faceless voice-sculpture art with no woman, person, headphones, chair, devices, flags, landmarks, or postcard imagery. Its three city cards crop one connected abstract rhythm panorama. The previous v3 woman artwork remains an untouched backup and has no runtime reference. **Speak with Mila** stays the primary dashboard action, and the mobile companion launcher remains fixed and reachable while scrolling. The darker pricing moment is preserved as a contained plum featured plan rather than a black route theme. | `cca35c8`, merged as `4e0d313` (2026-07-19) | deploy run `29662956018` green in 1m56s; `Deploy via SSH` succeeded for exact SHA `4e0d3138e41b7e4482d7861af49ed81980060c47`. Seventeen live probes returned 200 and auth-gated `/phonetics` correctly redirected to `/login` 200. Live desktop 1440x900 and true mobile 390x844 screenshots verify `/visuals/v4/mila-electric-voice-desktop-v1.webp`, `/visuals/v4/mila-electric-voice-mobile-v1.webp`, the connected `/visuals/v4/mila-city-rhythms-strip-v1.webp`, the voice-first dashboard, and the unified Listen page. Live computed audits of `/`, `/dashboard`, `/listen`, `/assessment`, `/darshan`, `/start`, and `/login` found zero visible off-palette blue/green/cyan signals and zero horizontal overflow. On mobile the guide remained fixed at `y=88` before and after a 1,800px scroll. Full spoken round-trip remains a physical-microphone check, not claimed from browser automation. |
 | Front door `/` design (historical predecessor) | The `683aa47` conversation-poster pass established the free Talk with Mila action and level-check hierarchy. Its dark cinematic `Speak freely.` hero was superseded by the current white/pink editorial atelier row above. | `683aa47` (2026-07-18) | Historical deploy run `29624436105` was green; current front-door proof is recorded above. |
 | Conversation-first Mila core | `/dashboard` is a Mila conversation stage instead of a widget directory: **Speak with Mila** is primary, **Chat with Mila** is second, and lessons are a quieter supporting rail. `/chat` carries Mila's identity, starter prompts, assistant portraits, and a direct voice handoff. Ordinary chat is isolated from focused-drill history; “just talk / stop correcting / stop repeating” overrides prior lesson context; fast configured-provider text turns fall back to the resident local model. Placeholder Guest names no longer leak across interface languages. | `f7cc269`, `74508b0`, `12e65a9`, merged as `7512b45`, `1c6afb7`, `60f0207` (2026-07-18) | deploy runs `29637130227`, `29637431694`, `29637788415` all green. `/dashboard`, `/chat`, `/darshan` 200; live CSS `3a9ac04649781d65.css` contains `conversation-stage__presence`, `chat-page__empty-presence`, `dashboard-conversation__main`, `chat-page__starters`; live dashboard/chat JS contains the new voice/chat copy. Desktop + 390 px live screenshots pass with no horizontal overflow. Live clicks prove dashboard→voice, dashboard→chat, chat mic→voice. The exact “Let's just talk… no repeat or correct” probe stopped the old drill and returned ordinary conversation; the final live timing probe showed first visible reply at **1.576 s**, full reply at **2.096 s**. |
@@ -33,25 +31,39 @@ No local screenshot counts. No "LIVE" claim without both.**
 
 ## LOCAL / UNPUSHED
 
+- **Mumbai deploy/runtime hardening (not live yet):** the workflow now forces
+  `LOCAL_LLM_ENABLED=false`, verifies the configured cloud Chat and Voice draft
+  targets sequentially through `scripts/check-cloud-brains.mjs`, and no longer
+  lets a stale server `.env` trigger retired Ollama health probes. Runtime model
+  selection skips local readiness checks when disabled and preserves the Voice
+  model during external fallback. The read-only diagnose workflow now reports
+  current app/speech health and retired-container residue instead of querying
+  containers that production intentionally removed. Verified locally on
+  2026-07-19: YAML parsing, script syntax and plan, the sequential regression
+  test (maximum one in-flight request; Chat before Voice), every `src/lib` test,
+  `npx tsc --noEmit`, and an isolated `npm run build` all pass. Docker is not
+  installed in this workspace, so Compose was syntax-parsed but not rendered.
+  No live/deploy claim until a green run on the eventual main SHA.
 - The Apple Distribution IPA remains local only because App Store Connect is
   waiting for an interactive Apple ID sign-in and app-record creation before
   validation/upload.
 
 ## OWED (asked, NOT done — do not claim these)
 
-- The former voice-chat / Mila-bot UI refinement debt is closed by the live
-  guide row above. Continue to treat physical-device voice/microphone checks
-  and the App Store submission items below as separate release work rather than
-  silently folding them into the web-design claim.
+- No open route-uniformity debt is recorded. Continue to treat physical-device
+  voice/microphone checks and the App Store submission items below as separate
+  release work rather than silently folding them into the web-design claim.
 
 ---
 
 ## Deploy (the only path to "live")
 
-**Pipeline GREEN again (2026-07-18): the 01:19–02:00 UTC red streak is
-diagnosed and fixed. Read this before touching LLM memory settings.**
-Six straight deploys died at `Ollama … warm-up status 500` while the site
-served fine. Root cause — proven with the new read-only `diagnose.yml`
+**Historical failure, exact mode (2026-07-18 01:19–02:00 UTC):** six deploys
+died after the app was already serving, at `Ollama … warm-up status 500`.
+Run `29625359609` failed Chat warm-up. Run `29625405695` attempt 2 warmed Chat
+and then failed Voice; attempt 3 failed Chat again. This is the observed
+"whichever loads next loses" pattern. Root cause — proven with the read-only
+`diagnose.yml`
 workflow (runs `29625992299`, `29626140024`) — was NOT host RAM (31GiB total,
 23.6GiB available, no swap, disk 39%): an out-of-band `docker update`, never
 committed to git, had capped `mila-llm` at 6GiB/3cpu and `mila-voice-llm` at
@@ -67,16 +79,24 @@ in 12m47s, the first since 01:19: both LLM containers `Recreated`, `local chat
 model warmed` on the first attempt, the voice warm-up 500'd once and the new
 retry caught it, both residencies `ready`; after the run `/` and `/assessment`
 200 from outside and purangpt.com still answering (no freeze-window casualty).
-What changed: `docker-compose.prod.yml` now declares ALL LLM limits
-(chat 16g, voice 6g, memswap pinned) and the next deploy recreates both
-containers back to git truth; the workflow's warm-up + residency checks are
-retried and then become `::warning::` lines instead of hard failures (the
+The immediate recovery changed `docker-compose.prod.yml` to declare all LLM
+limits (chat 16g, voice 6g, memswap pinned), and the next deploy recreated both
+containers from git truth; the workflow's warm-up + residency checks were
+retried and then became `::warning::` lines instead of hard failures (the
 same pattern the speech services already used), and every deploy now warns
 when live container limits drift from compose. **Green now means "the app is
 serving" — model-residency truth lives in the run-log tail; read it whenever
 local chat/voice latency matters.** If the LLMs ever need strangling again,
-edit the two `mem_limit` lines in `docker-compose.prod.yml` — in git — and
-deploys stay green while saying so.
+edit Compose in git rather than using `docker update`.
+
+**Current production containment:** commit `2c72037` retired both resident
+Ollama services from Mumbai after they also clashed with PuranGPT on the shared
+box. Deploy run `29649945122` was green, and the latest observed main deploy
+run `29666331075` is also green. Production is cloud-brain/local-speech now;
+there are no Chat/Voice model warm-ups on the VPS. The local hardening patch
+listed above closes the remaining drift: explicit runtime disablement plus two
+sequential, surface-specific cloud checks. Until that patch deploys, the live
+workflow still has only its older single cloud-completion gate.
 
 Push to `main` → `.github/workflows/deploy.yml` SSHes to Mumbai
 (`209.182.233.163`), `git reset --hard origin/main`, rebuilds compose. ~2–4 min.
@@ -85,8 +105,9 @@ Push to `main` → `.github/workflows/deploy.yml` SSHes to Mumbai
 workflow too, same commit.
 
 **Box vitals without SSH:** `.github/workflows/diagnose.yml`
-(workflow_dispatch) reads memory/disk/docker stats/`ollama ps`/OOM
-kills/compose-drift over the deploy key, strictly read-only. `gh workflow run
+(workflow_dispatch) reads memory/disk/docker stats, app/speech health,
+retired-container residue, routing flags, and OOM history over the deploy key,
+strictly read-only. `gh workflow run
 diagnose.yml --ref main`, then read the run log. Local Macs have no key to the
 Mumbai box — this is the sanctioned door.
 

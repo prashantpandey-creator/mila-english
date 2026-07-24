@@ -13,6 +13,9 @@ services:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_ASSESSMENT_MODEL=${OPENROUTER_ASSESSMENT_MODEL:-}
       - OPENAI_TRANSLATION_MODEL=${OPENAI_TRANSLATION_MODEL:-gpt-5.6}
+      # This Compose file no longer declares Ollama services. Opt in only when
+      # LOCAL_*_URL points at an independently managed reachable runtime.
+      - LOCAL_LLM_ENABLED=${LOCAL_LLM_ENABLED:-false}
       - LOCAL_LLM_URL=${LOCAL_LLM_URL:-http://mila-llm:11434}
       - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-gpt-oss:20b}
       - LOCAL_LLM_REASONING_EFFORT=${LOCAL_LLM_REASONING_EFFORT:-low}
@@ -61,8 +64,8 @@ services:
     build: ./tts-service
     container_name: mila-tts
     restart: unless-stopped
-    # Piper CPU neural voice (warm US female). Hard-bounded so it never competes
-    # with the resident Ollama models — synthesis is ~150-250ms per spoken line.
+    # Piper CPU neural voice (warm US female). Hard-bounded so it cannot crowd
+    # the web app or co-tenant services; synthesis is ~150-250ms per spoken line.
     mem_limit: 1g
     cpus: 2.0
     networks:

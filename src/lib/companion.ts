@@ -99,6 +99,17 @@ export function getLocalLlmConfig(
   };
 }
 
+/**
+ * Local Ollama remains available for native development, but production can
+ * retire it explicitly without paying a failed health-probe timeout per turn.
+ * Unset preserves the historical local-first development behavior.
+ */
+export function localLlmEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  const configured = env.LOCAL_LLM_ENABLED?.trim();
+  if (!configured) return true;
+  return /^(?:1|true|yes|on)$/i.test(configured);
+}
+
 export function ollamaHasModel(payload: unknown, model: string): boolean {
   if (!payload || typeof payload !== 'object' || !Array.isArray((payload as { models?: unknown }).models)) return false;
   const wanted = model.toLowerCase();
@@ -253,8 +264,8 @@ export function builtInCompanionReply(
     : 'Hi! I can guide you through the app, continue your lesson, or begin a short English conversation.';
 
   return locale === 'ru'
-    ? 'Моя локальная разговорная модель сейчас недоступна, поэтому я не буду выдумывать ответ. Пока я всё ещё могу объяснить эту страницу, подсказать следующий шаг или начать практику.'
-    : 'My local conversation model is unavailable right now, so I won’t invent an answer. I can still explain this page, suggest the next learning step, or start an English practice.';
+    ? 'Мой разговорный сервис сейчас недоступен, поэтому я не буду выдумывать ответ. Пока я всё ещё могу объяснить эту страницу, подсказать следующий шаг или начать практику.'
+    : 'My conversation service is unavailable right now, so I won’t invent an answer. I can still explain this page, suggest the next learning step, or start an English practice.';
 }
 
 const UNSUPPORTED_VOICE_EVIDENCE = [

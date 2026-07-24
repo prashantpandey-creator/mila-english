@@ -39,59 +39,39 @@ transcription makes no request to OpenAI, Hugging Face, or OpenRouter. The pronu
 intentionally not committed; place `pron-service/model.onnx` as described in
 [`pron-service/README.md`](pron-service/README.md) before building production.
 
-## Self-hosted companion model
+## Companion model routing
 
-Mila uses two already-trained models through private Ollama runtimes; no
-fine-tuning or training job is required. [GPT-OSS 20B](https://developers.openai.com/cookbook/articles/gpt-oss/run-locally-ollama)
-powers text Chat and the floating guide. A compact multilingual
-[Qwen3](https://github.com/QwenLM/Qwen3) 4B instruction model powers Darshan
-Voice. Their weights are downloaded once into separate Docker volumes and kept
-out of Git and application images.
+Mumbai production uses configured cloud text models for Chat, the floating
+guide, and controlled Voice drafts. The older resident GPT-OSS 20B and Qwen3 4B
+Ollama pair was retired from the shared host after its deploy warm-ups competed
+for constrained container memory. Speech stays self-hosted: ASR,
+pronunciation, and Piper TTS still run on Mila's private Docker network.
 
 The same companion endpoint, learner context, explicit memories, persona, and
-conversation store power Chat, the guide, and Darshan, while model routing is
-surface-specific. Darshan has a separate 4K Ollama runtime and compact spoken
-prompt so text-chat traffic cannot evict its voice prompt cache. It never falls
-back to CPU-bound GPT-OSS: if its Qwen runtime is unavailable, Mila uses the
-built-in response path or an explicitly enabled external fallback. Darshan adds
-local speech recognition before the chat request and browser speech output after
-it. A deterministic controller validates the complete Voice script and removes
+conversation store power Chat, the guide, and Darshan, while cloud model routing
+remains surface-specific. Darshan adds local speech recognition before its text
+request and local Piper or browser speech output afterward. A deterministic
+controller validates the Voice script and removes
 unsupported hearing/progress claims, praise without evidence, emoji, and markup;
-the speaker never receives raw model tokens. OpenAI Realtime remains an optional
-supported-region enhancement, not a dependency of the local voice conversation.
+the speaker never receives unchecked model text. OpenAI Realtime remains a
+supported-region live-audio path and uses the server-side key only.
 
 For native development, install Ollama and run:
 
 ```bash
+ollama pull gpt-oss:20b
 ollama pull qwen3:4b-instruct-2507-q4_K_M
 ollama serve
 ```
 
-Then copy `.env.local.example` to `.env.local`; its
-`LOCAL_LLM_URL=http://127.0.0.1:11434` value is correct when Next.js and Ollama
-both run on the host. For the Docker stack, Ollama is available only to Mila on
-the private Docker network and is intentionally not published on a host port:
+Then copy `.env.local.example` to `.env.local`. Its
+`LOCAL_LLM_ENABLED=true` and `LOCAL_LLM_URL=http://127.0.0.1:11434` values are
+correct when Next.js and Ollama both run natively on the same development host.
+The Compose files no longer declare Ollama services; opt in there only when the
+configured `LOCAL_*_URL` values reach independently managed runtimes.
 
-```bash
-docker compose up -d mila-llm mila-voice-llm
-docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-llm \
-  ollama pull gpt-oss:20b
-docker exec -e OLLAMA_HOST=127.0.0.1:11434 mila-voice-llm \
-  ollama pull qwen3:4b-instruct-2507-q4_K_M
-docker compose up -d
-```
-
-Production deliberately splits the workload: `gpt-oss:20b` handles text Chat
-and Guide for stronger factual and general answers, while
-`qwen3:4b-instruct-2507-q4_K_M` handles Darshan Voice for latency and Russian
-teaching quality. Both are pretrained; no training or fine-tuning is required.
-The Chat container has a 16 GB memory ceiling, a four-CPU hard cap, and lower
-CPU shares, so Voice and the web origin remain responsive when Chat is active.
-`OLLAMA_CONTEXT_LENGTH` defaults to 4096 for both models,
-`OLLAMA_NUM_PARALLEL` to one, and one model per runtime is kept loaded.
-Production pins Ollama 0.32.0 and warms both runtimes after ASR and
-pronunciation are healthy. The measured model comparison, live timings, and
-rejection reasons are recorded in
+The measured local-model comparison, live timings, and rejection reasons are
+recorded in
 [`docs/LOCAL_MODEL_BENCHMARK_2026-07-16.md`](docs/LOCAL_MODEL_BENCHMARK_2026-07-16.md).
 
 Mila injects `reasoning_effort=low` for GPT-OSS so it does not exhaust a short
@@ -100,19 +80,15 @@ conversational response budget on hidden reasoning. A smaller machine can set
 or use `qwen3:1.7b-q4_K_M` when even 4B does not fit; both fallbacks reduce
 quality. Never point Darshan at GPT-OSS on a CPU-only host.
 
-The production deployment pulls the configured model, starts Mila and both
-speech services, then runs a short warm-up prompt and verifies that Ollama kept
-the model resident. Chat prompts stay inside the private runtime network; the
-initial model download still
-requires outbound access to Ollama's registry. Russian-network availability of
-the Mila web origin must still be acceptance-tested from Russia without a VPN.
-
-External chat fallback is opt-in. It remains disabled unless
-`ALLOW_EXTERNAL_CHAT_FALLBACK=true` is set. The fallback cascade tries
-OpenRouter only when its key and an explicitly reviewed
-`OPENROUTER_CHAT_MODEL` are both present, then tries OpenAI when its key is
-present. Leave the flag `false` for the self-hosted, provider-independent path;
-never use the fallback to bypass a provider's regional terms.
+The production deployment starts the app and local speech services, then
+hard-gates the exact cloud Chat and controlled-Voice targets with
+`scripts/check-cloud-brains.mjs`. Those two checks run sequentially. Production
+also forces `LOCAL_LLM_ENABLED=false`, so an old server `.env` cannot add failed
+Ollama health probes or model loads back into normal turns. OpenRouter is chosen
+for a surface only when its key and matching model configuration are present;
+otherwise OpenAI is used when configured. Never use either provider to bypass
+regional terms. Russian-network availability of the Mila web origin must still
+be acceptance-tested from Russia without a VPN.
 
 ## Telegram translator
 

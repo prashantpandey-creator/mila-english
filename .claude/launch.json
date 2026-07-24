@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Mila Web (Next.js)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "Pron Service (wav2vec2 GOP)",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "uvicorn", "server:app", "--app-dir", "pron-service", "--host", "0.0.0.0", "--port", "8000"],
+      "port": 8000
+    },
+    {
+      "name": "ASR Service (faster-whisper)",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "uvicorn", "server:app", "--app-dir", "asr-service", "--host", "0.0.0.0", "--port", "8001"],
+      "port": 8001
+    },
+    {
+      "name": "TTS Service (Piper)",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "uvicorn", "server:app", "--app-dir", "tts-service", "--host", "0.0.0.0", "--port", "8002"],
+      "port": 8002
+    }
+  ]
+}

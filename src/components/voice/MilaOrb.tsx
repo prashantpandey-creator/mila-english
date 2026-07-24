@@ -73,13 +73,19 @@ void main() {
   vec2 st = (v_uv - 0.5) * 2.0;
   float t = u_t, lv = u_lv;
 
-  // White, blush, rose, and deep berry only. The outer field is deliberately
-  // light-valued so alpha compositing on white can never turn it charcoal.
-  vec3 cIvory  = vec3(1.0, 0.992, 0.992);
-  vec3 cSignal = vec3(0.714, 0.239, 0.408);
-  vec3 cPetal  = vec3(0.863, 0.427, 0.573);
-  vec3 cBlush  = vec3(1.0, 0.914, 0.941);
-  vec3 cBerry  = vec3(0.553, 0.176, 0.314);
+  // Mineral linen and eucalyptus carry the atmosphere. Carbon provides depth;
+  // the magenta family is reserved for Mila's active signal.
+  vec3 cLinen   = vec3(0.980, 0.973, 0.961);
+  vec3 cMineral = vec3(0.945, 0.925, 0.898);
+  vec3 cMist    = vec3(0.867, 0.910, 0.890);
+  vec3 cWash    = vec3(0.949, 0.965, 0.957);
+  vec3 cEuca    = vec3(0.271, 0.416, 0.376);
+  vec3 cEucaSoft = vec3(0.373, 0.490, 0.447);
+  vec3 cCarbon  = vec3(0.149, 0.204, 0.231);
+  vec3 cSlate   = vec3(0.251, 0.322, 0.353);
+  vec3 cDeep    = vec3(0.643, 0.0, 0.314);
+  vec3 cSignal  = vec3(0.851, 0.0, 0.424);
+  vec3 cFlare   = vec3(1.0, 0.176, 0.584);
 
   float n1 = fbm(vec3(st * 2.6, t * 0.16));
   float n2 = fbm(vec3(st * 3.0 + n1 * 0.5, t * 0.12 + 4.0));
@@ -123,33 +129,33 @@ void main() {
   float sturb = fbm(vec3(st * 3.0, t * 0.14));
   float arms = pow(0.5 + 0.5 * sin(spiralPhase), 6.0);
   float spiral = arms * smoothstep(0.30, 0.0, rr) * (0.7 + 0.5 * lv) * (0.7 + 0.4 * flicker) * (0.7 + 0.5 * sturb);
-  vec3 spiralHue = mix(cBlush, cSignal, 0.5 + 0.5 * sin(spiralPhase * 0.5 + t * 0.3));
-  spiralHue = mix(spiralHue, cBerry, 0.08 * sturb);
+  vec3 spiralHue = mix(cEucaSoft, cSignal, 0.46 + 0.18 * sin(spiralPhase * 0.5 + t * 0.3));
+  spiralHue = mix(spiralHue, cSlate, 0.08 * sturb);
 
   float gwave = sin(wd * 16.0 - t * (1.0 + 0.4 * wspeed));
   float gwenv = exp(-wd * 1.15) * smoothstep(0.05, 0.20, wd);
   float gcrest = max(gwave, 0.0) * gwenv * (0.7 + 0.5 * lv);
 
   float hueT = 0.5 + 0.5 * sin(t * 0.18 + n2 * 2.5);
-  vec3 surroundHue = mix(cBlush, cPetal, hueT);
-  surroundHue = mix(surroundHue, cSignal, 0.32 * (0.5 + 0.5 * sin(t * 0.11 + n1 * 2.0)));
+  vec3 surroundHue = mix(cMist, cEucaSoft, hueT);
+  surroundHue = mix(surroundHue, cSignal, 0.16 * (0.5 + 0.5 * sin(t * 0.11 + n1 * 2.0)));
   float fineTex = fbm(vec3(st * 4.2 + 7.0, t * 0.10));
   float surroundField = smoothstep(1.18, 0.16, wd) * (0.08 + 0.12 * fineTex);
 
   vec3 col = surroundHue * surroundField * (0.7 + 0.5 * tide)
-    + core * cBerry
-    + corona * mix(cIvory, cSignal, 0.58)
-    + inner * mix(cSignal, cPetal, 0.35 + n1 * 0.2)
-    + outer * mix(cPetal, cBlush, 0.30 + n2 * 0.25)
-    + bloom * mix(cIvory, cBlush, 0.62)
-    + aura * cBlush
-    + rings * mix(cSignal, cBlush, 0.34)
+    + core * cCarbon
+    + corona * mix(cMineral, cDeep, 0.58)
+    + inner * mix(cSignal, cFlare, 0.35 + n1 * 0.2)
+    + outer * mix(cEucaSoft, cMineral, 0.30 + n2 * 0.25)
+    + bloom * mix(cLinen, cMineral, 0.62)
+    + aura * mix(cWash, cMist, 0.58)
+    + rings * mix(cEuca, cSignal, 0.18)
     + spiral * spiralHue
-    + gcrest * mix(cBlush, cSignal, 0.45) * 0.24;
+    + gcrest * mix(cMist, cFlare, 0.45) * 0.24;
 
   float a = clamp(surroundField * 0.7 + core + corona * 0.8 + inner + outer * 0.7 + bloom + aura * 0.9 + rings + spiral + gcrest * 0.24, 0.0, 1.0);
   col = clamp(col, 0.0, 1.0);
-  col = mix(cIvory, col, smoothstep(0.08, 0.92, a));
+  col = mix(cLinen, col, smoothstep(0.08, 0.92, a));
   o = vec4(col * a, a);
 }`;
 
@@ -184,14 +190,14 @@ void main() {
   glow *= ring;
   
   float h = fract(v_seed * 0.61);
-  vec3 signal = vec3(0.788, 0.310, 0.357);
-  vec3 petal = vec3(0.914, 0.561, 0.647);
-  vec3 blush = vec3(0.949, 0.769, 0.808);
-  vec3 ivory = vec3(1.0, 0.992, 0.992);
+  vec3 signal = vec3(1.0, 0.176, 0.584);
+  vec3 euca = vec3(0.373, 0.490, 0.447);
+  vec3 mist = vec3(0.867, 0.910, 0.890);
+  vec3 linen = vec3(0.949, 0.965, 0.957);
   
-  vec3 col = mix(blush, petal, smoothstep(0.0, 0.34, h));
+  vec3 col = mix(mist, euca, smoothstep(0.0, 0.34, h));
   col = mix(col, signal, smoothstep(0.34, 0.68, h));
-  col = mix(col, ivory, smoothstep(0.68, 1.0, h));
+  col = mix(col, linen, smoothstep(0.68, 1.0, h));
   
   float a = glow * v_sw * 0.9;
   o = vec4(col * a, a);
@@ -466,13 +472,15 @@ export function MilaOrb({
       <svg viewBox="0 0 320 320" width={size} height={size} className={className} role="img" aria-label={ariaLabel} style={{ display: "block", overflow: "visible" }}>
         <defs>
           <radialGradient id={halo}>
-            <stop offset="0%" stopColor="#d9006c" stopOpacity="0.34" />
-            <stop offset="55%" stopColor="#f2c4ce" stopOpacity="0.18" />
-            <stop offset="100%" stopColor="#f2c4ce" stopOpacity="0" />
+            <stop offset="0%" stopColor="#d9006c" stopOpacity="0.28" />
+            <stop offset="52%" stopColor="#dde8e3" stopOpacity="0.24" />
+            <stop offset="100%" stopColor="#f2f6f4" stopOpacity="0" />
           </radialGradient>
           <radialGradient id={core}>
-            <stop offset="0%" stopColor="#a40050" />
-            <stop offset="40%" stopColor="#ffffff" />
+            <stop offset="0%" stopColor="#26343b" />
+            <stop offset="24%" stopColor="#40525a" />
+            <stop offset="46%" stopColor="#a40050" />
+            <stop offset="70%" stopColor="#f2f6f4" />
             <stop offset="100%" stopColor="#d9006c" stopOpacity="0" />
           </radialGradient>
         </defs>
@@ -485,10 +493,10 @@ export function MilaOrb({
         <g className={`orb-breathe-${id}`}>
           <circle cx="160" cy="160" r="150" fill={`url(#${halo})`} />
           <circle cx="160" cy="160" r="118" fill="none" stroke="#d9006c" strokeWidth={1.4} opacity="0.5" />
-          <circle cx="160" cy="160" r="90" fill="none" stroke="#e98fa5" strokeWidth={1} opacity="0.46" />
-          <circle cx="160" cy="160" r="58" fill="none" stroke="#f2c4ce" strokeWidth={0.8} opacity="0.58" />
+          <circle cx="160" cy="160" r="90" fill="none" stroke="#456a60" strokeWidth={1} opacity="0.46" />
+          <circle cx="160" cy="160" r="58" fill="none" stroke="#dde8e3" strokeWidth={0.8} opacity="0.72" />
           <circle cx="160" cy="160" r="46" fill={`url(#${core})`} opacity="0.7" />
-          <circle cx="160" cy="160" r="13" fill="#a40050" />
+          <circle cx="160" cy="160" r="13" fill="#26343b" />
         </g>
       </svg>
     );

@@ -2,38 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Mila's Electric Paper language: white daylight, hot pigment, berry depth. */
+/* Mila's Mineral Paper language: linen daylight, graphite structure,
+   eucalyptus calm, and one unmistakable electric signal. */
 :root {
-  --noir: #26131f; --noir-2: #3b222e; --noir-3: #492a38;
-  --ivory: #ffffff; --stone: #65535f;
-  --mila-paper: #fffcfe; --mila-panel: #ffffff; --mila-raised: #fff4fa; --mila-band: #ffe8f3;
-  --mila-ink: #26131f; --mila-muted: #65535f; --mila-line: #f0c7da; --mila-line-strong: #e58bb5;
+  --noir: #26343b; --noir-2: #33464a; --noir-3: #456a60;
+  --ivory: #faf8f5; --stone: #5e6a6a;
+  --mila-paper: #faf8f5; --mila-panel: #ffffff; --mila-raised: #f3f6f7; --mila-band: #dde8e3;
+  --mila-ink: #26343b; --mila-muted: #5e6a6a; --mila-line: #d8e0e3; --mila-line-strong: #a9bab6;
   --mila-brand: #d9006c; --mila-brand-deep: #a40050;
   --mila-brand-bright: #ff2d95;
   --mila-brand-plate: #75003f;
   --mila-brand-soft: rgba(217,0,108,.1); --mila-brand-line: rgba(217,0,108,.24);
+  --mila-mineral: #26343b; --mila-mineral-mid: #40525a; --mila-mineral-soft: #d8e0e3;
+  --mila-eucalyptus: #456a60; --mila-eucalyptus-mid: #5f7d72; --mila-eucalyptus-soft: #dde8e3;
+  --mila-linen: #f1ece5;
+  --mila-gradient-anchor: linear-gradient(145deg,#26343b 0%,#334b4a 58%,#456a60 100%);
+  --mila-gradient-paper: radial-gradient(circle at 82% 12%,rgba(69,106,96,.14),transparent 38%),linear-gradient(150deg,#ffffff 0%,#f1ece5 55%,#dde8e3 100%);
+  --mila-gradient-signal: linear-gradient(135deg,#d9006c 0%,#a40050 100%);
   --mercury: var(--mila-brand); --mercury-bright: var(--mila-brand-bright); --mercury-soft: var(--mila-brand-soft);
-  --venus: var(--mila-brand); --venus-bright: var(--mila-brand-bright); --venus-deep: var(--mila-brand-deep); --venus-ink: #26131f; --venus-soft: var(--mila-brand-soft);
-  --voice: var(--mila-brand); --voice-bright: var(--mila-brand-bright); --voice-soft: var(--mila-brand-soft);
-  --jupiter: var(--mila-brand); --jupiter-bright: var(--mila-brand-bright); --jupiter-soft: var(--mila-brand-soft);
-  --gold: var(--mila-brand); --gold-soft: var(--mila-brand-soft);
-  --danger: var(--mila-brand-deep); --danger-soft: var(--mila-brand-soft);
+  --venus: var(--mila-brand); --venus-bright: var(--mila-brand-bright); --venus-deep: var(--mila-brand-deep); --venus-ink: var(--mila-ink); --venus-soft: var(--mila-brand-soft);
+  --voice: var(--mila-eucalyptus); --voice-bright: var(--mila-eucalyptus-mid); --voice-soft: rgba(69,106,96,.12);
+  --jupiter: var(--mila-eucalyptus); --jupiter-bright: var(--mila-eucalyptus-mid); --jupiter-soft: rgba(69,106,96,.12);
+  --gold: var(--mila-eucalyptus); --gold-soft: rgba(69,106,96,.12);
+  --danger: #b4233b; --danger-soft: rgba(180,35,59,.1);
   --rose: var(--mila-brand); --rose-soft: var(--mila-brand-soft);
-  --sage: var(--mila-brand); --sage-soft: var(--mila-brand-soft);
-  --glass: rgba(255,255,255,.94); --line: rgba(217,0,108,.16);
+  --sage: var(--mila-eucalyptus); --sage-soft: rgba(69,106,96,.12);
+  --glass: rgba(255,255,255,.94); --line: rgba(38,52,59,.14);
   --lp-font-serif: var(--font-display);
   --lp-font-accent: var(--font-sans);
   --font-serif: var(--font-display);
 }
 
-html { background: #fffcfe; color-scheme: light; }
+html { background: #faf8f5; color-scheme: light; }
 
 body {
   /* The front-door artwork remains visible through the transparent body. The
-     html canvas is white, so SSR, overscroll, and slow hydration never flash
+     html canvas is linen, so SSR, overscroll, and slow hydration never flash
      the retired black theme. */
   background: transparent;
-  color: #26131f;
+  color: var(--mila-ink);
   font-family: var(--font-sans, 'Manrope'), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
@@ -1417,8 +1424,8 @@ h1, h2 {
 
 /* Legacy rules below still provide structural fallbacks. The document canvas
    itself stays on Mila's light palette so no route can flash black. */
-html { background: #fffcfe; }
-body { color: #26131f; }
+html { background: #faf8f5; }
+body { color: #26343b; }
 
 /* ── Learning journeys — one authored symbol and card language ────────── */
 .mila-icon { display: block; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
@@ -1984,7 +1991,7 @@ body { color: #26131f; }
 
 /* ── One-room Mila: compatibility selectors resolve to the light atelier ── */
 html[data-mila-surface="welcome"],
-html[data-mila-surface="focus"] { background: #fffcfe; }
+html[data-mila-surface="focus"] { background: #faf8f5; }
 
 .mila-surface {
   min-height: 100vh;
@@ -1992,34 +1999,34 @@ html[data-mila-surface="focus"] { background: #fffcfe; }
   transition: background-color .32s ease,color .24s ease;
 }
 .mila-surface--focus {
-  --surface-page: #fffcfe;
-  --surface-text: #26131f;
-  --surface-muted: #65535f;
+  --surface-page: #faf8f5;
+  --surface-text: #26343b;
+  --surface-muted: #5e6a6a;
   --surface-card: var(--mila-paper-grain), #ffffff;
   --surface-nav: rgba(255,255,255,.96);
-  --surface-line: #f0c7da;
-  --surface-control: #fff4fa;
-  --surface-control-line: #f0c7da;
-  --surface-control-shadow: 0 1px 3px rgba(47,27,36,.05);
-  --surface-track: rgba(47,27,36,.08);
-  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(117,0,63,.055);
-  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(117,0,63,.08);
+  --surface-line: #d8e0e3;
+  --surface-control: #f3f6f7;
+  --surface-control-line: #d8e0e3;
+  --surface-control-shadow: 0 1px 3px rgba(38,52,59,.05);
+  --surface-track: rgba(38,52,59,.08);
+  --surface-card-shadow: 0 1px 2px rgba(38,52,59,.025),0 10px 28px rgba(38,52,59,.055);
+  --surface-card-shadow-hover: 0 2px 4px rgba(38,52,59,.035),0 16px 38px rgba(38,52,59,.08);
   --surface-card-line-hover: rgba(217,0,108,.3);
   --surface-icon-tile: rgba(217,0,108,.1);
 }
 html:not([data-mila-theme="dark"]) .mila-surface--welcome {
-  --surface-page: rgba(255,253,253,.98);
-  --surface-text: #26131f;
-  --surface-muted: #65535f;
+  --surface-page: rgba(250,248,245,.98);
+  --surface-text: #26343b;
+  --surface-muted: #5e6a6a;
   --surface-card: var(--mila-paper-grain), rgba(255,255,255,.98);
   --surface-nav: rgba(255,255,255,.94);
-  --surface-line: #f0c7da;
-  --surface-control: rgba(255,247,250,.9);
-  --surface-control-line: #e3becb;
-  --surface-control-shadow: 0 1px 3px rgba(117,0,63,.05);
-  --surface-track: rgba(47,27,36,.08);
-  --surface-card-shadow: 0 1px 2px rgba(47,27,36,.025),0 10px 28px rgba(117,0,63,.055);
-  --surface-card-shadow-hover: 0 2px 4px rgba(47,27,36,.035),0 16px 38px rgba(117,0,63,.08);
+  --surface-line: #d8e0e3;
+  --surface-control: rgba(243,246,247,.9);
+  --surface-control-line: #a9bab6;
+  --surface-control-shadow: 0 1px 3px rgba(38,52,59,.05);
+  --surface-track: rgba(38,52,59,.08);
+  --surface-card-shadow: 0 1px 2px rgba(38,52,59,.025),0 10px 28px rgba(38,52,59,.055);
+  --surface-card-shadow-hover: 0 2px 4px rgba(38,52,59,.035),0 16px 38px rgba(38,52,59,.08);
   --surface-card-line-hover: rgba(217,0,108,.3);
   --surface-icon-tile: rgba(217,0,108,.1);
   --venus-readable: var(--mila-brand);
@@ -2031,13 +2038,13 @@ html:not([data-mila-theme="dark"]) .mila-surface--welcome {
 }
 .mila-surface--front { background: transparent; }
 
-.atmosphere--focus { background: #fffcfe; }
+.atmosphere--focus { background: #faf8f5; }
 .atmosphere--focus::after {
   background:
-    radial-gradient(980px 720px at 82% 8%,rgba(217,0,108,.1),transparent 62%),
-    linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,244,248,.92));
+    radial-gradient(980px 720px at 82% 8%,rgba(69,106,96,.13),transparent 62%),
+    linear-gradient(180deg,rgba(255,255,255,.74),rgba(241,236,229,.92));
 }
-html:not([data-mila-theme="dark"]) .atmosphere--welcome { background: #fffcfe; }
+html:not([data-mila-theme="dark"]) .atmosphere--welcome { background: #faf8f5; }
 html:not([data-mila-theme="dark"]) .atmosphere--welcome video,
 html:not([data-mila-theme="dark"]) .atmosphere--welcome img {
   filter: saturate(.86) contrast(.96) brightness(1.05) blur(.2px);
@@ -3837,11 +3844,11 @@ html[data-mila-theme="dark"] .mila-showcase__nav button:hover{background:#e46a73
 /* Marketing and pricing use the same companion as the learning product.
    Motion communicates listening/thinking/speaking; colour never changes role. */
 html .mila-surface--marketing .mila-guide {
-  --guide-paper: #fff4fa;
+  --guide-paper: #f3f6f7;
   --guide-panel: #ffffff;
-  --guide-ink: #26131f;
-  --guide-muted: #65535f;
-  --guide-line: #f0c7da;
+  --guide-ink: #26343b;
+  --guide-muted: #5e6a6a;
+  --guide-line: #d8e0e3;
   --guide-accent: #d9006c;
   --guide-accent-deep: #a40050;
   color: var(--guide-ink);
@@ -3851,9 +3858,9 @@ html .mila-surface--marketing .mila-guide__launcher {
   border: 1px solid var(--guide-line) !important;
   border-radius: 16px !important;
   background: var(--guide-panel) !important;
-  box-shadow: 0 14px 36px rgba(117,0,63,.14) !important;
+  box-shadow: 0 14px 36px rgba(38,52,59,.14) !important;
 }
-html .mila-surface--marketing .mila-guide__launcher:hover { border-color: var(--guide-accent) !important; box-shadow: 0 16px 40px rgba(117,0,63,.16) !important; }
+html .mila-surface--marketing .mila-guide__launcher:hover { border-color: var(--guide-accent) !important; box-shadow: 0 16px 40px rgba(38,52,59,.16) !important; }
 html .mila-surface--marketing .mila-guide__launcher:focus-visible { outline-color: var(--guide-accent); }
 html .mila-surface--marketing .mila-guide__launcher::before { display: none; }
 html .mila-surface--marketing .mila-guide__orbit { display: none; }
@@ -3867,7 +3874,7 @@ html .mila-surface--marketing .mila-guide__portrait > i {
   box-shadow: none !important;
 }
 html .mila-surface--marketing .mila-guide[data-state] .mila-guide__launcher,
-html .mila-surface--marketing .mila-guide[data-voice="1"] .mila-guide__launcher { border-color: var(--guide-accent) !important; box-shadow: 0 14px 36px rgba(117,0,63,.14) !important; }
+html .mila-surface--marketing .mila-guide[data-voice="1"] .mila-guide__launcher { border-color: var(--guide-accent) !important; box-shadow: 0 14px 36px rgba(38,52,59,.14) !important; }
 html .mila-surface--marketing .mila-guide__textchip,
 html .mila-surface--marketing .mila-guide__voicechip {
   border: 1px solid var(--guide-accent) !important;
@@ -3881,7 +3888,7 @@ html .mila-surface--marketing :is(.mila-guide__panel,.mila-guide__nudge,.mila-gu
   border-radius: 14px !important;
   color: var(--guide-ink) !important;
   background: var(--guide-panel) !important;
-  box-shadow: 0 20px 58px rgba(117,0,63,.16) !important;
+  box-shadow: 0 20px 58px rgba(38,52,59,.16) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
@@ -3916,43 +3923,43 @@ html .mila-surface--marketing .mila-guide__chips button:hover {
 html .mila-surface--marketing .mila-guide__error {
   border-color: var(--guide-line) !important;
   color: var(--guide-accent-deep) !important;
-  background: #fff1f6 !important;
+  background: #f5eeef !important;
 }
 
-/* ── White / pink compatibility guard ────────────────────────────────────
+/* ── Mineral Paper compatibility guard ──────────────────────────────────
    A few early utilities still exist for older routes and experiments. Keep
    their geometry, but make their visual contract identical to the current
-   atelier: white paper, cool blush, berry action, and deep plum ink. This is
+   atelier: linen paper, mineral structure, eucalyptus calm, and magenta action. This is
    deliberately last so a stale saved `dark` preference cannot revive the
-   retired cyan, emerald, gold, beige, or black primitives. */
+   retired cyan, gold, beige, or black primitives. */
 ::selection { color: #ffffff; background: #d9006c; }
 
 .card,
 .glass,
 .glass-card {
-  color: #26131f;
-  border-color: #f0c7da;
+  color: #26343b;
+  border-color: #d8e0e3;
   background: #ffffff;
-  background-image: none;
-  box-shadow: 0 1px 2px rgba(47,27,36,.025), 0 12px 32px rgba(117,0,63,.07);
+  background-image: linear-gradient(155deg,#ffffff 0%,#f3f6f7 66%,#edf3f0 100%);
+  box-shadow: 0 1px 2px rgba(38,52,59,.025), 0 12px 32px rgba(38,52,59,.07);
 }
 .card:hover,
 .glass-card:hover {
   border-color: rgba(217,0,108,.34);
-  box-shadow: 0 2px 4px rgba(47,27,36,.035), 0 16px 38px rgba(117,0,63,.1);
+  box-shadow: 0 2px 4px rgba(38,52,59,.035), 0 16px 38px rgba(38,52,59,.1);
 }
 
 .btn-primary {
   color: #ffffff;
   border: 1px solid #d9006c;
-  background: #d9006c;
-  background-image: none;
+  background: linear-gradient(135deg,#d9006c,#a40050);
+  background-image: linear-gradient(135deg,#d9006c,#a40050);
   box-shadow: 0 9px 24px rgba(164,0,80,.2);
 }
 .btn-primary:hover {
   color: #ffffff;
   border-color: #a40050;
-  background: #a40050;
+  background: linear-gradient(135deg,#e00070,#8f0046);
   box-shadow: 0 12px 30px rgba(164,0,80,.24);
 }
 .btn-primary:focus-visible,
@@ -3964,21 +3971,21 @@ html .mila-surface--marketing .mila-guide__error {
 }
 
 .lang-toggle {
-  border-color: #f0c7da;
-  background: #fff4fa;
+  border-color: #d8e0e3;
+  background: #f3f6f7;
 }
-.lang-toggle button { color: #65535f; }
+.lang-toggle button { color: #5e6a6a; }
 .lang-toggle button.active,
 .landing-nav .lang-toggle button.active {
   color: #ffffff;
-  background: #d9006c;
-  background-image: none;
+  background: linear-gradient(135deg,#d9006c,#a40050);
+  background-image: linear-gradient(135deg,#d9006c,#a40050);
   box-shadow: none;
 }
 .streak-card {
-  border-color: #f0c7da;
-  background: #fff4fa;
-  background-image: none;
+  border-color: #d8e0e3;
+  background: #f3f6f7;
+  background-image: linear-gradient(145deg,#ffffff,#dde8e3);
 }
 .gradient-text {
   background-image: linear-gradient(120deg, #a40050, #d9006c 52%, #ff2d95);
@@ -3989,46 +3996,46 @@ html .mila-surface--marketing .mila-guide__error {
 
 html .mila-tabbar,
 html[data-mila-theme="dark"] .mila-tabbar {
-  border-top-color: #f0c7da;
-  background: rgba(255,255,255,.95);
-  box-shadow: 0 -8px 28px rgba(117,0,63,.06);
+  border-top-color: #d8e0e3;
+  background: linear-gradient(90deg,rgba(255,255,255,.96),rgba(243,246,247,.96),rgba(221,232,227,.94));
+  box-shadow: 0 -8px 28px rgba(38,52,59,.06);
 }
 html .mila-tabbar__tab,
-html[data-mila-theme="dark"] .mila-tabbar__tab { color: #65535f; }
+html[data-mila-theme="dark"] .mila-tabbar__tab { color: #5e6a6a; }
 html .mila-tabbar__tab:not(.is-active):hover,
-html[data-mila-theme="dark"] .mila-tabbar__tab:not(.is-active):hover { color: #26131f; }
+html[data-mila-theme="dark"] .mila-tabbar__tab:not(.is-active):hover { color: #26343b; }
 html .mila-tabbar__tab.is-active,
 html[data-mila-theme="dark"] .mila-tabbar__tab.is-active { color: #a40050; }
 html .mila-tabbar__tab.is-active .mila-tabbar__icon,
 html[data-mila-theme="dark"] .mila-tabbar__tab.is-active .mila-tabbar__icon {
   color: #d9006c;
-  background: #ffe8f3;
+  background: #f1ece5;
 }
 
 html .mila-showcase,
 html[data-mila-theme="dark"] .mila-showcase {
-  border-color: #f0c7da;
-  background: #ffffff;
-  box-shadow: 0 16px 44px rgba(117,0,63,.08);
+  border-color: #d8e0e3;
+  background: linear-gradient(155deg,#ffffff 0%,#f3f6f7 62%,#dde8e3 100%);
+  box-shadow: 0 16px 44px rgba(38,52,59,.08);
 }
 html .mila-showcase__grain,
 html[data-mila-theme="dark"] .mila-showcase__grain {
   opacity: .18;
   mix-blend-mode: multiply;
-  background-image: repeating-linear-gradient(105deg, rgba(217,0,108,.09) 0 1px, transparent 1px 6px);
+  background-image: repeating-linear-gradient(105deg, rgba(69,106,96,.09) 0 1px, transparent 1px 6px);
 }
 html .mila-showcase__heading,
 html[data-mila-theme="dark"] .mila-showcase__heading,
 html .mila-showcase__vu-cap,
 html[data-mila-theme="dark"] .mila-showcase__vu-cap,
 html .mila-showcase__score span,
-html[data-mila-theme="dark"] .mila-showcase__score span { color: #65535f; }
+html[data-mila-theme="dark"] .mila-showcase__score span { color: #5e6a6a; }
 html .mila-showcase__top,
 html[data-mila-theme="dark"] .mila-showcase__top,
 html .mila-showcase__vu,
-html[data-mila-theme="dark"] .mila-showcase__vu { border-color: #f0c7da; }
+html[data-mila-theme="dark"] .mila-showcase__vu { border-color: #d8e0e3; }
 html .mila-showcase__kick,
-html[data-mila-theme="dark"] .mila-showcase__kick { color: #65535f; }
+html[data-mila-theme="dark"] .mila-showcase__kick { color: #5e6a6a; }
 html .mila-showcase__live,
 html[data-mila-theme="dark"] .mila-showcase__live,
 html .mila-showcase__ipa,
@@ -4045,14 +4052,14 @@ html[data-mila-theme="dark"] .mila-showcase__live i {
 html .mila-showcase__word,
 html[data-mila-theme="dark"] .mila-showcase__word,
 html .mila-showcase__score b,
-html[data-mila-theme="dark"] .mila-showcase__score b { color: #26131f; }
+html[data-mila-theme="dark"] .mila-showcase__score b { color: #26343b; }
 html .mila-showcase__stop,
-html[data-mila-theme="dark"] .mila-showcase__stop { color: #65535f; }
+html[data-mila-theme="dark"] .mila-showcase__stop { color: #5e6a6a; }
 html .mila-showcase__stop::before,
-html[data-mila-theme="dark"] .mila-showcase__stop::before { background: #f0c7da; }
+html[data-mila-theme="dark"] .mila-showcase__stop::before { background: #a9bab6; }
 html .mila-showcase__stop::after,
 html[data-mila-theme="dark"] .mila-showcase__stop::after {
-  border-color: #26131f;
+  border-color: #26343b;
   background: #ffffff;
 }
 html .mila-showcase__stop.is-hub::after,
@@ -4067,8 +4074,8 @@ html .mila-showcase__dot.is-on,
 html[data-mila-theme="dark"] .mila-showcase__dot.is-on { background: #d9006c; }
 html .mila-showcase__nav button,
 html[data-mila-theme="dark"] .mila-showcase__nav button {
-  color: #26131f;
-  border-color: #f0c7da;
+  color: #26343b;
+  border-color: #d8e0e3;
   background: #ffffff;
 }
 html .mila-showcase__nav button:hover,

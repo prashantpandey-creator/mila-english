@@ -9,13 +9,13 @@ export default function RouteSurface({ children }: { children: ReactNode }) {
   const surface = routeSurfaceForPath(pathname);
   const isMarketing = pathname === '/' || pathname === '/start';
 
-  // Route intent is deterministic: the same warm paper and rose language on
-  // every page. A saved device preference must never split Mila into competing
+  // Route intent is deterministic: the same mineral-paper language on every
+  // page. A saved device preference must never split Mila into competing
   // palettes or make a voice room feel like a different product.
   useEffect(() => {
     document.documentElement.dataset.milaTheme = 'light';
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    if (meta) meta.content = '#fffcfe';
+    if (meta) meta.content = '#faf8f5';
   }, [pathname, surface]);
 
   useEffect(() => {

@@ -498,7 +498,7 @@ export default function VoicePage() {
         {liveText}
       </div>
 
-      {/* The AI's answer — emerges from the flame in pink/white (and is spoken) */}
+      {/* The AI's answer — emerges from the mineral field (and is spoken) */}
       {phase === "manifesting" && answer && (
         <>
           <div className="voice-ascrim" aria-hidden="true" />

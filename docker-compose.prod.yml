@@ -14,12 +14,9 @@ services:
       - PRON_URL=http://mila-pron:8000
       - ASR_URL=http://mila-asr:8001
       - TTS_URL=http://mila-tts:8002
-      - LOCAL_LLM_URL=${LOCAL_LLM_URL:-http://mila-llm:11434}
-      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-gpt-oss:20b}
-      - LOCAL_LLM_REASONING_EFFORT=${LOCAL_LLM_REASONING_EFFORT:-low}
-      - LOCAL_VOICE_LLM_URL=${LOCAL_VOICE_LLM_URL:-http://mila-voice-llm:11434}
-      - LOCAL_VOICE_LLM_MODEL=${LOCAL_VOICE_LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
-      - LOCAL_VOICE_LLM_REASONING_EFFORT=${LOCAL_VOICE_LLM_REASONING_EFFORT:-low}
+      # The resident Ollama pair was retired from this shared production host.
+      # Explicitly disable its health probes even if the server .env is stale.
+      - LOCAL_LLM_ENABLED=false
       - ALLOW_EXTERNAL_CHAT_FALLBACK=${ALLOW_EXTERNAL_CHAT_FALLBACK:-true}
       - OPENROUTER_CHAT_MODEL=${OPENROUTER_CHAT_MODEL:-}
       - NODE_ENV=production
@@ -57,8 +54,7 @@ services:
     container_name: mila-tts
     restart: unless-stopped
     # Piper is a small CPU neural voice (warm US female, en_US-amy-medium).
-    # Hard-bounded so it can never compete with the resident Ollama models for
-    # RAM or cores — synthesis is ~150-250ms and only bursts on spoken lines.
+    # Hard-bounded so synthesis cannot crowd the web app or co-tenant services.
     mem_limit: 1g
     cpus: 2.0
     networks:
