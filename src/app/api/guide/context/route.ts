@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticate } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { COURSE_LESSON_IDS, getBuiltinLesson } from '@/lib/builtinLessons'
+import { teacherForNativeLanguage } from '@/lib/learningMarkets'
 
 export async function GET(request: NextRequest) {
   const user = await authenticate(request)
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   const [profile, progresses] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
-      select: { name: true, level: true, streakDays: true },
+      select: { name: true, level: true, streakDays: true, nativeLanguage: true },
     }),
     prisma.progress.findMany({
       where: { userId },
@@ -64,6 +65,8 @@ export async function GET(request: NextRequest) {
     name: profile.name,
     level: profile.level,
     streakDays: profile.streakDays,
+    nativeLanguage: profile.nativeLanguage,
+    teacherName: teacherForNativeLanguage(profile.nativeLanguage)?.name || null,
     continueHref,
     continueTitle,
     continueTitleRu,

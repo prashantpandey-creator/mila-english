@@ -9,11 +9,13 @@ import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import MilaIcon, { type MilaIconName } from '@/components/ui/MilaIcon';
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
+import { resolveIndianNativeLanguage, teacherForNativeLanguage } from '@/lib/learningMarkets';
 
 type Learner = {
   name?: string;
   streakDays?: number;
   level?: string;
+  nativeLanguage?: string;
   isGuest?: boolean;
   subscription?: { plan: 'free' | 'pro'; isPaid: boolean; status: string; renewsAt: string | null };
 };
@@ -69,6 +71,8 @@ export default function DashboardPage() {
   const firstNameCandidate = user?.name?.trim().split(/\s+/)[0];
   const firstName = firstNameCandidate && !/^(?:guest|гость)$/iu.test(firstNameCandidate) ? firstNameCandidate : '';
   const isPro = !!user?.subscription?.isPaid;
+  const nativeLanguage = resolveIndianNativeLanguage(user?.nativeLanguage);
+  const matchedTeacher = teacherForNativeLanguage(user?.nativeLanguage);
   const practiceRoutes: Array<{
     icon: MilaIconName;
     labelEn: string;
@@ -146,15 +150,19 @@ export default function DashboardPage() {
           <div className="conversation-stage__copy">
             <p className="conversation-stage__eyebrow">
               <span aria-hidden />
-              {lang === 'ru' ? 'Твой путь в языке' : 'Your language path'}
+              {matchedTeacher
+                ? `${matchedTeacher.name} · AI English teacher`
+                : lang === 'ru' ? 'Твой путь в английском' : 'Your English path'}
             </p>
             <h1 id="conversation-stage-title">
-              {lang === 'ru' ? 'Что хочешь освоить сегодня?' : 'What do you want to practise today?'}
+              {lang === 'ru' ? 'Что хочешь освоить сегодня?' : 'What English do you want to practise today?'}
             </h1>
             <p className="conversation-stage__lede">
-              {lang === 'ru'
+              {matchedTeacher && nativeLanguage
+                ? `${matchedTeacher.name} can explain new ideas in ${nativeLanguage.name}, while every lesson builds your English.`
+                : lang === 'ru'
                 ? 'Продолжай личный маршрут: короткие уроки, тренировка слуха, произношение и слова, которые пригодятся в реальной жизни.'
-                : 'Keep building your personal path through short lessons, listening, pronunciation, and useful real-world language.'}
+                : 'Keep building your English through short lessons, listening, pronunciation, and useful real-world situations.'}
             </p>
 
             <div className="conversation-stage__actions">
@@ -162,7 +170,7 @@ export default function DashboardPage() {
                 <span className="conversation-action__icon" aria-hidden><MilaIcon name="lessons" size={24} /></span>
                 <span>
                   <strong>{lang === 'ru' ? 'Продолжить обучение' : 'Continue learning'}</strong>
-                  <small>{lang === 'ru' ? 'Уроки по твоим целям' : 'Lessons shaped around your goals'}</small>
+                  <small>{lang === 'ru' ? 'Уроки по твоим целям' : `English lessons${nativeLanguage ? ` with ${nativeLanguage.name} support` : ''}`}</small>
                 </span>
                 <MilaIcon name="arrow" size={20} />
               </button>
@@ -227,14 +235,14 @@ export default function DashboardPage() {
               <span><MilaIcon name="level" size={21} /></span>
               <span>
                 <strong>{lang === 'ru' ? 'Не знаешь, с чего начать?' : 'Not sure where to begin?'}</strong>
-                <small>{lang === 'ru' ? 'Пятиминутная проверка уровня даст Миле отправную точку.' : 'A five-minute level check gives Mila a useful starting point.'}</small>
+                <small>{lang === 'ru' ? 'Пятиминутная проверка уровня даст Миле отправную точку.' : 'A five-minute English check gives your teacher a useful starting point.'}</small>
               </span>
               <span className="dashboard-level-check__action">{lang === 'ru' ? 'Проверить' : 'Check my level'} <MilaIcon name="arrow" size={17} /></span>
             </button>
           ) : null}
           <button className="dashboard-bug-report" type="button" onClick={() => router.push('/support')}>
             <span aria-hidden>↗</span>
-            {lang === 'ru' ? 'Сообщить об ошибке в Mila' : 'Report a problem with Mila'}
+            {lang === 'ru' ? 'Сообщить об ошибке в Mila English' : 'Report a problem with Mila English'}
           </button>
         </section>
       </AppMain>

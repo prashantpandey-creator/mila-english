@@ -43,9 +43,9 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   }
 
   return {
-    name: 'Mila — structured language learning',
-    short_name: 'Mila',
-    description: 'Focused lessons, real-world practice, pronunciation, vocabulary, and visible progress.',
+    name: 'Mila English — English from your native language',
+    short_name: 'Mila English',
+    description: 'India-first English learning with a native-language AI teacher, speaking practice, and visible progress.',
     start_url: '/',
     scope: '/',
     display: 'standalone',

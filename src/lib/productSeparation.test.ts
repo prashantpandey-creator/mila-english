@@ -56,7 +56,7 @@ test('Mila owns its learning entry points and shared policies cover every produc
   assert.match(privacy, /mila\.purangpt\.com/);
   assert.match(privacy, /gia\.purangpt\.com/);
   assert.match(privacy, /mia\.purangpt\.com/);
-  assert.match(terms, /Mila, Gia, and Mia/);
+  assert.match(terms, /Mila English, Gia, and Mia/);
 });
 
 test('Gia and Mila use separate durable conversation and memory namespaces', () => {

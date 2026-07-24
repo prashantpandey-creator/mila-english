@@ -1,32 +1,25 @@
+import { MILA_TARGET_LANGUAGE } from '@/lib/learningMarkets';
+
+/**
+ * Mila English intentionally has one target. Native languages are support
+ * languages and live in learningMarkets.ts; they must never become a second
+ * course target through a client-supplied chat value.
+ */
 export const TARGET_LANGUAGES = [
   {
-    id: 'auto',
-    en: 'Any language',
-    ru: 'Любой язык',
-    prompt: 'Auto: follow the language the learner is using, and teach whichever language they ask for',
+    id: 'english',
+    en: MILA_TARGET_LANGUAGE.name,
+    ru: 'Английский',
+    prompt: MILA_TARGET_LANGUAGE.name,
   },
-  { id: 'english', en: 'English', ru: 'Английский', prompt: 'English' },
-  { id: 'spanish', en: 'Spanish', ru: 'Испанский', prompt: 'Spanish' },
-  { id: 'french', en: 'French', ru: 'Французский', prompt: 'French' },
-  { id: 'german', en: 'German', ru: 'Немецкий', prompt: 'German' },
-  { id: 'hindi', en: 'Hindi', ru: 'Хинди', prompt: 'Hindi' },
-  { id: 'portuguese', en: 'Portuguese', ru: 'Португальский', prompt: 'Portuguese' },
-  { id: 'italian', en: 'Italian', ru: 'Итальянский', prompt: 'Italian' },
-  { id: 'japanese', en: 'Japanese', ru: 'Японский', prompt: 'Japanese' },
-  { id: 'korean', en: 'Korean', ru: 'Корейский', prompt: 'Korean' },
-  { id: 'mandarin', en: 'Mandarin', ru: 'Китайский', prompt: 'Mandarin Chinese' },
-  { id: 'arabic', en: 'Arabic', ru: 'Арабский', prompt: 'Arabic' },
-  { id: 'russian', en: 'Russian', ru: 'Русский', prompt: 'Russian' },
 ] as const;
 
 export type TargetLanguageId = (typeof TARGET_LANGUAGES)[number]['id'];
 
 export function isTargetLanguageId(value: unknown): value is TargetLanguageId {
-  return typeof value === 'string'
-    && TARGET_LANGUAGES.some((language) => language.id === value);
+  return value === 'english';
 }
 
-export function targetLanguagePrompt(id: TargetLanguageId): string {
-  return TARGET_LANGUAGES.find((language) => language.id === id)?.prompt
-    ?? TARGET_LANGUAGES[0].prompt;
+export function targetLanguagePrompt(_id: TargetLanguageId): string {
+  return MILA_TARGET_LANGUAGE.name;
 }

@@ -62,7 +62,7 @@ export default function PricingPage() {
         <div className="pricing-intro">
           <p className="pricing-intro__kicker">FREE + PRO</p>
           <h1>{T('Сначала почувствуй пользу. Потом решай.', 'Feel the value first. Then decide.')}</h1>
-          <p>{T('Основной путь Mila остаётся бесплатным. Pro — это один прозрачный 30-дневный доступ без скрытого автопродления.', 'Mila’s core path stays free. Pro is one transparent 30-day pass with no hidden auto-renewal.')}</p>
+          <p>{T('Основной путь Mila English остаётся бесплатным. Pro — это один прозрачный 30-дневный доступ без скрытого автопродления.', 'Mila English’s core path stays free. Pro is one transparent 30-day pass with no hidden auto-renewal.')}</p>
         </div>
         <div className="pricing-grid">
           <article className="pricing-card">
@@ -78,7 +78,7 @@ export default function PricingPage() {
             <a className="pricing-cta" href={user ? '/dashboard' : '/register?returnTo=/dashboard'}>{T('Продолжить бесплатно', 'Continue free')}</a>
           </article>
           <article className="pricing-card pricing-card--pro">
-            <span className="pricing-card__label">MILA PRO</span>
+            <span className="pricing-card__label">MILA ENGLISH PRO</span>
             <h2>{T('Быстрее и лично для тебя', 'Faster and made for you')}</h2>
             <div className="pricing-card__price">₽1 490 <small>{T('за 30 дней', 'for 30 days')}</small></div>
             <ul>
@@ -93,7 +93,7 @@ export default function PricingPage() {
             {error ? <p className="pricing-error" role="alert">{error}</p> : null}
           </article>
         </div>
-        <p className="pricing-note">{T('Оплата проходит на защищённой странице ЮKassa. Mila не видит и не хранит данные карты. Доступ не продлевается автоматически.', 'Payment happens on YooKassa’s secure page. Mila never sees or stores card details. Access does not renew automatically.')} {' '}<a href="/terms">{T('Условия', 'Terms')}</a> · <a href="/refunds">{T('Возвраты', 'Refunds')}</a></p>
+        <p className="pricing-note">{T('Оплата проходит на защищённой странице ЮKassa. Mila English не видит и не хранит данные карты. Доступ не продлевается автоматически.', 'Payment happens on YooKassa’s secure page. Mila English never sees or stores card details. Access does not renew automatically.')} {' '}<a href="/terms">{T('Условия', 'Terms')}</a> · <a href="/refunds">{T('Возвраты', 'Refunds')}</a></p>
       </AppMain>
     </AppShell>
   );

@@ -2,22 +2,22 @@ import type { Metadata } from 'next'
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Mila, Gia, and Mia',
-  description: 'How Mila, Gia, and Mia handle account, learning, chat, and voice data.',
+  title: 'Privacy Policy — Mila English, Gia, and Mia',
+  description: 'How Mila English, Gia, and Mia handle account, learning, chat, and voice data.',
 }
 
 export default function PrivacyPage() {
   return (
     <AppShell className="legal-page privacy-page">
-      <AppHeader backHref="/" title="Privacy policy" eyebrow="Mila · Gia · Mia" />
+      <AppHeader backHref="/" title="Privacy policy" eyebrow="Mila English · Gia · Mia" />
       <AppMain width="work" className="legal-page__main">
       <article className="legal-page__article">
         <p className="legal-page__kicker">PRIVACY POLICY</p>
         <h1>Your words are yours.</h1>
         <p className="legal-page__meta">Effective 24 July 2026 · Действует с 24 июля 2026 г.</p>
 
-        <p style={{fontSize:18,marginTop:30}}>This policy covers the related services at <strong>mila.purangpt.com</strong> (structured language learning), <strong>gia.purangpt.com</strong> (the Gia text-and-voice companion), and <strong>mia.purangpt.com</strong> (the public travel, language, and culture experience), plus the Mila iOS app and legacy miachat.purangpt.com links. Together they are called the Services below.</p>
-        <p>Mia’s public Scene Studio does not require an account and keeps its most recent scene in your browser. Gia and Mila have separate product experiences while using related account and service infrastructure behind the scenes.</p>
+        <p style={{fontSize:18,marginTop:30}}>This policy covers the related services at <strong>mila.purangpt.com</strong> (Mila English structured learning), <strong>gia.purangpt.com</strong> (the Gia text-and-voice companion), and <strong>mia.purangpt.com</strong> (the public travel, language, and culture experience), plus the Mila English iOS app and legacy miachat.purangpt.com links. Together they are called the Services below.</p>
+        <p>Mia’s public Scene Studio does not require an account and keeps its most recent scene in your browser. Gia and Mila English have separate product experiences while using related account and service infrastructure behind the scenes.</p>
 
         <section>
           <h2>What the Services store</h2>
@@ -27,14 +27,14 @@ export default function PrivacyPage() {
             <li><strong>Learning data:</strong> level, lesson progress, answers, vocabulary reviews, pronunciation measurements, assessments, and study streaks.</li>
             <li><strong>Conversations:</strong> chat messages, voice transcripts, and only the facts you explicitly ask the active companion to remember.</li>
             <li><strong>Bug reports:</strong> the description and reply email you choose to provide, plus the current page, device/browser, screen size, language, and timezone. Chat history and audio are not attached.</li>
-            <li><strong>Payments:</strong> provider payment ID, product, amount, currency, status, and access period. Mila does not receive or store full card details.</li>
+            <li><strong>Payments:</strong> provider payment ID, product, amount, currency, status, and access period. Mila English does not receive or store full card details.</li>
           </ul>
         </section>
 
         <section>
           <h2>Voice data</h2>
-          <p>Pronunciation tools and the private level-assessment path send a recording to Mila only after you tap the microphone. Mila’s speech service uses it to create a transcript, then deletes the recording after the request. The transcript and resulting learning feedback may remain in your learning history.</p>
-          <p>The Mila level assessment offers a private Mila-server voice path, a written path with no microphone, and a separate optional <strong>Live conversation</strong>. Before Live conversation starts, the Service explains that microphone audio and its transcript will be sent to OpenAI for real-time processing and asks for explicit consent. Nothing is sent to OpenAI from that path unless you agree.</p>
+          <p>Pronunciation tools and the private level-assessment path send a recording to Mila English only after you tap the microphone. Its speech service uses it to create a transcript, then deletes the recording after the request. The transcript and resulting learning feedback may remain in your learning history.</p>
+          <p>The Mila English level assessment offers a private server voice path, a written path with no microphone, and a separate optional <strong>Live conversation</strong>. Before Live conversation starts, the Service explains that microphone audio and its transcript will be sent to OpenAI for real-time processing and asks for explicit consent. Nothing is sent to OpenAI from that path unless you agree.</p>
           <p>Gia’s companion voice room currently offers only consented <strong>Live voice</strong> to eligible preview or Pro accounts; its unfinished private/local mode is unavailable. Before Live starts, Gia explains that microphone audio and the transcript will be sent to OpenAI for real-time processing and asks for explicit consent. If you do not agree, you can continue in text chat. Pia asks separately for each page session. Audio is never sent to advertising companies.</p>
           <p>Text chat may be processed by a configured AI model provider to generate a reply. The Services’ server brokers those requests; clients do not receive provider credentials.</p>
         </section>
@@ -52,8 +52,8 @@ export default function PrivacyPage() {
 
         <section>
           <h2>Retention and deletion</h2>
-          <p>Learning and account data is retained while your guest profile or account remains active. Mila’s <strong>Account</strong> page can delete the shared account and its learning data. Gia’s <strong>Account</strong> page can independently delete Gia conversation history and remembered facts without touching Mila learning data. These actions cannot be undone.</p>
-          <p>When an account has a payment, Mila may retain a detached record of the payment ID, amount, currency, status, and access period where required for accounting, fraud prevention, refunds, or legal compliance. The local record no longer has a direct relation to the deleted Mila profile, but it can remain linkable through processor records where required. YooKassa and other service providers may retain data under their own legal obligations.</p>
+          <p>Learning and account data is retained while your guest profile or account remains active. Mila English’s <strong>Account</strong> page can delete the shared account and its learning data. Gia’s <strong>Account</strong> page can independently delete Gia conversation history and remembered facts without touching Mila English learning data. These actions cannot be undone.</p>
+          <p>When an account has a payment, Mila English may retain a detached record of the payment ID, amount, currency, status, and access period where required for accounting, fraud prevention, refunds, or legal compliance. The local record no longer has a direct relation to the deleted learning profile, but it can remain linkable through processor records where required. YooKassa and other service providers may retain data under their own legal obligations.</p>
         </section>
 
         <section>

@@ -10,11 +10,11 @@ import MilaIcon from '@/components/ui/MilaIcon';
 import { useI18n } from '@/lib/i18n-provider';
 
 const QUESTIONS = [
-  { sentence: 'She ___ from home.', options: ['works', 'work'], answer: 'works', ru: 'С he/she/it в настоящем времени добавляем -s.' },
-  { sentence: '___ you call yesterday?', options: ['Did', 'Do'], answer: 'Did', ru: 'Yesterday указывает на прошлое: используем Did.' },
-  { sentence: 'I ___ see you tomorrow.', options: ['will', 'did'], answer: 'will', ru: 'Tomorrow указывает на будущее: используем will.' },
-  { sentence: 'He ___ coffee every morning.', options: ['drinks', 'drink'], answer: 'drinks', ru: 'С he в настоящем времени: drinks.' },
-  { sentence: 'I would like ___ tea.', options: ['some', 'any'], answer: 'some', ru: 'В вежливой просьбе обычно используем some.' },
+  { sentence: 'She ___ from home.', options: ['works', 'work'], answer: 'works', en: 'With he, she, or it, add -s in the present simple.', ru: 'С he/she/it в настоящем времени добавляем -s.' },
+  { sentence: '___ you call yesterday?', options: ['Did', 'Do'], answer: 'Did', en: 'Yesterday points to the past, so use Did.', ru: 'Yesterday указывает на прошлое: используем Did.' },
+  { sentence: 'I ___ see you tomorrow.', options: ['will', 'did'], answer: 'will', en: 'Tomorrow points to the future, so use will.', ru: 'Tomorrow указывает на будущее: используем will.' },
+  { sentence: 'He ___ coffee every morning.', options: ['drinks', 'drink'], answer: 'drinks', en: 'With he in the present simple, use drinks.', ru: 'С he в настоящем времени: drinks.' },
+  { sentence: 'I would like ___ tea.', options: ['some', 'any'], answer: 'some', en: 'In this polite request, some sounds natural.', ru: 'В вежливой просьбе обычно используем some.' },
 ];
 
 export default function GrammarPage() {
@@ -82,7 +82,7 @@ export default function GrammarPage() {
           </Card>
           {selected && <Card hover={false} padding="0" className={`quiz-feedback ${selected===question.answer?'is-correct':'is-wrong'}`}>
             <div className="quiz-feedback__title">{selected===question.answer?(lang==='ru'?'Отлично — звучит естественно.':'Exactly — that sounds natural.'):(lang==='ru'?'Хорошая попытка. Посмотри на подсказку.':'Good try. Use this clue.')}</div>
-            <div className="quiz-feedback__copy">{lang==='ru'?question.ru:`Correct: “${question.answer}”. ${question.ru}`}</div>
+            <div className="quiz-feedback__copy">{lang==='ru'?question.ru:`Correct: “${question.answer}”. ${question.en}`}</div>
           </Card>}
           <button onClick={advance} disabled={!selected} className="product-button product-button--primary product-button--full">{index===QUESTIONS.length-1?(lang==='ru'?'Показать результат':'See result'):(lang==='ru'?'Продолжить →':'Continue →')}</button>
         </> : <Card hover={false} padding="0" className="quiz-complete">

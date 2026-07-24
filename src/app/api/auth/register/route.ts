@@ -6,8 +6,10 @@ import { consumeAuthAttempt, requestIdentity } from '@/lib/authRateLimit';
 import { publicUser } from '@/lib/publicUser';
 import { issueEmailVerification } from '@/lib/emailVerification';
 import { GIA_ORIGIN, isGiaHostname } from '@/lib/productHosts';
+import { resolveIndianNativeLanguage } from '@/lib/learningMarkets';
 
 export async function POST(request: NextRequest) {
+  const isGia = isGiaHostname(request.headers.get('host'));
   const parsed = registerSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({
@@ -24,7 +26,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { email, name, password, nativeLanguage, learnerCategory, level } = parsed.data;
+  const selectedNativeLanguage = resolveIndianNativeLanguage(parsed.data.nativeLanguage);
+  if (!isGia && !selectedNativeLanguage) {
+    return NextResponse.json({
+      error: 'Choose one of the supported native languages before creating a Mila English account.',
+      code: 'INVALID_NATIVE_LANGUAGE',
+    }, { status: 400 });
+  }
+
+  const {
+    email,
+    name,
+    password,
+    learnerCategory,
+    level,
+  } = parsed.data;
+  const nativeLanguage = isGia ? parsed.data.nativeLanguage : selectedNativeLanguage!.name;
   const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
   if (existing) {
     return NextResponse.json({ error: 'An account already uses this email. Sign in instead.', code: 'ACCOUNT_EXISTS' }, { status: 409 });
@@ -76,7 +93,6 @@ export async function POST(request: NextRequest) {
   }
 
   await createSession(user);
-  const isGia = isGiaHostname(request.headers.get('host'));
   const brand = isGia ? 'Gia' : 'Mila';
   let verificationEmailSent = false;
   let verificationUrl: string | undefined;

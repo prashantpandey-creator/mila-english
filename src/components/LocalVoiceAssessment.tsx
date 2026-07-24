@@ -35,7 +35,7 @@ const PROMPTS: Prompt[] = [
   {
     id: 'calibration',
     kind: 'read',
-    en: 'Hello, my name is Anna, and I live in Moscow.',
+    en: 'Hello, my name is Sam, and I live in a busy city.',
     ru: 'Прочитай эту фразу вслух. Она нужна только для базовой оценки произношения.',
   },
   {

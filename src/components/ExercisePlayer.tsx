@@ -59,7 +59,7 @@ function OnboardingGate({ lang, onStart }: { lang: 'ru'|'en'; onStart: () => voi
 }
 
 export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
-  phrases: { en: string; ru: string }[]; lang: 'ru'|'en';
+  phrases: { en: string; ru?: string }[]; lang: 'ru'|'en';
   onSpeak: (t: string) => void; onComplete: (score: number) => void;
 }) {
   const [showGate, setShowGate] = useState(true);  // onboarding gate
@@ -207,7 +207,7 @@ export default function ExercisePlayer({ phrases, lang, onSpeak, onComplete }: {
           <MilaIcon name="target" size={15}/>{lang==='ru' ? 'Повтори эту фразу:' : 'Repeat this phrase:'}
         </div>
         <div style={{fontSize:'1.35rem',fontWeight:700,color:C.dark,lineHeight:1.35,marginBottom:6}}>{phrase.en}</div>
-        <div style={{fontSize:'0.9rem',color:C.warm}}>{phrase.ru}</div>
+        {phrase.ru ? <div style={{fontSize:'0.9rem',color:C.warm}}>{phrase.ru}</div> : null}
         <button onClick={onListen} disabled={phase==='speaking' || phase==='recording'}
           style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,
             width:'100%',marginTop:16,padding:'10px 18px',borderRadius:12,

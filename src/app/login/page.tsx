@@ -7,6 +7,10 @@ import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
 import { useProduct } from '@/lib/product-context';
+import {
+  MILA_LEARNING_PROFILE_STORAGE_KEY,
+  resolveIndianNativeLanguage,
+} from '@/lib/learningMarkets';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -30,10 +34,19 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [returnTo, setReturnTo] = useState(isGia ? '/chat' : '/dashboard');
+  const [nativeLanguage, setNativeLanguage] = useState('');
 
   useEffect(() => {
     const requestedReturnTo = new URLSearchParams(window.location.search).get('returnTo');
     setReturnTo(safeReturnTo(requestedReturnTo, isGia ? '/chat' : '/dashboard'));
+    if (isGia) return;
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(MILA_LEARNING_PROFILE_STORAGE_KEY) || '{}');
+      const language = resolveIndianNativeLanguage(stored?.nativeLanguageId);
+      if (language) setNativeLanguage(language.name);
+    } catch {
+      setNativeLanguage('');
+    }
   }, [isGia]);
 
   const messageFor = (code?: string, fallback?: string) => {
@@ -56,9 +69,17 @@ export default function LoginPage() {
   };
 
   const handleGuestLogin = async () => {
+    if (!isGia && !resolveIndianNativeLanguage(nativeLanguage)) {
+      router.push('/?chooseLanguage=1');
+      return;
+    }
     setLoading(true); setError('');
     try {
-      const res = await fetch('/api/auth/guest', { method: 'POST' });
+      const res = await fetch('/api/auth/guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(isGia ? {} : { nativeLanguage }),
+      });
       const body = await res.json().catch(() => null);
       if (!res.ok) throw new Error(messageFor(body?.code, body?.error));
       router.push(returnTo);
@@ -76,9 +97,9 @@ export default function LoginPage() {
         <div className="welcome-auth__nav-inner">
           <span className="welcome-auth__brand">
             <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'M'}</span>
-            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila'}</span>
+            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila English'}</span>
           </span>
-          <LangToggle />
+          {isGia ? <LangToggle /> : <span className="welcome-auth__market">India · English</span>}
         </div>
       </nav>
       <main className="welcome-auth__main">
@@ -90,45 +111,45 @@ export default function LoginPage() {
             <h1 className="welcome-auth__title">
               {isGia
                 ? (lang === 'ru' ? 'Продолжить в Gia' : 'Continue to Gia')
-                : t('login_title')}
+                : 'Continue to Mila English'}
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
                 ? (lang === 'ru' ? 'Войди в Gia или продолжи как гость.' : 'Sign in to Gia, or continue as a guest.')
-                : t('login_subtitle')}
+                : 'Sign in to continue your English learning path.'}
             </p>
           </div>
           <form onSubmit={handleLogin} className="welcome-auth__form">
             {error && <div className="welcome-auth__error" role="alert">{error}</div>}
             <div className="welcome-auth__field">
-              <label className="welcome-auth__label" htmlFor="login-email">{t('login_email')}</label>
-              <input id="login-email" name="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} className="welcome-auth__input" placeholder="anna@example.com" autoComplete="email" maxLength={254} required />
+              <label className="welcome-auth__label" htmlFor="login-email">{isGia ? t('login_email') : 'Email'}</label>
+              <input id="login-email" name="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} className="welcome-auth__input" placeholder="you@example.com" autoComplete="email" maxLength={254} required />
             </div>
             <div className="welcome-auth__field">
-              <label className="welcome-auth__label" htmlFor="login-password">{t('login_password')}</label>
+              <label className="welcome-auth__label" htmlFor="login-password">{isGia ? t('login_password') : 'Password'}</label>
               <input id="login-password" name="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="welcome-auth__input" placeholder="••••••••" autoComplete="current-password" maxLength={128} required />
-              <a href="/forgot-password" className="welcome-auth__field-link">{lang === 'ru' ? 'Забыли пароль?' : 'Forgot password?'}</a>
+              <a href="/forgot-password" className="welcome-auth__field-link">{isGia && lang === 'ru' ? 'Забыли пароль?' : 'Forgot password?'}</a>
             </div>
-            <button type="submit" disabled={loading} className="welcome-auth__button welcome-auth__button--primary">{loading ? '...' : t('login_btn')}</button>
-            <div className="welcome-auth__separator">{lang==='ru'?'или':'or'}</div>
+            <button type="submit" disabled={loading} className="welcome-auth__button welcome-auth__button--primary">{loading ? '...' : isGia ? t('login_btn') : 'Sign in to Mila English'}</button>
+            <div className="welcome-auth__separator">{isGia && lang==='ru'?'или':'or'}</div>
             <button type="button" onClick={handleGuestLogin} disabled={loading}
               className="welcome-auth__button welcome-auth__button--secondary">
-              {lang==='ru'?'Продолжить как гость':'Continue as guest'}
+              {isGia && lang==='ru'?'Продолжить как гость':nativeLanguage ? 'Continue as guest' : 'Choose language to continue as guest'}
             </button>
             <p className="welcome-auth__guest-note">
               {isGia
                 ? (lang === 'ru'
                     ? 'Гостевой сеанс приватный: разговоры не сохраняются. Зарегистрируйся, чтобы сохранить историю.'
                     : 'A guest session is private: chats aren’t saved. Sign up to keep your history.')
-                : (lang === 'ru'
-                    ? 'Гостевой сеанс приватный: разговоры не сохраняются. Зарегистрируйся, чтобы сохранить прогресс и историю.'
-                    : 'A guest session is private: chats aren’t saved. Sign up to keep your progress and history.')}
+                : nativeLanguage
+                  ? `Guest learning will use ${nativeLanguage} for explanations. Sign up to keep progress across devices.`
+                  : 'Choose your native language on the Mila English home page before entering as a guest.'}
             </p>
           </form>
           <p className="welcome-auth__footer">
-            {t('login_no_account')} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="welcome-auth__link">{t('login_create')}</a>
+            {isGia ? t('login_no_account') : 'New to Mila English?'} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="welcome-auth__link">{isGia ? t('login_create') : 'Create an account'}</a>
           </p>
-          <p className="welcome-auth__legal"><a href="/terms">{lang === 'ru' ? 'Условия' : 'Terms'}</a><span>·</span><a href="/privacy">{lang === 'ru' ? 'Конфиденциальность' : 'Privacy'}</a></p>
+          <p className="welcome-auth__legal"><a href="/terms">{isGia && lang === 'ru' ? 'Условия' : 'Terms'}</a><span>·</span><a href="/privacy">{isGia && lang === 'ru' ? 'Конфиденциальность' : 'Privacy'}</a></p>
         </div>
       </main>
       <style jsx>{`
@@ -209,6 +230,13 @@ export default function LoginPage() {
           font-size: 1.28rem;
           font-weight: 750;
           letter-spacing: -.025em;
+        }
+        .welcome-auth__market {
+          color: var(--auth-muted);
+          font-size: .68rem;
+          font-weight: 800;
+          letter-spacing: .11em;
+          text-transform: uppercase;
         }
         .welcome-auth__nav :global(.lang-toggle) {
           border-color: rgba(217,0,108, .14);

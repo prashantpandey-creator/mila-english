@@ -22,6 +22,8 @@ type GuideContext = {
   name?: string
   level?: string | null
   streakDays?: number
+  nativeLanguage?: string
+  teacherName?: string | null
   continueHref?: string
   continueTitle?: string
   continueTitleRu?: string
@@ -184,6 +186,7 @@ export default function MilaGuide() {
   const { isHydrating: isHistoryHydrating, refreshHistory } = useCompanionHistory({ limit: 12, setMessages })
 
   const page = PAGE_LABELS[pageKey(pathname)]
+  const teacherName = context?.teacherName || 'Mila'
   const agentState = listening ? 'listening' : isLoading || voicePending ? 'thinking' : speaking ? 'speaking' : 'idle'
   const isMiaApex = mounted && typeof window !== 'undefined' && isMiaHostname(window.location.hostname) && pathname === '/'
   const isVoiceRoom = isMiaApex
@@ -192,7 +195,7 @@ export default function MilaGuide() {
   const welcome = useMemo(() => {
     if (pathname === '/') return lang === 'ru'
       ? 'Привет! Я Мила. Покажу, как всё устроено, и помогу начать.'
-      : "Hi! I'm Mila. I can show you around and help you begin."
+      : `Hi! I’m ${teacherName}, your AI English teacher. I can show you around and help you begin.`
     if (pathname.startsWith('/lessons/')) return lang === 'ru'
       ? 'Я рядом. Спроси про фразу, правило или произношение из этого урока.'
       : 'I’m here. Ask me about any phrase, rule, or sound in this lesson.'
@@ -202,7 +205,7 @@ export default function MilaGuide() {
     return lang === 'ru'
       ? `Ты в разделе «${page.ru}». Я могу объяснить его или предложить следующий шаг.`
       : `You’re in ${page.en}. I can explain this page or suggest what to do next.`
-  }, [lang, page.en, page.ru, pathname])
+  }, [lang, page.en, page.ru, pathname, teacherName])
 
   useEffect(() => {
     setMounted(true)
@@ -633,7 +636,7 @@ export default function MilaGuide() {
     else if (!open) startVoiceConversation()
   }
 
-  if (!mounted || isVoiceRoom) return null
+  if (!mounted || isVoiceRoom || pathname === '/') return null
 
   const continueLabel = lang === 'ru' ? context?.continueTitleRu : context?.continueTitle
   const status = agentState === 'thinking'
@@ -645,7 +648,7 @@ export default function MilaGuide() {
         : (lang === 'ru' ? 'Готова помочь' : 'Ready to help')
 
   return (
-    <aside className={`mila-guide ${pathname === '/' ? 'is-home' : ''} ${open ? 'is-open' : ''}`} data-state={agentState} data-voice={voiceMode ? '1' : '0'} aria-label={lang === 'ru' ? 'Помощница Мила' : 'Mila assistant'}>
+    <aside className={`mila-guide ${pathname === '/' ? 'is-home' : ''} ${open ? 'is-open' : ''}`} data-state={agentState} data-voice={voiceMode ? '1' : '0'} aria-label={lang === 'ru' ? 'Помощница Mila English' : `${teacherName}, AI English teacher`}>
       <span
         id="mila-guide-launcher-help"
         style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}
@@ -655,14 +658,14 @@ export default function MilaGuide() {
           : 'Click once or press Enter to talk. Double-click or use the chat button to type.'}
       </span>
       {open && (
-        <section id="mila-guide-text-panel" className="mila-guide__panel" data-mila-surface="text-chat" role="dialog" aria-modal="false" aria-label={lang === 'ru' ? 'Чат с Милой' : 'Chat with Mila'}>
+        <section id="mila-guide-text-panel" className="mila-guide__panel" data-mila-surface="text-chat" role="dialog" aria-modal="false" aria-label={lang === 'ru' ? 'Чат с учителем Mila English' : `Chat with ${teacherName}`}>
           <header className="mila-guide__header">
             <div className="mila-guide__portrait" aria-hidden>
               <MilaVoiceMark size={38} state={agentState} />
               <i />
             </div>
             <div className="mila-guide__identity">
-              <strong>Mila</strong>
+              <strong>{teacherName}</strong>
               <span><i />{status}</span>
             </div>
             <span className="mila-guide__page">{lang === 'ru' ? page.ru : page.en}</span>
@@ -747,7 +750,7 @@ export default function MilaGuide() {
               <button className={`mila-guide__mic ${listening ? 'is-listening' : ''}`} type="button" onClick={startListening} disabled={isLoading || isHistoryHydrating} aria-label={lang === 'ru' ? 'Сказать вопрос' : 'Speak a question'} title={speechSupported ? (lang === 'ru' ? 'Говорить' : 'Speak') : (lang === 'ru' ? 'Голосовой ввод недоступен — можно написать' : 'Voice input unavailable — you can type instead')}>
                 <svg viewBox="0 0 24 24" aria-hidden><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
               </button>
-              <input ref={inputRef} value={input} onChange={handleInputChange} disabled={isLoading || isHistoryHydrating} placeholder={lang === 'ru' ? 'Спроси Милу…' : 'Ask Mila…'} aria-label={lang === 'ru' ? 'Сообщение Миле' : 'Message Mila'} />
+              <input ref={inputRef} value={input} onChange={handleInputChange} disabled={isLoading || isHistoryHydrating} placeholder={lang === 'ru' ? 'Спроси учителя…' : `Ask ${teacherName}…`} aria-label={lang === 'ru' ? 'Сообщение учителю' : `Message ${teacherName}`} />
               <button className="mila-guide__send" type="submit" disabled={isLoading || isHistoryHydrating || !input.trim()} aria-label={lang === 'ru' ? 'Отправить' : 'Send'}><MilaIcon name="arrow" size={18} style={{transform:'rotate(-90deg)'}}/></button>
             </form>
           ) : (

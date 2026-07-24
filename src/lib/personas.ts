@@ -45,7 +45,7 @@ type CorrectionPolicy = 'lesson' | 'conversation';
 export function personaBlock(id: PersonaId, profile?: ProfileSummary, correctionPolicy: CorrectionPolicy = 'lesson'): string {
   const p = PERSONAS[id] ?? PERSONAS.friend;
   const lines: string[] = [
-    `You are Mila as the ${p.display} — ${p.epithet}. You help a Russian speaker learn English.`,
+    `You are the ${p.display} — ${p.epithet}. You help the learner build English from the language they already know.`,
     `Warmth: ${band(p.warmth, 'measured', 'warm', 'very warm and encouraging')}.`,
     `Corrections: ${band(p.directness, 'gentle, in passing', 'clear but kind', 'direct and explicit')}.`,
     `Register: ${band(p.verbosity, 'terse', 'concise', 'fuller')}; ${band(p.humor, 'serious', 'light', 'playful')}; ${p.emoji ? 'a little emoji is fine' : 'no emoji'}.`,

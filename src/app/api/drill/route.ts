@@ -12,7 +12,8 @@ import { z } from 'zod';
 
 export const maxDuration = 30;
 
-// Minimal-pair fallbacks for the sounds Russian speakers actually stumble on.
+// General English minimal-pair fallbacks. Personal targets come from the
+// learner's measured phoneme history, not a presumed native-language accent.
 const STATIC_DRILLS: Record<string, { text: string; contrast: string }[]> = {
   'θ': [{ text: 'I think this thing is thin.', contrast: 'think–sink' },
         { text: 'Both paths go through the theatre.', contrast: 'path–pass' }],
@@ -34,11 +35,14 @@ export async function GET(req: NextRequest) {
 
   // Weakest first: attempted, lowest mastery. (due filtering can come later —
   // for drills we always want the weakest sounds regardless of schedule.)
-  const weak = await prisma.phonemeStat.findMany({
-    where: { userId, attempts: { gt: 0 } },
-    orderBy: { mastery: 'asc' },
-    take: 3,
-  });
+  const [weak, profile] = await Promise.all([
+    prisma.phonemeStat.findMany({
+      where: { userId, attempts: { gt: 0 } },
+      orderBy: { mastery: 'asc' },
+      take: 3,
+    }),
+    prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
+  ]);
 
   if (weak.length === 0) {
     return NextResponse.json({ drills: [], reason: 'no-data' });
@@ -55,11 +59,12 @@ export async function GET(req: NextRequest) {
     const { object } = await generateObject({
       model: openai('gpt-4o-mini'),
       system:
-        'You are a pronunciation coach for Russian speakers learning English. ' +
+        'You are an English pronunciation coach. Base every drill on the measured target phonemes supplied, not on stereotypes about a native language. ' +
         'Generate short minimal-pair drill sentences (6-10 words) that are dense in the target phoneme. ' +
         'Natural, everyday English. If a substitution is given (what the learner says instead), ' +
         'pick words that contrast the target sound against that substitution.',
       prompt:
+        `Learner native language (context only): ${JSON.stringify(profile?.nativeLanguage || 'not set')}\n` +
         `Target phonemes (IPA, weakest first): ${JSON.stringify(targets)}\n` +
         'Generate exactly 2 drill sentences per phoneme.',
       schema: z.object({

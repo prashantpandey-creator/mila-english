@@ -13,6 +13,7 @@ import { ttsSpeak } from '@/lib/tts';
 import { useI18n } from '@/lib/i18n-provider';
 import { C } from '@/lib/theme';
 import { getBuiltinLesson } from '@/lib/builtinLessons';
+import { teacherForNativeLanguage } from '@/lib/learningMarkets';
 
 function lessonIcon(id: string, category: string): MilaIconName {
   if (id === '1') return 'conversation';
@@ -163,6 +164,7 @@ export default function LessonPage() {
   const [step, setStep] = useState<'words'|'phrases'|'practice'>('words');
   const [dbLesson, setDbLesson] = useState<any>(null);
   const [dbError, setDbError] = useState(false);
+  const [nativeLanguage, setNativeLanguage] = useState('');
   const startedAt = useRef(Date.now());
 
   // Lessons not in the built-in set are AI-generated ones living in the DB,
@@ -176,9 +178,22 @@ export default function LessonPage() {
       .catch(() => { clearTimeout(timer); setDbError(true); });
   }, [params?.id, staticLesson]);
 
+  useEffect(() => {
+    fetch('/api/users/me', { cache: 'no-store' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((profile) => setNativeLanguage(profile?.nativeLanguage || ''))
+      .catch(() => {});
+  }, []);
+
   const speak = (text: string) => {
     ttsSpeak(text, 'en-US', 0.75);
   };
+  const legacyRussianSupport = /^(?:русский|russian)$/iu.test(nativeLanguage);
+  const matchedTeacher = teacherForNativeLanguage(nativeLanguage);
+  const practicePhrases = (staticLesson?.phrases || []).map((phrase) => ({
+    en: phrase.en,
+    ru: legacyRussianSupport ? phrase.ru : '',
+  }));
 
   // AI-generated lesson: read the content, then answer the quiz for real —
   // each tap checks against /api/exercises/<id>/check, completion records Progress.
@@ -262,7 +277,15 @@ export default function LessonPage() {
               <button type="button" className="focus-card" key={i} style={{width:'100%',padding:'16px 20px',marginBottom:10,color:'inherit',font:'inherit',textAlign:'left',cursor:'pointer'}}
                    onClick={()=>{setShowTranslation(showTranslation===p.en?!showTranslation:p.en);speak(p.en)}}>
                 <div style={{fontWeight:600,fontSize:'1.05rem',color:C.dark}}>{p.en}</div>
-                {showTranslation===p.en && <div style={{color:C.warm,marginTop:4,fontSize:'0.9rem'}}>{p.ru}</div>}
+                {showTranslation===p.en && (
+                  <div style={{color:C.warm,marginTop:4,fontSize:'0.9rem'}}>
+                    {legacyRussianSupport
+                      ? p.ru
+                      : matchedTeacher
+                        ? `${matchedTeacher.name}, your AI English teacher, can explain this in ${nativeLanguage}.`
+                        : 'Ask your Mila English teacher to explain this phrase in your native language.'}
+                  </div>
+                )}
               </button>
             ))}
             <button onClick={()=>setStep('practice')}
@@ -274,7 +297,7 @@ export default function LessonPage() {
 
         {step === 'practice' && (
           <ExercisePlayer
-            phrases={lesson.phrases}
+            phrases={practicePhrases}
             lang={lang}
             onSpeak={speak}
             onComplete={(score)=>{

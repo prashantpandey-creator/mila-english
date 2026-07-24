@@ -111,6 +111,13 @@ export default function Atmosphere() {
     };
   }, [storyActive]);
 
+  // Mila English now starts with the compact country/native-language setup.
+  // Keep that front door visually quiet; the older cinematic origin story
+  // would compete with the required first choice and reintroduce a skip control.
+  if (pathname === '/') {
+    return <div className={`atmosphere atmosphere--${surface}`} aria-hidden />;
+  }
+
   if (pathname !== '/' || dead) {
     return <div className={`atmosphere atmosphere--${surface}`} aria-hidden />;
   }

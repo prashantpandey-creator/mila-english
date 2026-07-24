@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { authenticate, createSession, hashPassword } from '@/lib/auth';
 import { consumeAuthAttempt, requestIdentity } from '@/lib/authRateLimit';
 import { publicUser } from '@/lib/publicUser';
+import { resolveIndianNativeLanguage } from '@/lib/learningMarkets';
+import { isGiaHostname } from '@/lib/productHosts';
 
 export async function POST(request: NextRequest) {
   const current = await authenticate(request);
@@ -20,14 +22,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const isGia = isGiaHostname(request.headers.get('host'));
+  const body = await request.json().catch(() => null);
+  const selectedNativeLanguage = resolveIndianNativeLanguage(body?.nativeLanguage);
+  if (!isGia && body?.nativeLanguage && !selectedNativeLanguage) {
+    return NextResponse.json({
+      error: 'Choose a supported native language.',
+      code: 'INVALID_NATIVE_LANGUAGE',
+    }, { status: 400 });
+  }
+
   const guestId = randomUUID();
   const user = await prisma.user.create({
     data: {
       email: `guest-${guestId}@mila.local`,
-      name: 'Гость / Guest',
+      name: 'Guest',
       password: await hashPassword(randomBytes(32).toString('hex')),
       learnerCategory: 'pending',
-      nativeLanguage: 'Русский',
+      // Guest entry points in Mila's onboarding always send this choice.
+      // Other product/internal guest flows remain deliberately unclassified
+      // instead of silently assuming Hindi or retaining the old Russian default.
+      nativeLanguage: selectedNativeLanguage?.name ?? 'Not set',
       level: 'pending',
       accountType: 'guest',
       joinDate: new Date(),

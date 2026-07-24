@@ -18,8 +18,8 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   return {
-    title: 'Sign in to Mila',
-    description: 'Continue your Mila language-learning path.',
+    title: 'Sign in to Mila English',
+    description: 'Continue learning English with your native-language AI teacher.',
     robots: { index: false, follow: false },
   };
 }

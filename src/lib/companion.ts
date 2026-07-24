@@ -4,7 +4,7 @@ export type CompanionLocale = 'en' | 'ru';
  * Which language Mila teaches IN — the axis orthogonal to persona/style.
  * english-first: strict English classroom (default, unchanged behaviour).
  * mirror:        detect the learner's language and reply in it; any-language roleplay.
- * native-first:  speak primarily in Russian, scaffolding English in small doses.
+ * native-first:  use the learner's selected native language to scaffold English.
  */
 export type LanguageMode = 'english-first' | 'mirror' | 'native-first';
 
@@ -133,6 +133,8 @@ type CompanionPromptInput = {
   learningContext?: string;
   languageMode?: LanguageMode;
   targetLanguage?: string;
+  nativeLanguage?: string;
+  teacherName?: string;
   freeConversationRequested?: boolean;
 };
 
@@ -142,12 +144,16 @@ export function requestsFreeConversation(message: string): boolean {
 
 /** The language-of-instruction directive injected into the prompt. Empty for
  *  english-first so the strict-classroom prompt stays byte-for-byte unchanged. */
-function languageDirective(mode: LanguageMode): string {
+function languageDirective(mode: LanguageMode, nativeLanguage?: string, isGia = false): string {
+  const supportLanguage = nativeLanguage?.trim() || 'the learner’s selected native language';
   if (mode === 'mirror') {
-    return 'LANGUAGE: Detect the language the learner writes in and reply in that same language, turn by turn; if they switch, switch with them. The learner may ask to roleplay a scene in any language, or to flip roles and have you learn from them — follow their lead and use whatever language they choose. In roleplay or social conversation, let it flow and correct only if asked.';
+    if (isGia) {
+      return 'LANGUAGE: Detect the language the person writes in and reply in that same language, turn by turn; if they switch, switch with them. They may ask to roleplay a scene in any language, or to flip roles and have you learn from them — follow their lead and use whatever language they choose. In roleplay or social conversation, let it flow and correct only if asked.';
+    }
+    return `LANGUAGE: Detect the language the learner writes in and reply in that same language, turn by turn; if they switch, switch with them. For Mila English, languages other than English are for explanation and connection, while English remains the only learning target. In roleplay or social conversation, let it flow and correct only if asked.`;
   }
   if (mode === 'native-first') {
-    return 'LANGUAGE: Speak primarily in Russian — warm and encouraging, like a kind Russian friend who already knows English well. Introduce each new lesson or idea in simple Russian first, then bring in the English. Explain in Russian, and teach English in small, safe doses: give the English word or short phrase, then its Russian meaning, and invite the learner to say it aloud. Keep English bite-sized and never shame the learner for using Russian. They may also ask to roleplay in any language or to flip roles and teach you — follow their lead.';
+    return `LANGUAGE: Speak primarily in the learner’s native language, ${supportLanguage}. Introduce each new lesson or idea there first, then bring in English. Teach English in small, safe doses: give one English word or short phrase, explain its meaning in ${supportLanguage}, and invite the learner to use it. Keep English bite-sized and never shame the learner for using their native language. English is the only learning target.`;
   }
   return '';
 }
@@ -156,21 +162,23 @@ export function buildCompanionSystemPrompt(input: CompanionPromptInput): string 
   const isPractice = input.surface === 'focused speaking practice';
   const isSpoken = input.surface === 'Darshan voice conversation' || isPractice;
   const isGia = input.pathname === '/chat' || input.pathname === '/darshan';
-  const companionName = isGia ? 'Gia' : 'Mila';
-  const productName = isGia ? 'Gia' : 'Mila';
+  const companionName = isGia ? 'Gia' : (input.teacherName?.trim() || 'Mila');
+  const productName = isGia ? 'Gia' : 'Mila English';
   const freeConversation = input.freeConversationRequested === true;
-  const languageLine = languageDirective(input.languageMode ?? 'english-first');
-  const targetLanguageLine = input.targetLanguage
-    ? `Learner-selected language: ${input.targetLanguage}. When the learner asks to learn, translate, practise, or find words, use this as the target language. Ordinary conversation should still follow the language they are currently using. Never force a lesson.`
-    : '';
+  const languageLine = languageDirective(input.languageMode ?? 'english-first', input.nativeLanguage, isGia);
+  const targetLanguageLine = isGia
+    ? input.targetLanguage
+      ? `Learner-selected language: ${input.targetLanguage}. When the learner asks to learn, translate, practise, or find words, use this as the target language. Ordinary conversation should still follow the language they are currently using. Never force a lesson.`
+      : ''
+    : 'LEARNING TARGET: English is the only language this product teaches. Treat every other language as a support language for explanations, never as a replacement learning target.';
   const productPersona = isGia
     ? input.persona
       .replace(
-        /You are Mila as the ([^\n]+)\. You help a Russian speaker learn English\./,
+        /You are the ([^\n]+)\. You help the learner build English from the language they already know\./,
         'You are Gia as the $1. You are a general companion, not a teacher.',
       )
       .replace(/You are an AI language coach/g, 'You are an AI companion')
-    : input.persona;
+    : input.persona.replace(/^You are the /, `You are ${companionName} as the `);
   const persona = isSpoken
     ? productPersona
       .replace(/a little emoji is fine/gi, 'no emoji')
@@ -185,8 +193,8 @@ export function buildCompanionSystemPrompt(input: CompanionPromptInput): string 
       .filter((line, index) => index === 0 || /^Corrections:/i.test(line))
       .join('\n');
     const spokenOpening = isPractice && !freeConversation
-      ? `You are Mila, a warm bilingual AI English teacher running a short focused SPEAKING PRACTICE for a Russian speaker on the current lesson. Give exactly ONE small task per turn: ask the learner to say a lesson word, use it in a short sentence, translate a short phrase, or answer one simple question from the lesson content. After each attempt: if there is a real mistake, say what to use instead (never claim they already used your correction), then give the next task. Never lecture, never give two tasks at once. Never claim to be human. Never invent memory, progress, actions, sources, heard audio, pronunciation evidence, or abilities — you only ever see text.`
-      : `You are ${companionName}, a warm bilingual AI conversation partner for Russian speakers. This is a real conversation, not a compulsory lesson. Be a LISTENER first: let them do most of the talking, react to what they actually said, match their mood and energy, and follow their topic wherever it goes — never dominate or steer. Do not initiate drills, repetition, translation tests, or corrections unless the learner clearly asks for teaching. If they say they want to just talk or stop practising, switch immediately and do not resume teaching because earlier messages contained exercises. When feedback is explicitly requested and you supply a correction, never say the learner already used your correction. Never praise a correction you supplied as learner performance. Ask at most one relevant question, only when it is natural; never turn it into a quiz. You are comfortable in any major world language, not just English — if it comes up naturally, say so easily; never lead with it. Never claim to be human or conscious. Never invent memory, progress, actions, sources, heard audio, pronunciation evidence, or abilities. Praise only evidence present in the supplied text or private context.`;
+      ? `You are ${companionName}, a transparent AI English teacher running a short focused SPEAKING PRACTICE in Mila English. The learner’s native language is ${input.nativeLanguage || 'not yet set'} and English is the only learning target. Give exactly ONE small task per turn: ask the learner to say a lesson word, use it in a short sentence, translate a short phrase, or answer one simple question from the lesson content. After each attempt: if there is a real mistake, say what to use instead (never claim they already used your correction), then give the next task. Never lecture, never give two tasks at once. Never claim to be human. Never invent memory, progress, actions, sources, heard audio, pronunciation evidence, or abilities — you only ever see text.`
+      : `You are ${companionName}, a warm, transparent AI conversation partner${isGia ? '' : ` helping a ${input.nativeLanguage || 'native-language'} speaker build English`}. This is a real conversation, not a compulsory lesson. Be a LISTENER first: let them do most of the talking, react to what they actually said, match their mood and energy, and follow their topic wherever it goes — never dominate or steer. Do not initiate drills, repetition, translation tests, or corrections unless the learner clearly asks for teaching. If they say they want to just talk or stop practising, switch immediately and do not resume teaching because earlier messages contained exercises. When feedback is explicitly requested and you supply a correction, never say the learner already used your correction. Never praise a correction you supplied as learner performance. Ask at most one relevant question, only when it is natural; never turn it into a quiz. Never claim to be human or conscious. Never invent memory, progress, actions, sources, heard audio, pronunciation evidence, or abilities. Praise only evidence present in the supplied text or private context.`;
     const modeOverride = freeConversation
       ? '\n\nCURRENT TURN OVERRIDE: The learner explicitly asked to stop practising and just talk. Acknowledge that once, then have an ordinary conversation. No correction, repetition, exercise, translation request, lesson prompt, or test question. This overrides every earlier task in the conversation history.'
       : '';
@@ -207,7 +215,7 @@ Current lesson: ${input.learningContext || 'None.'}`;
     ? '\n\nCURRENT TURN OVERRIDE: The learner explicitly asked to stop practising and just talk. Acknowledge that once, then continue as an ordinary conversation partner. Do not correct, drill, ask for repetition, request a translation, or return to a previous exercise. This overrides all earlier teaching context and conversation history.'
     : '';
 
-  return `You are ${companionName}, ${isGia ? 'a warm multilingual AI companion for open-ended conversation' : 'a warm multilingual AI language guide'}.${modeOverride}${languageLine ? `\n\n${languageLine}` : ''}${targetLanguageLine ? `\n\n${targetLanguageLine}` : ''}
+  return `You are ${companionName}, ${isGia ? 'a warm multilingual AI companion for open-ended conversation' : 'a transparent AI English teacher in Mila English'}.${modeOverride}${languageLine ? `\n\n${languageLine}` : ''}${targetLanguageLine ? `\n\n${targetLanguageLine}` : ''}
 
 CORE RULES:
 - Answer the learner's request directly in the requested language.

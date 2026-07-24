@@ -56,8 +56,15 @@ export default function ListenPage() {
   const [drills, setDrills] = useState<any[]>([]);        // personal AI drills from /api/drill
   const [drillIdx, setDrillIdx] = useState<number|null>(null); // null = pack mode
   const [drillLoading, setDrillLoading] = useState(false);
+  const [nativeLanguage, setNativeLanguage] = useState('');
 
   useEffect(() => { setM(true); }, []);
+  useEffect(() => {
+    fetch('/api/users/me', { cache: 'no-store' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((profile) => setNativeLanguage(profile?.nativeLanguage || ''))
+      .catch(() => {});
+  }, []);
   useEffect(() => { if (typeof window !== 'undefined') window.speechSynthesis?.getVoices(); }, [m]);
   if (!m) return null;
 
@@ -67,6 +74,7 @@ export default function ListenPage() {
   const phrase = inDrill
     ? { text: drills[drillIdx!].text, ipa: drills[drillIdx!].contrast, ru: drills[drillIdx!].tip || '', gi: -1, hard: '', sound: drills[drillIdx!].phoneme }
     : (items[pos] || items[0]);
+  const phraseSupport = inDrill || /^(?:русский|russian)$/iu.test(nativeLanguage) ? phrase.ru : '';
 
   const onPack = (id: string) => {
     setPack(id); setPos(0); setResult(null); setPhase('idle'); setErrMsg(''); setSession(null); setDrillIdx(null);
@@ -268,7 +276,7 @@ export default function ListenPage() {
             <div className="listen-page__tip">
               <MilaIcon name="sparkle" size={15}/><span>{result.tip}</span>
             </div>
-            <div style={{marginTop:8,fontSize:'0.8rem',color:'var(--mila-muted, #65535f)'}}>{phrase.ru}</div>
+            {phraseSupport ? <div style={{marginTop:8,fontSize:'0.8rem',color:'var(--mila-muted, #65535f)'}}>{phraseSupport}</div> : null}
           </section>
         )}
 

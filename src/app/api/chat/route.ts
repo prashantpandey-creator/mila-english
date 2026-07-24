@@ -28,13 +28,13 @@ import {
 } from '@/lib/companionStore';
 import { selectHistoryForModel } from '@/lib/companionHistory';
 import { readLearnerProfile } from '@/lib/learnerProfile';
-import { isTargetLanguageId, targetLanguagePrompt } from '@/lib/languages';
 import { personaBlock, type PersonaId } from '@/lib/personas';
 import { prisma } from '@/lib/prisma';
 import { builtinLessonContent, getBuiltinLesson } from '@/lib/builtinLessons';
 import { bugReportSchema, parseBugReportRequest } from '@/lib/bugReport';
 import { reserveBugReportDelivery, sendBugReportEmail } from '@/lib/sendBugReportEmail';
 import { isGiaHostname, isMiaHostname } from '@/lib/productHosts';
+import { MILA_TARGET_LANGUAGE, teacherForNativeLanguage } from '@/lib/learningMarkets';
 
 export const maxDuration = 60;
 
@@ -361,7 +361,7 @@ export async function POST(request: NextRequest) {
   const [profile, learnerProfile, recentProgress, storedMessages, memories] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
-      select: { name: true, level: true, goal: true, tonePreference: true, streakDays: true },
+      select: { name: true, level: true, goal: true, tonePreference: true, streakDays: true, nativeLanguage: true },
     }),
     readLearnerProfile(userId),
     prisma.progress.findMany({
@@ -383,7 +383,7 @@ export async function POST(request: NextRequest) {
         ? `Person: ${safeContextValue(profile.name, 'guest')}; personal context: ${safeContextValue(profile.goal, 'not set')}.`
         : 'Personal profile is not available.')
     : profile
-      ? `Learner: ${safeContextValue(profile.name, 'student')}; level: ${safeContextValue(profile.level, 'unknown')}; goal: ${safeContextValue(profile.goal, 'not set')}; streak: ${profile.streakDays}.`
+      ? `Learner: ${safeContextValue(profile.name, 'student')}; native language: ${safeContextValue(profile.nativeLanguage, 'not set')}; learning target: English; level: ${safeContextValue(profile.level, 'unknown')}; goal: ${safeContextValue(profile.goal, 'not set')}; streak: ${profile.streakDays}.`
       : 'Learner profile is not available.';
   const recentSummary = giaRequest
     ? 'Structured learning progress is outside Gia.'
@@ -393,21 +393,18 @@ export async function POST(request: NextRequest) {
   const lessonId = pathname.match(/^\/lessons\/([a-z0-9-]+)$/i)?.[1];
   const currentLesson = !giaRequest && lessonId ? getBuiltinLesson(lessonId) : null;
   const learningContext = currentLesson
-    ? `Current lesson: ${currentLesson.titleEn} / ${currentLesson.titleRu}.\nVocabulary: ${currentLesson.words.join(', ')}.\nExamples:\n${builtinLessonContent(currentLesson)}`
+    ? `Current English lesson: ${currentLesson.titleEn}.\nVocabulary: ${currentLesson.words.join(', ')}.\nExamples:\n${builtinLessonContent(currentLesson)}`
     : undefined;
-  // Language-of-instruction axis (orthogonal to persona), matching the owner's
-  // rule: the general/front conversation is fun and neutral — mirror whatever
-  // language the learner uses, help only if asked. The CLASSROOM lives INSIDE
-  // lessons: there a beginner is taught in Russian (introduced simply), everyone
-  // else in English. An explicit client value (a future toggle) always wins.
+  // Language of explanation and teaching target are separate. Mila may explain
+  // through the learner's stored native language, but English is server-enforced
+  // as its only target. Client-supplied target-language values are ignored.
   const levelTag = (profile?.level || '').trim().toUpperCase();
   const beginner = levelTag === '' || levelTag === 'PENDING' || levelTag === 'A1';
   const freeConversationRequested = requestsFreeConversation(latestUserMessage);
   const inLesson = !giaRequest && (surfaceKind === 'practice' || Boolean(currentLesson)) && !freeConversationRequested;
   const playfulConversation = surfaceKind === 'chat' && payload?.context?.conversationStyle === 'playful';
-  const targetLanguage = !giaRequest && isTargetLanguageId(payload?.context?.targetLanguage)
-    ? targetLanguagePrompt(payload.context.targetLanguage)
-    : undefined;
+  const targetLanguage = giaRequest ? undefined : MILA_TARGET_LANGUAGE.name;
+  const matchedTeacher = giaRequest ? undefined : teacherForNativeLanguage(profile?.nativeLanguage);
   const persona = personaBlock(
     playfulConversation
       ? 'playful'
@@ -419,11 +416,11 @@ export async function POST(request: NextRequest) {
   );
   const requestedLanguageMode = payload?.context?.languageMode;
   const languageMode: LanguageMode =
-    requestedLanguageMode === 'english-first' || requestedLanguageMode === 'mirror' || requestedLanguageMode === 'native-first'
+    giaRequest
+      ? 'mirror'
+      : requestedLanguageMode === 'english-first' || requestedLanguageMode === 'mirror' || requestedLanguageMode === 'native-first'
       ? requestedLanguageMode
-      : giaRequest
-        ? 'mirror'
-        : inLesson
+      : inLesson
         ? (beginner ? 'native-first' : 'english-first')
         : 'mirror';
   const system = buildCompanionSystemPrompt({
@@ -439,6 +436,8 @@ export async function POST(request: NextRequest) {
     learningContext,
     languageMode,
     targetLanguage,
+    nativeLanguage: giaRequest ? undefined : profile?.nativeLanguage,
+    teacherName: matchedTeacher?.name,
     freeConversationRequested,
   });
 

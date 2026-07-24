@@ -227,31 +227,39 @@ assert.match(justTalkPrompt, /Do not correct, drill, ask for repetition/i);
 
 const nativePrompt = buildCompanionSystemPrompt({
   persona: 'You are Mila as the Friend.',
-  pathname: '/chat',
-  locale: 'ru',
+  pathname: '/practice',
+  locale: 'en',
   surface: 'full tutor chat',
-  learnerSummary: 'Learner: Guest; level: A1.',
+  learnerSummary: 'Learner: Guest; native language: Hindi; level: A1.',
   recentSummary: 'No recorded lesson progress yet.',
   memories: [],
   languageMode: 'native-first',
+  nativeLanguage: 'Hindi',
+  teacherName: 'Asha',
 });
-assert.match(nativePrompt, /primarily in Russian/i);
-assert.match(nativePrompt, /introduce each new lesson or idea in simple Russian first/i);
+assert.match(nativePrompt, /You are Asha/i);
+assert.match(nativePrompt, /primarily in the learner’s native language, Hindi/i);
+assert.match(nativePrompt, /introduce each new lesson or idea there first/i);
 assert.match(nativePrompt, /small, safe doses/i);
-assert.match(nativePrompt, /never shame the learner for using Russian/i);
+assert.match(nativePrompt, /never shame the learner for using their native language/i);
+assert.match(nativePrompt, /English is the only learning target/i);
+assert.doesNotMatch(nativePrompt, /Russian/i);
 
 // The axis reaches voice too: a native-first spoken prompt still carries VOICE OUTPUT.
 const nativeVoice = buildCompanionSystemPrompt({
   persona: 'You are Mila as the Teacher.',
-  pathname: '/darshan',
-  locale: 'ru',
-  surface: 'Darshan voice conversation',
-  learnerSummary: 'Learner: Guest; level: A1.',
+  pathname: '/practice',
+  locale: 'en',
+  surface: 'focused speaking practice',
+  learnerSummary: 'Learner: Guest; native language: Tamil; level: A1.',
   recentSummary: 'No recorded lesson progress yet.',
   memories: [],
   languageMode: 'native-first',
+  nativeLanguage: 'Tamil',
+  teacherName: 'Tara',
 });
-assert.match(nativeVoice, /primarily in Russian/i);
+assert.match(nativeVoice, /primarily in the learner’s native language, Tamil/i);
+assert.match(nativeVoice, /You are Tara/i);
 assert.match(nativeVoice, /VOICE OUTPUT/);
 
 // Explicit english-first is identical to the default — no directive leaks in.

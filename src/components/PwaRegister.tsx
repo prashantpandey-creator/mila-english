@@ -1,6 +1,6 @@
 'use client'
 
-// Registers the service worker AND owns the "install Mila" affordance.
+// Registers the service worker AND owns the product install affordance.
 // Android/Chrome: captures beforeinstallprompt and offers a one-tap install chip.
 // iOS Safari (no install event): shows a one-time hint for Share → Add to Home
 // Screen. Dismissal is remembered; the chip never nags. Mounted OUTSIDE
@@ -29,8 +29,8 @@ function isStandalone() {
 export default function PwaRegister() {
   const [installEvent, setInstallEvent] = useState<any>(null)
   const [showIOSHint, setShowIOSHint] = useState(false)
-  const [lang, setLang] = useState<'ru' | 'en'>('ru')
-  const [productName, setProductName] = useState<'Mila' | 'Gia' | 'Mia'>('Mila')
+  const [lang, setLang] = useState<'ru' | 'en'>('en')
+  const [productName, setProductName] = useState<'Mila English' | 'Gia' | 'Mia'>('Mila English')
 
   useEffect(() => {
     // Production only: dev chunks have STABLE names (layout.js), so the SW's
@@ -48,7 +48,7 @@ export default function PwaRegister() {
         ? 'Gia'
         : isMiaHostname(window.location.hostname)
           ? 'Mia'
-          : 'Mila',
+          : 'Mila English',
     )
     if (localStorage.getItem(DISMISS_KEY) || isStandalone()) return
 

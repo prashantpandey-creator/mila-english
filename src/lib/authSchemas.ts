@@ -18,7 +18,9 @@ export const registerSchema = z.object({
   name: z.string().trim().min(1).max(80),
   email,
   password,
-  nativeLanguage: z.string().trim().min(1).max(40).default('Русский'),
+  // Mila validates this against its market catalog at the route boundary.
+  // "Not set" remains available only for the separate Gia account flow.
+  nativeLanguage: z.string().trim().min(1).max(40).default('Not set'),
   learnerCategory: learnerCategory.default('absolute_beginner'),
   level: z.string().trim().max(20).optional(),
 });

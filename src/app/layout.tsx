@@ -75,22 +75,22 @@ export async function generateMetadata(): Promise<Metadata> {
     }
   }
 
-  const title = 'Mila — Learn languages for the life you want'
-  const description = 'A focused multilingual learning app for lessons, real-world practice, pronunciation, vocabulary, and progress.'
+  const title = 'Mila English — Learn English from the language you know'
+  const description = 'India-first English learning with an AI teacher matched to your native language, plus speaking, pronunciation, vocabulary, and progress.'
   return {
     ...common,
     metadataBase: new URL('https://mila.purangpt.com'),
     title,
     description,
-    appleWebApp: { capable: true, title: 'Mila', statusBarStyle: 'default' },
+    appleWebApp: { capable: true, title: 'Mila English', statusBarStyle: 'default' },
     openGraph: {
       title,
       description,
       type: 'website',
       url: '/',
-      images: [{ url: '/og.png', width: 1200, height: 630, alt: title }],
+      images: [],
     },
-    twitter: { card: 'summary_large_image', title, description, images: ['/og.png'] },
+    twitter: { card: 'summary', title, description, images: [] },
   }
 }
 
@@ -111,7 +111,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html
-      lang={product === 'mila' ? 'ru' : 'en'}
+      lang="en"
       data-product={product}
       data-mila-theme={product === 'gia' ? 'dark' : 'light'}
       className={`${serifFont.variable} ${sansFont.variable} ${monoFont.variable}`}

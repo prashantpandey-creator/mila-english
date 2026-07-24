@@ -7,6 +7,12 @@ import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
 import { useProduct } from '@/lib/product-context';
+import {
+  INDIA_NATIVE_LANGUAGES,
+  MILA_LEARNING_PROFILE_STORAGE_KEY,
+  resolveIndianNativeLanguage,
+  teacherForNativeLanguage,
+} from '@/lib/learningMarkets';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -29,7 +35,7 @@ export default function RegisterPage() {
     name: '',
     email: '',
     password: '',
-    nativeLanguage: isGia ? 'Not set' : 'Русский',
+    nativeLanguage: isGia ? 'Not set' : '',
     learnerCategory: isGia ? 'pending' : 'absolute_beginner',
   });
   const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
@@ -38,14 +44,30 @@ export default function RegisterPage() {
   const up = (f:string) => (e:any) => setForm(p=>({...p,[f]:e.target.value}));
 
   useEffect(() => {
-    const requestedReturnTo = new URLSearchParams(window.location.search).get('returnTo');
+    const params = new URLSearchParams(window.location.search);
+    const requestedReturnTo = params.get('returnTo');
     setReturnTo(safeReturnTo(requestedReturnTo, isGia ? '/chat' : '/dashboard'));
+    if (isGia) return;
+
+    let requestedLanguage = resolveIndianNativeLanguage(params.get('nativeLanguage'));
+    if (!requestedLanguage) {
+      try {
+        const stored = JSON.parse(window.localStorage.getItem(MILA_LEARNING_PROFILE_STORAGE_KEY) || '{}');
+        requestedLanguage = resolveIndianNativeLanguage(stored?.nativeLanguageId);
+      } catch {
+        requestedLanguage = undefined;
+      }
+    }
+    if (requestedLanguage) {
+      setForm((current) => ({ ...current, nativeLanguage: requestedLanguage.name }));
+    }
   }, [isGia]);
 
   const messageFor = (code?: string, fallback?: string) => {
     if (code === 'ACCOUNT_EXISTS') return lang === 'ru' ? 'Аккаунт с этим email уже есть. Войди в него.' : 'An account already uses this email. Sign in instead.';
     if (code === 'ALREADY_SIGNED_IN') return lang === 'ru' ? 'Сначала выйди из текущего аккаунта.' : 'Sign out of the current account first.';
     if (code === 'INVALID_INPUT') return lang === 'ru' ? 'Проверь имя и email. Пароль должен содержать от 8 до 128 символов.' : 'Check your name and email. Use a password between 8 and 128 characters.';
+    if (code === 'INVALID_NATIVE_LANGUAGE') return 'Choose your native language before continuing.';
     if (code === 'RATE_LIMITED') return lang === 'ru' ? 'Слишком много попыток. Попробуй позже.' : 'Too many attempts. Please try again later.';
     return fallback || t('error_try_again');
   };
@@ -63,9 +85,17 @@ export default function RegisterPage() {
   };
 
   const handleGuestLogin = async () => {
+    if (!isGia && !resolveIndianNativeLanguage(form.nativeLanguage)) {
+      setError('Choose your native language before continuing.');
+      return;
+    }
     setLoading(true); setError('');
     try {
-      const res = await fetch('/api/auth/guest', { method: 'POST' });
+      const res = await fetch('/api/auth/guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(isGia ? {} : { nativeLanguage: form.nativeLanguage }),
+      });
       const body = await res.json().catch(() => null);
       if (!res.ok) throw new Error(messageFor(body?.code, body?.error));
       router.push(returnTo);
@@ -77,15 +107,18 @@ export default function RegisterPage() {
     }
   };
 
+  const selectedLanguage = isGia ? undefined : resolveIndianNativeLanguage(form.nativeLanguage);
+  const selectedTeacher = selectedLanguage ? teacherForNativeLanguage(selectedLanguage.id) : undefined;
+
   return (
     <div className="welcome-auth welcome-auth--register" style={welcomeTheme}>
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
           <span className="welcome-auth__brand">
             <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'M'}</span>
-            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila'}</span>
+            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila English'}</span>
           </span>
-          <LangToggle />
+          {isGia ? <LangToggle /> : <span className="welcome-auth__market">India · English</span>}
         </div>
       </nav>
       <main className="welcome-auth__main">
@@ -97,26 +130,27 @@ export default function RegisterPage() {
             <h1 className="welcome-auth__title">
               {isGia
                 ? (lang === 'ru' ? 'Присоединиться к Gia' : 'Join Gia')
-                : t('register_title')}
+                : 'Create your Mila English account'}
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
                 ? (lang === 'ru' ? 'Сохраняй разговоры и личный контекст между устройствами.' : 'Keep your conversations and personal context across devices.')
-                : t('register_subtitle')}
+                : selectedLanguage && selectedTeacher
+                  ? `${selectedTeacher.name}, your AI English teacher, can explain in ${selectedLanguage.name}.`
+                  : 'First choose the language you understand naturally. You will learn English.'}
             </p>
           </div>
           <form onSubmit={submit} className="welcome-auth__form">
             {error && <div className="welcome-auth__error" role="alert">{error}</div>}
             {[
-              {k:'name',l:'register_name',ph:'Анна'},
-              {k:'email',l:'register_email',ph:'anna@email.com'},
+              {k:'name',l:'register_name',ph:'Your name'},
+              {k:'email',l:'register_email',ph:'you@example.com'},
               {k:'password',l:'register_password',ph:'••••••••'},
-              ...(!isGia ? [{k:'nativeLanguage',l:'register_language',ph:'Русский'}] : []),
             ].map(f=>{
               const fieldId = `register-${f.k}`;
               const hintId = f.k === 'password' ? 'register-password-hint' : undefined;
               return <div key={f.k} className="welcome-auth__field">
-                <label className="welcome-auth__label" htmlFor={fieldId}>{t(f.l as any)}</label>
+                <label className="welcome-auth__label" htmlFor={fieldId}>{isGia ? t(f.l as any) : f.k === 'name' ? 'Your name' : f.k === 'email' ? 'Email' : 'Password'}</label>
                 <input
                   id={fieldId}
                   name={f.k}
@@ -134,34 +168,57 @@ export default function RegisterPage() {
                 {f.k === 'password' ? <span id={hintId} className="welcome-auth__hint">{lang === 'ru' ? 'От 8 до 128 символов.' : 'Use 8–128 characters.'}</span> : null}
               </div>
             })}
+            {!isGia ? (
+              <div className="welcome-auth__field">
+                <label className="welcome-auth__label" htmlFor="register-native-language">Your native language</label>
+                <select
+                  id="register-native-language"
+                  name="nativeLanguage"
+                  value={form.nativeLanguage}
+                  onChange={up('nativeLanguage')}
+                  className="welcome-auth__input"
+                  required
+                >
+                  <option value="">Choose the language you know best</option>
+                  {INDIA_NATIVE_LANGUAGES.map((language) => (
+                    <option value={language.name} key={language.id}>
+                      {language.nativeName} · {language.name}
+                    </option>
+                  ))}
+                </select>
+                {selectedLanguage ? (
+                  <span className="welcome-auth__hint" lang={selectedLanguage.locale}>
+                    {selectedLanguage.promise} Target: English.
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
             <label className="welcome-auth__consent">
               <input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} required />
-              <span>{lang === 'ru' ? 'Я принимаю ' : 'I agree to the '}<a href="/terms" target="_blank">{lang === 'ru' ? 'условия' : 'Terms'}</a>{lang === 'ru' ? ' и ' : ' and '}<a href="/privacy" target="_blank">{lang === 'ru' ? 'политику конфиденциальности' : 'Privacy Policy'}</a>.</span>
+              <span>{isGia && lang === 'ru' ? 'Я принимаю ' : 'I agree to the '}<a href="/terms" target="_blank">{isGia && lang === 'ru' ? 'условия' : 'Terms'}</a>{isGia && lang === 'ru' ? ' и ' : ' and '}<a href="/privacy" target="_blank">{isGia && lang === 'ru' ? 'политику конфиденциальности' : 'Privacy Policy'}</a>.</span>
             </label>
-            <button type="submit" disabled={loading || !acceptedTerms} className="welcome-auth__button welcome-auth__button--primary">
+            <button type="submit" disabled={loading || !acceptedTerms || (!isGia && !selectedLanguage)} className="welcome-auth__button welcome-auth__button--primary">
               {loading
                 ? '...'
                 : isGia
                   ? (lang === 'ru' ? 'Создать аккаунт Gia' : 'Create my Gia account')
-                  : t('register_btn')}
+                  : 'Create my Mila English account'}
             </button>
-            <div className="welcome-auth__separator">{lang==='ru'?'или':'or'}</div>
-            <button type="button" onClick={handleGuestLogin} disabled={loading}
+            <div className="welcome-auth__separator">{isGia && lang==='ru'?'или':'or'}</div>
+            <button type="button" onClick={handleGuestLogin} disabled={loading || (!isGia && !selectedLanguage)}
               className="welcome-auth__button welcome-auth__button--secondary">
-              {lang==='ru'?'Продолжить как гость':'Continue as guest'}
+              {isGia && lang==='ru'?'Продолжить как гость':'Continue as guest'}
             </button>
             <p className="welcome-auth__guest-note">
               {isGia
                 ? (lang === 'ru'
                     ? 'Гостевой сеанс приватный: разговоры не сохраняются. Создай аккаунт, чтобы сохранить историю.'
                     : 'A guest session is private: chats aren’t saved. Create an account to keep your history.')
-                : (lang === 'ru'
-                    ? 'Гостевой сеанс приватный: разговоры не сохраняются. Создай аккаунт, чтобы сохранить прогресс и историю.'
-                    : 'A guest session is private: chats aren’t saved. Create an account to keep your progress and history.')}
+                : 'A guest session is private. Create an account to keep your English progress across devices.'}
             </p>
           </form>
           <p className="welcome-auth__footer">
-            {t('register_has_account')} <a href={`/login?returnTo=${encodeURIComponent(returnTo)}`} className="welcome-auth__link">{t('register_login')}</a>
+            {isGia ? t('register_has_account') : 'Already have an account?'} <a href={`/login?returnTo=${encodeURIComponent(returnTo)}`} className="welcome-auth__link">{isGia ? t('register_login') : 'Sign in'}</a>
           </p>
         </div>
       </main>
@@ -243,6 +300,13 @@ export default function RegisterPage() {
           font-size: 1.28rem;
           font-weight: 750;
           letter-spacing: -.025em;
+        }
+        .welcome-auth__market {
+          color: var(--auth-muted);
+          font-size: .68rem;
+          font-weight: 800;
+          letter-spacing: .11em;
+          text-transform: uppercase;
         }
         .welcome-auth__nav :global(.lang-toggle) {
           border-color: rgba(217,0,108, .14);

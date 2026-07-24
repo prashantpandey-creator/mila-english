@@ -1,12 +1,16 @@
 export type AuthBrand = 'Mila' | 'Gia';
 
+function authBrandDisplayName(brand: AuthBrand) {
+  return brand === 'Mila' ? 'Mila English' : brand;
+}
+
 function brandedSender(brand: AuthBrand) {
   const productFrom = process.env[`${brand.toUpperCase()}_AUTH_EMAIL_FROM`]?.trim();
   if (productFrom) return productFrom;
 
   const sharedFrom = process.env.AUTH_EMAIL_FROM?.trim() || 'onboarding@resend.dev';
   const address = sharedFrom.match(/<([^>]+)>/)?.[1] || sharedFrom;
-  return `${brand} <${address}>`;
+  return `${authBrandDisplayName(brand)} <${address}>`;
 }
 
 async function sendAuthEmail(input: { brand: AuthBrand; email: string; subject: string; text: string; html: string }) {
@@ -30,21 +34,23 @@ async function sendAuthEmail(input: { brand: AuthBrand; email: string; subject: 
 }
 
 export async function sendPasswordResetEmail(input: { brand: AuthBrand; email: string; resetUrl: string }) {
+  const displayName = authBrandDisplayName(input.brand);
   return sendAuthEmail({
     brand: input.brand,
     email: input.email,
-    subject: `Reset your ${input.brand} password`,
-    text: `Reset your ${input.brand} password: ${input.resetUrl}\n\nThis link expires in 30 minutes. If you did not request it, you can ignore this email.`,
-    html: `<p>Use this private link to reset your ${input.brand} password:</p><p><a href="${input.resetUrl}">Reset my password</a></p><p>The link expires in 30 minutes. If you did not request it, you can ignore this email.</p>`,
+    subject: `Reset your ${displayName} password`,
+    text: `Reset your ${displayName} password: ${input.resetUrl}\n\nThis link expires in 30 minutes. If you did not request it, you can ignore this email.`,
+    html: `<p>Use this private link to reset your ${displayName} password:</p><p><a href="${input.resetUrl}">Reset my password</a></p><p>The link expires in 30 minutes. If you did not request it, you can ignore this email.</p>`,
   });
 }
 
 export async function sendEmailVerification(input: { brand: AuthBrand; email: string; verificationUrl: string }) {
+  const displayName = authBrandDisplayName(input.brand);
   return sendAuthEmail({
     brand: input.brand,
     email: input.email,
-    subject: `Verify your ${input.brand} email`,
-    text: `Verify your ${input.brand} email: ${input.verificationUrl}\n\nThis link expires in 24 hours. If you did not create this account, you can ignore this email.`,
-    html: `<p>Confirm this email belongs to your ${input.brand} account:</p><p><a href="${input.verificationUrl}">Verify my email</a></p><p>The link expires in 24 hours. If you did not create this account, you can ignore this email.</p>`,
+    subject: `Verify your ${displayName} email`,
+    text: `Verify your ${displayName} email: ${input.verificationUrl}\n\nThis link expires in 24 hours. If you did not create this account, you can ignore this email.`,
+    html: `<p>Confirm this email belongs to your ${displayName} account:</p><p><a href="${input.verificationUrl}">Verify my email</a></p><p>The link expires in 24 hours. If you did not create this account, you can ignore this email.</p>`,
   });
 }

@@ -14,10 +14,16 @@ export async function GET(request: NextRequest) {
   }
 
   const userId = Number(user.sub)
+  const profile = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { nativeLanguage: true },
+  })
+  const legacyRussianSupport = /^(?:русский|russian)$/iu.test(profile?.nativeLanguage || '')
   await Promise.all(BUILTIN_WORDS.map(async (word) => {
     const existing = await prisma.word.findFirst({ where: { english: word.english }, select: { id: true } })
     if (!existing) {
-      await prisma.word.create({ data: { ...word, learnerCategory: 'all' } })
+      const { definitionEnglish: _definitionEnglish, ...storedWord } = word
+      await prisma.word.create({ data: { ...storedWord, learnerCategory: 'all' } })
     }
   }))
 
@@ -27,6 +33,9 @@ export async function GET(request: NextRequest) {
   })
   return NextResponse.json(items.map(({ Reviews, ...word }) => ({
     ...word,
+    translationNative: legacyRussianSupport
+      ? word.translationNative
+      : BUILTIN_WORDS.find((entry) => entry.english === word.english)?.definitionEnglish || '',
     review: Reviews[0] ?? null,
   })))
 }

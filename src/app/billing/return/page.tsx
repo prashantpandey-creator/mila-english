@@ -43,15 +43,15 @@ export default function BillingReturnPage() {
   }, []);
 
   const content = state === 'paid' ? {
-    title: 'Mila Pro is ready.', copy: 'Your verified 30-day access is active on this account.', action: '/dashboard', label: 'Continue to Mila',
+    title: 'Mila English Pro is ready.', copy: 'Your verified 30-day access is active on this account.', action: '/dashboard', label: 'Continue to Mila English',
   } : state === 'canceled' ? {
-    title: 'No access was activated.', copy: 'The payment was canceled or refunded. You can continue with Mila Free.', action: '/pricing', label: 'Return to plans',
+    title: 'No access was activated.', copy: 'The payment was canceled or refunded. You can continue with Mila English Free.', action: '/pricing', label: 'Return to plans',
   } : state === 'pending' ? {
     title: 'Payment is still being verified.', copy: 'Some banks take a little longer. Your access activates only after YooKassa confirms the payment.', action: '/account', label: 'Check my account',
   } : state === 'error' ? {
-    title: 'We could not match this return.', copy: 'No charge is trusted from a browser redirect. Check your account or contact Mila support.', action: '/support', label: 'Get support',
+    title: 'We could not match this return.', copy: 'No charge is trusted from a browser redirect. Check your account or contact Mila English support.', action: '/support', label: 'Get support',
   } : {
-    title: 'Confirming your payment…', copy: 'Mila is checking the payment directly with YooKassa.', action: '', label: '',
+    title: 'Confirming your payment…', copy: 'Mila English is checking the payment directly with the provider.', action: '', label: '',
   };
 
   return (

@@ -21,12 +21,12 @@ export const BUILTIN_LESSONS: Record<string, BuiltinLesson> = {
     titleRu: 'Знакомство', titleEn: 'Introductions',
     subtitleRu: 'Представься и спроси имя', subtitleEn: 'Introduce yourself and ask names',
     durationMinutes: 3, difficulty: 1,
-    words: ['Hello', 'My name is...', 'Nice to meet you', 'Where are you from?', 'I am from Russia'],
+    words: ['Hello', 'My name is...', 'Nice to meet you', 'Where are you from?', 'I am from India'],
     phrases: [
       { en: 'Hello, how are you?', ru: 'Привет, как дела?' },
       { en: 'My name is Anna.', ru: 'Меня зовут Анна.' },
       { en: 'Nice to meet you!', ru: 'Приятно познакомиться!' },
-      { en: 'I am from Moscow.', ru: 'Я из Москвы.' },
+      { en: 'I am from India.', ru: 'Я из Индии.' },
     ],
   },
   '2': {
@@ -141,5 +141,5 @@ export function getBuiltinLesson(id: string | number): BuiltinLesson | null {
 }
 
 export function builtinLessonContent(lesson: BuiltinLesson): string {
-  return lesson.phrases.map((phrase) => `${phrase.en} — ${phrase.ru}`).join('\n');
+  return lesson.phrases.map((phrase) => phrase.en).join('\n');
 }

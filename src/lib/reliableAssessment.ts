@@ -23,7 +23,7 @@ export type PlacementQuestion = {
 export const RELIABLE_ASSESSMENT_QUESTIONS: PlacementQuestion[] = [
   {
     id: 'a1-be', level: 'A1', skill: 'foundations',
-    prompt: 'I ___ from Moscow.', promptRu: 'Выбери правильную форму глагола.',
+    prompt: 'I ___ ready.', promptRu: 'Выбери правильную форму глагола.',
     options: ['am', 'is', 'are', 'be'], answer: 0,
   },
   {
@@ -33,7 +33,7 @@ export const RELIABLE_ASSESSMENT_QUESTIONS: PlacementQuestion[] = [
   },
   {
     id: 'a1-word', level: 'A1', skill: 'vocabulary',
-    prompt: 'Which word means «вчера»?', promptRu: 'Как по-английски «вчера»?',
+    prompt: 'Which word means “the day before today”?', promptRu: 'Выбери слово со значением «день перед сегодня».',
     options: ['tomorrow', 'today', 'yesterday', 'morning'], answer: 2,
   },
   {
@@ -159,9 +159,9 @@ export function scoreReliableAssessment(answers: number[]): ReliableAssessmentSu
       level,
       score,
       method: 'reliable',
-      strengths: `Сильная сторона: ${strongest.ru}. / Strength: ${strongest.en}.`,
-      weaknesses: `Следующий фокус: ${weakest.ru}. / Next focus: ${weakest.en}.`,
-      custom_plan_focus: `Закрепить уровень ${level}: ${weakest.ru}, затем разговорная практика. / Consolidate ${level}: ${weakest.en}, then speaking practice.`,
+      strengths: `Strength: ${strongest.en}.`,
+      weaknesses: `Next focus: ${weakest.en}.`,
+      custom_plan_focus: `Consolidate ${level}: ${weakest.en}, then speaking practice.`,
     }),
   };
 }
@@ -173,7 +173,7 @@ const BEGINNER_EXERCISES = {
   ],
   vocabulary: [
     { question: 'Which phrase politely asks for something?', correctAnswer: 'Could I have some water, please?', options: ['Water now.', 'Could I have some water, please?', 'I had water yesterday.', 'Where water?'], hintText: 'Could I have… is a useful polite pattern.' },
-    { question: 'What does “I am looking for the station” mean?', correctAnswer: 'Я ищу станцию.', options: ['Я покидаю станцию.', 'Я вижу станцию.', 'Я ищу станцию.', 'Я работаю на станции.'], hintText: 'look for = искать.' },
+    { question: 'What does “I am looking for the station” mean?', correctAnswer: 'I am trying to find the station.', options: ['I am leaving the station.', 'I can see the station.', 'I am trying to find the station.', 'I work at the station.'], hintText: 'look for = try to find.' },
   ],
   speaking: [
     { question: 'Choose the natural introduction.', correctAnswer: 'Hi, my name is Anna. Nice to meet you.', options: ['Hi, my name is Anna. Nice to meet you.', 'Hi, I Anna meet.', 'Name Anna yesterday.', 'Nice is Anna.'], hintText: 'Use “My name is…” and “Nice to meet you.”' },
@@ -202,24 +202,24 @@ export function buildReliableLessonPlan(result: AssessmentResult): LessonPlan {
   const plan = {
     lessons: [
       {
-        title: `${result.level} Grammar Patterns · Грамматические модели`,
+        title: `${result.level} Grammar Patterns`,
         category: 'Grammar' as const,
         difficulty,
-        content: `Короткая практика грамматики уровня ${result.level}. Замечай модель, произноси пример вслух и создавай свою фразу. Focus: notice the pattern, say it aloud, then make one personal example.`,
+        content: `Short ${result.level} grammar practice. Notice the pattern, say the example aloud, then make one personal example. Your Mila English teacher can explain it in your native language when needed.`,
         exercises: exercises.grammar,
       },
       {
-        title: `${result.level} Useful Vocabulary · Полезные слова`,
+        title: `${result.level} Useful Vocabulary`,
         category: 'Vocabulary' as const,
         difficulty,
-        content: `Учи слова внутри полезных фраз, а не отдельно. Read each phrase, connect it to a real situation, and reuse it in a new sentence. Текущий фокус: ${result.weaknesses}`,
+        content: `Learn words inside useful phrases, not in isolation. Read each phrase, connect it to a real situation, and reuse it in a new sentence. Current focus: ${result.weaknesses}`,
         exercises: exercises.vocabulary,
       },
       {
-        title: `${result.level} Speaking Practice · Разговорная практика`,
+        title: `${result.level} Speaking Practice`,
         category: 'Speaking' as const,
         difficulty,
-        content: `Скажи каждый ответ вслух два раза: сначала медленно, затем естественно. Speak each answer twice—slowly first, then at a comfortable natural pace. Ошибки здесь являются частью практики.`,
+        content: 'Say each answer aloud twice: slowly first, then at a comfortable natural pace. Mistakes are useful evidence for the next practice step.',
         exercises: exercises.speaking,
       },
     ],

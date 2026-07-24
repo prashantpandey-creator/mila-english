@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { resolvePlan, isPaid } from '@/lib/subscription'
 import { publicUser } from '@/lib/publicUser'
 import { isGiaHostname } from '@/lib/productHosts'
+import { resolveIndianNativeLanguage } from '@/lib/learningMarkets'
 
 export async function GET(request: NextRequest) {
   const user = await authenticate(request)
@@ -47,6 +48,32 @@ export async function GET(request: NextRequest) {
     },
     liveVoicePreviewAvailable: profile.voicePreviewUsedAt === null,
   })
+}
+
+export async function PATCH(request: NextRequest) {
+  const user = await authenticate(request)
+  const userId = Number(user?.sub)
+  if (!user || !Number.isSafeInteger(userId) || userId <= 0) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (isGiaHostname(request.headers.get('host'))) {
+    return NextResponse.json({ error: 'This setting belongs to Mila English.' }, { status: 404 })
+  }
+
+  const body = await request.json().catch(() => null)
+  const nativeLanguage = resolveIndianNativeLanguage(body?.nativeLanguage)
+  if (!nativeLanguage) {
+    return NextResponse.json({
+      error: 'Choose a supported native language.',
+      code: 'INVALID_NATIVE_LANGUAGE',
+    }, { status: 400 })
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { nativeLanguage: nativeLanguage.name },
+  })
+  return NextResponse.json(publicUser(updated))
 }
 
 export async function DELETE(request: NextRequest) {

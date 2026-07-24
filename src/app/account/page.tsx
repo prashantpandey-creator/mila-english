@@ -6,6 +6,7 @@ import LangToggle from '@/components/LangToggle';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
 import { useI18n } from '@/lib/i18n-provider';
 import { useProduct } from '@/lib/product-context';
+import { teacherForNativeLanguage } from '@/lib/learningMarkets';
 import './account.css';
 
 type Account = {
@@ -109,6 +110,7 @@ export default function AccountPage() {
 
   if (loading || !account) return <div className="account-page" />;
   const pro = account.subscription.isPaid;
+  const milaTeacher = isGia ? undefined : teacherForNativeLanguage(account.nativeLanguage);
   const expiry = account.subscription.renewsAt ? new Intl.DateTimeFormat(lang === 'ru' ? 'ru-RU' : 'en-GB', { dateStyle: 'long' }).format(new Date(account.subscription.renewsAt)) : null;
 
   return (
@@ -117,7 +119,7 @@ export default function AccountPage() {
       <AppMain width="work" className="account-page__main">
         <div className="account-stack">
           <section className="account-hero">
-            <p className="account-hero__kicker">{isGia ? 'YOUR GIA' : T('ТВОЯ MILA', 'YOUR MILA')}</p>
+            <p className="account-hero__kicker">{isGia ? 'YOUR GIA' : T('ТВОЯ MILA ENGLISH', 'YOUR MILA ENGLISH')}</p>
             <h1>{account.isGuest
               ? (isGia ? T('Сохрани свои разговоры', 'Keep your conversations') : T('Сохрани свой прогресс', 'Keep your progress'))
               : account.name}</h1>
@@ -137,13 +139,15 @@ export default function AccountPage() {
             <div className="account-panel__row">
               <div>
                 <p className="account-panel__kicker">{T('ДОСТУП', 'ACCESS')}</p>
-                <h2>{pro ? 'Mila Pro' : T('Бесплатный план', 'Free plan')}</h2>
+                <h2>{pro ? 'Mila English Pro' : T('Бесплатный план', 'Free plan')}</h2>
               </div>
               <span className={`account-plan${pro ? ' is-pro' : ''}`}>{pro ? 'PRO' : 'FREE'}</span>
             </div>
             <p>{pro
               ? T(`Pro активен${expiry ? ` до ${expiry}` : ''}. Автопродления нет.`, `Pro is active${expiry ? ` until ${expiry}` : ''}. It does not renew automatically.`)
-              : T('Основные уроки и чат остаются бесплатными. Pro добавляет постоянный Live-голос и уроки по твоему запросу.', 'Core lessons and chat stay free. Pro adds ongoing Live voice and custom lessons made for your goal.')}</p>
+              : milaTeacher
+                ? 'Core English lessons and your AI teacher stay free. Paid plans for India are not being sold yet.'
+                : T('Основные уроки и чат остаются бесплатными. Pro добавляет постоянный Live-голос и уроки по твоему запросу.', 'Core lessons and chat stay free. Pro adds ongoing Live voice and custom lessons made for your goal.')}</p>
             {purchase && ['created', 'pending'].includes(purchase.status) ? (
               <p className="account-feedback" role="status">{T('Платёж ещё проверяется. Pro включится только после подтверждения ЮKassa.', 'Payment verification is in progress. Pro activates only after YooKassa confirms it.')}</p>
             ) : purchase?.status === 'canceled' ? (
@@ -152,8 +156,8 @@ export default function AccountPage() {
               <p className="account-feedback" role="status">{T('Последняя оплата возвращена. Доступ от неё завершён.', 'The latest payment was refunded. Access from it has ended.')}</p>
             ) : null}
             <div className="account-actions">
-              <a className="account-button account-button--primary" href="/pricing">{pro ? T('Посмотреть тариф', 'View plan') : T('Открыть Pro', 'See Mila Pro')}</a>
-              <a className="account-button" href="/refunds">{T('Оплата и возвраты', 'Payments and refunds')}</a>
+              {pro || !milaTeacher ? <a className="account-button account-button--primary" href="/pricing">{pro ? T('Посмотреть тариф', 'View plan') : T('Открыть Pro', 'See Mila English Pro')}</a> : null}
+              {pro || !milaTeacher ? <a className="account-button" href="/refunds">{T('Оплата и возвраты', 'Payments and refunds')}</a> : null}
             </div>
           </section> : null}
 
@@ -163,7 +167,8 @@ export default function AccountPage() {
             <div className="account-details">
               <div className="account-detail"><span>Email</span><strong>{account.isGuest ? T('Гостевой профиль', 'Guest profile') : account.email}</strong></div>
               {!isGia ? <div className="account-detail"><span>{T('Уровень', 'Level')}</span><strong>{account.level && account.level !== 'pending' ? account.level.toUpperCase() : T('Ещё не определён', 'Not placed yet')}</strong></div> : null}
-              {!isGia ? <div className="account-detail"><span>{T('Родной язык', 'Learning language')}</span><strong>{account.nativeLanguage}</strong></div> : null}
+              {!isGia ? <div className="account-detail"><span>{T('Родной язык', 'Native language')}</span><strong>{account.nativeLanguage}</strong></div> : null}
+              {!isGia && milaTeacher ? <div className="account-detail"><span>{T('AI-учитель английского', 'AI English teacher')}</span><strong>{milaTeacher.name} · India</strong></div> : null}
               <div className="account-detail"><span>{T('Статус', 'Status')}</span><strong>{account.isGuest ? T('Приватный гость', 'Private guest') : T('Сохранённый аккаунт', 'Saved account')}</strong></div>
               {!account.isGuest ? <div className="account-detail"><span>{T('Статус email', 'Email status')}</span><strong>{account.emailVerified ? T('Подтверждён', 'Verified') : T('Нужно подтвердить', 'Verification needed')}</strong></div> : null}
             </div>
