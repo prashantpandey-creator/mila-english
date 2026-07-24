@@ -34,6 +34,16 @@
 }
 
 html { background: #faf8f5; color-scheme: light; }
+html[data-product="gia"],
+html[data-product="gia"][data-mila-app] {
+  background: #04070a;
+  color-scheme: dark;
+}
+html[data-product="mia"],
+html[data-product="mia"][data-mila-app] {
+  background: #f5efe4;
+  color-scheme: light;
+}
 
 body {
   /* The front-door artwork remains visible through the transparent body. The
@@ -191,6 +201,10 @@ h1, h2 {
 
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 .animate-in { animation: fadeIn 0.4s ease; }
+.product-surface--gia .animate-in {
+  min-height: 100dvh;
+  animation: none;
+}
 
 /* Glassmorphism utilities — dark atelier glass */
 @layer utilities {

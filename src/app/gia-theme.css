@@ -2,6 +2,11 @@
    The dark signal grid connects text, voice, auth, recovery, and account
    surfaces without changing the shared accessible component structure. */
 
+html[data-product="gia"] {
+  background: #04070a !important;
+  color-scheme: dark;
+}
+
 .product-surface--gia.mila-surface--app {
   --mila-paper: #05080d;
   --mila-panel: #0b1119;
@@ -94,6 +99,23 @@
   border-radius: 28px 28px 28px 4px !important;
   background: linear-gradient(145deg, #111b26, #070b11) !important;
   box-shadow: 18px 18px 0 rgba(0, 0, 0, .24), 0 0 50px rgba(255, 47, 134, .08) !important;
+}
+
+.product-surface--gia .chat-page__presence-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover !important;
+  filter: saturate(.9) contrast(1.04);
+}
+
+.product-surface--gia .chat-page__empty-presence > .chat-page__presence-image {
+  border-radius: 20px 20px 20px 3px;
+}
+
+.product-surface--gia .chat-page__mila-avatar > .chat-page__presence-image {
+  border-radius: 8px 8px 8px 2px;
 }
 
 .product-surface--gia .mila-voice-mark {

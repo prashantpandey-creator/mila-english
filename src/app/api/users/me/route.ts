@@ -4,7 +4,7 @@ import { authenticate } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { resolvePlan, isPaid } from '@/lib/subscription'
 import { publicUser } from '@/lib/publicUser'
-import { isGiaHostname } from '@/lib/productHosts'
+import { isGiaHostname, isMiaHostname } from '@/lib/productHosts'
 import { resolveIndianNativeLanguage } from '@/lib/learningMarkets'
 
 export async function GET(request: NextRequest) {
@@ -88,12 +88,21 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Deletion confirmation is required' }, { status: 400 })
   }
 
-  if (body?.scope === 'gia' && isGiaHostname(request.headers.get('host'))) {
+  const host = request.headers.get('host')
+  // Product host is the authority boundary. A stale or altered browser body
+  // must never let Gia fall through into deleting the shared learning account.
+  if (isGiaHostname(host)) {
     await prisma.$transaction([
       prisma.companionThread.deleteMany({ where: { userId, key: 'gia' } }),
       prisma.companionMemory.deleteMany({ where: { userId, product: 'gia' } }),
     ])
     return NextResponse.json({ deleted: true, scope: 'gia' })
+  }
+  if (isMiaHostname(host)) {
+    return NextResponse.json({ error: 'Account deletion is not available from Mia.' }, { status: 404 })
+  }
+  if (body?.scope !== 'account') {
+    return NextResponse.json({ error: 'Full-account deletion scope is required' }, { status: 400 })
   }
 
   await prisma.$transaction(async (tx) => {

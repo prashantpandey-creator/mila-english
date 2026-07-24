@@ -26,13 +26,20 @@ export function PresencePicker({
   }, []);
 
   return (
-    <div className={`presence-picker${open ? " is-open" : ""}`}>
+    <div
+      className={`presence-picker${open ? " is-open" : ""}`}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape" || !open) return;
+        event.preventDefault();
+        closeAndRestoreFocus();
+      }}
+    >
       <button
         ref={triggerRef}
         type="button"
         className="presence-picker__trigger"
         aria-expanded={open}
-        aria-controls="mila-presence-options"
+        aria-controls="gia-presence-options"
         onClick={() => setOpen((current) => !current)}
       >
         <span>{lang === "ru" ? "Образ" : "Presence"}</span>
@@ -42,19 +49,13 @@ export function PresencePicker({
 
       {open ? (
         <section
-          id="mila-presence-options"
+          id="gia-presence-options"
           className="presence-picker__panel"
           aria-label={lang === "ru" ? "Выбрать образ Джиа" : "Choose Gia's presence"}
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              event.preventDefault();
-              closeAndRestoreFocus();
-            }
-          }}
         >
           <div className="presence-picker__intro">
             <div>
-              <p>{lang === "ru" ? "Один разум, разное присутствие" : "One mind, a different presence"}</p>
+              <p>{lang === "ru" ? "Джиа в разных визуальных образах" : "Gia in different visual looks"}</p>
               <span>
                 {lang === "ru"
                   ? "Образ не меняет характер разговора или обработку аудио."
@@ -75,6 +76,7 @@ export function PresencePicker({
               <button
                 key={presence.id}
                 type="button"
+                data-presence={presence.id}
                 aria-pressed={value === presence.id}
                 className={value === presence.id ? "is-selected" : ""}
                 onClick={() => {
@@ -95,7 +97,17 @@ export function PresencePicker({
                   )}
                 </span>
                 <span className="presence-picker__copy">
-                  <strong>{presence.name[lang]}</strong>
+                  <span className="presence-picker__title">
+                    <strong>
+                      {lang === "ru"
+                        ? `Джиа · ${presence.id === "signal" ? "Сигнал" : presence.name.ru}`
+                        : `Gia · ${presence.id === "signal" ? "Signal" : presence.name.en}`}
+                    </strong>
+                    <small className="presence-picker__medium">
+                      {presence.medium[lang]}
+                      {presence.animated ? ` · ${lang === "ru" ? "Динамичный" : "Dynamic"}` : ""}
+                    </small>
+                  </span>
                   <small>{presence.description[lang]}</small>
                 </span>
                 <span className="presence-picker__check" aria-hidden="true">

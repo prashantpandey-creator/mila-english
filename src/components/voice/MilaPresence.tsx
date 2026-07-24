@@ -14,12 +14,17 @@ export function MilaPresence({
   presenceId,
   state = "resting",
   size = 320,
+  lang = "en",
 }: {
   presenceId: PresenceId;
   state?: OrbState;
   size?: number;
-}) {
+  lang?: "en" | "ru";
+  }) {
   const presence = presenceById(presenceId);
+  const lookName = presenceId === "signal"
+    ? (lang === "ru" ? "Сигнал" : "Signal")
+    : presence.name[lang];
   const ring = RING[state];
 
   return (
@@ -33,9 +38,13 @@ export function MilaPresence({
         ["--presence-size" as string]: `${size}px`,
       }}
       role="img"
-      aria-label={`Gia · ${presence.name.en}, a synthetic AI character`}
+      aria-label={lang === "ru"
+        ? `Джиа · образ ${lookName}, синтетический ИИ-персонаж`
+        : `Gia · ${lookName}, a synthetic AI character`}
     >
       <span className="mila-portrait-presence__halo" aria-hidden="true" />
+      <span className="mila-portrait-presence__orbit mila-portrait-presence__orbit--outer" aria-hidden="true" />
+      <span className="mila-portrait-presence__orbit mila-portrait-presence__orbit--inner" aria-hidden="true" />
       <span className="mila-portrait-presence__meter" aria-hidden="true">
         {Array.from({ length: 32 }, (_, index) => (
           <span
@@ -60,6 +69,8 @@ export function MilaPresence({
           style={{ objectPosition: presence.objectPosition }}
         />
         <span className="mila-portrait-presence__shade" aria-hidden="true" />
+        <span className="mila-portrait-presence__luster" aria-hidden="true" />
+        <span className="mila-portrait-presence__breath" aria-hidden="true" />
         <span className="mila-portrait-presence__scan" aria-hidden="true" />
       </span>
 
@@ -67,7 +78,8 @@ export function MilaPresence({
       <span className="mila-portrait-presence__reticle mila-portrait-presence__reticle--south" aria-hidden="true" />
       <span className="mila-portrait-presence__identity" aria-hidden="true">
         <small>{presence.systemId}</small>
-        <strong>{presence.name.en}</strong>
+        <strong>Gia · {presenceId}</strong>
+        <em>{presence.medium.en} · dynamic portrait</em>
       </span>
       <span className="mila-portrait-presence__signal" aria-hidden="true" />
     </span>

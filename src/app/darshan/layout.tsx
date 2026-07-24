@@ -10,11 +10,13 @@ export const metadata: Metadata = {
     description: 'A playful, multilingual AI companion for natural live voice conversation.',
     type: 'website',
     url: '/',
+    images: [{ url: '/gia-og-v2.jpg', width: 1200, height: 630, alt: 'Gia — Live voice with Gia' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Gia — Live voice with Gia',
     description: 'A playful, multilingual AI companion for natural live voice conversation.',
+    images: ['/gia-og-v2.jpg'],
   },
 };
 

@@ -69,10 +69,10 @@ void main(){
   // Synthetic Presence mode: a graphite interface chamber with a living
   // magenta signal, faint machine-grid telemetry and enough warmth to keep
   // the companion emotionally present rather than clinically mechanical.
-  vec3 voidBase = vec3(0.014, 0.020, 0.027);
-  vec3 graphite = vec3(0.035, 0.047, 0.058);
-  vec3 cyanMetal = vec3(0.105, 0.225, 0.235);
-  vec3 magenta = vec3(1.000, 0.090, 0.510);
+  vec3 voidBase = vec3(0.024, 0.009, 0.020);
+  vec3 graphite = vec3(0.066, 0.026, 0.047);
+  vec3 cyanMetal = vec3(0.310, 0.130, 0.210);
+  vec3 magenta = vec3(1.000, 0.145, 0.455);
   float chamberHalo = exp(-r * (2.2 - u_lv * 0.55));
   float darkMist = fbm(c * 3.1 + vec2(u_t * 0.012, -u_t * 0.008));
   vec3 darkCol = mix(voidBase, graphite, 0.32 + chamberHalo * 0.52 + darkMist * 0.10);
@@ -82,12 +82,12 @@ void main(){
   vec2 gridUv = uv * vec2(34.0 * u_res.x / max(u_res.y, 1.0), 34.0);
   vec2 gridCell = abs(fract(gridUv - 0.5) - 0.5) / fwidth(gridUv);
   float gridLine = 1.0 - min(min(gridCell.x, gridCell.y), 1.0);
-  darkCol += vec3(0.08, 0.16, 0.17) * gridLine * 0.055 * smoothstep(1.05, 0.32, r);
+  darkCol += vec3(0.24, 0.10, 0.16) * gridLine * 0.055 * smoothstep(1.05, 0.32, r);
 
   float interfaceRing = smoothstep(0.006, 0.0, abs(r - (0.305 + 0.008 * sin(u_t * 0.24))));
   darkCol = mix(darkCol, mix(cyanMetal, magenta, u_warm), interfaceRing * (0.11 + u_lv * 0.16));
   float scan = pow(0.5 + 0.5 * sin((uv.y * u_res.y + u_t * 28.0) * 0.075), 18.0);
-  darkCol += vec3(0.04, 0.11, 0.12) * scan * 0.05;
+  darkCol += vec3(0.18, 0.07, 0.12) * scan * 0.05;
   darkCol *= 1.0 - smoothstep(0.42, 1.16, r) * 0.64;
   col = mix(col, darkCol, u_dark);
   o = vec4(col, 1.0);

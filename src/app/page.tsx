@@ -41,8 +41,14 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       appleWebApp: { capable: true, title: 'Gia', statusBarStyle: 'black-translucent' },
       alternates: { canonical: '/' },
-      openGraph: { title, description, type: 'website', url: '/' },
-      twitter: { card: 'summary', title, description },
+      openGraph: {
+        title,
+        description,
+        type: 'website',
+        url: '/',
+        images: [{ url: '/gia-og-v2.jpg', width: 1200, height: 630, alt: title }],
+      },
+      twitter: { card: 'summary_large_image', title, description, images: ['/gia-og-v2.jpg'] },
     }
   }
 

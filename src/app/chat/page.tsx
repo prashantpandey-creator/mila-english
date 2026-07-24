@@ -6,8 +6,13 @@ import { useRouter } from 'next/navigation';
 import LangToggle from '@/components/LangToggle';
 import { AppHeader, AppShell } from '@/components/ui/AppShell';
 import MilaIcon from '@/components/ui/MilaIcon';
-import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
+import {
+  normalizePresenceId,
+  presenceById,
+  PRESENCE_STORAGE_KEY,
+  type PresenceId,
+} from '@/lib/presences';
 import { announceCompanionHistoryCleared, announceCompanionHistoryUpdated, useCompanionHistory } from '@/lib/use-companion-history';
 
 export default function Chat() {
@@ -25,6 +30,7 @@ export default function Chat() {
   const messagesViewportRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [m, setM] = useState(false);
+  const [presenceId, setPresenceId] = useState<PresenceId>('signal');
   const [isClearing, setIsClearing] = useState(false);
   const [clearError, setClearError] = useState(false);
   const { isHydrating, historyError } = useCompanionHistory({ limit: 40, setMessages });
@@ -32,10 +38,15 @@ export default function Chat() {
 
   useEffect(() => {
     setM(true);
+    setPresenceId(normalizePresenceId(window.localStorage.getItem(PRESENCE_STORAGE_KEY)));
     if (window.localStorage.getItem('gia-chat-style-v1') === 'playful') {
       setConversationStyle('playful');
     }
   }, []);
+  const presence = presenceById(presenceId);
+  const presenceLookName = presenceId === 'signal'
+    ? (lang === 'ru' ? 'Сигнал' : 'Signal')
+    : presence.name[lang];
   useEffect(() => {
     const viewport = messagesViewportRef.current;
     if (!viewport) return;
@@ -186,8 +197,20 @@ export default function Chat() {
 
         {!isHydrating && messages.length === 0 && (
           <div className="chat-page__empty">
-            <div className="chat-page__empty-presence" aria-hidden="true">
-              <MilaVoiceMark size={92} />
+            <div
+              className="chat-page__empty-presence"
+              role="img"
+              aria-label={lang === 'ru'
+                ? `Выбранный синтетический образ Джиа: ${presenceLookName}`
+                : `Gia's selected synthetic presence: ${presenceLookName}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="chat-page__presence-image"
+                src={presence.poster}
+                alt=""
+                style={{ objectPosition: presence.objectPosition }}
+              />
               <span className="chat-page__status-dot" />
             </div>
             <p className="chat-page__empty-kicker">{lang === 'ru' ? 'Джиа здесь' : 'Gia is here'}</p>
@@ -213,7 +236,13 @@ export default function Chat() {
           <div key={m.id} className={`chat-page__row ${m.role === 'user' ? 'is-user' : 'is-assistant'}`}>
             {m.role !== 'user' ? (
               <span className="chat-page__mila-avatar" aria-label="Gia">
-                <MilaVoiceMark size={29} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="chat-page__presence-image"
+                  src={presence.poster}
+                  alt=""
+                  style={{ objectPosition: presence.objectPosition }}
+                />
               </span>
             ) : null}
             <div className="chat-page__bubble">

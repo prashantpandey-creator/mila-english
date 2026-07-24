@@ -7,7 +7,7 @@
 ## Product direction
 
 Darshan is now a near-future companion chamber rather than a soft portrait
-atelier. Gia, Ember, and Nocturne remain visual interfaces for one adult
+atelier. Gia, Ember, Nocturne, and Velvet remain visual interfaces for one adult
 language companion. Selecting a presence still changes appearance only; it
 does not select a model, persona, audio pipeline, privacy mode, or adult tone.
 
@@ -30,9 +30,23 @@ the honest alternative when Live is unavailable.
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
 - `public/avatar/presences/nocturne-v3/avatar.webp`
+- `public/avatar/presences/velvet-v1/avatar.webp`
+- `public/gia-og-v2.jpg`
 
 Each production asset is a 900×900 WebP intended for the circular diagnostic
 aperture.
+
+Velvet is the illustrated option: a clearly adult anime-noir synthetic
+companion generated on 2026-07-24 with the built-in OpenAI image-generation
+workflow. She is an original fictional character with no real-person or known
+character reference. Her production prompt requested an adult editorial-anime
+portrait with an obsidian and oxblood chamber, rose-gold interfaces, a direct
+gaze, and tasteful midnight glamour; it explicitly excluded youthful cues,
+school uniforms, nudity, fetish styling, exaggerated anatomy, and resemblance
+to copyrighted characters.
+
+The Gia social preview reuses Velvet and the finished chamber palette in a
+1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
 
 ## Provenance and reference boundary
 
@@ -98,13 +112,14 @@ person supplies the in-product voice.
 ## Interface implementation
 
 - `src/components/voice/MilaPresence.tsx` owns the aperture, 32-segment radial
-  meter, scan pass, reticles, identity label, and per-presence signal.
+  meter, scan pass, reticles, identity label, per-presence signal, breathing
+  portrait motion, orbit layers, and light-luster pass.
 - `src/components/voice/MilaAurora.tsx` keeps the light atelier for Pia and adds
   an opt-in `synthetic` shader variant for Darshan.
 - `src/app/inner-theme.css` scopes the dark chamber to `/darshan`; the rest of
   Mila remains on the Mineral Paper system.
-- `src/lib/presences.ts` is the closed three-presence catalogue and points only
-  at the production v3 assets.
+- `src/lib/presences.ts` is the closed four-presence catalogue and points only
+  at the documented production assets.
 
 ## Local verification
 

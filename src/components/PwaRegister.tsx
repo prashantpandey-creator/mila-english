@@ -7,6 +7,7 @@
 // I18nProvider, so language comes straight from the same storage the provider
 // uses (getLangFromStorage) rather than the hook.
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { getLangFromStorage } from '@/lib/i18n'
 import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand'
 import { isGiaHostname, isMiaHostname } from '@/lib/productHosts'
@@ -28,6 +29,7 @@ function isStandalone() {
 }
 
 export default function PwaRegister() {
+  const pathname = usePathname()
   const [installEvent, setInstallEvent] = useState<any>(null)
   const [showIOSHint, setShowIOSHint] = useState(false)
   const [lang, setLang] = useState<'ru' | 'en'>('en')
@@ -94,7 +96,11 @@ export default function PwaRegister() {
     dismiss()
   }
 
-  if (!installEvent && !showIOSHint) return null
+  const voiceRoomIsOpen = typeof window !== 'undefined'
+    && isGiaHostname(window.location.hostname)
+    && (pathname === '/' || pathname === '/darshan')
+
+  if (voiceRoomIsOpen || (!installEvent && !showIOSHint)) return null
 
   const ru = lang === 'ru'
 
