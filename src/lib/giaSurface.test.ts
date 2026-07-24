@@ -25,6 +25,21 @@ test('Gia voice and text share the selected synthetic presence', () => {
   assert.match(chatPage, /className="chat-page__presence-image"/);
 });
 
+test('Gia silences background tabs and resumes only from a deliberate tap', () => {
+  const voicePage = readSource('src/app/darshan/page.tsx');
+  const realtimeVoice = readSource('src/lib/realtimeVoice.ts');
+
+  assert.match(voicePage, /createGiaVoiceTabCoordinator/);
+  assert.match(voicePage, /document\.addEventListener\("visibilitychange"/);
+  assert.match(voicePage, /window\.addEventListener\("blur", pauseActiveVoice\)/);
+  assert.match(voicePage, /!document\.hasFocus\(\)/);
+  assert.match(voicePage, /await realtimeRef\.current\?\.resume\(\)/);
+  assert.match(voicePage, /Tap Gia to resume your microphone and audio/);
+  assert.match(realtimeVoice, /microphoneTrack\.enabled = false/);
+  assert.match(realtimeVoice, /audio\.pause\(\)/);
+  assert.match(realtimeVoice, /type: 'output_audio_buffer\.clear'/);
+});
+
 test('Gia deletion is host-scoped and cannot fall through to account deletion', () => {
   const accountRoute = readSource('src/app/api/users/me/route.ts');
   const giaBoundary = accountRoute.indexOf('if (isGiaHostname(host))');

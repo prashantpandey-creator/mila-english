@@ -22,6 +22,10 @@ import {
   appendGiaGuestVoiceTurn,
   createGiaGuestVoiceHandoffToken,
 } from "@/lib/giaGuestHandoff";
+import {
+  createGiaVoiceTabCoordinator,
+  type GiaVoiceTabCoordinator,
+} from "@/lib/giaVoiceTabCoordinator";
 import { MILA_ORIGIN } from "@/lib/productHosts";
 
 const INVITES = {
@@ -124,6 +128,8 @@ export default function VoicePage() {
   const [previewAvailable, setPreviewAvailable] = useState(false);
   const [accessCheckFailed, setAccessCheckFailed] = useState(false);
   const [showRealtimeConsent, setShowRealtimeConsent] = useState(false);
+  const [isVoicePaused, setIsVoicePaused] = useState(false);
+  const [otherVoiceTabActive, setOtherVoiceTabActive] = useState(false);
 
   const [liveText, setLiveText] = useState("");
   const [answer, setAnswer] = useState("");
@@ -145,6 +151,9 @@ export default function VoicePage() {
   const consentCancelRef = useRef<HTMLButtonElement>(null);
   const consentConfirmRef = useRef<HTMLButtonElement>(null);
   const guestVoiceHandoffTokenRef = useRef<string | null>(null);
+  const voiceTabCoordinatorRef = useRef<GiaVoiceTabCoordinator | null>(null);
+  const langRef = useRef(lang);
+  langRef.current = lang;
 
   // Responsive orb sizing
   useEffect(() => {
@@ -248,6 +257,123 @@ export default function VoicePage() {
       activeRef.current = false;
       realtimeRef.current?.close();
       realtimeRef.current = null;
+      voiceTabCoordinatorRef.current?.release();
+    };
+  }, []);
+
+  // Gia is deliberately silent outside the foreground tab. A short-lived
+  // device-local lease also prevents two copies of Gia from opening the
+  // microphone at once.
+  useEffect(() => {
+    const stopForAnotherTab = () => {
+      connectionAttemptRef.current += 1;
+      voiceConnectAbortRef.current?.abort();
+      voiceConnectAbortRef.current = null;
+      connectingRef.current = false;
+      activeRef.current = false;
+      realtimeRef.current?.close();
+      realtimeRef.current = null;
+      engineRef.current = null;
+      setIsConnected(false);
+      setIsConnecting(false);
+      setIsVoicePaused(false);
+      setPhase("resting");
+      setLiveText("");
+      setAnswer("");
+      setVoiceError("");
+      setOtherVoiceTabActive(true);
+    };
+
+    const coordinator = createGiaVoiceTabCoordinator({
+      onOwnershipLost: stopForAnotherTab,
+      onOtherOwnerChange: setOtherVoiceTabActive,
+    });
+    voiceTabCoordinatorRef.current = coordinator;
+    setOtherVoiceTabActive(coordinator.hasOtherOwner());
+
+    const pauseActiveVoice = () => {
+      const session = realtimeRef.current;
+      if (!activeRef.current || !session?.isOpen() || session.isSuspended()) return;
+      session.suspend();
+      setIsVoicePaused(true);
+      setPhase("resting");
+      setLiveText("");
+      setAnswer("");
+      setAnswerAnnouncement("");
+    };
+
+    const handleForeground = () => {
+      coordinator.refresh();
+      if (
+        realtimeRef.current?.isOpen()
+        && (!coordinator.isOwner() || coordinator.hasOtherOwner())
+      ) {
+        stopForAnotherTab();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (connectingRef.current) {
+          connectionAttemptRef.current += 1;
+          voiceConnectAbortRef.current?.abort();
+          voiceConnectAbortRef.current = null;
+          connectingRef.current = false;
+          coordinator.release();
+          setIsConnecting(false);
+          setPhase("resting");
+          setVoiceError(langRef.current === "ru"
+            ? "Подключение остановлено при смене вкладки. Нажми на Джиа, чтобы попробовать снова."
+            : "Voice setup paused when you switched tabs. Tap Gia to try again.");
+        }
+        pauseActiveVoice();
+        return;
+      }
+      handleForeground();
+    };
+
+    const handlePageHide = () => {
+      connectionAttemptRef.current += 1;
+      voiceConnectAbortRef.current?.abort();
+      voiceConnectAbortRef.current = null;
+      connectingRef.current = false;
+      activeRef.current = false;
+      realtimeRef.current?.close();
+      realtimeRef.current = null;
+      engineRef.current = null;
+      coordinator.release();
+      setIsConnected(false);
+      setIsConnecting(false);
+      setIsVoicePaused(false);
+      setPhase("resting");
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    // Some embedded browsers keep document.visibilityState at "visible" for
+    // background webviews. Window focus still changes when their tab changes.
+    window.addEventListener("blur", pauseActiveVoice);
+    window.addEventListener("focus", handleForeground);
+    window.addEventListener("pagehide", handlePageHide);
+    const focusGuard = window.setInterval(() => {
+      if (
+        activeRef.current
+        && !document.hidden
+        && typeof document.hasFocus === "function"
+        && !document.hasFocus()
+      ) {
+        pauseActiveVoice();
+      }
+    }, 1_000);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", pauseActiveVoice);
+      window.removeEventListener("focus", handleForeground);
+      window.removeEventListener("pagehide", handlePageHide);
+      window.clearInterval(focusGuard);
+      coordinator.destroy();
+      if (voiceTabCoordinatorRef.current === coordinator) {
+        voiceTabCoordinatorRef.current = null;
+      }
     };
   }, []);
 
@@ -311,7 +437,9 @@ export default function VoicePage() {
           if (!activeRef.current) return;
           activeRef.current = false;
           engineRef.current = null;
+          voiceTabCoordinatorRef.current?.release();
           setIsConnected(false);
+          setIsVoicePaused(false);
           setPhase("resting");
           setVoiceError(freePreview && !isPro
             ? (lang === "ru"
@@ -335,6 +463,8 @@ export default function VoicePage() {
     engineRef.current = "realtime";
     activeRef.current = true;
     setIsConnected(true);
+    setIsVoicePaused(false);
+    setOtherVoiceTabActive(false);
     setVoiceError("");
     setPhase("listening");
     if (freePreview && !isPro) setPreviewAvailable(false);
@@ -359,14 +489,23 @@ export default function VoicePage() {
 
     if (isConnected) return;
 
+    connectingRef.current = true;
+    setIsConnecting(true);
+    setVoiceError("");
+
+    const coordinator = voiceTabCoordinatorRef.current;
+    if (coordinator && !await coordinator.claim()) {
+      connectingRef.current = false;
+      setIsConnecting(false);
+      setOtherVoiceTabActive(true);
+      return;
+    }
+
     const connectionAttempt = connectionAttemptRef.current + 1;
     connectionAttemptRef.current = connectionAttempt;
     const connectAbort = new AbortController();
     voiceConnectAbortRef.current?.abort();
     voiceConnectAbortRef.current = connectAbort;
-    connectingRef.current = true;
-    setIsConnecting(true);
-    setVoiceError("");
     setLiveText("");
     setAnswer("");
     setAnswerAnnouncement("");
@@ -378,7 +517,9 @@ export default function VoicePage() {
         if (!mountedRef.current || connectionAttemptRef.current !== connectionAttempt) return;
         activeRef.current = false;
         engineRef.current = null;
+        voiceTabCoordinatorRef.current?.release();
         setIsConnected(false);
+        setIsVoicePaused(false);
         setPhase("resting");
         if (error instanceof Error && error.message === "VOICE_PREVIEW_USED") {
           setPreviewAvailable(false);
@@ -444,6 +585,40 @@ export default function VoicePage() {
   });
 
   const connectToVoice = async () => {
+    if (isVoicePaused && isConnected) {
+      primeMicrophoneAudioContext();
+      const coordinator = voiceTabCoordinatorRef.current;
+      coordinator?.refresh();
+      if (coordinator && (!coordinator.isOwner() || coordinator.hasOtherOwner())) {
+        setOtherVoiceTabActive(true);
+        return;
+      }
+
+      const resumed = await realtimeRef.current?.resume();
+      if (resumed) {
+        setIsVoicePaused(false);
+        setVoiceError("");
+        setLiveText("");
+        setAnswer("");
+        setPhase("listening");
+      } else {
+        activeRef.current = false;
+        realtimeRef.current?.close();
+        realtimeRef.current = null;
+        engineRef.current = null;
+        coordinator?.release();
+        setIsConnected(false);
+        setIsVoicePaused(false);
+        setPhase("resting");
+        setVoiceError(lang === "ru"
+          ? "Браузер не смог возобновить звук. Нажми «Попробовать снова»."
+          : "Your browser could not resume audio. Choose “Try again”.");
+      }
+      return;
+    }
+
+    if (otherVoiceTabActive && !voiceTabCoordinatorRef.current?.isOwner()) return;
+
     const launchDecision = decideVoiceLaunch({
       preferenceLoaded,
       isConnecting: isConnecting || connectingRef.current,
@@ -477,8 +652,11 @@ export default function VoicePage() {
     realtimeRef.current?.close();
     realtimeRef.current = null;
     engineRef.current = null;
+    voiceTabCoordinatorRef.current?.release();
     setIsConnected(false);
     setIsConnecting(false);
+    setIsVoicePaused(false);
+    setOtherVoiceTabActive(false);
     const handoff = guestVoiceHandoffTokenRef.current;
     router.push(handoff ? `/chat?handoff=${encodeURIComponent(handoff)}` : '/chat');
   }, [router]);
@@ -495,6 +673,10 @@ export default function VoicePage() {
   const invitePool = INVITES[lang];
   const systemState = isConnecting
     ? "CONNECTING"
+    : isVoicePaused
+      ? "PAUSED"
+      : otherVoiceTabActive
+        ? "OTHER TAB"
     : phase === "resting"
     ? "STANDBY"
     : phase === "listening"
@@ -510,6 +692,8 @@ export default function VoicePage() {
       data-presence={presenceId}
       data-access={voiceAccessReady ? (isConnected ? "active" : canUseLiveVoice ? "available" : "unavailable") : "checking"}
       data-error={voiceError ? "true" : "false"}
+      data-voice-paused={isVoicePaused ? "true" : "false"}
+      data-other-voice-tab={otherVoiceTabActive ? "true" : "false"}
       aria-busy={!voiceAccessReady || isConnecting}
       onPointerMove={(event) => {
         if (event.pointerType === "touch") return;
@@ -632,7 +816,9 @@ export default function VoicePage() {
         aria-label={!voiceAccessReady
           ? (lang === "ru" ? "Проверяем доступ к Live-голосу" : "Checking live voice access")
           : isConnected
-            ? phase === "manifesting"
+            ? isVoicePaused
+              ? (lang === "ru" ? "Возобновить разговор с Джиа" : "Resume Gia")
+              : phase === "manifesting"
               ? (lang === "ru" ? "Прервать ответ Джиа" : "Interrupt Gia")
               : (lang === "ru" ? "Говорить с Джиа" : "Speak with Gia")
             : !canUseLiveVoice
@@ -663,9 +849,29 @@ export default function VoicePage() {
       </button>
 
       {/* The invitation the orb breathes at rest */}
+      {isVoicePaused && !voiceError && (
+        <div className="voice-invoke" data-show="1" aria-live="polite">
+          <strong>{lang === "ru" ? "Live-голос на паузе" : "Live voice paused"}</strong>
+          <span className="voice-invoke-line">
+            {lang === "ru"
+              ? "Нажми на Джиа, чтобы снова включить микрофон и звук"
+              : "Tap Gia to resume your microphone and audio"}
+          </span>
+        </div>
+      )}
+
       {(!isConnected && !isConnecting && !voiceError) && (
         <div className="voice-invoke" data-show={showInvocation ? "1" : "0"}>
-          {!voiceAccessReady ? (
+          {otherVoiceTabActive ? (
+            <>
+              <strong>{lang === "ru" ? "Джиа уже говорит в другой вкладке" : "Gia is live in another tab"}</strong>
+              <span className="voice-invoke-line">
+                {lang === "ru"
+                  ? "Вернись в ту вкладку, чтобы продолжить — эта останется без звука"
+                  : "Return to that tab to resume — this one will stay silent"}
+              </span>
+            </>
+          ) : !voiceAccessReady ? (
             <>
               <strong>{lang === "ru" ? "Готовим Джиа…" : "Preparing Gia…"}</strong>
               <span className="voice-invoke-line">
@@ -750,7 +956,11 @@ export default function VoicePage() {
           aria-live="polite"
         >
           <p className="text-center text-[11px] tracking-[0.1em] uppercase mb-2 transition-colors duration-300">
-            {phase === "listening" ? (
+            {isVoicePaused ? (
+              <span className="voice-status voice-status--paused">
+                {lang === "ru" ? "На паузе — нажми на Джиа" : "Paused — tap Gia to resume"}
+              </span>
+            ) : phase === "listening" ? (
               <span className="voice-status voice-status--listening">
                 {lang === "ru" ? "● Слушаю тебя" : "● Hearing you"}
               </span>

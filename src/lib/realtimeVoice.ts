@@ -45,8 +45,13 @@ export type RealtimeVoiceEvents = {
 export type RealtimeVoiceSession = {
   /** Stop Mila mid-sentence and return to listening (tap-to-interrupt). */
   interrupt: () => void;
+  /** Silence output and disable the microphone without tearing down WebRTC. */
+  suspend: () => void;
+  /** Re-enable audio after a user gesture. */
+  resume: () => Promise<boolean>;
   close: () => void;
   isOpen: () => boolean;
+  isSuspended: () => boolean;
 };
 
 export async function connectRealtimeVoice(options: {
@@ -68,7 +73,10 @@ export async function connectRealtimeVoice(options: {
   audio.autoplay = true;
   audio.setAttribute('playsinline', '');
   let media: MediaStream | null = null;
+  let microphoneTrack: MediaStreamTrack | null = null;
   let open = true;
+  let suspended = false;
+  let responseActive = false;
   let disconnectFired = false;
   let disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   let readinessTimer: ReturnType<typeof setTimeout> | null = null;
@@ -89,8 +97,10 @@ export async function connectRealtimeVoice(options: {
     if (abortConnection) options.signal?.removeEventListener('abort', abortConnection);
     abortConnection = null;
     try { pc.close(); } catch { /* already closed */ }
+    try { audio.pause(); } catch { /* already paused */ }
     media?.getTracks().forEach((track) => track.stop());
     media = null;
+    microphoneTrack = null;
     audio.srcObject = null;
   };
 
@@ -107,6 +117,7 @@ export async function connectRealtimeVoice(options: {
   try {
     pc.ontrack = (event) => {
       audio.srcObject = event.streams[0];
+      if (suspended) return;
       void audio.play().catch(() => {
         // Capturing pages are normally allowed to play remote audio. If a
         // vendor still blocks it, the next orb tap remains a user gesture.
@@ -114,7 +125,7 @@ export async function connectRealtimeVoice(options: {
     };
     media = await requestMicrophoneStream();
     if (!open) throw new Error('voice-connect-cancelled');
-    const microphoneTrack = media.getAudioTracks()[0];
+    microphoneTrack = media.getAudioTracks()[0] ?? null;
     if (!microphoneTrack) throw new Error('no-microphone');
     pc.addTrack(microphoneTrack, media);
 
@@ -150,6 +161,9 @@ export async function connectRealtimeVoice(options: {
     dc.addEventListener('message', (event) => {
       let ev: any;
       try { ev = JSON.parse(event.data); } catch { return; }
+      if (ev.type === 'response.created') responseActive = true;
+      if (ev.type === 'response.done') responseActive = false;
+      if (suspended && ev.type !== 'error') return;
       switch (ev.type) {
         case 'input_audio_buffer.speech_started':
           events.onListening?.();
@@ -253,13 +267,47 @@ export async function connectRealtimeVoice(options: {
       interrupt: () => {
         if (!open || dc.readyState !== 'open') return;
         try {
-          dc.send(JSON.stringify({ type: 'response.cancel' }));
-          // WebRTC-specific: flush audio already buffered for playback.
-          dc.send(JSON.stringify({ type: 'output_audio_buffer.clear' }));
+          if (responseActive) {
+            responseActive = false;
+            dc.send(JSON.stringify({ type: 'response.cancel' }));
+            // WebRTC-specific: flush audio already buffered for playback.
+            dc.send(JSON.stringify({ type: 'output_audio_buffer.clear' }));
+          }
         } catch { /* channel raced closed */ }
+      },
+      suspend: () => {
+        if (!open || suspended) return;
+        suspended = true;
+        if (microphoneTrack) microphoneTrack.enabled = false;
+        try { audio.pause(); } catch { /* already paused */ }
+        if (dc.readyState !== 'open') return;
+        try {
+          if (responseActive) {
+            responseActive = false;
+            dc.send(JSON.stringify({ type: 'response.cancel' }));
+            dc.send(JSON.stringify({ type: 'output_audio_buffer.clear' }));
+          }
+          dc.send(JSON.stringify({ type: 'input_audio_buffer.clear' }));
+        } catch { /* channel raced closed */ }
+      },
+      resume: async () => {
+        if (!open) return false;
+        suspended = false;
+        if (microphoneTrack) microphoneTrack.enabled = true;
+        if (audio.srcObject) {
+          try {
+            await audio.play();
+          } catch {
+            suspended = true;
+            if (microphoneTrack) microphoneTrack.enabled = false;
+            return false;
+          }
+        }
+        return true;
       },
       close: cleanup,
       isOpen: () => open,
+      isSuspended: () => suspended,
     };
   } catch (error) {
     cleanup();

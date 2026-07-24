@@ -1483,6 +1483,17 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
       transparent 1.5deg 8deg
     );
 }
+.mila-surface--app[data-route="/darshan"] .voice-stage[data-voice-paused="true"] .voice-orb::after {
+  opacity: .2;
+  animation-play-state: paused;
+}
+.mila-surface--app[data-route="/darshan"] .voice-stage[data-voice-paused="true"] .mila-portrait-presence {
+  filter: saturate(.58) brightness(.72);
+  transform: scale(.985);
+}
+.mila-surface--app[data-route="/darshan"] .voice-stage[data-other-voice-tab="true"] .voice-orb {
+  opacity: .72;
+}
 .mila-surface--app[data-route="/darshan"] .voice-orb:focus-visible {
   outline: 1px solid var(--synthetic-magenta) !important;
   outline-offset: 28px;
@@ -1812,6 +1823,9 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 }
 .mila-surface--app[data-route="/darshan"] :is(.voice-status--listening,.voice-status--thinking,.voice-status--speaking) {
   color: var(--synthetic-magenta);
+}
+.mila-surface--app[data-route="/darshan"] .voice-status--paused {
+  color: var(--synthetic-rose-gold);
 }
 .mila-surface--app[data-route="/darshan"] .voice-error {
   border-color: rgba(255,46,145,.34);

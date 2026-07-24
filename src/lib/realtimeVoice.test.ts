@@ -21,11 +21,15 @@ async function run() {
   let stopped = 0;
   let openDataChannel = false;
   let lastRequest: RequestInit | undefined;
+  let played = 0;
+  let paused = 0;
+  let lastTrack: ({ enabled: boolean; readyState: string; stop: () => void }) | null = null;
   const storage = new Map<string, string>();
 
   class FakeDataChannel extends EventTarget {
     readyState: RTCDataChannelState = 'connecting';
-    send() {}
+    sent: string[] = [];
+    send(message: string) { this.sent.push(JSON.parse(message).type); }
     open() {
       this.readyState = 'open';
       this.dispatchEvent(new Event('open'));
@@ -59,14 +63,20 @@ async function run() {
     autoplay = false;
     srcObject: MediaStream | null = null;
     setAttribute() {}
-    async play() {}
+    async play() { played += 1; }
+    pause() { paused += 1; }
   }
 
   const makeStream = () => {
-    const track = { readyState: 'live', stop: () => { stopped += 1; } } as MediaStreamTrack;
+    const track = {
+      enabled: true,
+      readyState: 'live',
+      stop: () => { stopped += 1; },
+    };
+    lastTrack = track;
     return {
-      getAudioTracks: () => [track],
-      getTracks: () => [track],
+      getAudioTracks: () => [track as MediaStreamTrack],
+      getTracks: () => [track as MediaStreamTrack],
     } as MediaStream;
   };
 
@@ -119,6 +129,24 @@ async function run() {
     assert.match(headers['X-Device-Id'], /^[a-zA-Z0-9-]{16,80}$/);
     assert.equal(headers['X-Mila-OpenAI-Audio-Consent'], 'v1');
     assert.equal(session.isOpen(), true);
+    assert.equal(session.isSuspended(), false);
+    const liveChannel = FakePeerConnection.instances.at(-1)?.channel;
+    liveChannel?.dispatchEvent(new MessageEvent('message', {
+      data: JSON.stringify({ type: 'response.created' }),
+    }));
+    session.suspend();
+    assert.equal(session.isSuspended(), true);
+    assert.equal((lastTrack as { enabled: boolean } | null)?.enabled, false);
+    assert.equal(paused > 0, true);
+    assert.deepEqual(liveChannel?.sent.slice(-3), [
+      'response.cancel',
+      'output_audio_buffer.clear',
+      'input_audio_buffer.clear',
+    ]);
+    assert.equal(await session.resume(), true);
+    assert.equal(session.isSuspended(), false);
+    assert.equal((lastTrack as { enabled: boolean } | null)?.enabled, true);
+    assert.equal(played, 0, 'resume does not invent playback before a remote track exists');
     session.close();
     assert.equal(session.isOpen(), false);
     assert.equal(stopped, 2);
