@@ -62,23 +62,30 @@ const config = {
     ];
   },
   async rewrites() {
-    return [
-      {
-        source: '/',
-        has: [{ type: 'host', value: PIA_HOST }],
-        destination: '/pia',
-      },
-      {
-        source: '/',
-        has: [{ type: 'host', value: GIA_HOST }],
-        destination: '/darshan',
-      },
-      {
-        source: '/',
-        has: [{ type: 'host', value: MIA_HOST }],
-        destination: '/mia',
-      },
-    ];
+    // These host-owned apexes must run before Next resolves the filesystem
+    // root page. Array-form rewrites are too late for an existing `/` route,
+    // which left Mia and authenticated Gia rendering Mila's homepage.
+    return {
+      beforeFiles: [
+        {
+          source: '/',
+          has: [{ type: 'host', value: PIA_HOST }],
+          destination: '/pia',
+        },
+        {
+          source: '/',
+          has: [{ type: 'host', value: GIA_HOST }],
+          destination: '/darshan',
+        },
+        {
+          source: '/',
+          has: [{ type: 'host', value: MIA_HOST }],
+          destination: '/mia',
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
   },
   async redirects() {
     return [

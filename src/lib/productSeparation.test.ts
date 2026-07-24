@@ -13,6 +13,7 @@ const privacy = readFileSync('src/app/privacy/page.tsx', 'utf8');
 const terms = readFileSync('src/app/terms/page.tsx', 'utf8');
 
 test('Gia remains the gated companion while Mia owns the public traveler apex', () => {
+  assert.match(nextConfig, /return \{\s*beforeFiles:/);
   assert.match(nextConfig, /value: GIA_HOST \}\],\s*destination: '\/darshan'/);
   assert.match(nextConfig, /value: MIA_HOST \}\],\s*destination: '\/mia'/);
   assert.match(middleware, /const giaApex = isGiaHostname/);
