@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import MilaIcon from '@/components/ui/MilaIcon';
+import { safeReturnTo } from '@/lib/navigation';
 import {
-  INDIA_LEARNING_MARKET,
   INDIA_NATIVE_LANGUAGES,
   MILA_LEARNING_PROFILE_STORAGE_KEY,
-  MILA_TARGET_LANGUAGE,
   resolveIndianNativeLanguage,
   teacherForNativeLanguage,
 } from '@/lib/learningMarkets';
@@ -32,11 +31,31 @@ function readStoredLanguage(): string {
   }
 }
 
+function storeLearningLanguage(languageId: string) {
+  const language = resolveIndianNativeLanguage(languageId);
+  try {
+    if (!language) {
+      window.localStorage.removeItem(MILA_LEARNING_PROFILE_STORAGE_KEY);
+      return;
+    }
+    const profile: StoredLearningProfile = {
+      countryCode: 'IN',
+      nativeLanguageId: language.id,
+      targetLanguageId: 'en',
+    };
+    window.localStorage.setItem(MILA_LEARNING_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  } catch {
+    // The query-string handoff still preserves the choice when storage is unavailable.
+  }
+}
+
 export default function HomePage() {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('loading');
   const [selectedLanguageId, setSelectedLanguageId] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [returnTo, setReturnTo] = useState('/dashboard');
+  const languageSelectRef = useRef<HTMLSelectElement>(null);
   const isLoggedIn = sessionStatus === 'in';
 
   const selectedLanguage = useMemo(
@@ -50,9 +69,22 @@ export default function HomePage() {
 
   useEffect(() => {
     let cancelled = false;
-    const queryLanguage = new URLSearchParams(window.location.search).get('nativeLanguage');
+    const params = new URLSearchParams(window.location.search);
+    const queryLanguage = params.get('nativeLanguage');
+    const shouldChooseLanguage = params.get('chooseLanguage') === '1';
+    setReturnTo(safeReturnTo(params.get('returnTo'), '/dashboard'));
     const initialLanguage = resolveIndianNativeLanguage(queryLanguage)?.id || readStoredLanguage();
-    if (initialLanguage) setSelectedLanguageId(initialLanguage);
+    if (initialLanguage) {
+      setSelectedLanguageId(initialLanguage);
+      storeLearningLanguage(initialLanguage);
+    }
+    if (shouldChooseLanguage) {
+      setSaveError('Choose the language you understand best.');
+      window.requestAnimationFrame(() => {
+        languageSelectRef.current?.focus();
+        languageSelectRef.current?.scrollIntoView({ block: 'center' });
+      });
+    }
 
     fetch('/api/users/me', { credentials: 'include', cache: 'no-store' })
       .then(async (response) => {
@@ -75,26 +107,37 @@ export default function HomePage() {
     };
   }, []);
 
-  const rememberSelection = () => {
-    if (!selectedLanguage) return;
-    const profile: StoredLearningProfile = {
-      countryCode: 'IN',
-      nativeLanguageId: selectedLanguage.id,
-      targetLanguageId: 'en',
-    };
-    window.localStorage.setItem(MILA_LEARNING_PROFILE_STORAGE_KEY, JSON.stringify(profile));
-  };
-
   const startLearning = async () => {
-    if (!selectedLanguage || saving) return;
+    if (saving) return;
+    if (!selectedLanguage) {
+      setSaveError('Choose the language you understand best.');
+      languageSelectRef.current?.focus();
+      return;
+    }
+
     setSaving(true);
     setSaveError('');
-    rememberSelection();
+    storeLearningLanguage(selectedLanguage.id);
 
-    if (!isLoggedIn) {
+    let hasSession = isLoggedIn;
+    if (sessionStatus === 'loading') {
+      try {
+        const response = await fetch('/api/users/me', {
+          credentials: 'include',
+          cache: 'no-store',
+        });
+        hasSession = response.ok;
+        setSessionStatus(response.ok ? 'in' : 'out');
+      } catch {
+        hasSession = false;
+        setSessionStatus('out');
+      }
+    }
+
+    if (!hasSession) {
       const params = new URLSearchParams({
         nativeLanguage: selectedLanguage.name,
-        returnTo: '/dashboard',
+        returnTo,
       });
       window.location.assign(`/register?${params.toString()}`);
       return;
@@ -107,7 +150,7 @@ export default function HomePage() {
         body: JSON.stringify({ nativeLanguage: selectedLanguage.name }),
       });
       if (!response.ok) throw new Error('save failed');
-      window.location.assign('/dashboard');
+      window.location.assign(returnTo);
     } catch {
       setSaveError('We could not save your language. Please try again.');
       setSaving(false);
@@ -124,17 +167,23 @@ export default function HomePage() {
 
         <div className="lp-minimal__nav-actions">
           <span className="lp-minimal__market">India · English</span>
-          <Link
-            className="lp-minimal__account"
-            href={isLoggedIn ? '/account' : '/login?returnTo=%2Fdashboard'}
-          >
-            {isLoggedIn ? 'My account' : 'Sign in'}
-          </Link>
+          {sessionStatus === 'loading' ? (
+            <span className="lp-minimal__account lp-minimal__account--loading">Checking…</span>
+          ) : (
+            <Link
+              className="lp-minimal__account"
+              href={isLoggedIn
+                ? '/dashboard'
+                : `/login?returnTo=${encodeURIComponent(returnTo)}${selectedLanguage ? `&nativeLanguage=${encodeURIComponent(selectedLanguage.name)}` : ''}`}
+            >
+              {isLoggedIn ? 'My learning' : 'Sign in'}
+            </Link>
+          )}
         </div>
       </header>
 
       <main>
-        <section className="lp-minimal__hero">
+        <section className="lp-minimal__hero lp-minimal__hero--simple">
           <div className="lp-minimal__copy">
             <p className="lp-minimal__eyebrow">
               <span aria-hidden="true" />
@@ -142,62 +191,38 @@ export default function HomePage() {
             </p>
 
             <h1>
-              English, explained
-              <em>in your language.</em>
+              Learn English
+              <em>from your language.</em>
             </h1>
 
             <p className="lp-minimal__intro">
-              Start with the language you already know. Your Mila English teacher
-              explains clearly, introduces English step by step, and adapts the path
-              to your level.
-            </p>
-
-            <div className="lp-minimal__actions">
-              <button
-                className="lp-minimal__primary"
-                type="button"
-                onClick={startLearning}
-                disabled={!selectedLanguage || saving}
-              >
-                {saving ? 'Saving…' : selectedLanguage ? 'Start learning English' : 'Choose your native language'}
-                <MilaIcon name="arrow" size={20} />
-              </button>
-              <Link className="lp-minimal__secondary" href="/login?returnTo=%2Fdashboard">
-                I already have an account
-              </Link>
-            </div>
-
-            <p className="lp-minimal__trust">
-              <MilaIcon name="lock" size={16} />
-              English is the only learning target
-              <span aria-hidden="true">·</span>
-              Start free
-              <span aria-hidden="true">·</span>
-              Progress saved
+              Choose the language you understand best. Your AI English teacher
+              will use it to explain English clearly.
             </p>
           </div>
 
-          <aside className="lp-onboarding-card" aria-labelledby="lp-onboarding-title">
-            <div className="lp-onboarding-card__topline">
-              <span>Set up your learning path</span>
-              <i>01</i>
-            </div>
+          <form
+            className="lp-onboarding-card lp-onboarding-card--simple"
+            aria-labelledby="lp-onboarding-title"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void startLearning();
+            }}
+          >
+            <p className="lp-onboarding-card__topline" id="lp-onboarding-title">
+              Start here
+            </p>
 
-            <div className="lp-onboarding-card__field">
-              <span>Country</span>
-              <strong>
-                <b aria-hidden="true">IN</b>
-                {INDIA_LEARNING_MARKET.countryName}
-              </strong>
-            </div>
-
-            <label className="lp-onboarding-card__field" htmlFor="native-language">
-              <span>Your native language</span>
+            <label className="lp-simple-field" htmlFor="native-language">
+              <span>Which language do you understand best?</span>
               <select
+                ref={languageSelectRef}
                 id="native-language"
                 value={selectedLanguageId}
                 onChange={(event) => {
-                  setSelectedLanguageId(event.target.value);
+                  const nextLanguageId = event.target.value;
+                  setSelectedLanguageId(nextLanguageId);
+                  storeLearningLanguage(nextLanguageId);
                   setSaveError('');
                 }}
               >
@@ -210,60 +235,41 @@ export default function HomePage() {
               </select>
             </label>
 
-            <div className="lp-onboarding-card__target">
-              <span>You will learn</span>
-              <strong>{MILA_TARGET_LANGUAGE.name}</strong>
-              <small>One clear target. No language switching.</small>
-            </div>
-
             {selectedLanguage && teacher ? (
-              <div className="lp-teacher" aria-live="polite">
-                <div className="lp-teacher__mark" aria-hidden="true">
+              <div className="lp-simple-match" aria-live="polite">
+                <div className="lp-simple-match__mark" aria-hidden="true">
                   {teacher.name.charAt(0)}
                 </div>
                 <div>
-                  <span>Your matched teacher</span>
-                  <h2 id="lp-onboarding-title">{teacher.name}</h2>
+                  <strong>{teacher.name} will teach you English</strong>
                   <p>
-                    {teacher.role} · explains in {selectedLanguage.name}
+                    AI English teacher · explanations in {selectedLanguage.name}
                   </p>
-                  <blockquote lang={selectedLanguage.locale}>
-                    {selectedLanguage.promise}
-                  </blockquote>
                 </div>
               </div>
             ) : (
-              <div className="lp-teacher lp-teacher--empty">
-                <div className="lp-teacher__mark" aria-hidden="true">AI</div>
-                <div>
-                  <span>Your matched teacher</span>
-                  <h2 id="lp-onboarding-title">Choose your language</h2>
-                  <p>We will match an AI English teacher who can explain in it.</p>
-                </div>
-              </div>
+              <p className="lp-simple-hint">12 Indian languages supported.</p>
             )}
 
             {saveError ? <p className="lp-onboarding-card__error" role="alert">{saveError}</p> : null}
-          </aside>
-        </section>
 
-        <section className="lp-method" aria-labelledby="lp-method-title">
-          <p className="lp-method__eyebrow">How Mila English starts</p>
-          <h2 id="lp-method-title">Your language is the bridge. English is the destination.</h2>
-          <div className="lp-method__steps">
-            <article>
-              <span>01</span>
-              <p><strong>Choose your language</strong>Tell us the language you understand naturally.</p>
-            </article>
-            <article>
-              <span>02</span>
-              <p><strong>Meet your AI teacher</strong>Get explanations and encouragement in that language.</p>
-            </article>
-            <article>
-              <span>03</span>
-              <p><strong>Build real English</strong>Practise short lessons, speech, and everyday situations.</p>
-            </article>
-          </div>
+            <button
+              className="lp-minimal__primary lp-minimal__primary--simple"
+              type="submit"
+              disabled={saving}
+            >
+              {saving ? 'Opening your learning…' : 'Continue'}
+              <MilaIcon name="arrow" size={20} />
+            </button>
+
+            <p className="lp-minimal__trust">
+              English only
+              <span aria-hidden="true">·</span>
+              Free to start
+              <span aria-hidden="true">·</span>
+              Progress saved
+            </p>
+          </form>
         </section>
       </main>
 

@@ -42,6 +42,21 @@ export default function RegisterPage() {
   const [returnTo, setReturnTo] = useState(isGia ? '/chat' : '/dashboard');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const up = (f:string) => (e:any) => setForm(p=>({...p,[f]:e.target.value}));
+  const updateNativeLanguage = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const nextValue = event.target.value;
+    setForm((current) => ({ ...current, nativeLanguage: nextValue }));
+    const language = resolveIndianNativeLanguage(nextValue);
+    if (!language) return;
+    try {
+      window.localStorage.setItem(MILA_LEARNING_PROFILE_STORAGE_KEY, JSON.stringify({
+        countryCode: 'IN',
+        nativeLanguageId: language.id,
+        targetLanguageId: 'en',
+      }));
+    } catch {
+      // The sign-in link below also carries the choice when storage is unavailable.
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -175,7 +190,7 @@ export default function RegisterPage() {
                   id="register-native-language"
                   name="nativeLanguage"
                   value={form.nativeLanguage}
-                  onChange={up('nativeLanguage')}
+                  onChange={updateNativeLanguage}
                   className="welcome-auth__input"
                   required
                 >
@@ -218,7 +233,7 @@ export default function RegisterPage() {
             </p>
           </form>
           <p className="welcome-auth__footer">
-            {isGia ? t('register_has_account') : 'Already have an account?'} <a href={`/login?returnTo=${encodeURIComponent(returnTo)}`} className="welcome-auth__link">{isGia ? t('register_login') : 'Sign in'}</a>
+            {isGia ? t('register_has_account') : 'Already have an account?'} <a href={`/login?returnTo=${encodeURIComponent(returnTo)}${!isGia && selectedLanguage ? `&nativeLanguage=${encodeURIComponent(selectedLanguage.name)}` : ''}`} className="welcome-auth__link">{isGia ? t('register_login') : 'Sign in'}</a>
           </p>
         </div>
       </main>

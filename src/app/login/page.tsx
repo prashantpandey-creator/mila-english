@@ -37,16 +37,19 @@ export default function LoginPage() {
   const [nativeLanguage, setNativeLanguage] = useState('');
 
   useEffect(() => {
-    const requestedReturnTo = new URLSearchParams(window.location.search).get('returnTo');
+    const params = new URLSearchParams(window.location.search);
+    const requestedReturnTo = params.get('returnTo');
     setReturnTo(safeReturnTo(requestedReturnTo, isGia ? '/chat' : '/dashboard'));
     if (isGia) return;
+
+    let selectedLanguage = resolveIndianNativeLanguage(params.get('nativeLanguage'));
     try {
       const stored = JSON.parse(window.localStorage.getItem(MILA_LEARNING_PROFILE_STORAGE_KEY) || '{}');
-      const language = resolveIndianNativeLanguage(stored?.nativeLanguageId);
-      if (language) setNativeLanguage(language.name);
+      selectedLanguage ||= resolveIndianNativeLanguage(stored?.nativeLanguageId);
     } catch {
-      setNativeLanguage('');
+      // A query-string selection remains usable even if old local storage is malformed.
     }
+    setNativeLanguage(selectedLanguage?.name || '');
   }, [isGia]);
 
   const messageFor = (code?: string, fallback?: string) => {
@@ -70,7 +73,7 @@ export default function LoginPage() {
 
   const handleGuestLogin = async () => {
     if (!isGia && !resolveIndianNativeLanguage(nativeLanguage)) {
-      router.push('/?chooseLanguage=1');
+      router.push(`/?chooseLanguage=1&returnTo=${encodeURIComponent(returnTo)}`);
       return;
     }
     setLoading(true); setError('');
@@ -147,7 +150,7 @@ export default function LoginPage() {
             </p>
           </form>
           <p className="welcome-auth__footer">
-            {isGia ? t('login_no_account') : 'New to Mila English?'} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="welcome-auth__link">{isGia ? t('login_create') : 'Create an account'}</a>
+            {isGia ? t('login_no_account') : 'New to Mila English?'} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}${!isGia && nativeLanguage ? `&nativeLanguage=${encodeURIComponent(nativeLanguage)}` : ''}`} className="welcome-auth__link">{isGia ? t('login_create') : 'Create an account'}</a>
           </p>
           <p className="welcome-auth__legal"><a href="/terms">{isGia && lang === 'ru' ? 'Условия' : 'Terms'}</a><span>·</span><a href="/privacy">{isGia && lang === 'ru' ? 'Конфиденциальность' : 'Privacy'}</a></p>
         </div>

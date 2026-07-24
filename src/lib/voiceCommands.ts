@@ -19,9 +19,7 @@ const DESTINATIONS: Destination[] = [
   { route: '/progress', labelEn: 'Progress', labelRu: 'Прогресс', aliases: ['progress', 'прогресс'] },
   { route: '/achievements', labelEn: 'Achievements', labelRu: 'Достижения', aliases: ['achievements', 'достижения'] },
   { route: '/dashboard', labelEn: 'Home', labelRu: 'Главная', aliases: ['dashboard', 'home', 'главная', 'главную', 'домой', 'кабинет'] },
-  { route: '/chat', labelEn: 'Tutor chat', labelRu: 'Чат', aliases: ['chat', 'чат'] },
   { route: '/assessment', labelEn: 'Level check', labelRu: 'Проверка уровня', aliases: ['assessment', 'level check', 'тест уровня', 'проверку уровня'] },
-  { route: '/darshan', labelEn: 'Voice room', labelRu: 'Голосовая комната', aliases: ['voice room', 'voice practice', 'голосовая комната', 'голосовую комнату'] },
 ];
 
 // Leading verbs that turn a target into a command. Anchored at the start of

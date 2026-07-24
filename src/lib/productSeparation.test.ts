@@ -9,6 +9,9 @@ const miaMetadata = readFileSync('src/app/mia/layout.tsx', 'utf8');
 const sceneStudio = readFileSync('src/components/mia/MiaSceneGenerator.tsx', 'utf8');
 const rootLayout = readFileSync('src/app/layout.tsx', 'utf8');
 const milaHome = readFileSync('src/app/MilaHomePageClient.tsx', 'utf8');
+const milaDashboard = readFileSync('src/app/dashboard/page.tsx', 'utf8');
+const milaLogin = readFileSync('src/app/login/page.tsx', 'utf8');
+const milaStart = readFileSync('src/app/start/page.tsx', 'utf8');
 const privacy = readFileSync('src/app/privacy/page.tsx', 'utf8');
 const terms = readFileSync('src/app/terms/page.tsx', 'utf8');
 const companionStore = readFileSync('src/lib/companionStore.ts', 'utf8');
@@ -50,7 +53,7 @@ test('Mia and Gia never mount Mila global chrome', () => {
 });
 
 test('Mila owns its learning entry points and shared policies cover every product', () => {
-  assert.match(milaHome, /Start learning/);
+  assert.match(milaHome, /Learn English/);
   assert.match(milaHome, /\/dashboard/);
   assert.doesNotMatch(milaHome, /\bGia\b/);
   assert.doesNotMatch(milaHome, /https:\/\/gia\.purangpt\.com/);
@@ -58,6 +61,20 @@ test('Mila owns its learning entry points and shared policies cover every produc
   assert.match(privacy, /gia\.purangpt\.com/);
   assert.match(privacy, /mia\.purangpt\.com/);
   assert.match(terms, /Mila English, Gia, and Mia/);
+});
+
+test('Mila entry actions lead forward instead of returning learners to the front door', () => {
+  assert.match(milaHome, /Which language do you understand best/);
+  assert.match(milaHome, /params\.get\('chooseLanguage'\)/);
+  assert.doesNotMatch(milaHome, /disabled=\{!selectedLanguage/);
+  assert.ok(
+    milaHome.indexOf('id="native-language"') < milaHome.indexOf("Opening your learning"),
+    'the required language choice must appear before the primary action',
+  );
+  assert.match(milaLogin, /\/\?chooseLanguage=1/);
+  assert.match(milaStart, /nativeLanguage/);
+  assert.doesNotMatch(milaDashboard, /router\.push\('\/practice'\)/);
+  assert.match(milaDashboard, /router\.push\('\/listen'\)/);
 });
 
 test('Gia and Mila use separate durable conversation and memory namespaces', () => {

@@ -23,9 +23,16 @@ assert.strictEqual(gotoRoute('take me home'), '/dashboard');
 assert.strictEqual(gotoRoute('open pronunciation'), '/phonetics');
 assert.strictEqual(gotoRoute('open listening'), '/listen');
 
-// The practice room is hidden at /voice-lab (internal): spoken "practice"
-// must no longer resolve to a navigation command at all.
-for (const phrase of ['open speaking practice', 'открой практику']) {
+// Retired or foreign companion routes must never send Mila learners back to
+// the front door and make a working command appear broken.
+for (const phrase of [
+  'open speaking practice',
+  'открой практику',
+  'open chat',
+  'открой чат',
+  'open voice room',
+  'открой голосовую комнату',
+]) {
   const cmd = parseVoiceCommand(phrase);
   assert.ok(!cmd || cmd.kind !== 'goto', `"${phrase}" must NOT navigate anywhere`);
 }

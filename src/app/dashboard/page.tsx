@@ -90,12 +90,12 @@ export default function DashboardPage() {
       href: '/lessons',
     },
     {
-      icon: 'listening',
-      labelEn: 'Train your ear',
-      labelRu: 'Тренировать слух',
-      detailEn: 'Hear, notice and repeat',
-      detailRu: 'Слушать, замечать, повторять',
-      href: '/listen',
+      icon: 'grammar',
+      labelEn: 'Understand grammar',
+      labelRu: 'Понять грамматику',
+      detailEn: 'See the pattern in plain English',
+      detailRu: 'Понять правило простыми словами',
+      href: '/grammar',
     },
     {
       icon: 'phonetics',
@@ -174,11 +174,11 @@ export default function DashboardPage() {
                 </span>
                 <MilaIcon name="arrow" size={20} />
               </button>
-              <button className="conversation-action conversation-action--chat" type="button" onClick={() => router.push('/practice')}>
-                <span className="conversation-action__icon" aria-hidden><MilaIcon name="conversation" size={24} /></span>
+              <button className="conversation-action conversation-action--chat" type="button" onClick={() => router.push('/listen')}>
+                <span className="conversation-action__icon" aria-hidden><MilaIcon name="listening" size={24} /></span>
                 <span>
-                  <strong>{lang === 'ru' ? 'Практика речи' : 'Speaking practice'}</strong>
-                  <small>{lang === 'ru' ? 'Используй урок в коротком диалоге' : 'Use the lesson in a short guided exchange'}</small>
+                  <strong>{lang === 'ru' ? 'Слушай и говори' : 'Listen and speak'}</strong>
+                  <small>{lang === 'ru' ? 'Услышь фразу и повтори её вслух' : 'Hear a phrase, then say it back'}</small>
                 </span>
                 <MilaIcon name="arrow" size={20} />
               </button>
