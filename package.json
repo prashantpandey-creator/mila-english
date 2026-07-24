@@ -10,7 +10,6 @@
     "lint": "next lint",
     "telegram:webhook": "node scripts/telegram-webhook.mjs",
     "clear-chat-history": "node scripts/clear-chat-history.mjs",
-    "analytics:report": "node scripts/analytics-report.mjs",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:seed": "prisma db seed"

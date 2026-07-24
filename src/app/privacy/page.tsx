@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <article className="legal-page__article">
         <p className="legal-page__kicker">PRIVACY POLICY</p>
         <h1>Your learning is private.</h1>
-        <p className="legal-page__meta">Effective 24 July 2026 · Действует с 24 июля 2026 г.</p>
+        <p className="legal-page__meta">Effective 19 July 2026 · Действует с 19 июля 2026 г.</p>
 
         <p style={{fontSize:18,marginTop:30}}>This policy covers the related services at <strong>mila.purangpt.com</strong> (structured language learning), <strong>gia.purangpt.com</strong> (the Gia text-and-voice companion), and <strong>mia.purangpt.com</strong> (the public travel, language, and culture experience), plus the Mila iOS app and legacy miachat.purangpt.com links. Together they are called the Services below.</p>
         <p>Mia’s public editorial pages do not require an account. When Mia sends you to conversation, sign-in, or account features, you move to Gia; when it sends you to structured lessons, you move to Mila. Gia and Mila use the shared account and service infrastructure described here.</p>
@@ -28,7 +28,6 @@ export default function PrivacyPage() {
             <li><strong>Conversations:</strong> chat messages, voice transcripts, and only the facts you explicitly ask Mila to remember.</li>
             <li><strong>Bug reports:</strong> the description and reply email you choose to provide, plus the current page, device/browser, screen size, language, and timezone. Chat history and audio are not attached.</li>
             <li><strong>Payments:</strong> provider payment ID, product, amount, currency, status, and access period. Mila does not receive or store full card details.</li>
-            <li><strong>Anonymous site counts:</strong> the Service records the site and page path, without query strings, against a one-way hash derived from a random same-site cookie. It does not store your IP address, device fingerprint, user agent, or referrer for these counts.</li>
           </ul>
         </section>
 
@@ -47,8 +46,8 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2>No advertising or cross-site tracking</h2>
-          <p>The Services use anonymous, first-party page counts to understand how many visitors use each page. The counts are not connected to an account or payment, are not shared with an analytics vendor, and honor browser Do Not Track and Global Privacy Control signals. The Services do not sell personal data, show behavioral advertising, or combine your activity with third-party data for advertising. The iOS app contains no advertising or cross-app tracking SDK.</p>
+          <h2>No advertising or tracking</h2>
+          <p>The Services do not sell personal data, show behavioral advertising, or combine your activity with third-party data for advertising. The iOS app contains no advertising or cross-app tracking SDK.</p>
         </section>
 
         <section>
@@ -65,7 +64,7 @@ export default function PrivacyPage() {
 
         <section className="legal-page__note">
           <h2>Коротко по-русски</h2>
-          <p>Эта политика распространяется на Mila, Gia и Mia. Приватная запись на сервер Mila остаётся только в упражнениях на произношение и отдельной проверке уровня; аудио удаляется после запроса. Основная голосовая комната Gia сейчас предлагает только Live для доступного демо или Pro: аудио и текст передаются в OpenAI лишь после отдельного явного согласия. Незавершённый приватный/локальный режим основной комнаты временно недоступен; без согласия можно продолжить в текстовом чате. В отчёт об ошибке входят только введённое описание и технические данные, перечисленные выше; история чата и аудио не прикладываются. Сервисы считают анонимные посещения страниц без IP-адресов, цифровых отпечатков, рефереров и параметров ссылок; сигналы Do Not Track и Global Privacy Control учитываются. Сервисы не продают данные, не показывают рекламу и не используют межсайтовый трекинг. Учебные данные можно удалить на сайте или в приложении: <strong>Аккаунт → Удалить аккаунт и данные</strong>. Отдельная обезличенная запись об оплате может храниться для бухгалтерии и возвратов.</p>
+          <p>Эта политика распространяется на Mila, Gia и Mia. Приватная запись на сервер Mila остаётся только в упражнениях на произношение и отдельной проверке уровня; аудио удаляется после запроса. Основная голосовая комната Gia сейчас предлагает только Live для доступного демо или Pro: аудио и текст передаются в OpenAI лишь после отдельного явного согласия. Незавершённый приватный/локальный режим основной комнаты временно недоступен; без согласия можно продолжить в текстовом чате. В отчёт об ошибке входят только введённое описание и технические данные, перечисленные выше; история чата и аудио не прикладываются. Сервисы не продают данные, не показывают рекламу и не используют межсайтовый трекинг. Учебные данные можно удалить на сайте или в приложении: <strong>Аккаунт → Удалить аккаунт и данные</strong>. Отдельная обезличенная запись об оплате может храниться для бухгалтерии и возвратов.</p>
         </section>
       </article>
       </AppMain>
