@@ -6,7 +6,7 @@ import {
   targetLanguagePrompt,
 } from './languages';
 
-test('Mila English exposes one fixed, prompt-safe learning target', () => {
+test('FluentMitra exposes one fixed, prompt-safe learning target', () => {
   assert.equal(TARGET_LANGUAGES.length, 1);
   assert.equal(TARGET_LANGUAGES[0].id, 'english');
   assert.equal(isTargetLanguageId('english'), true);

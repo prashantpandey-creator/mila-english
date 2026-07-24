@@ -236,7 +236,7 @@ export function MilaBindu({
   state = "resting",
   size = 200,
   className,
-  ariaLabel = "Mila AI",
+  ariaLabel = "AI voice presence",
 }: {
   state?: BinduState;
   size?: number;

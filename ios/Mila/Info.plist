@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mila</string>
+	<string>FluentMitra</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -40,7 +40,7 @@
 	<key>MilaBaseURL</key>
 	<string>https://mila.purangpt.com</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Mila uses the microphone only while you record an English practice answer. Audio is processed for transcription and deleted after the request.</string>
+	<string>FluentMitra uses the microphone only while you record an English practice answer. Audio is processed for transcription and deleted after the request.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

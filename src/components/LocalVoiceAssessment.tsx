@@ -90,7 +90,7 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
     setMessage(code === 'no-speech' || code === 'transcribe-empty'
       ? (lang==='ru'?'Микрофон не уловил английскую речь. Это технический результат, а не оценка уровня.':'The mic did not capture English speech. This is a technical result, not a level score.')
       : code === 'score-failed' || code === 'score-empty' || code === 'transcribe-failed'
-      ? (lang==='ru'?'Локальный сервис Mila временно не смог обработать запись. Попробуй снова.':'Mila could not process the recording just now. Please try again.')
+      ? (lang==='ru'?'Локальный сервис FluentMitra временно не смог обработать запись. Попробуй снова.':'FluentMitra could not process the recording just now. Please try again.')
       : code === 'auth-required'
       ? (lang==='ru'?'Сессия истекла. Войди снова, чтобы продолжить.':'Your session expired. Sign in again to continue.')
       : (lang==='ru'?'Проверь доступ к микрофону и попробуй снова.':'Check microphone permission and try again.'))
@@ -190,7 +190,7 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
       </div>
       <h2 style={{fontSize:'1.3rem',lineHeight:1.4,color:C.dark,margin:'12px 0 7px'}}>{prompt.en}</h2>
       <p style={{fontSize:'0.84rem',color:C.warm,margin:'0 0 16px'}}>
-        {lang==='ru' ? prompt.ru : prompt.kind === 'read' ? 'Read this sentence aloud. It is used only as a pronunciation baseline.' : 'Speak naturally for about 15–20 seconds. Mila will show what it heard.'}
+        {lang==='ru' ? prompt.ru : prompt.kind === 'read' ? 'Read this sentence aloud. It is used only as a pronunciation baseline.' : 'Speak naturally for about 15–20 seconds. Your transcript will appear below.'}
       </p>
       {prompt.kind === 'read' && <button onClick={()=>ttsSpeak(prompt.en,'en-GB',.8)} disabled={phase==='recording'||phase==='scoring'} style={{width:'100%',padding:11,borderRadius:11,border:`1px solid ${SIGNAL}`,background:SIGNAL_SOFT,color:SIGNAL,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}><MilaIcon name="volume" size={17}/>{lang==='ru'?'Послушать':'Listen'}</button>}
       {pronunciation && <div style={{marginTop:14,padding:14,borderRadius:12,background:SIGNAL_SOFT,color:C.dark}}>
@@ -198,7 +198,7 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
         <div style={{fontSize:'0.83rem',color:C.warm,marginTop:4,display:'flex',alignItems:'flex-start',gap:6}}><MilaIcon name="sparkle" size={14} style={{flex:'0 0 auto',marginTop:2}}/><span>{pronunciation.tip}</span></div>
       </div>}
       {transcript && <div style={{marginTop:14,padding:14,borderRadius:12,background:SIGNAL_SOFT,color:C.dark,textAlign:'left'}}>
-        <strong style={{color:SIGNAL}}>{lang==='ru'?'Mila услышала':'Mila heard'}:</strong>
+        <strong style={{color:SIGNAL}}>{lang==='ru'?'Расшифровка':'Transcript'}:</strong>
         <div style={{fontSize:'0.9rem',color:C.warm,marginTop:6,lineHeight:1.5}}>{transcript}</div>
       </div>}
       {(message||error) && <div role="alert" style={{marginTop:14,padding:12,borderRadius:11,background:SIGNAL_SOFT,color:SIGNAL,fontSize:'0.84rem'}}>{message||error}</div>}
@@ -213,6 +213,6 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
           : <><MilaIcon name="voice" size={17}/>{lang==='ru'?'Начать запись':'Start recording'}</>}
       </button>}
     </div>
-    <p style={{fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #65535f)',margin:'14px auto 0',maxWidth:450}}>{lang==='ru'?'Аудио отправляется только на сервер Mila, обрабатывается локальными моделями и удаляется сразу после запроса. Внешний AI-провайдер не используется.':'Audio goes only to Mila, is processed by local models, and is deleted immediately after the request. No external AI provider is used.'}</p>
+    <p style={{fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #65535f)',margin:'14px auto 0',maxWidth:450}}>{lang==='ru'?'Аудио отправляется только на сервер FluentMitra, обрабатывается локальными моделями и удаляется сразу после запроса. Внешний AI-провайдер не используется.':'Audio goes only to FluentMitra, is processed by local models, and is deleted immediately after the request. No external AI provider is used.'}</p>
   </div>
 }

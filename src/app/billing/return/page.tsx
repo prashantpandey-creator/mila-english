@@ -43,15 +43,15 @@ export default function BillingReturnPage() {
   }, []);
 
   const content = state === 'paid' ? {
-    title: 'Mila English Pro is ready.', copy: 'Your verified 30-day access is active on this account.', action: '/dashboard', label: 'Continue to Mila English',
+    title: 'FluentMitra Pro is ready.', copy: 'Your verified 30-day access is active on this account.', action: '/dashboard', label: 'Continue to FluentMitra',
   } : state === 'canceled' ? {
-    title: 'No access was activated.', copy: 'The payment was canceled or refunded. You can continue with Mila English Free.', action: '/pricing', label: 'Return to plans',
+    title: 'No access was activated.', copy: 'The payment was canceled or refunded. You can continue with FluentMitra Free.', action: '/pricing', label: 'Return to plans',
   } : state === 'pending' ? {
     title: 'Payment is still being verified.', copy: 'Some banks take a little longer. Your access activates only after YooKassa confirms the payment.', action: '/account', label: 'Check my account',
   } : state === 'error' ? {
-    title: 'We could not match this return.', copy: 'No charge is trusted from a browser redirect. Check your account or contact Mila English support.', action: '/support', label: 'Get support',
+    title: 'We could not match this return.', copy: 'No charge is trusted from a browser redirect. Check your account or contact FluentMitra support.', action: '/support', label: 'Get support',
   } : {
-    title: 'Confirming your payment…', copy: 'Mila English is checking the payment directly with the provider.', action: '', label: '',
+    title: 'Confirming your payment…', copy: 'FluentMitra is checking the payment directly with the provider.', action: '', label: '',
   };
 
   return (

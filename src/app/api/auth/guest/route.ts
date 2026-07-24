@@ -23,9 +23,10 @@ export async function POST(request: NextRequest) {
   }
 
   const isGia = isGiaHostname(request.headers.get('host'));
-  const body = await request.json().catch(() => null);
+  const isJsonRequest = request.headers.get('content-type')?.includes('application/json') ?? false;
+  const body = isJsonRequest ? await request.json().catch(() => null) : null;
   const selectedNativeLanguage = resolveIndianNativeLanguage(body?.nativeLanguage);
-  if (!isGia && body?.nativeLanguage && !selectedNativeLanguage) {
+  if (!isGia && isJsonRequest && !selectedNativeLanguage) {
     return NextResponse.json({
       error: 'Choose a supported native language.',
       code: 'INVALID_NATIVE_LANGUAGE',
@@ -39,9 +40,9 @@ export async function POST(request: NextRequest) {
       name: 'Guest',
       password: await hashPassword(randomBytes(32).toString('hex')),
       learnerCategory: 'pending',
-      // Guest entry points in Mila's onboarding always send this choice.
-      // Other product/internal guest flows remain deliberately unclassified
-      // instead of silently assuming Hindi or retaining the old Russian default.
+      // Browser onboarding sends JSON and must include a deliberate choice.
+      // Existing native clients send a bodyless request, so keep that contract
+      // unclassified until their own language chooser ships.
       nativeLanguage: selectedNativeLanguage?.name ?? 'Not set',
       level: 'pending',
       accountType: 'guest',

@@ -205,7 +205,7 @@ export function buildReliableLessonPlan(result: AssessmentResult): LessonPlan {
         title: `${result.level} Grammar Patterns`,
         category: 'Grammar' as const,
         difficulty,
-        content: `Short ${result.level} grammar practice. Notice the pattern, say the example aloud, then make one personal example. Your Mila English teacher can explain it in your native language when needed.`,
+        content: `Short ${result.level} grammar practice. Notice the pattern, say the example aloud, then make one personal example. Your FluentMitra teacher can explain it in your native language when needed.`,
         exercises: exercises.grammar,
       },
       {

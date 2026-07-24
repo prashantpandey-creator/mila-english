@@ -10,9 +10,11 @@ import {
   resolveIndianNativeLanguage,
   teacherForNativeLanguage,
 } from '@/lib/learningMarkets';
+import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand';
 import './landing.css';
 
 type SessionStatus = 'loading' | 'in' | 'out';
+type EntryIntent = 'account' | 'guest';
 
 type StoredLearningProfile = {
   countryCode: 'IN';
@@ -54,7 +56,10 @@ export default function HomePage() {
   const [selectedLanguageId, setSelectedLanguageId] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [languageError, setLanguageError] = useState(false);
   const [returnTo, setReturnTo] = useState('/dashboard');
+  const [entryIntent, setEntryIntent] = useState<EntryIntent>('account');
+  const [languageChosenThisVisit, setLanguageChosenThisVisit] = useState(false);
   const languageSelectRef = useRef<HTMLSelectElement>(null);
   const isLoggedIn = sessionStatus === 'in';
 
@@ -72,14 +77,18 @@ export default function HomePage() {
     const params = new URLSearchParams(window.location.search);
     const queryLanguage = params.get('nativeLanguage');
     const shouldChooseLanguage = params.get('chooseLanguage') === '1';
+    setEntryIntent(params.get('intent') === 'guest' ? 'guest' : 'account');
     setReturnTo(safeReturnTo(params.get('returnTo'), '/dashboard'));
-    const initialLanguage = resolveIndianNativeLanguage(queryLanguage)?.id || readStoredLanguage();
+    const queryLanguageId = resolveIndianNativeLanguage(queryLanguage)?.id;
+    const initialLanguage = queryLanguageId || readStoredLanguage();
+    setLanguageChosenThisVisit(Boolean(queryLanguageId));
     if (initialLanguage) {
       setSelectedLanguageId(initialLanguage);
       storeLearningLanguage(initialLanguage);
     }
-    if (shouldChooseLanguage) {
+    if (shouldChooseLanguage && !initialLanguage) {
       setSaveError('Choose the language you understand best.');
+      setLanguageError(true);
       window.requestAnimationFrame(() => {
         languageSelectRef.current?.focus();
         languageSelectRef.current?.scrollIntoView({ block: 'center' });
@@ -111,12 +120,14 @@ export default function HomePage() {
     if (saving) return;
     if (!selectedLanguage) {
       setSaveError('Choose the language you understand best.');
+      setLanguageError(true);
       languageSelectRef.current?.focus();
       return;
     }
 
     setSaving(true);
     setSaveError('');
+    setLanguageError(false);
     storeLearningLanguage(selectedLanguage.id);
 
     let hasSession = isLoggedIn;
@@ -135,6 +146,24 @@ export default function HomePage() {
     }
 
     if (!hasSession) {
+      if (entryIntent === 'guest') {
+        try {
+          const response = await fetch('/api/auth/guest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nativeLanguage: selectedLanguage.name }),
+          });
+          const body = await response.json().catch(() => null);
+          if (!response.ok) {
+            throw new Error(body?.error || 'We could not start a guest session.');
+          }
+          window.location.assign(returnTo);
+        } catch (error) {
+          setSaveError(error instanceof Error ? error.message : 'We could not start a guest session.');
+          setSaving(false);
+        }
+        return;
+      }
       const params = new URLSearchParams({
         nativeLanguage: selectedLanguage.name,
         returnTo,
@@ -160,13 +189,12 @@ export default function HomePage() {
   return (
     <div className="lp-minimal">
       <header className="lp-minimal__nav">
-        <Link className="lp-minimal__brand" href="/" aria-label="Mila English home">
-          <span aria-hidden="true">M</span>
-          <strong>Mila <b>English</b></strong>
+        <Link className="lp-minimal__brand" href="/" aria-label={`${MILA_PUBLIC_BRAND.name} home`}>
+          <span aria-hidden="true" />
+          <strong>{MILA_PUBLIC_BRAND.name}</strong>
         </Link>
 
         <div className="lp-minimal__nav-actions">
-          <span className="lp-minimal__market">India · English</span>
           {sessionStatus === 'loading' ? (
             <span className="lp-minimal__account lp-minimal__account--loading">Checking…</span>
           ) : (
@@ -174,7 +202,7 @@ export default function HomePage() {
               className="lp-minimal__account"
               href={isLoggedIn
                 ? '/dashboard'
-                : `/login?returnTo=${encodeURIComponent(returnTo)}${selectedLanguage ? `&nativeLanguage=${encodeURIComponent(selectedLanguage.name)}` : ''}`}
+                : `/login?returnTo=${encodeURIComponent(returnTo)}${selectedLanguage && languageChosenThisVisit ? `&nativeLanguage=${encodeURIComponent(selectedLanguage.name)}` : ''}`}
             >
               {isLoggedIn ? 'My learning' : 'Sign in'}
             </Link>
@@ -192,12 +220,12 @@ export default function HomePage() {
 
             <h1>
               Learn English
-              <em>from your language.</em>
+              <em>in your language.</em>
             </h1>
 
             <p className="lp-minimal__intro">
-              Choose the language you understand best. Your AI English teacher
-              will use it to explain English clearly.
+              Choose a language you already know. Your AI teacher will use it
+              to explain English from day one.
             </p>
           </div>
 
@@ -210,23 +238,27 @@ export default function HomePage() {
             }}
           >
             <p className="lp-onboarding-card__topline" id="lp-onboarding-title">
-              Start here
+              Choose your language
             </p>
 
             <label className="lp-simple-field" htmlFor="native-language">
-              <span>Which language do you understand best?</span>
+              <span>Which language should we explain English in?</span>
               <select
                 ref={languageSelectRef}
                 id="native-language"
                 value={selectedLanguageId}
+                aria-invalid={languageError ? true : undefined}
+                aria-describedby={languageError ? 'native-language-error' : 'native-language-hint'}
                 onChange={(event) => {
                   const nextLanguageId = event.target.value;
                   setSelectedLanguageId(nextLanguageId);
+                  setLanguageChosenThisVisit(true);
                   storeLearningLanguage(nextLanguageId);
                   setSaveError('');
+                  setLanguageError(false);
                 }}
               >
-                <option value="">Choose the language you know best</option>
+                <option value="">Select a language</option>
                 {INDIA_NATIVE_LANGUAGES.map((language) => (
                   <option key={language.id} value={language.id}>
                     {language.nativeName} · {language.name}
@@ -236,34 +268,40 @@ export default function HomePage() {
             </label>
 
             {selectedLanguage && teacher ? (
-              <div className="lp-simple-match" aria-live="polite">
+              <div className="lp-simple-match" id="native-language-hint" aria-live="polite">
                 <div className="lp-simple-match__mark" aria-hidden="true">
                   {teacher.name.charAt(0)}
                 </div>
                 <div>
-                  <strong>{teacher.name} will teach you English</strong>
+                  <strong>{teacher.name} teaches English in {selectedLanguage.name}</strong>
                   <p>
-                    AI English teacher · explanations in {selectedLanguage.name}
+                    Your matched AI English teacher
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="lp-simple-hint">12 Indian languages supported.</p>
+              <p className="lp-simple-hint" id="native-language-hint">12 Indian languages supported.</p>
             )}
 
-            {saveError ? <p className="lp-onboarding-card__error" role="alert">{saveError}</p> : null}
+            {saveError ? <p className="lp-onboarding-card__error" id="native-language-error" role="alert">{saveError}</p> : null}
 
             <button
               className="lp-minimal__primary lp-minimal__primary--simple"
               type="submit"
               disabled={saving}
             >
-              {saving ? 'Opening your learning…' : 'Continue'}
+              {saving
+                ? 'Opening your learning…'
+                : isLoggedIn
+                  ? 'Continue learning'
+                  : entryIntent === 'guest'
+                    ? 'Continue as guest'
+                    : 'Start learning'}
               <MilaIcon name="arrow" size={20} />
             </button>
 
             <p className="lp-minimal__trust">
-              English only
+              12 Indian languages
               <span aria-hidden="true">·</span>
               Free to start
               <span aria-hidden="true">·</span>
@@ -274,7 +312,7 @@ export default function HomePage() {
       </main>
 
       <footer className="lp-minimal__footer">
-        <span>© {new Date().getFullYear()} Mila English</span>
+        <span>© {new Date().getFullYear()} {MILA_PUBLIC_BRAND.name}</span>
         <nav aria-label="Footer">
           <Link href="/support">Support</Link>
           <Link href="/privacy">Privacy</Link>

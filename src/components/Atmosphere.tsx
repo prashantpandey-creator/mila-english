@@ -111,7 +111,7 @@ export default function Atmosphere() {
     };
   }, [storyActive]);
 
-  // Mila English now starts with the compact country/native-language setup.
+  // FluentMitra now starts with the compact country/native-language setup.
   // Keep that front door visually quiet; the older cinematic origin story
   // would compete with the required first choice and reintroduce a skip control.
   if (pathname === '/') {
@@ -183,7 +183,7 @@ export default function Atmosphere() {
           type="button"
           className="atmosphere-story__skip"
           onClick={() => storyRef.current?.finish()}
-          aria-label="Skip Mila story / Пропустить историю Mila"
+          aria-label="Skip FluentMitra story / Пропустить историю FluentMitra"
           data-story-skip
         >
           Skip / Пропустить

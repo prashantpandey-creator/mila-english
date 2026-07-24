@@ -38,7 +38,7 @@ function browserDiagnostics() {
 }
 
 function mailtoHref(form: FormState, ru: boolean, diagnostics: ReturnType<typeof browserDiagnostics>) {
-  const subject = `[Mila bug] ${form.area || (ru ? 'Сообщение об ошибке' : 'Bug report')}`;
+  const subject = `[FluentMitra bug] ${form.area || (ru ? 'Сообщение об ошибке' : 'Bug report')}`;
   const body = [
     ru ? 'Что произошло:' : 'What happened:', form.description || '—', '',
     ru ? 'Как повторить:' : 'Steps to reproduce:', form.steps || '—', '',
@@ -99,11 +99,11 @@ export default function BugReportForm() {
     <section className="bug-report" aria-labelledby="bug-report-title">
       <div className="bug-report__intro">
         <p className="legal-page__kicker">{ru ? 'СООБЩИТЬ ОБ ОШИБКЕ' : 'REPORT A BUG'}</p>
-        <h2 id="bug-report-title">{ru ? 'Расскажи Миле, что сломалось.' : 'Tell Mila what broke.'}</h2>
+        <h2 id="bug-report-title">{ru ? 'Расскажи, что сломалось.' : 'Tell us what broke.'}</h2>
         <p>
           {ru
-            ? 'Отчёт отправится владельцу Mila по электронной почте. Не добавляй пароли, банковские данные или личные разговоры.'
-            : 'Your report goes to Mila’s owner by email. Do not include passwords, banking details, or private conversations.'}
+            ? 'Отчёт отправится владельцу FluentMitra по электронной почте. Не добавляй пароли, банковские данные или личные разговоры.'
+            : 'Your report goes to FluentMitra’s owner by email. Do not include passwords, banking details, or private conversations.'}
         </p>
       </div>
 
@@ -178,8 +178,8 @@ export default function BugReportForm() {
 
         <p className="bug-report__privacy">
           {ru
-            ? 'Mila автоматически добавит страницу, тип устройства и браузера, размер экрана, язык и часовой пояс. История чата и аудио не отправляются.'
-            : 'Mila automatically adds the page, device/browser, screen size, language, and timezone. Chat history and audio are never attached.'}
+            ? 'FluentMitra автоматически добавит страницу, тип устройства и браузера, размер экрана, язык и часовой пояс. История чата и аудио не отправляются.'
+            : 'FluentMitra automatically adds the page, device/browser, screen size, language, and timezone. Chat history and audio are never attached.'}
         </p>
 
         <div className="bug-report__actions">
@@ -192,7 +192,7 @@ export default function BugReportForm() {
         </div>
 
         <div className={`bug-report__status bug-report__status--${state}`} aria-live="polite" role="status">
-          {state === 'sent' && (ru ? 'Готово — отчёт отправлен владельцу Mila.' : 'Done — the report was emailed to Mila’s owner.')}
+          {state === 'sent' && (ru ? 'Готово — отчёт отправлен владельцу FluentMitra.' : 'Done — the report was emailed to FluentMitra’s owner.')}
           {state === 'fallback' && (
             <>
               {ru ? 'Прямая отправка сейчас недоступна. ' : 'Direct delivery is unavailable right now. '}

@@ -74,8 +74,8 @@ struct LearnerProgressView: View {
                 }
             } else {
                 Text(language == .ru
-                    ? "Пройди голосовую проверку, чтобы Mila нашла звуки для практики."
-                    : "Complete a voice check so Mila can find the sounds worth practising.")
+                    ? "Пройди голосовую проверку, чтобы FluentMitra нашёл звуки для практики."
+                    : "Complete a voice check so FluentMitra can find the sounds worth practising.")
                     .font(.subheadline).foregroundStyle(Color.milaMuted)
             }
         }

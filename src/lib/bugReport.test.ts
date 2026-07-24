@@ -20,7 +20,7 @@ const email = buildBugReportEmail(parsed, {
   receivedAt: '2026-07-19T12:00:00.000Z',
 });
 
-assert.strictEqual(email.subject, '[Mila bug] Voice conversation');
+assert.strictEqual(email.subject, '[FluentMitra bug] Voice conversation');
 assert.strictEqual(email.replyTo, 'anna@example.com');
 assert.match(email.text, /The microphone stays on Starting/);
 assert.match(email.html, /390×844/);

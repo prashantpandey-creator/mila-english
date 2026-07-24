@@ -27,12 +27,12 @@ struct SpeakView: View {
         VStack(spacing: 9) {
             MilaMark(size: 86)
                 .shadow(color: Color.milaCyan.opacity(0.25), radius: 28)
-            Text(language == .ru ? "Разговор с Mila" : "Speak with Mila")
+            Text(language == .ru ? "Практика во FluentMitra" : "Practise with FluentMitra")
                 .font(.system(size: 29, weight: .black, design: .rounded))
                 .foregroundStyle(Color.milaCream)
             Text(language == .ru
-                ? "Нажми, скажи одну мысль и нажми снова. Mila расшифрует речь, мягко ответит и прочитает ответ вслух."
-                : "Tap, say one thought, then tap again. Mila transcribes it, responds gently, and reads the reply aloud.")
+                ? "Нажми, скажи одну мысль и нажми снова. Твой преподаватель расшифрует речь, мягко ответит и прочитает ответ вслух."
+                : "Tap, say one thought, then tap again. Your teacher transcribes it, responds gently, and reads the reply aloud.")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.milaMuted)
@@ -92,7 +92,7 @@ struct SpeakView: View {
                 }
                 if !voice.reply.isEmpty {
                     bubble(
-                        label: "Mila",
+                        label: language == .ru ? "Преподаватель" : "Your teacher",
                         text: voice.reply,
                         color: .milaCyan,
                         replay: { Task { await voice.replay() } }
@@ -106,8 +106,8 @@ struct SpeakView: View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "lock.fill").foregroundStyle(Color.milaGreen)
             Text(language == .ru
-                ? "Запись отправляется только на сервер Mila, расшифровывается частной моделью и удаляется сразу после запроса. Текст сохраняется в твоей истории обучения."
-                : "The recording goes only to Mila, is transcribed by a private model, and is deleted immediately after the request. The transcript remains in your learning history.")
+                ? "Запись отправляется только во FluentMitra, расшифровывается частной моделью и удаляется сразу после запроса. Текст сохраняется в твоей истории обучения."
+                : "The recording goes only to FluentMitra, is transcribed by a private model, and is deleted immediately after the request. The transcript remains in your learning history.")
                 .font(.caption)
                 .foregroundStyle(Color.milaMuted)
         }
@@ -157,8 +157,8 @@ struct SpeakView: View {
             return language == .ru ? "Готова слушать" : "Ready to listen"
         case .recording: return language == .ru ? "Слушаю… нажми, чтобы закончить" : "Listening… tap to finish"
         case .transcribing: return language == .ru ? "Разбираю речь…" : "Transcribing…"
-        case .thinking: return language == .ru ? "Mila думает…" : "Mila is thinking…"
-        case .speaking: return language == .ru ? "Mila отвечает" : "Mila is speaking"
+        case .thinking: return language == .ru ? "Преподаватель думает…" : "Your teacher is thinking…"
+        case .speaking: return language == .ru ? "Преподаватель отвечает" : "Your teacher is speaking"
         case .failed(let message): return message
         }
     }

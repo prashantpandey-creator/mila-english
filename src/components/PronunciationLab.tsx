@@ -44,12 +44,12 @@ function recordingMessage(problem: unknown, lang: 'ru'|'en') {
   const error = problem instanceof Error ? problem : null
   const code = error?.message || ''
   const name = error?.name || ''
-  if (name === 'NotAllowedError' || code === 'permission-denied') return lang==='ru' ? 'Доступ к микрофону закрыт. Разреши микрофон для Mila в настройках сайта и попробуй снова.' : 'Microphone access is blocked. Allow the microphone for Mila in site settings and try again.'
+  if (name === 'NotAllowedError' || code === 'permission-denied') return lang==='ru' ? 'Доступ к микрофону закрыт. Разреши микрофон для FluentMitra в настройках сайта и попробуй снова.' : 'Microphone access is blocked. Allow the microphone for FluentMitra in site settings and try again.'
   if (name === 'NotFoundError' || code === 'no-microphone') return lang==='ru' ? 'Микрофон не найден. Подключи микрофон или выбери его в настройках браузера.' : 'No microphone was found. Connect or select one in browser settings.'
   if (name === 'NotReadableError' || code === 'microphone-busy') return lang==='ru' ? 'Микрофон занят другим приложением. Закрой звонок или диктофон и попробуй снова.' : 'Another app is using the microphone. Close the call or recorder and try again.'
   if (code === 'no-speech') return lang==='ru' ? 'Речь не записалась — это не оценка произношения. Нажми запись и начни говорить сразу.' : 'No speech was captured—this is not a pronunciation score. Start speaking just after tapping record.'
   if (code === 'score-failed' || code === 'score-empty') return lang==='ru' ? 'Сервис оценки временно недоступен. Запись не оценивалась; попробуй ещё раз.' : 'Scoring is temporarily unavailable. Your recording was not graded; please try again.'
-  if (code === 'insecure-context') return lang==='ru' ? 'Микрофон работает только на защищённом HTTPS‑сайте Mila.' : 'Microphone recording requires Mila to be opened over secure HTTPS.'
+  if (code === 'insecure-context') return lang==='ru' ? 'Микрофон работает только на защищённом HTTPS‑сайте FluentMitra.' : 'Microphone recording requires FluentMitra to be opened over secure HTTPS.'
   return lang==='ru' ? 'Не удалось начать запись. Проверь микрофон и разрешение сайта — менять браузер не обязательно.' : 'Recording could not start. Check the microphone and site permission—you do not need to change browsers.'
 }
 

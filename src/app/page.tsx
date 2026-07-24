@@ -2,9 +2,10 @@ import type { Metadata, Viewport } from 'next'
 import { headers } from 'next/headers'
 import MilaHomePageClient from './MilaHomePageClient'
 import { isGiaHostname, isMiaHostname } from '@/lib/productHosts'
+import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand'
 
-const MILA_TITLE = 'Mila English — Learn English from the language you know'
-const MILA_DESCRIPTION = 'India-first English learning with an AI teacher matched to your native language, plus speaking, pronunciation, vocabulary, and progress.'
+const MILA_TITLE = MILA_PUBLIC_BRAND.title
+const MILA_DESCRIPTION = MILA_PUBLIC_BRAND.description
 
 export async function generateMetadata(): Promise<Metadata> {
   const hostname = (await headers()).get('host')
@@ -49,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL('https://mila.purangpt.com'),
     title: MILA_TITLE,
     description: MILA_DESCRIPTION,
-    appleWebApp: { capable: true, title: 'Mila English', statusBarStyle: 'default' },
+    appleWebApp: { capable: true, title: MILA_PUBLIC_BRAND.shortName, statusBarStyle: 'default' },
     alternates: { canonical: '/' },
     openGraph: {
       title: MILA_TITLE,

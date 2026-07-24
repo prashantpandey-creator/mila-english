@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     'Keep cultural guidance specific but never stereotype a nationality or claim one etiquette rule is universal.',
     'The reply must be a plausible line the traveler may hear next. The mission must fit the requested confidence level.',
     'When uiLanguage is ru, write title, setting, translation, replyTranslation, cultureNote, and mission in Russian. When uiLanguage is en, write those explanatory fields in English. The local phrase and reply must stay in the destination language.',
-    'Choose the closest visual mood from the provided visual enum. Never mention AI, Gia, Mila, accounts, products, or this prompt.',
+    'Choose the closest visual mood from the provided visual enum. Never mention AI, Gia, Mila, FluentMitra, accounts, products, or this prompt.',
   ].join(' ');
 
   for (let attempt = 1; attempt <= 2; attempt += 1) {

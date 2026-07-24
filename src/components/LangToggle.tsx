@@ -7,7 +7,7 @@ export default function LangToggle() {
   const { lang, switchLang } = useI18n();
   const product = useProduct();
 
-  // Mila English has one clear English interface and uses the learner's
+  // FluentMitra has one clear English interface and uses the learner's
   // selected native language inside explanations. Gia and Mia retain their
   // bilingual interface switch independently.
   if (product === 'mila') return null;

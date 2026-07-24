@@ -7,7 +7,7 @@ import '../auth-recovery.css';
 export default function VerifyEmailPage() {
   const product = useProduct();
   const isGia = product === 'gia';
-  const brand = isGia ? 'Gia' : 'Mila English';
+  const brand = isGia ? 'Gia' : 'FluentMitra';
   const [state, setState] = useState<'checking' | 'verified' | 'error'>('checking');
   const [message, setMessage] = useState('');
   useEffect(() => {

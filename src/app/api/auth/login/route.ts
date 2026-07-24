@@ -11,6 +11,8 @@ import {
 import { loginSchema } from '@/lib/authSchemas';
 import { consumeAuthAttempt, requestIdentity } from '@/lib/authRateLimit';
 import { publicUser } from '@/lib/publicUser';
+import { resolveIndianNativeLanguage } from '@/lib/learningMarkets';
+import { isGiaHostname } from '@/lib/productHosts';
 
 export async function POST(request: NextRequest) {
   const parsed = loginSchema.safeParse(await request.json().catch(() => null));
@@ -18,7 +20,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Enter a valid email and password.', code: 'INVALID_INPUT' }, { status: 400 });
   }
 
-  const { email, password } = parsed.data;
+  const { email, password, nativeLanguage } = parsed.data;
+  const isGia = isGiaHostname(request.headers.get('host'));
+  const selectedNativeLanguage = resolveIndianNativeLanguage(nativeLanguage);
+  if (!isGia && nativeLanguage !== undefined && !selectedNativeLanguage) {
+    return NextResponse.json({
+      error: 'Choose a supported native language.',
+      code: 'INVALID_NATIVE_LANGUAGE',
+    }, { status: 400 });
+  }
   const identity = requestIdentity(request);
   const ipRate = consumeAuthAttempt(`login-ip:${identity}`, { limit: 30, windowMs: 15 * 60_000 });
   const emailRate = consumeAuthAttempt(`login-email:${email}`, { limit: 8, windowMs: 15 * 60_000 });
@@ -44,6 +54,7 @@ export async function POST(request: NextRequest) {
     data: {
       accountType: 'registered',
       ...(passwordNeedsUpgrade(user.password) ? { password: await hashPassword(password) } : {}),
+      ...(!isGia && selectedNativeLanguage ? { nativeLanguage: selectedNativeLanguage.name } : {}),
     },
   });
   await createSession(updated);

@@ -226,8 +226,8 @@ export default function AssessmentVoice() {
     idle:       lang==='ru' ? 'Голосовая проверка уровня' : 'Voice level assessment',
     connecting: lang==='ru' ? 'Соединяю…' : 'Connecting…',
     listening:  lang==='ru' ? 'Слушаю тебя…' : 'Listening to you…',
-    thinking:   lang==='ru' ? 'Мила думает…' : 'Mila is thinking…',
-    speaking:   lang==='ru' ? 'Мила говорит…' : 'Mila is speaking…',
+    thinking:   lang==='ru' ? 'Экзаменатор думает…' : 'Your examiner is thinking…',
+    speaking:   lang==='ru' ? 'Экзаменатор говорит…' : 'Your examiner is speaking…',
     finalizing: lang==='ru' ? 'Составляю твой план…' : 'Building your plan…',
     error:      lang==='ru' ? 'Что-то пошло не так' : 'Something went wrong',
   }[phase];
@@ -273,8 +273,8 @@ export default function AssessmentVoice() {
         </h1>
         <p className="focus-copy">
           {lang==='ru'
-            ? 'Выбирай способ, в котором тебе спокойно. Mila заметит, что уже получается, и соберёт личный маршрут без оценочного давления.'
-            : 'Choose the way that feels comfortable. Mila notices what already works and shapes a personal path without judgment.'}
+            ? 'Выбирай способ, в котором тебе спокойно. FluentMitra заметит, что уже получается, и соберёт личный маршрут без оценочного давления.'
+            : 'Choose the way that feels comfortable. FluentMitra notices what already works and shapes a personal path without judgment.'}
         </p>
 
         {mode === 'choice' && (
@@ -285,8 +285,8 @@ export default function AssessmentVoice() {
             note={lang==='ru' ? 'Каждый путь приводит к одному личному плану.' : 'Every route leads to the same personal learning plan.'}
           >
             <EditorialChoice
-              title={lang==='ru' ? 'Поговорить с Милой' : 'Talk with Mila'}
-              detail={lang==='ru' ? 'Голос · 3–5 минут · сервер Mila, без VPN' : 'Voice · 3–5 min · Mila server, no VPN'}
+              title={lang==='ru' ? 'Поговорить с экзаменатором' : 'Speak with an examiner'}
+              detail={lang==='ru' ? 'Голос · 3–5 минут · сервер FluentMitra, без VPN' : 'Voice · 3–5 min · FluentMitra server, no VPN'}
               mark="01"
               meta={lang==='ru' ? 'Советуем начать' : 'Best beginning'}
               icon={<MilaIcon name="voice" size={16}/>}
@@ -329,8 +329,8 @@ export default function AssessmentVoice() {
               </h2>
               <p id="assessment-live-consent-description" className="mb-6 text-sm leading-6 text-slate-600">
                 {lang === 'ru'
-                  ? 'В этом режиме звук с микрофона и расшифровка отправляются в OpenAI для обработки разговора в реальном времени. До нажатия «Согласен» ничего не отправляется. Вместо этого всегда можно выбрать приватную проверку на сервере Mila.'
-                  : 'This mode sends your microphone audio and transcript to OpenAI for live processing. Nothing is sent until you choose “I agree.” You can use Mila’s private server assessment instead.'}
+                  ? 'В этом режиме звук с микрофона и расшифровка отправляются в OpenAI для обработки разговора в реальном времени. До нажатия «Согласен» ничего не отправляется. Вместо этого всегда можно выбрать приватную проверку на сервере FluentMitra.'
+                  : 'This mode sends your microphone audio and transcript to OpenAI for live processing. Nothing is sent until you choose “I agree.” You can use FluentMitra’s private server assessment instead.'}
               </p>
               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <button
@@ -375,7 +375,7 @@ export default function AssessmentVoice() {
           <div className="assessment-page__captions" aria-live="polite">
             {examinerText && (
               <div className="assessment-page__caption is-mila">
-                <span style={{color:SIGNAL,fontWeight:700}}>Mila · </span>{examinerText}
+                <span style={{color:SIGNAL,fontWeight:700}}>FluentMitra · </span>{examinerText}
               </div>
             )}
             {youText && (

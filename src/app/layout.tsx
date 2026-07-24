@@ -13,6 +13,7 @@ import BottomNav from '@/components/BottomNav'
 import RouteSurface from '@/components/RouteSurface'
 import { ProductProvider } from '@/lib/product-context'
 import { productForHostname } from '@/lib/productHosts'
+import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand'
 
 const serifFont = Yeseva_One({
   weight: '400',
@@ -75,14 +76,14 @@ export async function generateMetadata(): Promise<Metadata> {
     }
   }
 
-  const title = 'Mila English — Learn English from the language you know'
-  const description = 'India-first English learning with an AI teacher matched to your native language, plus speaking, pronunciation, vocabulary, and progress.'
+  const title = MILA_PUBLIC_BRAND.title
+  const description = MILA_PUBLIC_BRAND.description
   return {
     ...common,
     metadataBase: new URL('https://mila.purangpt.com'),
     title,
     description,
-    appleWebApp: { capable: true, title: 'Mila English', statusBarStyle: 'default' },
+    appleWebApp: { capable: true, title: MILA_PUBLIC_BRAND.shortName, statusBarStyle: 'default' },
     openGraph: {
       title,
       description,

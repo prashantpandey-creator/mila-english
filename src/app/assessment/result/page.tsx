@@ -100,7 +100,7 @@ export default function AssessmentResultPage() {
             <section className="assessment-result__hero">
               <span className="assessment-result__eyebrow"><MilaIcon name="level" size={17} />{T('ТВОЯ ОТПРАВНАЯ ТОЧКА', 'YOUR STARTING POINT')}</span>
               <div className="assessment-result__level">{result.level}</div>
-              <h1>{T('Мила услышала, с чего лучше начать.', 'Mila heard where to begin.')}</h1>
+              <h1>{T('FluentMitra определила, с чего лучше начать.', 'FluentMitra found your best starting point.')}</h1>
               <p>{T('Это не оценка и не ярлык. Это ориентир, чтобы следующая практика была подходящей именно тебе.', 'This is not a grade or a label. It is a starting point that makes your next practice fit you.')}</p>
             </section>
 
@@ -118,7 +118,7 @@ export default function AssessmentResultPage() {
                 <h2>{T('Следующий фокус', 'Your next focus')}</h2>
                 {result.profile.focus.length ? (
                   <ul>{result.profile.focus.map((item) => <li key={item}>{item}</li>)}</ul>
-                ) : <p>{result.profile.weak_summary || T('Начни с короткого урока — Мила уточнит фокус по ходу.', 'Start with a short lesson and Mila will refine the focus as you go.')}</p>}
+                ) : <p>{result.profile.weak_summary || T('Начни с короткого урока — FluentMitra уточнит фокус по ходу.', 'Start with a short lesson and FluentMitra will refine the focus as you go.')}</p>}
               </section>
             </div>
 

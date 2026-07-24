@@ -8,6 +8,7 @@
 // uses (getLangFromStorage) rather than the hook.
 import { useEffect, useState } from 'react'
 import { getLangFromStorage } from '@/lib/i18n'
+import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand'
 import { isGiaHostname, isMiaHostname } from '@/lib/productHosts'
 
 const DISMISS_KEY = 'mila_install_dismissed'
@@ -30,7 +31,7 @@ export default function PwaRegister() {
   const [installEvent, setInstallEvent] = useState<any>(null)
   const [showIOSHint, setShowIOSHint] = useState(false)
   const [lang, setLang] = useState<'ru' | 'en'>('en')
-  const [productName, setProductName] = useState<'Mila English' | 'Gia' | 'Mia'>('Mila English')
+  const [productName, setProductName] = useState<string>(MILA_PUBLIC_BRAND.shortName)
 
   useEffect(() => {
     // Production only: dev chunks have STABLE names (layout.js), so the SW's
@@ -48,7 +49,7 @@ export default function PwaRegister() {
         ? 'Gia'
         : isMiaHostname(window.location.hostname)
           ? 'Mia'
-          : 'Mila English',
+          : MILA_PUBLIC_BRAND.shortName,
     )
     if (localStorage.getItem(DISMISS_KEY) || isStandalone()) return
 

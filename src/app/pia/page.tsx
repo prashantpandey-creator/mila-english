@@ -111,7 +111,7 @@ export default function PiaPage() {
       setIsConnected(false);
       setPhase("resting");
       setError(e instanceof Error && e.message === "VOICE_PAID_FEATURE"
-        ? "Pia live voice needs an active Mila Pro account."
+        ? "Pia live voice needs an active FluentMitra Pro account."
         : "Pia abhi aa nahi paa rahi. Ek pal ruk ke orb ko phir chhuo.");
     } finally {
       setIsConnecting(false);
@@ -163,7 +163,7 @@ export default function PiaPage() {
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-pink-700">OPTIONAL PRO VOICE</p>
             <h1 id="pia-openai-consent-title" className="mb-3 text-xl font-semibold">Talk with Pia through OpenAI?</h1>
             <p id="pia-openai-consent-description" className="mb-6 text-sm leading-6 text-slate-600">
-              Pia’s live Hindi voice sends microphone audio and its transcript to OpenAI for real-time processing. Nothing is sent until you agree. This external live voice requires an active Mila Pro account.
+              Pia’s live Hindi voice sends microphone audio and its transcript to OpenAI for real-time processing. Nothing is sent until you agree. This external live voice requires an active FluentMitra Pro account.
             </p>
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <button

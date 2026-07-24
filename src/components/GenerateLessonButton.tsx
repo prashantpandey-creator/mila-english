@@ -55,10 +55,10 @@ export default function GenerateLessonButton() {
         <Card className="lesson-generator__upgrade" padding="0">
           <span className="lesson-generator__upgrade-icon"><MilaIcon name="lock" size={20}/></span>
           <span>
-            <strong>{lang === 'ru' ? 'Личные уроки входят в Mila Pro' : 'Custom lessons are part of Mila Pro'}</strong>
+            <strong>{lang === 'ru' ? 'Личные уроки входят в FluentMitra Pro' : 'Custom lessons are part of FluentMitra Pro'}</strong>
             <small>{lang === 'ru' ? 'Один доступ на 30 дней, без автопродления.' : 'One 30-day pass, with no automatic renewal.'}</small>
           </span>
-          <button type="button" onClick={() => router.push('/pricing')}>{lang === 'ru' ? 'Посмотреть Pro' : 'See Mila Pro'}<MilaIcon name="arrow" size={16}/></button>
+          <button type="button" onClick={() => router.push('/pricing')}>{lang === 'ru' ? 'Посмотреть Pro' : 'See FluentMitra Pro'}<MilaIcon name="arrow" size={16}/></button>
         </Card>
       ) : (
       <Card className="lesson-generator__control" padding="0">
@@ -75,7 +75,7 @@ export default function GenerateLessonButton() {
           onClick={handleGenerate}
           disabled={loading || !topic.trim()}
           className="lesson-generator__button">
-          <MilaIcon name="sparkle" size={16}/>{loading ? (lang==='ru'?'Мила пишет…':'Mila is writing…') : (lang==='ru'?'Создать урок':'Commission it')}
+          <MilaIcon name="sparkle" size={16}/>{loading ? (lang==='ru'?'Создаю урок…':'Creating your lesson…') : (lang==='ru'?'Создать урок':'Commission it')}
         </button>
       </Card>
       )}

@@ -8,10 +8,10 @@ enum MilaAPIError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidURL: return "The Mila service address is invalid."
-        case .invalidResponse: return "Mila returned an unreadable response."
-        case let .server(code, message): return message.isEmpty ? "Mila returned error \(code)." : message
-        case .emptyReply: return "Mila did not return a reply. Please try again."
+        case .invalidURL: return "The FluentMitra service address is invalid."
+        case .invalidResponse: return "FluentMitra returned an unreadable response."
+        case let .server(code, message): return message.isEmpty ? "FluentMitra returned error \(code)." : message
+        case .emptyReply: return "FluentMitra did not return a reply. Please try again."
         }
     }
 }

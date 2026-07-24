@@ -24,7 +24,7 @@ struct ChatView: View {
                             if sending {
                                 HStack {
                                     ProgressView().tint(Color.milaCyan)
-                                    Text(language == .ru ? "Mila печатает…" : "Mila is typing…")
+                                    Text(language == .ru ? "Преподаватель печатает…" : "Your teacher is typing…")
                                         .font(.caption).foregroundStyle(Color.milaMuted)
                                     Spacer()
                                 }
@@ -66,7 +66,7 @@ struct ChatView: View {
     private var welcome: some View {
         VStack(spacing: 14) {
             MilaMark(size: 72)
-            Text(language == .ru ? "Привет — я Mila" : "Hi — I’m Mila")
+            Text(language == .ru ? "Твой преподаватель FluentMitra готов" : "Your FluentMitra teacher is ready")
                 .font(.title2.weight(.black)).foregroundStyle(Color.milaCream)
             Text(language == .ru
                 ? "Спроси об английском, разыграй ситуацию или просто поговори. Я мягко исправлю только важную ошибку."
@@ -125,7 +125,7 @@ struct ChatView: View {
                 Text(error).font(.caption).foregroundStyle(Color.milaPink).frame(maxWidth: .infinity, alignment: .leading)
             }
             HStack(spacing: 10) {
-                TextField(language == .ru ? "Напиши Mila…" : "Message Mila…", text: $input, axis: .vertical)
+                TextField(language == .ru ? "Напиши преподавателю…" : "Message your teacher…", text: $input, axis: .vertical)
                     .lineLimit(1...4)
                     .textFieldStyle(.plain)
                     .foregroundStyle(Color.milaCream)

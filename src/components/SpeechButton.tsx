@@ -6,7 +6,7 @@ import { C } from '@/lib/theme';
 import { ttsSpeak } from '@/lib/tts';
 import MilaIcon from '@/components/ui/MilaIcon';
 
-export default function SpeechButton({ text = 'Hello! Welcome to Mila.', label }: { text?: string; label?: string }) {
+export default function SpeechButton({ text = 'Hello! Welcome to FluentMitra.', label }: { text?: string; label?: string }) {
   const [playing, setPlaying] = useState(false);
   const speak = async () => {
     if (playing) return;

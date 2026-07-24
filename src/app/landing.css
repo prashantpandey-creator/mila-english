@@ -30,7 +30,8 @@
 }
 
 .lp-minimal button:focus-visible,
-.lp-minimal a:focus-visible {
+.lp-minimal a:focus-visible,
+.lp-minimal select:focus-visible {
   outline: 3px solid var(--lp-pink);
   outline-offset: 4px;
 }
@@ -54,14 +55,31 @@
 }
 
 .lp-minimal__brand > span {
+  position: relative;
   width: 34px;
   height: 34px;
   display: grid;
   place-items: center;
-  color: #171214;
   background: linear-gradient(145deg, var(--lp-pink) 0%, #ff5fa8 68%, var(--lp-blush) 100%);
-  font: 800 16px/1 var(--font-sans, system-ui, sans-serif);
   border-radius: 50%;
+}
+
+.lp-minimal__brand > span::before,
+.lp-minimal__brand > span::after {
+  content: '';
+  position: absolute;
+  width: 17px;
+  height: 7px;
+  background: #fff;
+  border-radius: 999px 999px 999px 2px;
+}
+
+.lp-minimal__brand > span::before {
+  transform: translate(-3px, -5px);
+}
+
+.lp-minimal__brand > span::after {
+  transform: translate(3px, 5px) rotate(180deg);
 }
 
 .lp-minimal__brand strong {

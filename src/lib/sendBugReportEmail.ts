@@ -29,7 +29,7 @@ export async function sendBugReportEmail(
   if (!apiKey) return { sent: false, reason: 'unavailable' };
 
   const recipient = process.env.BUG_REPORT_RECIPIENT_EMAIL?.trim() || BUG_REPORT_RECIPIENT;
-  const from = process.env.BUG_REPORT_FROM_EMAIL?.trim() || 'Mila Bug Reports <onboarding@resend.dev>';
+  const from = process.env.BUG_REPORT_FROM_EMAIL?.trim() || 'FluentMitra Bug Reports <onboarding@resend.dev>';
   const email = buildBugReportEmail(report, context);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);

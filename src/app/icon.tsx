@@ -24,7 +24,7 @@ export default async function Icon() {
         : isMia
           ? 'inset 0 0 0 4px #c43f70'
           : 'inset 0 0 0 4px #a9bab6',
-    }}>{isGia ? 'G' : 'M'}</div>,
+    }}>{isGia ? 'G' : isMia ? 'M' : 'F'}</div>,
     size,
   )
 }

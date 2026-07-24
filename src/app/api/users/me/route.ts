@@ -57,7 +57,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   if (isGiaHostname(request.headers.get('host'))) {
-    return NextResponse.json({ error: 'This setting belongs to Mila English.' }, { status: 404 })
+    return NextResponse.json({ error: 'This setting belongs to FluentMitra.' }, { status: 404 })
   }
 
   const body = await request.json().catch(() => null)

@@ -46,8 +46,11 @@ export default function RegisterPage() {
     const nextValue = event.target.value;
     setForm((current) => ({ ...current, nativeLanguage: nextValue }));
     const language = resolveIndianNativeLanguage(nextValue);
-    if (!language) return;
     try {
+      if (!language) {
+        window.localStorage.removeItem(MILA_LEARNING_PROFILE_STORAGE_KEY);
+        return;
+      }
       window.localStorage.setItem(MILA_LEARNING_PROFILE_STORAGE_KEY, JSON.stringify({
         countryCode: 'IN',
         nativeLanguageId: language.id,
@@ -130,8 +133,8 @@ export default function RegisterPage() {
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
           <span className="welcome-auth__brand">
-            <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'M'}</span>
-            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila English'}</span>
+            <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'F'}</span>
+            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'FluentMitra'}</span>
           </span>
           {isGia ? <LangToggle /> : <span className="welcome-auth__market">India · English</span>}
         </div>
@@ -145,7 +148,7 @@ export default function RegisterPage() {
             <h1 className="welcome-auth__title">
               {isGia
                 ? (lang === 'ru' ? 'Присоединиться к Gia' : 'Join Gia')
-                : 'Create your Mila English account'}
+                : 'Create your FluentMitra account'}
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
@@ -217,7 +220,7 @@ export default function RegisterPage() {
                 ? '...'
                 : isGia
                   ? (lang === 'ru' ? 'Создать аккаунт Gia' : 'Create my Gia account')
-                  : 'Create my Mila English account'}
+                  : 'Create my FluentMitra account'}
             </button>
             <div className="welcome-auth__separator">{isGia && lang==='ru'?'или':'or'}</div>
             <button type="button" onClick={handleGuestLogin} disabled={loading || (!isGia && !selectedLanguage)}

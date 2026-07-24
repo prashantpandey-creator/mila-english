@@ -114,7 +114,7 @@ export async function POST(req: Request) {
   if (mode === 'companion') {
     const userId = Number(user?.sub);
     if (!Number.isSafeInteger(userId) || userId <= 0) {
-      return errorResponse('A Mila account is required for the Gia live preview.', 401, 'UNAUTHORIZED');
+      return errorResponse('A FluentMitra account is required for the Gia live preview.', 401, 'UNAUTHORIZED');
     }
     previewReservation = await reserveVoicePreview(prisma.user, userId);
     if (!previewReservation) {

@@ -10,7 +10,7 @@ final class MilaUITests: XCTestCase {
     }
 
     func testNativeLearnerJourneyAndLiveTutor() throws {
-        XCTAssertTrue(app.staticTexts["Mila"].waitForExistence(timeout: 12))
+        XCTAssertTrue(app.staticTexts["FluentMitra"].waitForExistence(timeout: 12))
         XCTAssertTrue(app.buttons["Начать разговор"].exists)
         capture("01-home")
 
@@ -26,7 +26,7 @@ final class MilaUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Твой прогресс"].waitForExistence(timeout: 5))
         capture("04-progress")
 
-        app.tabBars.buttons["Mila"].tap()
+        app.tabBars.buttons["Преподаватель"].tap()
         let starter = app.buttons["Давай потренируем разговор в кафе"]
         XCTAssertTrue(starter.waitForExistence(timeout: 5))
         starter.tap()

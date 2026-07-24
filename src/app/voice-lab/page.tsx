@@ -137,7 +137,7 @@ function PracticeRoom() {
               await speakTurn(text, turnId);
             } catch {
               if (activeRef.current && turnRef.current === turnId) {
-                setError(lang === "ru" ? "Мила не смогла ответить. Коснись сферы." : "Mila could not answer. Touch the orb.");
+                setError(lang === "ru" ? "FluentMitra не смогла ответить. Коснись сферы." : "FluentMitra could not answer. Touch the orb.");
                 setPhase("resting");
                 setRunning(false);
                 return;
@@ -223,7 +223,7 @@ function PracticeRoom() {
     setRunning(false);
     activeRef.current = false;
     setPhase("resting");
-    setError(lang === "ru" ? "Мила не смогла начать. Попробуй ещё раз." : "Mila could not start. Try again.");
+    setError(lang === "ru" ? "FluentMitra не смогла начать. Попробуй ещё раз." : "FluentMitra could not start. Try again.");
   }, [lang, listenLoop, phase, running, speakTurn]);
 
   const exit = useCallback(() => {
@@ -258,7 +258,7 @@ function PracticeRoom() {
         </button>
       </header>
 
-      <section className="practice-orb" aria-label={lang === "ru" ? "Голосовая практика с Милой" : "Voice practice with Mila"}>
+      <section className="practice-orb" aria-label={lang === "ru" ? "Голосовая практика во FluentMitra" : "Voice practice in FluentMitra"}>
         <button
           type="button"
           onClick={begin}
@@ -281,7 +281,7 @@ function PracticeRoom() {
           ) : phase === "listening" ? (
             <span className="practice-live__status--listening"><i aria-hidden />{lang === "ru" ? "Говори" : "Your turn"}</span>
           ) : phase === "thinking" ? (
-            <span className="practice-live__status--thinking">{lang === "ru" ? "Мила думает…" : "Mila is thinking…"}</span>
+            <span className="practice-live__status--thinking">{lang === "ru" ? "Твой преподаватель думает…" : "Your teacher is thinking…"}</span>
           ) : (
             <span className="practice-live__status--speaking">{lang === "ru" ? "Слушай задание" : "Listen to the task"}</span>
           )}

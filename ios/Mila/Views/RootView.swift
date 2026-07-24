@@ -70,7 +70,7 @@ struct RootView: View {
 
                 ChatView(language: language)
                     .tag(RootTab.chat)
-                    .tabItem { Label("Mila", systemImage: "bubble.left.and.bubble.right.fill") }
+                    .tabItem { Label(language.wrappedValue == .ru ? "Преподаватель" : "Teacher", systemImage: "bubble.left.and.bubble.right.fill") }
 
                 LearnerProgressView(language: language, webDestination: $webDestination)
                     .tag(RootTab.progress)

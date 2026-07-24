@@ -119,7 +119,7 @@ export default function AccountPage() {
       <AppMain width="work" className="account-page__main">
         <div className="account-stack">
           <section className="account-hero">
-            <p className="account-hero__kicker">{isGia ? 'YOUR GIA' : T('ТВОЯ MILA ENGLISH', 'YOUR MILA ENGLISH')}</p>
+            <p className="account-hero__kicker">{isGia ? 'YOUR GIA' : T('ТВОЙ FLUENTMITRA', 'YOUR FLUENTMITRA')}</p>
             <h1>{account.isGuest
               ? (isGia ? T('Сохрани свои разговоры', 'Keep your conversations') : T('Сохрани свой прогресс', 'Keep your progress'))
               : account.name}</h1>
@@ -139,7 +139,7 @@ export default function AccountPage() {
             <div className="account-panel__row">
               <div>
                 <p className="account-panel__kicker">{T('ДОСТУП', 'ACCESS')}</p>
-                <h2>{pro ? 'Mila English Pro' : T('Бесплатный план', 'Free plan')}</h2>
+                <h2>{pro ? 'FluentMitra Pro' : T('Бесплатный план', 'Free plan')}</h2>
               </div>
               <span className={`account-plan${pro ? ' is-pro' : ''}`}>{pro ? 'PRO' : 'FREE'}</span>
             </div>
@@ -156,7 +156,7 @@ export default function AccountPage() {
               <p className="account-feedback" role="status">{T('Последняя оплата возвращена. Доступ от неё завершён.', 'The latest payment was refunded. Access from it has ended.')}</p>
             ) : null}
             <div className="account-actions">
-              {pro || !milaTeacher ? <a className="account-button account-button--primary" href="/pricing">{pro ? T('Посмотреть тариф', 'View plan') : T('Открыть Pro', 'See Mila English Pro')}</a> : null}
+              {pro || !milaTeacher ? <a className="account-button account-button--primary" href="/pricing">{pro ? T('Посмотреть тариф', 'View plan') : T('Открыть Pro', 'See FluentMitra Pro')}</a> : null}
               {pro || !milaTeacher ? <a className="account-button" href="/refunds">{T('Оплата и возвраты', 'Payments and refunds')}</a> : null}
             </div>
           </section> : null}
@@ -194,7 +194,7 @@ export default function AccountPage() {
               ) : (
                 <>
                   <p>{isGia
-                    ? T('Это навсегда удалит историю разговоров и факты, сохранённые в Gia. Данные Mila не затрагиваются. Введи DELETE для подтверждения.', 'This permanently deletes Gia conversation history and remembered facts. Mila learning data is not touched. Type DELETE to confirm.')
+                    ? T('Это навсегда удалит историю разговоров и факты, сохранённые в Gia. Данные FluentMitra не затрагиваются. Введи DELETE для подтверждения.', 'This permanently deletes Gia conversation history and remembered facts. FluentMitra learning data is not touched. Type DELETE to confirm.')
                     : T('Это навсегда удалит обучение, прогресс и историю. Введи DELETE для подтверждения. Финансовая запись об оплате может храниться отдельно, если этого требует закон.', 'This permanently deletes learning data, progress, and history. Type DELETE to confirm. A payment record may be retained separately where legally required.')}</p>
                   <input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder="DELETE" aria-label="Type DELETE to confirm" />
                   <div className="account-actions">

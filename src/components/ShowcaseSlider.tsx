@@ -43,7 +43,7 @@ export default function ShowcaseSlider() {
     return () => clearInterval(t);
   }, []);
 
-  const heading = lang === 'ru' ? 'Как Mila слышит акценты' : 'How Mila hears every accent';
+  const heading = lang === 'ru' ? 'Практика разных акцентов' : 'Practise across English accents';
 
   return (
     <section className="mila-showcase-sec">

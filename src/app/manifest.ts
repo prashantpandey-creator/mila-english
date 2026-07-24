@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { headers } from 'next/headers'
 import { isGiaHostname, isMiaHostname } from '@/lib/productHosts'
+import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand'
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const hostname = (await headers()).get('host')
@@ -43,9 +44,9 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   }
 
   return {
-    name: 'Mila English — English from your native language',
-    short_name: 'Mila English',
-    description: 'India-first English learning with a native-language AI teacher, speaking practice, and visible progress.',
+    name: `${MILA_PUBLIC_BRAND.name} — ${MILA_PUBLIC_BRAND.descriptor}`,
+    short_name: MILA_PUBLIC_BRAND.shortName,
+    description: MILA_PUBLIC_BRAND.description,
     start_url: '/',
     scope: '/',
     display: 'standalone',

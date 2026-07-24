@@ -22,7 +22,7 @@ struct WebModuleView: View {
                     VStack(spacing: 12) {
                         MilaMark(size: 64)
                         ProgressView(value: progress).tint(Color.milaCyan).frame(width: 150)
-                        Text("Loading Mila…").font(.caption).foregroundStyle(Color.milaMuted)
+                        Text("Loading FluentMitra…").font(.caption).foregroundStyle(Color.milaMuted)
                     }
                     .padding(22)
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
@@ -110,7 +110,7 @@ private struct MilaWebView: UIViewRepresentable {
         func loadAuthenticatedModule(_ url: URL, in webView: WKWebView) {
             guard Self.isAllowedModuleURL(url) else {
                 parent.loading = false
-                parent.error = "This page is not available inside the Mila app."
+                parent.error = "This page is not available inside the FluentMitra app."
                 return
             }
 
@@ -132,7 +132,7 @@ private struct MilaWebView: UIViewRepresentable {
                             webView.load(URLRequest(url: url, cachePolicy: .reloadRevalidatingCacheData))
                         } else {
                             self.parent.loading = false
-                            self.parent.error = "Your Mila session expired. Close this window and sign in again."
+                            self.parent.error = "Your FluentMitra session expired. Close this window and sign in again."
                         }
                         return
                     }

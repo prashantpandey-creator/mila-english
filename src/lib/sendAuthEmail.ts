@@ -1,7 +1,9 @@
+import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand';
+
 export type AuthBrand = 'Mila' | 'Gia';
 
 function authBrandDisplayName(brand: AuthBrand) {
-  return brand === 'Mila' ? 'Mila English' : brand;
+  return brand === 'Mila' ? MILA_PUBLIC_BRAND.name : brand;
 }
 
 function brandedSender(brand: AuthBrand) {

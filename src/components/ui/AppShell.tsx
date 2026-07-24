@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useProduct } from '@/lib/product-context';
+import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand';
 
 type AppShellProps = {
   children: ReactNode;
@@ -35,7 +36,7 @@ export function AppShell({ children, className, fullHeight = false }: AppShellPr
 export function AppHeader({ title, eyebrow, actions, backHref = '/dashboard', brand, className }: AppHeaderProps) {
   const product = useProduct();
   const brandId = brand ?? (product === 'gia' ? 'Gia' : product === 'mia' ? 'Mia' : 'Mila');
-  const resolvedBrand = brandId === 'Mila' ? 'Mila English' : brandId;
+  const resolvedBrand = brandId === 'Mila' ? MILA_PUBLIC_BRAND.name : brandId;
   const backLabel = backHref === '/'
     ? `${resolvedBrand} · home`
     : backHref === '/lessons'
@@ -46,7 +47,7 @@ export function AppHeader({ title, eyebrow, actions, backHref = '/dashboard', br
       <div className="app-header__inner">
         <div className="app-header__identity">
           <Link className="app-header__brand" href={backHref} aria-label={backLabel}>
-            <span className="app-header__mark" aria-hidden="true">{brandId === 'Gia' ? 'G' : 'M'}</span>
+            <span className="app-header__mark" aria-hidden="true">{brandId === 'Gia' ? 'G' : brandId === 'Mia' ? 'M' : 'F'}</span>
             <span>{resolvedBrand}</span>
           </Link>
           {title ? (

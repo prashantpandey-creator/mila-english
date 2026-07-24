@@ -24,7 +24,7 @@ export default async function AppleIcon() {
         : isMia
           ? 'inset 0 0 0 2px #c43f70'
           : 'inset 0 0 0 2px #a9bab6',
-    }}>{isGia ? 'G' : 'M'}</div>,
+    }}>{isGia ? 'G' : isMia ? 'M' : 'F'}</div>,
     size,
   )
 }

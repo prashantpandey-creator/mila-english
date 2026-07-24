@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   const selectedNativeLanguage = resolveIndianNativeLanguage(parsed.data.nativeLanguage);
   if (!isGia && !selectedNativeLanguage) {
     return NextResponse.json({
-      error: 'Choose one of the supported native languages before creating a Mila English account.',
+      error: 'Choose one of the supported native languages before creating a FluentMitra account.',
       code: 'INVALID_NATIVE_LANGUAGE',
     }, { status: 400 });
   }

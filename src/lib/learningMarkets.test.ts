@@ -11,7 +11,7 @@ import {
   teacherForNativeLanguage,
 } from './learningMarkets';
 
-test('Mila English has one fixed target language', () => {
+test('FluentMitra has one fixed target language', () => {
   assert.deepEqual(MILA_TARGET_LANGUAGE, {
     id: 'en',
     name: 'English',

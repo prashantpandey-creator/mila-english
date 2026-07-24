@@ -186,7 +186,7 @@ export default function MilaGuide() {
   const { isHydrating: isHistoryHydrating, refreshHistory } = useCompanionHistory({ limit: 12, setMessages })
 
   const page = PAGE_LABELS[pageKey(pathname)]
-  const teacherName = context?.teacherName || 'Mila'
+  const teacherName = context?.teacherName || (lang === 'ru' ? 'Твой учитель' : 'Your teacher')
   const agentState = listening ? 'listening' : isLoading || voicePending ? 'thinking' : speaking ? 'speaking' : 'idle'
   const isMiaApex = mounted && typeof window !== 'undefined' && isMiaHostname(window.location.hostname) && pathname === '/'
   const isVoiceRoom = isMiaApex
@@ -506,14 +506,7 @@ export default function MilaGuide() {
 
   const startGuest = async () => {
     setGuideError('')
-    const response = await fetch('/api/auth/guest', { method: 'POST' }).catch(() => null)
-    if (!response?.ok) {
-      setGuideError(lang === 'ru' ? 'Не удалось начать. Попробуй ещё раз.' : 'I could not start a session. Please try again.')
-      return
-    }
-    router.push('/dashboard')
-    router.refresh()
-    setContext(null)
+    router.push('/?chooseLanguage=1&intent=guest&returnTo=%2Fdashboard')
   }
 
   // Guest FAQ chips answer INLINE — no login wall, no empty composer. Canned
@@ -648,7 +641,7 @@ export default function MilaGuide() {
         : (lang === 'ru' ? 'Готова помочь' : 'Ready to help')
 
   return (
-    <aside className={`mila-guide ${pathname === '/' ? 'is-home' : ''} ${open ? 'is-open' : ''}`} data-state={agentState} data-voice={voiceMode ? '1' : '0'} aria-label={lang === 'ru' ? 'Помощница Mila English' : `${teacherName}, AI English teacher`}>
+    <aside className={`mila-guide ${pathname === '/' ? 'is-home' : ''} ${open ? 'is-open' : ''}`} data-state={agentState} data-voice={voiceMode ? '1' : '0'} aria-label={lang === 'ru' ? `${teacherName}, ИИ-учитель английского` : `${teacherName}, AI English teacher`}>
       <span
         id="mila-guide-launcher-help"
         style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}
@@ -658,7 +651,7 @@ export default function MilaGuide() {
           : 'Click once or press Enter to talk. Double-click or use the chat button to type.'}
       </span>
       {open && (
-        <section id="mila-guide-text-panel" className="mila-guide__panel" data-mila-surface="text-chat" role="dialog" aria-modal="false" aria-label={lang === 'ru' ? 'Чат с учителем Mila English' : `Chat with ${teacherName}`}>
+        <section id="mila-guide-text-panel" className="mila-guide__panel" data-mila-surface="text-chat" role="dialog" aria-modal="false" aria-label={lang === 'ru' ? `Чат с учителем ${teacherName}` : `Chat with ${teacherName}`}>
           <header className="mila-guide__header">
             <div className="mila-guide__portrait" aria-hidden>
               <MilaVoiceMark size={38} state={agentState} />
@@ -732,8 +725,8 @@ export default function MilaGuide() {
               <>
                 <button type="button" onClick={() => faqAnswer(
                   lang === 'ru' ? 'Что это за приложение?' : 'What is this app?',
-                  'Mila is a personal English tutor. She hears every sound you speak, gives gentle feedback, builds lessons around your goals, and you can practise by voice — all in a friendly chat like this.',
-                  'Mila — персональная наставница по английскому. Она слышит каждый твой звук, мягко поправляет, собирает уроки под твои цели, и с ней можно говорить голосом — всё в дружеском чате, как этот.',
+                  'FluentMitra matches you with an AI English teacher who can explain in your language, give gentle feedback, and build lessons around your goals.',
+                  'FluentMitra подбирает ИИ-учителя английского, который объясняет на твоём языке, мягко исправляет и строит уроки вокруг твоих целей.',
                 )}><MilaIcon name="conversation" size={14}/>{lang === 'ru' ? 'Что это?' : 'What is this?'}</button>
                 <button type="button" onClick={() => faqAnswer(
                   lang === 'ru' ? 'Это бесплатно?' : 'Is it free?',
@@ -767,7 +760,7 @@ export default function MilaGuide() {
 
       {!open && nudge && (
         <button className="mila-guide__nudge" type="button" onClick={startVoiceConversation}>
-          <strong>{lang === 'ru' ? 'Мила рядом' : 'Mila is here'}</strong>
+          <strong>{lang === 'ru' ? `${teacherName} рядом` : `${teacherName} is here`}</strong>
           <span>{lang === 'ru' ? 'Нажми — говорить · чат — писать' : 'Tap to talk · use chat to type'}</span>
         </button>
       )}
@@ -797,8 +790,8 @@ export default function MilaGuide() {
         aria-label={voiceMode
           ? (lang === 'ru' ? 'Остановить голосовой режим' : 'Stop voice mode')
           : open
-            ? (lang === 'ru' ? 'Свернуть Милу' : 'Collapse Mila')
-            : (lang === 'ru' ? 'Начать голосовой разговор с Милой' : 'Start a voice conversation with Mila')}
+            ? (lang === 'ru' ? 'Свернуть чат с учителем' : `Collapse ${teacherName}`)
+            : (lang === 'ru' ? `Начать голосовой разговор с ${teacherName}` : `Start a voice conversation with ${teacherName}`)}
         title={voiceMode
           ? (lang === 'ru' ? 'Голосовой режим — коснись, чтобы остановить' : 'Voice mode — tap to stop')
           : open
@@ -809,7 +802,7 @@ export default function MilaGuide() {
         <MilaVoiceMark size={52} state={agentState} />
         <span className="mila-guide__launcher-label" aria-hidden>
           <strong>{voiceMode ? (lang === 'ru' ? 'Стоп' : 'Stop') : (lang === 'ru' ? 'Говорить' : 'Talk')}</strong>
-          <small>{voiceMode ? status : (lang === 'ru' ? 'с Милой' : 'with Mila')}</small>
+          <small>{voiceMode ? status : (lang === 'ru' ? `с ${teacherName}` : `with ${teacherName}`)}</small>
         </span>
         <span className="mila-guide__launcher-wave" aria-hidden><i /><i /><i /></span>
         <span className="mila-guide__state" aria-hidden />
@@ -825,8 +818,8 @@ export default function MilaGuide() {
           onClick={() => openTextChat()}
           aria-controls="mila-guide-text-panel"
           aria-haspopup="dialog"
-          aria-label={lang === 'ru' ? 'Открыть текстовый чат с Милой' : 'Open text chat with Mila'}
-          title={lang === 'ru' ? 'Написать Миле' : 'Type to Mila'}
+          aria-label={lang === 'ru' ? `Открыть текстовый чат с ${teacherName}` : `Open text chat with ${teacherName}`}
+          title={lang === 'ru' ? `Написать ${teacherName}` : `Type to ${teacherName}`}
         >
           <svg viewBox="0 0 24 24" aria-hidden><path d="M5 5.5h14v10H9l-4 3v-13Z" /><path d="M8 9h8M8 12h5" /></svg>
           <span>{lang === 'ru' ? 'Чат' : 'Chat'}</span>

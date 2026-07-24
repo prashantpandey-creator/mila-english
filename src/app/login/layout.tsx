@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   return {
-    title: 'Sign in to Mila English',
+    title: 'Sign in to FluentMitra',
     description: 'Continue learning English with your native-language AI teacher.',
     robots: { index: false, follow: false },
   };

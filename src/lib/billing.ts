@@ -2,7 +2,7 @@ import type { Payment } from '@prisma/client';
 
 export const PRO_30_PRODUCT = {
   code: 'mila_pro_30',
-  name: 'Mila Pro — 30 days',
+  name: 'FluentMitra Pro — 30 days',
   amountMinor: 149_000,
   currency: 'RUB',
   durationDays: 30,

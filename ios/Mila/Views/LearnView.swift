@@ -35,8 +35,8 @@ struct LearnView: View {
                 .font(.system(size: 29, weight: .black, design: .rounded))
                 .foregroundStyle(Color.milaCream)
             Text(language == .ru
-                ? "Фразы доступны даже без сети. Mila подгрузит твои уроки и словарь, когда появится связь."
-                : "Essential phrases work offline. Mila loads your lessons and vocabulary when you are connected.")
+                ? "Фразы доступны даже без сети. FluentMitra подгрузит твои уроки и словарь, когда появится связь."
+                : "Essential phrases work offline. FluentMitra loads your lessons and vocabulary when you are connected.")
                 .font(.subheadline)
                 .foregroundStyle(Color.milaMuted)
         }

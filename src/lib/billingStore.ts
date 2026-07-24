@@ -69,12 +69,12 @@ export async function beginCheckout(input: {
     throw new BillingError('ACCOUNT_REQUIRED', 'Create an account first so paid access cannot be lost.', 409);
   }
   if (!user.emailVerifiedAt) {
-    throw new BillingError('EMAIL_VERIFICATION_REQUIRED', 'Verify your email before buying Mila Pro.', 409);
+    throw new BillingError('EMAIL_VERIFICATION_REQUIRED', 'Verify your email before buying FluentMitra Pro.', 409);
   }
 
   const plan = await getUserPlan(user.id);
   if (isPaid(plan) && (!plan.renewsAt || plan.renewsAt.getTime() > Date.now() + 3 * 86_400_000)) {
-    throw new BillingError('PLAN_ALREADY_ACTIVE', 'Mila Pro is already active on this account.', 409);
+    throw new BillingError('PLAN_ALREADY_ACTIVE', 'FluentMitra Pro is already active on this account.', 409);
   }
 
   const recent = await prisma.payment.findFirst({

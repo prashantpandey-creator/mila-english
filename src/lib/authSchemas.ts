@@ -12,6 +12,9 @@ const learnerCategory = z
 export const loginSchema = z.object({
   email,
   password: z.string().min(1).max(128),
+  // Mila may carry a deliberate landing-page language choice into sign-in.
+  // The login route validates it against the market catalog before applying it.
+  nativeLanguage: z.string().trim().max(40).optional(),
 });
 
 export const registerSchema = z.object({

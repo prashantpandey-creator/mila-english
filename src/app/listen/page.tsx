@@ -114,7 +114,7 @@ export default function ListenPage() {
     const message = e?.message;
     const permissionDenied = e?.name === 'NotAllowedError' || message === 'permission-denied';
     setErrMsg(message === 'unsupported'
-      ? (lang==='ru' ? 'Этот браузер не поддерживает запись. Открой Mila в Chrome или Safari.' : 'This browser cannot record audio. Open Mila in Chrome or Safari.')
+      ? (lang==='ru' ? 'Этот браузер не поддерживает запись. Открой FluentMitra в Chrome или Safari.' : 'This browser cannot record audio. Open FluentMitra in Chrome or Safari.')
       : permissionDenied
       ? (lang==='ru' ? 'Нужен доступ к микрофону. Разреши его в настройках браузера — речь пока не оценивалась.' : 'Microphone permission is needed. Allow it in browser settings — your speech was not graded.')
       : message === 'no-speech'
@@ -208,7 +208,7 @@ export default function ListenPage() {
           index="02"
           columns={3}
           label={lang==='ru' ? 'Какой голос слушаем?' : 'Which voice shall we hear?'}
-          note={lang==='ru' ? 'Произношение меняется, атмосфера Mila остаётся той же.' : 'The pronunciation changes; the Mila atmosphere stays the same.'}
+          note={lang==='ru' ? 'Произношение меняется, формат практики остаётся знакомым.' : 'The pronunciation changes; the practice stays familiar.'}
         >
           {ACCENTS.map((a) => {
             const presentation = ACCENT_PRESENTATION[a.id]
@@ -335,7 +335,7 @@ export default function ListenPage() {
               className="focus-button focus-button--voice">
               <MilaIcon name="sparkle" size={16}/>
               {drillLoading
-                ? (lang==='ru'?'Мила готовит упражнения…':'Mila is building your drills…')
+                ? (lang==='ru'?'Готовим упражнения…':'Building your drills…')
                 : (lang==='ru'?'Тренировка на мои слабые звуки':'Drills for my weak sounds')}
             </button>
           </section>

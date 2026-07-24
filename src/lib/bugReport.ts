@@ -60,7 +60,7 @@ export function buildBugReportEmail(report: BugReport, context: BugReportEmailCo
   const reporterEmail = report.replyEmail;
   const userAgent = report.diagnostics.userAgent || context.requestUserAgent || '';
   const subjectArea = report.area.replace(/[\r\n]+/g, ' ').trim().slice(0, 100);
-  const subject = `[Mila bug] ${subjectArea}`;
+  const subject = `[FluentMitra bug] ${subjectArea}`;
   const rows: Array<[string, string | undefined]> = [
     ['Area / feature', report.area],
     ['What happened', report.description],

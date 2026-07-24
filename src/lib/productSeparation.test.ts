@@ -12,6 +12,10 @@ const milaHome = readFileSync('src/app/MilaHomePageClient.tsx', 'utf8');
 const milaDashboard = readFileSync('src/app/dashboard/page.tsx', 'utf8');
 const milaLogin = readFileSync('src/app/login/page.tsx', 'utf8');
 const milaStart = readFileSync('src/app/start/page.tsx', 'utf8');
+const milaGuide = readFileSync('src/components/MilaGuide.tsx', 'utf8');
+const loginRoute = readFileSync('src/app/api/auth/login/route.ts', 'utf8');
+const guestRoute = readFileSync('src/app/api/auth/guest/route.ts', 'utf8');
+const milaBrand = readFileSync('src/lib/milaBrand.ts', 'utf8');
 const privacy = readFileSync('src/app/privacy/page.tsx', 'utf8');
 const terms = readFileSync('src/app/terms/page.tsx', 'utf8');
 const companionStore = readFileSync('src/lib/companionStore.ts', 'utf8');
@@ -54,27 +58,49 @@ test('Mia and Gia never mount Mila global chrome', () => {
 
 test('Mila owns its learning entry points and shared policies cover every product', () => {
   assert.match(milaHome, /Learn English/);
+  assert.match(milaBrand, /name: 'FluentMitra'/);
+  assert.match(milaHome, /MILA_PUBLIC_BRAND\.name/);
   assert.match(milaHome, /\/dashboard/);
   assert.doesNotMatch(milaHome, /\bGia\b/);
   assert.doesNotMatch(milaHome, /https:\/\/gia\.purangpt\.com/);
   assert.match(privacy, /mila\.purangpt\.com/);
   assert.match(privacy, /gia\.purangpt\.com/);
   assert.match(privacy, /mia\.purangpt\.com/);
-  assert.match(terms, /Mila English, Gia, and Mia/);
+  assert.match(terms, /FluentMitra, Gia, and Mia/);
 });
 
 test('Mila entry actions lead forward instead of returning learners to the front door', () => {
-  assert.match(milaHome, /Which language do you understand best/);
+  assert.match(milaHome, /Which language should we explain English in/);
   assert.match(milaHome, /params\.get\('chooseLanguage'\)/);
+  assert.match(milaHome, /params\.get\('intent'\) === 'guest'/);
+  assert.match(milaHome, /entryIntent === 'guest'/);
   assert.doesNotMatch(milaHome, /disabled=\{!selectedLanguage/);
   assert.ok(
     milaHome.indexOf('id="native-language"') < milaHome.indexOf("Opening your learning"),
     'the required language choice must appear before the primary action',
   );
-  assert.match(milaLogin, /\/\?chooseLanguage=1/);
+  assert.match(milaLogin, /\/\?chooseLanguage=1&intent=guest/);
   assert.match(milaStart, /nativeLanguage/);
   assert.doesNotMatch(milaDashboard, /router\.push\('\/practice'\)/);
   assert.match(milaDashboard, /router\.push\('\/listen'\)/);
+});
+
+test('Mila preserves a deliberate native-language choice through every auth path', () => {
+  assert.match(milaLogin, /nativeLanguage \? \{ nativeLanguage \} : \{\}/);
+  assert.doesNotMatch(milaLogin, /MILA_LEARNING_PROFILE_STORAGE_KEY/);
+  assert.match(milaHome, /languageChosenThisVisit/);
+  assert.match(loginRoute, /selectedNativeLanguage/);
+  assert.match(loginRoute, /nativeLanguage: selectedNativeLanguage\.name/);
+  assert.match(guestRoute, /if \(!isGia && isJsonRequest && !selectedNativeLanguage\)/);
+  assert.match(guestRoute, /Existing native clients send a bodyless request/);
+  assert.match(milaGuide, /chooseLanguage=1&intent=guest/);
+  assert.doesNotMatch(milaGuide, /fetch\('\/api\/auth\/guest'/);
+});
+
+test('the landing reports language validation separately from submission failures', () => {
+  assert.match(milaHome, /const \[languageError, setLanguageError\]/);
+  assert.match(milaHome, /aria-invalid=\{languageError/);
+  assert.doesNotMatch(milaHome, /aria-invalid=\{saveError/);
 });
 
 test('Gia and Mila use separate durable conversation and memory namespaces', () => {

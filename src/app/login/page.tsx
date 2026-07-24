@@ -7,10 +7,7 @@ import MilaVoiceMark from '@/components/ui/MilaVoiceMark';
 import { useI18n } from '@/lib/i18n-provider';
 import { safeReturnTo } from '@/lib/navigation';
 import { useProduct } from '@/lib/product-context';
-import {
-  MILA_LEARNING_PROFILE_STORAGE_KEY,
-  resolveIndianNativeLanguage,
-} from '@/lib/learningMarkets';
+import { resolveIndianNativeLanguage } from '@/lib/learningMarkets';
 
 const welcomeTheme = {
   '--auth-ink': '#26131f',
@@ -42,19 +39,14 @@ export default function LoginPage() {
     setReturnTo(safeReturnTo(requestedReturnTo, isGia ? '/chat' : '/dashboard'));
     if (isGia) return;
 
-    let selectedLanguage = resolveIndianNativeLanguage(params.get('nativeLanguage'));
-    try {
-      const stored = JSON.parse(window.localStorage.getItem(MILA_LEARNING_PROFILE_STORAGE_KEY) || '{}');
-      selectedLanguage ||= resolveIndianNativeLanguage(stored?.nativeLanguageId);
-    } catch {
-      // A query-string selection remains usable even if old local storage is malformed.
-    }
+    const selectedLanguage = resolveIndianNativeLanguage(params.get('nativeLanguage'));
     setNativeLanguage(selectedLanguage?.name || '');
   }, [isGia]);
 
   const messageFor = (code?: string, fallback?: string) => {
     if (code === 'INVALID_CREDENTIALS') return lang === 'ru' ? 'Неверный email или пароль.' : 'That email or password is not correct.';
     if (code === 'INVALID_INPUT') return lang === 'ru' ? 'Проверь email и пароль.' : 'Check your email and password.';
+    if (code === 'INVALID_NATIVE_LANGUAGE') return 'Choose a supported native language before continuing.';
     if (code === 'RATE_LIMITED') return lang === 'ru' ? 'Слишком много попыток. Попробуй позже.' : 'Too many attempts. Please try again later.';
     return fallback || t('error_try_again');
   };
@@ -62,9 +54,22 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true); setError('');
     try {
-      const res = await fetch('/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          ...(!isGia && nativeLanguage ? { nativeLanguage } : {}),
+        }),
+      });
       const body = await res.json().catch(() => null);
       if (!res.ok) throw new Error(messageFor(body?.code, body?.error));
+      if (!isGia && !resolveIndianNativeLanguage(nativeLanguage) && !resolveIndianNativeLanguage(body?.nativeLanguage)) {
+        router.push(`/?chooseLanguage=1&returnTo=${encodeURIComponent(returnTo)}`);
+        router.refresh();
+        return;
+      }
       router.push(returnTo);
       router.refresh();
     } catch (nextError) { setError(nextError instanceof Error && nextError.message ? nextError.message : t('error_try_again')); }
@@ -73,7 +78,7 @@ export default function LoginPage() {
 
   const handleGuestLogin = async () => {
     if (!isGia && !resolveIndianNativeLanguage(nativeLanguage)) {
-      router.push(`/?chooseLanguage=1&returnTo=${encodeURIComponent(returnTo)}`);
+      router.push(`/?chooseLanguage=1&intent=guest&returnTo=${encodeURIComponent(returnTo)}`);
       return;
     }
     setLoading(true); setError('');
@@ -99,8 +104,8 @@ export default function LoginPage() {
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
           <span className="welcome-auth__brand">
-            <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'M'}</span>
-            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila English'}</span>
+            <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'F'}</span>
+            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'FluentMitra'}</span>
           </span>
           {isGia ? <LangToggle /> : <span className="welcome-auth__market">India · English</span>}
         </div>
@@ -114,7 +119,7 @@ export default function LoginPage() {
             <h1 className="welcome-auth__title">
               {isGia
                 ? (lang === 'ru' ? 'Продолжить в Gia' : 'Continue to Gia')
-                : 'Continue to Mila English'}
+                : 'Continue to FluentMitra'}
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
@@ -133,7 +138,7 @@ export default function LoginPage() {
               <input id="login-password" name="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="welcome-auth__input" placeholder="••••••••" autoComplete="current-password" maxLength={128} required />
               <a href="/forgot-password" className="welcome-auth__field-link">{isGia && lang === 'ru' ? 'Забыли пароль?' : 'Forgot password?'}</a>
             </div>
-            <button type="submit" disabled={loading} className="welcome-auth__button welcome-auth__button--primary">{loading ? '...' : isGia ? t('login_btn') : 'Sign in to Mila English'}</button>
+            <button type="submit" disabled={loading} className="welcome-auth__button welcome-auth__button--primary">{loading ? '...' : isGia ? t('login_btn') : 'Sign in to FluentMitra'}</button>
             <div className="welcome-auth__separator">{isGia && lang==='ru'?'или':'or'}</div>
             <button type="button" onClick={handleGuestLogin} disabled={loading}
               className="welcome-auth__button welcome-auth__button--secondary">
@@ -146,11 +151,11 @@ export default function LoginPage() {
                     : 'A guest session is private: chats aren’t saved. Sign up to keep your history.')
                 : nativeLanguage
                   ? `Guest learning will use ${nativeLanguage} for explanations. Sign up to keep progress across devices.`
-                  : 'Choose your native language on the Mila English home page before entering as a guest.'}
+                  : 'Choose your native language on the FluentMitra home page before entering as a guest.'}
             </p>
           </form>
           <p className="welcome-auth__footer">
-            {isGia ? t('login_no_account') : 'New to Mila English?'} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}${!isGia && nativeLanguage ? `&nativeLanguage=${encodeURIComponent(nativeLanguage)}` : ''}`} className="welcome-auth__link">{isGia ? t('login_create') : 'Create an account'}</a>
+            {isGia ? t('login_no_account') : 'New to FluentMitra?'} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}${!isGia && nativeLanguage ? `&nativeLanguage=${encodeURIComponent(nativeLanguage)}` : ''}`} className="welcome-auth__link">{isGia ? t('login_create') : 'Create an account'}</a>
           </p>
           <p className="welcome-auth__legal"><a href="/terms">{isGia && lang === 'ru' ? 'Условия' : 'Terms'}</a><span>·</span><a href="/privacy">{isGia && lang === 'ru' ? 'Конфиденциальность' : 'Privacy'}</a></p>
         </div>

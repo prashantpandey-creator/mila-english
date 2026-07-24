@@ -49,8 +49,8 @@ struct SettingsView: View {
             }
         } message: {
             Text(language == .ru
-                ? "Mila удалит профиль, прогресс, историю чата и сохранённые воспоминания. Это действие нельзя отменить."
-                : "Mila will delete your profile, progress, chat history, and saved memories. This cannot be undone.")
+                ? "FluentMitra удалит профиль, прогресс, историю чата и сохранённые воспоминания. Это действие нельзя отменить."
+                : "FluentMitra will delete your profile, progress, chat history, and saved memories. This cannot be undone.")
         }
     }
 
@@ -174,7 +174,7 @@ struct SettingsView: View {
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionLabel(language == .ru ? "О ПРИЛОЖЕНИИ" : "ABOUT")
-            Text("Mila 1.0 (1)").font(.subheadline.weight(.bold)).foregroundStyle(Color.milaCream)
+            Text("FluentMitra 1.0 (1)").font(.subheadline.weight(.bold)).foregroundStyle(Color.milaCream)
             Text(language == .ru
                 ? "Персональная студия английского для русскоязычных учеников."
                 : "A personal English studio for Russian-speaking learners.")
@@ -224,8 +224,8 @@ struct SettingsView: View {
         do {
             try await MilaAPI.shared.requestPasswordReset(email: email)
             resetMessage = language == .ru
-                ? "Если такой аккаунт существует, Mila отправила приватную ссылку на 30 минут."
-                : "If that account exists, Mila sent a private 30-minute reset link."
+                ? "Если такой аккаунт существует, FluentMitra отправил приватную ссылку на 30 минут."
+                : "If that account exists, FluentMitra sent a private 30-minute reset link."
         } catch {
             self.error = language == .ru
                 ? "Не удалось запросить ссылку. Проверь соединение и попробуй ещё раз."

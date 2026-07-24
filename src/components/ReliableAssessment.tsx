@@ -104,8 +104,8 @@ export default function ReliableAssessment({ lang, busy, error, onComplete, onCa
 
       <p style={{margin:'15px auto 0',fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #65535f)',maxWidth:440,textAlign:'center'}}>
         {lang === 'ru'
-          ? 'Не обращается к внешнему ИИ. Ответы остаются в браузере; на сервер Mila отправляется только итог.'
-          : 'No external AI calls. Answers stay in the browser; only the final result is saved to Mila.'}
+          ? 'Не обращается к внешнему ИИ. Ответы остаются в браузере; на сервер FluentMitra отправляется только итог.'
+          : 'No external AI calls. Answers stay in the browser; only the final result is saved to FluentMitra.'}
       </p>
     </div>
   );
