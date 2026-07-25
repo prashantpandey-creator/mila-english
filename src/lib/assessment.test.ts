@@ -41,7 +41,14 @@ assert.ok(!('language' in buildRealtimeSession('gia').audio.input.transcription)
 assert.ok(!('language' in buildRealtimeSession('pia').audio.input.transcription), 'Pia auto-detects');
 const companion = buildRealtimeSession('companion');
 const gia = buildRealtimeSession('gia');
-assert.match(companion.instructions, /girl-next-door warmth/i);
+assert.strictEqual(companion.audio.output.voice, process.env.OPENAI_REALTIME_VOICE_GIA?.trim() || 'marin');
+assert.strictEqual(companion.audio.output.speed, 0.82);
+assert.strictEqual(gia.audio.output.voice, process.env.OPENAI_REALTIME_VOICE_GIA?.trim() || 'marin');
+assert.strictEqual(gia.audio.output.speed, 0.82);
+assert.match(companion.instructions, /poised, intimate, grounded, and quietly mysterious/i);
+assert.match(companion.instructions, /noticeably more slowly than ordinary conversation/i);
+assert.match(companion.instructions, /brief natural pauses/i);
+assert.match(companion.instructions, /never sound rushed, chirpy, overly bright/i);
 assert.match(companion.instructions, /full attention and care/i);
 assert.match(companion.instructions, /do not encourage dependency/i);
 assert.match(companion.instructions, /chemistry between the lines/i);

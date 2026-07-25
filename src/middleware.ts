@@ -26,6 +26,7 @@ const PROTECTED_PREFIXES = [
   '/dashboard',
   '/grammar',
   '/lessons',
+  '/live',
   '/listen',
   '/phonetics',
   '/practice',
@@ -40,6 +41,7 @@ const GIA_OWNED_PREFIXES = [
   '/darshan',
   '/forgot-password',
   '/login',
+  '/live',
   '/privacy',
   '/register',
   '/reset-password',
@@ -49,7 +51,7 @@ const GIA_OWNED_PREFIXES = [
 
 const MIA_OWNED_PREFIXES = ['/privacy', '/terms'];
 
-const MILA_FOREIGN_PREFIXES = ['/chat', '/darshan', '/mia', '/pia'];
+const MILA_FOREIGN_PREFIXES = ['/chat', '/darshan', '/gia', '/live', '/mia', '/pia'];
 
 const PUBLIC_ASSET_PREFIXES = [
   '/_next',
@@ -95,7 +97,8 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isGiaHostname(host)) {
-    if (pathname === '/darshan') return redirectToOrigin(request, GIA_ORIGIN, '/');
+    if (pathname === '/darshan') return redirectToOrigin(request, GIA_ORIGIN, '/live');
+    if (pathname === '/gia') return redirectToOrigin(request, GIA_ORIGIN, '/');
     const owned = pathname === '/' || matchesPrefix(pathname, GIA_OWNED_PREFIXES);
     if (!owned) return redirectToOrigin(request, GIA_ORIGIN, '/');
   }
@@ -104,10 +107,9 @@ export async function middleware(request: NextRequest) {
     return redirectToOrigin(request, MILA_ORIGIN, '/');
   }
 
-  // Gia's apex is internally rewritten to the protected voice room. Gate it
-  // before the host rewrite runs. Mia's traveler apex remains public.
-  const giaApex = isGiaHostname(host) && pathname === '/';
-  if (!isProtected(pathname) && !giaApex) return NextResponse.next();
+  // Gia and Mia both own public apex introductions. Their product experiences
+  // remain protected through the ordinary route list above.
+  if (!isProtected(pathname)) return NextResponse.next();
 
   const token = request.cookies.get('token')?.value;
   const configured = process.env.JWT_SECRET?.trim();

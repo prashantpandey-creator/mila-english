@@ -40,8 +40,8 @@ export function productForHostname(value: string | null | undefined): ProductId 
  * that visible pathname before selecting route-scoped chrome and CSS.
  */
 export function effectiveProductPath(product: ProductId, pathname: string): string {
+  if (product === 'gia' && pathname === '/live') return '/darshan';
   if (pathname !== '/') return pathname;
-  if (product === 'gia') return '/darshan';
   if (product === 'mia') return '/mia';
   return '/';
 }

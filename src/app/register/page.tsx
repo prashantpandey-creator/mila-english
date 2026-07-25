@@ -132,10 +132,10 @@ export default function RegisterPage() {
     <div className="welcome-auth welcome-auth--register" style={welcomeTheme}>
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
-          <span className="welcome-auth__brand">
+          <a href="/" className="welcome-auth__brand" aria-label={isGia ? 'Back to Gia' : 'FluentMitra home'}>
             <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'F'}</span>
             <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'FluentMitra'}</span>
-          </span>
+          </a>
           {isGia ? <LangToggle /> : <span className="welcome-auth__market">India · English</span>}
         </div>
       </nav>
@@ -296,7 +296,7 @@ export default function RegisterPage() {
           align-items: center;
           justify-content: space-between;
         }
-        .welcome-auth__brand { display: inline-flex; align-items: center; gap: .65rem; }
+        .welcome-auth__brand { display: inline-flex; align-items: center; gap: .65rem; text-decoration: none; }
         .welcome-auth__brand-mark {
           width: 2.15rem;
           height: 2.15rem;

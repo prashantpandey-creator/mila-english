@@ -103,10 +103,10 @@ export default function LoginPage() {
     <div className="welcome-auth welcome-auth--login" style={welcomeTheme}>
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
-          <span className="welcome-auth__brand">
+          <a href="/" className="welcome-auth__brand" aria-label={isGia ? 'Back to Gia' : 'FluentMitra home'}>
             <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'F'}</span>
             <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'FluentMitra'}</span>
-          </span>
+          </a>
           {isGia ? <LangToggle /> : <span className="welcome-auth__market">India · English</span>}
         </div>
       </nav>
@@ -123,7 +123,13 @@ export default function LoginPage() {
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
-                ? (lang === 'ru' ? 'Войди в Gia или продолжи как гость.' : 'Sign in to Gia, or continue as a guest.')
+                ? (lang === 'ru'
+                    ? (returnTo === '/live'
+                        ? 'Войди для Live-голоса или продолжи приватно как гость.'
+                        : 'Войди в текстовый чат или продолжи приватно как гость.')
+                    : (returnTo === '/live'
+                        ? 'Sign in for Live voice, or enter privately as a guest.'
+                        : 'Sign in for text chat, or continue privately as a guest.'))
                 : 'Sign in to continue your English learning path.'}
             </p>
           </div>
@@ -142,7 +148,11 @@ export default function LoginPage() {
             <div className="welcome-auth__separator">{isGia && lang==='ru'?'или':'or'}</div>
             <button type="button" onClick={handleGuestLogin} disabled={loading}
               className="welcome-auth__button welcome-auth__button--secondary">
-              {isGia && lang==='ru'?'Продолжить как гость':nativeLanguage ? 'Continue as guest' : 'Choose language to continue as guest'}
+              {isGia
+                ? (lang === 'ru' ? 'Продолжить как гость' : 'Continue as guest')
+                : nativeLanguage
+                  ? 'Continue as guest'
+                  : 'Choose language to continue as guest'}
             </button>
             <p className="welcome-auth__guest-note">
               {isGia
@@ -216,7 +226,7 @@ export default function LoginPage() {
           align-items: center;
           justify-content: space-between;
         }
-        .welcome-auth__brand { display: inline-flex; align-items: center; gap: .65rem; }
+        .welcome-auth__brand { display: inline-flex; align-items: center; gap: .65rem; text-decoration: none; }
         .welcome-auth__brand-mark {
           width: 2.15rem;
           height: 2.15rem;

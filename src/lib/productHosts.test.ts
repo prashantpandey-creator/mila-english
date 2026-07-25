@@ -46,8 +46,9 @@ test('hostnames select one product without leaking between sibling products', ()
   assert.equal(productForHostname('localhost:3000'), 'mila');
 });
 
-test('product apex rewrites expose the internal route to client-side surfaces', () => {
-  assert.equal(effectiveProductPath('gia', '/'), '/darshan');
+test('product routes expose the correct client-side surface', () => {
+  assert.equal(effectiveProductPath('gia', '/'), '/');
+  assert.equal(effectiveProductPath('gia', '/live'), '/darshan');
   assert.equal(effectiveProductPath('mia', '/'), '/mia');
   assert.equal(effectiveProductPath('mila', '/'), '/');
   assert.equal(effectiveProductPath('gia', '/chat'), '/chat');

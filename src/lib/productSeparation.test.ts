@@ -4,6 +4,9 @@ import test from 'node:test';
 
 const nextConfig = readFileSync('next.config.mjs', 'utf8');
 const middleware = readFileSync('src/middleware.ts', 'utf8');
+const giaPage = readFileSync('src/app/gia/page.tsx', 'utf8');
+const giaHomeTheme = readFileSync('src/app/gia/gia-home.css', 'utf8');
+const giaChat = readFileSync('src/app/chat/page.tsx', 'utf8');
 const miaPage = readFileSync('src/app/mia/page.tsx', 'utf8');
 const miaMetadata = readFileSync('src/app/mia/layout.tsx', 'utf8');
 const sceneStudio = readFileSync('src/components/mia/MiaSceneGenerator.tsx', 'utf8');
@@ -24,16 +27,30 @@ const prismaSchema = readFileSync('prisma/schema.prisma', 'utf8');
 const giaTheme = readFileSync('src/app/gia-theme.css', 'utf8');
 const accountPage = readFileSync('src/app/account/page.tsx', 'utf8');
 
-test('Gia remains gated while Mia owns the public traveler apex', () => {
+test('Gia owns a public introduction while Live and text remain gated', () => {
   assert.match(nextConfig, /return \{\s*beforeFiles:/);
-  assert.match(nextConfig, /value: GIA_HOST \}\],\s*destination: '\/darshan'/);
+  assert.match(nextConfig, /source: '\/',\s*has: \[\{ type: 'host', value: GIA_HOST \}\],\s*destination: '\/gia'/);
+  assert.match(nextConfig, /source: '\/live',\s*has: \[\{ type: 'host', value: GIA_HOST \}\],\s*destination: '\/darshan'/);
   assert.match(nextConfig, /value: MIA_HOST \}\],\s*destination: '\/mia'/);
-  assert.match(middleware, /const giaApex = isGiaHostname/);
+  assert.match(middleware, /'\/live'/);
+  assert.doesNotMatch(middleware, /const giaApex = isGiaHostname/);
   assert.match(middleware, /if \(isMiaHostname\(host\)\)/);
   assert.match(middleware, /if \(isGiaHostname\(host\)\)/);
   assert.match(middleware, /if \(isMilaHostname\(host\) && matchesPrefix\(pathname, MILA_FOREIGN_PREFIXES\)\)/);
   assert.doesNotMatch(nextConfig, /destination: `https:\/\/\$\{GIA_HOST\}\/login/);
   assert.doesNotMatch(nextConfig, /destination: `https:\/\/\$\{MILA_HOST\}\$\{source\}`/);
+});
+
+test('Gia introduces voice and text as clear, honest companion modes', () => {
+  assert.match(giaPage, /Meet Gia\./);
+  assert.match(giaPage, /AI companion · voice \+ text/);
+  assert.match(giaPage, /href="\/live"/);
+  assert.match(giaPage, /href="\/chat"/);
+  assert.match(giaPage, /Fictional AI presence/);
+  assert.match(giaPage, /Voice starts only when you choose it/);
+  assert.match(giaHomeTheme, /@media \(max-width: 520px\)/);
+  assert.match(giaHomeTheme, /prefers-reduced-motion: reduce/);
+  assert.match(giaChat, /router\.push\('\/live'\)/);
 });
 
 test('Mia is an owned travel product with an interactive scene studio', () => {

@@ -1,0 +1,490 @@
+.gia-home {
+  --gia-home-ink: #f4f6f7;
+  --gia-home-muted: #9ca9b2;
+  --gia-home-rose: #ff4b92;
+  --gia-home-teal: #6fd8ce;
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  color: var(--gia-home-ink);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(rgba(255, 255, 255, .018) 1px, transparent 1px) 0 0 / 72px 72px,
+    radial-gradient(circle at 71% 46%, rgba(114, 223, 210, .065), transparent 28rem),
+    #05080d;
+  isolation: isolate;
+}
+
+.gia-home,
+.gia-home * {
+  box-sizing: border-box;
+}
+
+.gia-home__glow {
+  position: absolute;
+  z-index: -1;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(10px);
+}
+
+.gia-home__glow--rose {
+  width: min(42rem, 64vw);
+  height: min(42rem, 64vw);
+  right: -22rem;
+  bottom: -24rem;
+  background: rgba(255, 50, 132, .16);
+}
+
+.gia-home__glow--teal {
+  width: 26rem;
+  height: 26rem;
+  left: -18rem;
+  top: 8rem;
+  background: rgba(111, 216, 206, .08);
+}
+
+.gia-home__nav {
+  width: min(1240px, calc(100% - 3rem));
+  height: 84px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(184, 217, 222, .12);
+}
+
+.gia-home__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .72rem;
+  color: var(--gia-home-ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.28rem;
+  letter-spacing: -.02em;
+  text-decoration: none;
+}
+
+.gia-home__brand-mark {
+  width: 2.12rem;
+  height: 2.12rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(111, 216, 206, .52);
+  border-radius: 4px 12px 12px 12px;
+  color: var(--gia-home-teal);
+  background: rgba(9, 17, 25, .82);
+  box-shadow: inset 0 0 0 1px rgba(255, 75, 146, .14);
+  font-family: var(--font-mono), monospace;
+  font-size: .9rem;
+}
+
+.gia-home__nav-actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(.8rem, 2vw, 1.5rem);
+}
+
+.gia-home__nav-link,
+.gia-home__nav-cta {
+  color: var(--gia-home-ink);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-decoration: none;
+}
+
+.gia-home__nav-link {
+  color: #b7c1c8;
+}
+
+.gia-home__nav-cta {
+  padding: .7rem 1rem;
+  border: 1px solid rgba(111, 216, 206, .28);
+  border-radius: 999px;
+  background: rgba(111, 216, 206, .065);
+}
+
+.gia-home__hero {
+  width: min(1240px, calc(100% - 3rem));
+  min-height: calc(100svh - 84px);
+  margin: 0 auto;
+  padding: clamp(2.5rem, 5vw, 5rem) 0 clamp(2.5rem, 5vw, 4rem);
+  display: grid;
+  grid-template-columns: minmax(0, .92fr) minmax(340px, .78fr);
+  align-items: center;
+  gap: clamp(2.5rem, 7vw, 8rem);
+}
+
+.gia-home__copy {
+  position: relative;
+  z-index: 2;
+  max-width: 660px;
+}
+
+.gia-home__eyebrow {
+  margin: 0 0 1.45rem;
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  color: var(--gia-home-teal);
+  font-family: var(--font-mono), monospace;
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.gia-home__eyebrow span {
+  width: 1.65rem;
+  height: 1px;
+  background: currentColor;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.gia-home h1 {
+  margin: 0;
+  color: var(--gia-home-ink) !important;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(4.2rem, 9.2vw, 8.2rem);
+  font-weight: 400;
+  line-height: .88;
+  letter-spacing: -.065em;
+}
+
+.gia-home__lede {
+  max-width: 580px;
+  margin: clamp(1.7rem, 4vw, 2.4rem) 0 0;
+  color: #b7c1c7;
+  font-size: clamp(1.02rem, 1.65vw, 1.22rem);
+  line-height: 1.7;
+  letter-spacing: -.012em;
+}
+
+.gia-home__actions {
+  margin-top: 2.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8rem;
+}
+
+.gia-home__button {
+  min-height: 3.35rem;
+  padding: .82rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .72rem;
+  border-radius: 999px;
+  font-size: .83rem;
+  font-weight: 750;
+  letter-spacing: .015em;
+  text-decoration: none;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.gia-home__button:hover {
+  transform: translateY(-2px);
+}
+
+.gia-home__button:focus-visible,
+.gia-home__nav a:focus-visible {
+  outline: 3px solid rgba(111, 216, 206, .35);
+  outline-offset: 4px;
+}
+
+.gia-home__button--primary {
+  color: #081015;
+  background: linear-gradient(120deg, #8de6dc, #63cfc5);
+  box-shadow: 0 16px 40px rgba(67, 194, 181, .16);
+}
+
+.gia-home__button--primary:hover {
+  box-shadow: 0 20px 48px rgba(67, 194, 181, .25);
+}
+
+.gia-home__button--secondary {
+  border: 1px solid rgba(206, 226, 229, .18);
+  color: var(--gia-home-ink);
+  background: rgba(255, 255, 255, .035);
+}
+
+.gia-home__button-icon {
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.gia-home__button-icon span {
+  width: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.gia-home__button-icon span:nth-child(1) { height: 45%; }
+.gia-home__button-icon span:nth-child(2) { height: 100%; }
+.gia-home__button-icon span:nth-child(3) { height: 65%; }
+
+.gia-home__modes {
+  max-width: 600px;
+  margin-top: clamp(2.5rem, 6vw, 4.2rem);
+  padding-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  border-top: 1px solid rgba(184, 217, 222, .12);
+}
+
+.gia-home__modes > div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: .7rem;
+}
+
+.gia-home__mode-index {
+  color: var(--gia-home-rose);
+  font-family: var(--font-mono), monospace;
+  font-size: .63rem;
+  letter-spacing: .08em;
+}
+
+.gia-home__modes p {
+  margin: 0;
+  color: #81909a;
+  font-size: .76rem;
+  line-height: 1.55;
+}
+
+.gia-home__modes strong {
+  color: #c8d1d5;
+  font-weight: 700;
+}
+
+.gia-home__portrait-column {
+  display: grid;
+  justify-items: center;
+}
+
+.gia-home__portrait-shell {
+  position: relative;
+  width: min(40vw, 500px);
+  min-width: 340px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.gia-home__portrait-orbit {
+  position: absolute;
+  inset: 2%;
+  border: 1px solid rgba(111, 216, 206, .2);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2.8rem rgba(255, 255, 255, .012),
+    0 0 0 2.85rem rgba(255, 75, 146, .07),
+    0 0 70px rgba(111, 216, 206, .08);
+}
+
+.gia-home__portrait-orbit::before,
+.gia-home__portrait-orbit::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+
+.gia-home__portrait-orbit::before {
+  inset: 11%;
+  border: 1px dashed rgba(255, 255, 255, .09);
+}
+
+.gia-home__portrait-orbit::after {
+  width: .42rem;
+  height: .42rem;
+  top: 8.8%;
+  right: 20%;
+  background: var(--gia-home-rose);
+  box-shadow: 0 0 18px rgba(255, 75, 146, .8);
+}
+
+.gia-home__portrait {
+  position: relative;
+  width: 76%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid rgba(200, 232, 234, .18);
+  border-radius: 50%;
+  background: #0c1117;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .5);
+}
+
+.gia-home__portrait img {
+  object-fit: cover;
+  transform: scale(1.025);
+}
+
+.gia-home__portrait-shade {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, transparent 58%, rgba(3, 6, 9, .48)),
+    radial-gradient(circle at 50% 38%, transparent 30%, rgba(1, 5, 8, .13) 72%);
+  box-shadow: inset 0 0 35px rgba(0, 0, 0, .22);
+}
+
+.gia-home__presence {
+  position: absolute;
+  left: 3.5%;
+  bottom: 13%;
+  padding: .65rem .9rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  border: 1px solid rgba(194, 222, 225, .15);
+  border-radius: 999px;
+  color: #cbd4d8;
+  background: rgba(6, 11, 17, .78);
+  backdrop-filter: blur(15px);
+  font-family: var(--font-mono), monospace;
+  font-size: .62rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.gia-home__presence span {
+  width: .43rem;
+  height: .43rem;
+  border-radius: 50%;
+  background: var(--gia-home-teal);
+  box-shadow: 0 0 14px rgba(111, 216, 206, .8);
+}
+
+.gia-home__disclosure {
+  margin: .4rem 0 0;
+  color: #66747e;
+  font-family: var(--font-mono), monospace;
+  font-size: .58rem;
+  letter-spacing: .07em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 800px) {
+  .gia-home {
+    overflow: auto;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, .02) 1px, transparent 1px) 0 0 / 52px 52px,
+      radial-gradient(circle at 50% 38%, rgba(114, 223, 210, .06), transparent 24rem),
+      #05080d;
+  }
+
+  .gia-home__nav,
+  .gia-home__hero {
+    width: min(100% - 2rem, 680px);
+  }
+
+  .gia-home__nav {
+    height: 72px;
+  }
+
+  .gia-home__nav-link {
+    display: none;
+  }
+
+  .gia-home__hero {
+    min-height: auto;
+    padding: 2.2rem 0 3rem;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .gia-home__copy {
+    max-width: none;
+  }
+
+  .gia-home__eyebrow,
+  .gia-home__actions {
+    justify-content: center;
+  }
+
+  .gia-home h1 {
+    font-size: clamp(4.1rem, 20vw, 6.7rem);
+  }
+
+  .gia-home__lede {
+    max-width: 34rem;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1rem;
+  }
+
+  .gia-home__portrait-column {
+    grid-row: 1;
+  }
+
+  .gia-home__portrait-shell {
+    width: min(82vw, 430px);
+    min-width: 0;
+  }
+
+  .gia-home__modes {
+    max-width: 34rem;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .gia-home__nav-cta {
+    padding: .62rem .78rem;
+    font-size: .7rem;
+  }
+
+  .gia-home__hero {
+    padding-top: 1.65rem;
+  }
+
+  .gia-home__portrait-shell {
+    width: min(79vw, 330px);
+  }
+
+  .gia-home__portrait-orbit {
+    box-shadow:
+      0 0 0 1.5rem rgba(255, 255, 255, .012),
+      0 0 0 1.55rem rgba(255, 75, 146, .065);
+  }
+
+  .gia-home h1 {
+    font-size: clamp(3.8rem, 19vw, 4.8rem);
+  }
+
+  .gia-home__lede {
+    line-height: 1.62;
+  }
+
+  .gia-home__actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-content: stretch;
+  }
+
+  .gia-home__button {
+    width: 100%;
+  }
+
+  .gia-home__modes {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gia-home__button {
+    transition: none;
+  }
+}

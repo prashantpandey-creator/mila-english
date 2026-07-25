@@ -2,7 +2,8 @@
 //   • on pia.purangpt.com  → her voice room sits at the apex (/ → /pia)
 //   • on mila.purangpt.com → /pia does not exist; a stray poke lands on the
 //     front door, revealing nothing.
-//   • on gia.purangpt.com → Gia's companion voice room sits at the apex.
+//   • on gia.purangpt.com → Gia's public introduction sits at the apex, with
+//     the protected voice room exposed at /live.
 //   • on mia.purangpt.com → Mia's public travel/culture scene studio sits at
 //     the apex.
 //   • on mila.purangpt.com → the learning product keeps its dashboard,
@@ -62,6 +63,11 @@ const config = {
         },
         {
           source: '/',
+          has: [{ type: 'host', value: GIA_HOST }],
+          destination: '/gia',
+        },
+        {
+          source: '/live',
           has: [{ type: 'host', value: GIA_HOST }],
           destination: '/darshan',
         },

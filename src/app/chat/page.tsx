@@ -285,7 +285,7 @@ export default function Chat() {
           <button
             type="button"
             className="chat-page__voice-button"
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/live')}
             aria-label={lang==='ru' ? 'Начать голосовой разговор' : 'Start a voice conversation'}
             title={lang==='ru' ? 'Говорить с Джиа' : 'Talk with Gia'}
           >
