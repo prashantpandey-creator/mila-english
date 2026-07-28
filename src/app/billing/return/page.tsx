@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { AppHeader, AppMain, AppShell } from '@/components/ui/AppShell';
+import { useProduct } from '@/lib/product-context';
 import '../../account/account.css';
 
 type State = 'checking' | 'paid' | 'pending' | 'canceled' | 'error';
 
 export default function BillingReturnPage() {
+  const product = useProduct();
+  const isGia = product === 'gia';
   const [state, setState] = useState<State>('checking');
 
   useEffect(() => {
@@ -43,23 +46,35 @@ export default function BillingReturnPage() {
   }, []);
 
   const content = state === 'paid' ? {
-    title: 'FluentMitra Pro is ready.', copy: 'Your verified 30-day access is active on this account.', action: '/dashboard', label: 'Continue to FluentMitra',
+    title: isGia ? 'Gia is waiting.' : 'FluentMitra Pro is ready.',
+    copy: 'Your verified 30-day access is active on this account.',
+    action: isGia ? '/live' : '/dashboard',
+    label: isGia ? 'Return to Gia Live' : 'Continue to FluentMitra',
   } : state === 'canceled' ? {
-    title: 'No access was activated.', copy: 'The payment was canceled or refunded. You can continue with FluentMitra Free.', action: '/pricing', label: 'Return to plans',
+    title: 'No access was activated.',
+    copy: isGia ? 'The payment was canceled or refunded. Gia text chat is still available.' : 'The payment was canceled or refunded. You can continue with FluentMitra Free.',
+    action: '/pricing',
+    label: isGia ? 'Return to Gia access' : 'Return to plans',
   } : state === 'pending' ? {
     title: 'Payment is still being verified.', copy: 'Some banks take a little longer. Your access activates only after YooKassa confirms the payment.', action: '/account', label: 'Check my account',
   } : state === 'error' ? {
-    title: 'We could not match this return.', copy: 'No charge is trusted from a browser redirect. Check your account or contact FluentMitra support.', action: '/support', label: 'Get support',
+    title: 'We could not match this return.',
+    copy: isGia ? 'No charge is trusted from a browser redirect. Check your Gia account for verified access.' : 'No charge is trusted from a browser redirect. Check your account or contact FluentMitra support.',
+    action: isGia ? '/account' : '/support',
+    label: isGia ? 'Check my Gia account' : 'Get support',
   } : {
-    title: 'Confirming your payment…', copy: 'FluentMitra is checking the payment directly with the provider.', action: '', label: '',
+    title: 'Confirming your payment…',
+    copy: isGia ? 'Gia is checking the payment directly with the provider.' : 'FluentMitra is checking the payment directly with the provider.',
+    action: '',
+    label: '',
   };
 
   return (
     <AppShell className="account-page">
-      <AppHeader backHref="/" title="Payment" />
+      <AppHeader backHref={isGia ? '/pricing' : '/'} title={isGia ? 'Gia access' : 'Payment'} />
       <AppMain width="compact" centered className="account-page__main">
         <section className="account-hero" aria-live="polite">
-          <p className="account-hero__kicker">SECURE CHECKOUT</p>
+          <p className="account-hero__kicker">{isGia ? 'GIA · SECURE CHECKOUT' : 'SECURE CHECKOUT'}</p>
           <h1>{content.title}</h1>
           <p>{content.copy}</p>
           {content.action ? <div className="account-actions"><a className="account-button account-button--primary" href={content.action}>{content.label}</a></div> : null}

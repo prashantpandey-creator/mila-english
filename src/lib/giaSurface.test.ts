@@ -11,7 +11,9 @@ test('Gia discovers an unused Live preview and keeps a real text fallback', () =
   assert.match(voicePage, /if \(!paid && available\) setFreePreview\(true\)/);
   assert.match(voicePage, /className="voice-text-handoff"/);
   assert.match(voicePage, /Starting it uses your one free Live preview/);
-  assert.match(voicePage, /href=\{`\$\{MILA_ORIGIN\}\/pricing`\}/);
+  assert.match(voicePage, /href="\/pricing"/);
+  assert.match(voicePage, /Gia Live access options/);
+  assert.doesNotMatch(voicePage, /MILA_ORIGIN/);
   assert.match(voicePage, /const canOperateVoice = isConnected \|\| canUseLiveVoice/);
   assert.doesNotMatch(voicePage, /INVITES\.length/);
 });

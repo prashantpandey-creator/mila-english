@@ -26,7 +26,6 @@ import {
   createGiaVoiceTabCoordinator,
   type GiaVoiceTabCoordinator,
 } from "@/lib/giaVoiceTabCoordinator";
-import { MILA_ORIGIN } from "@/lib/productHosts";
 
 const INVITES = {
   en: [
@@ -899,7 +898,7 @@ export default function VoicePage() {
               <span className="voice-invoke-line">
                 {accessCheckFailed
                   ? (lang === "ru" ? "Текстовый чат уже готов" : "Text chat is ready")
-                  : (lang === "ru" ? "Live продолжается с FluentMitra Pro" : "Live continues with FluentMitra Pro")}
+                  : (lang === "ru" ? "Продолжай Live с Джиа — спокойно и без автопродления" : "Continue Live with Gia—quietly, with no auto-renewal")}
               </span>
               <div className="voice-unavailable-actions">
                 <button type="button" className="voice-text-handoff" onClick={exit}>
@@ -909,12 +908,10 @@ export default function VoicePage() {
                 </button>
                 <a
                   className="voice-access-link"
-                  href={`${MILA_ORIGIN}/pricing`}
-                  target="_blank"
-                  rel="noreferrer"
+                  href="/pricing"
                   aria-label={lang === "ru"
-                    ? "Варианты доступа к Live на FluentMitra — откроется новая вкладка"
-                    : "Live access options on FluentMitra — opens a new tab"}
+                    ? "Варианты доступа к Gia Live"
+                    : "Gia Live access options"}
                 >
                   <span>{lang === "ru" ? "Доступ к Live" : "Live access"}</span>
                   <MilaIcon name="arrow" size={14} />

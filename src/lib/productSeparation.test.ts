@@ -26,6 +26,8 @@ const companionStore = readFileSync('src/lib/companionStore.ts', 'utf8');
 const prismaSchema = readFileSync('prisma/schema.prisma', 'utf8');
 const giaTheme = readFileSync('src/app/gia-theme.css', 'utf8');
 const accountPage = readFileSync('src/app/account/page.tsx', 'utf8');
+const pricingPage = readFileSync('src/app/pricing/page.tsx', 'utf8');
+const billingReturn = readFileSync('src/app/billing/return/page.tsx', 'utf8');
 
 test('Gia owns a public introduction while Live and text remain gated', () => {
   assert.match(nextConfig, /return \{\s*beforeFiles:/);
@@ -149,4 +151,9 @@ test('Gia owns a distinct visual system and account controls', () => {
   assert.match(giaTheme, /\.product-surface--gia \.welcome-auth/);
   assert.match(accountPage, /Delete Gia conversation data/);
   assert.match(middleware, /const GIA_OWNED_PREFIXES = \[\s*'\/account'/);
+  assert.match(middleware, /'\/billing'/);
+  assert.match(middleware, /'\/pricing'/);
+  assert.match(pricingPage, /GIA LIVE · 30 DAYS/);
+  assert.match(pricingPage, /Gia never sees or stores card details/);
+  assert.match(billingReturn, /Return to Gia Live/);
 });

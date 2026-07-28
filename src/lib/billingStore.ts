@@ -18,6 +18,7 @@ import {
   fetchYooKassaPayment,
   isYooKassaConfigured,
 } from '@/lib/yookassa';
+import { GIA_ORIGIN, MILA_ORIGIN, isGiaHostname, isMilaHostname } from '@/lib/productHosts';
 
 type YooKassaPaymentLookup = (providerPaymentId: string) => Promise<Payment | null>;
 type YooKassaPaymentFetcher = (providerPaymentId: string) => Promise<VerifiedProviderPayment>;
@@ -45,6 +46,15 @@ export async function loadKnownYooKassaPayment(
 }
 
 function appBaseUrl(requestOrigin?: string) {
+  if (requestOrigin) {
+    try {
+      const requested = new URL(requestOrigin);
+      if (isGiaHostname(requested.host)) return GIA_ORIGIN;
+      if (isMilaHostname(requested.host)) return MILA_ORIGIN;
+    } catch {
+      // Fall back to the configured application origin below.
+    }
+  }
   const configured = process.env.APP_URL?.trim()?.replace(/\/$/, '');
   const value = configured || (process.env.NODE_ENV !== 'production' ? requestOrigin?.replace(/\/$/, '') : '');
   if (!value || !/^https?:\/\//.test(value)) throw new BillingError('APP_URL_NOT_CONFIGURED', 'Billing return URL is not configured.', 503);
@@ -69,12 +79,12 @@ export async function beginCheckout(input: {
     throw new BillingError('ACCOUNT_REQUIRED', 'Create an account first so paid access cannot be lost.', 409);
   }
   if (!user.emailVerifiedAt) {
-    throw new BillingError('EMAIL_VERIFICATION_REQUIRED', 'Verify your email before buying FluentMitra Pro.', 409);
+    throw new BillingError('EMAIL_VERIFICATION_REQUIRED', 'Verify your email before buying a 30-day access pass.', 409);
   }
 
   const plan = await getUserPlan(user.id);
   if (isPaid(plan) && (!plan.renewsAt || plan.renewsAt.getTime() > Date.now() + 3 * 86_400_000)) {
-    throw new BillingError('PLAN_ALREADY_ACTIVE', 'FluentMitra Pro is already active on this account.', 409);
+    throw new BillingError('PLAN_ALREADY_ACTIVE', 'A 30-day access pass is already active on this account.', 409);
   }
 
   const recent = await prisma.payment.findFirst({
@@ -100,13 +110,15 @@ export async function beginCheckout(input: {
 
   if (purchase.checkoutUrl && purchase.providerPaymentId) return purchase;
 
-  const returnUrl = `${appBaseUrl(input.requestOrigin)}/billing/return?purchase=${encodeURIComponent(purchase.id)}`;
+  const returnOrigin = appBaseUrl(input.requestOrigin);
+  const returnUrl = `${returnOrigin}/billing/return?purchase=${encodeURIComponent(purchase.id)}`;
   const remote = await createYooKassaPayment({
     purchaseId: purchase.id,
     idempotencyKey: purchase.idempotencyKey,
     userId: user.id,
     customerEmail: user.email,
     returnUrl,
+    productLabel: isGiaHostname(new URL(returnOrigin).host) ? 'Gia Live access' : 'FluentMitra Pro access',
   });
   const checkoutUrl = remote.confirmation?.confirmation_url;
   if (!remote.id || !checkoutUrl) throw new BillingError('CHECKOUT_UNAVAILABLE', 'The payment page did not open. Try again.', 502);

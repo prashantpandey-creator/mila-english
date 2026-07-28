@@ -23,3 +23,52 @@
 .pricing-note a { color: #a40050; font-weight: 800; }
 .pricing-error { margin: 12px 0 0; color: #ffb8d7; font-size: 13px; line-height: 1.5; }
 @media (max-width:760px){.pricing-grid{grid-template-columns:1fr}.pricing-card{min-height:0}.pricing-card--pro{order:-1}}
+
+.product-surface--gia .pricing-page {
+  color: var(--mila-ink);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 47, 134, .12), transparent 30rem),
+    radial-gradient(circle at 18% 82%, rgba(114, 223, 210, .08), transparent 28rem),
+    transparent;
+}
+.product-surface--gia .pricing-page__main { padding-top: clamp(44px, 7vw, 82px); }
+.product-surface--gia .pricing-intro { max-width: 790px; }
+.product-surface--gia .pricing-intro__kicker { color: #72dfd2; }
+.product-surface--gia .pricing-intro h1 {
+  color: #f4f8fa;
+  font-weight: 520;
+  letter-spacing: -.06em;
+}
+.product-surface--gia .pricing-intro p { color: var(--mila-muted); }
+.product-surface--gia .pricing-grid { gap: 22px; }
+.product-surface--gia .pricing-card {
+  border-color: var(--mila-line);
+  border-radius: 6px 26px 26px 26px;
+  color: var(--mila-ink);
+  background: rgba(11, 17, 25, .94);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, .28);
+}
+.product-surface--gia .pricing-card--pro {
+  border-color: rgba(255, 63, 145, .54);
+  background:
+    linear-gradient(145deg, rgba(255, 63, 145, .13), transparent 48%),
+    linear-gradient(160deg, #151323, #090d14 70%);
+  box-shadow: 10px 10px 0 rgba(255, 47, 134, .08), 0 28px 80px rgba(0, 0, 0, .42);
+}
+.product-surface--gia .pricing-card__label,
+.product-surface--gia .pricing-card li::before { color: #72dfd2; }
+.product-surface--gia .pricing-card h2 { color: #f4f8fa !important; }
+.product-surface--gia .pricing-card ul { border-color: var(--mila-line); }
+.product-surface--gia .pricing-cta {
+  border-color: var(--mila-line-strong);
+  border-radius: 5px;
+  color: #72dfd2;
+  background: #080d14;
+}
+.product-surface--gia .pricing-card--pro .pricing-cta {
+  border-color: #ff3f91;
+  color: #fff;
+  background: var(--mila-gradient-signal);
+}
+.product-surface--gia .pricing-note { color: var(--mila-muted); }
+.product-surface--gia .pricing-note a { color: #72dfd2; }

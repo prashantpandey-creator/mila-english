@@ -47,9 +47,7 @@ export default function AccountPage() {
   useEffect(() => {
     Promise.all([
       fetch('/api/users/me', { cache: 'no-store' }).then((response) => response.ok ? response.json() : Promise.reject()),
-      isGia
-        ? Promise.resolve(null)
-        : fetch('/api/billing/status', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null),
+      fetch('/api/billing/status', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null),
     ])
       .then(([profile, billing]) => {
         setAccount(profile);
@@ -135,7 +133,31 @@ export default function AccountPage() {
             ) : null}
           </section>
 
-          {!isGia ? <section className="account-panel">
+          {isGia ? <section className="account-panel">
+            <div className="account-panel__row">
+              <div>
+                <p className="account-panel__kicker">{T('ДОСТУП К ДЖИА', 'GIA ACCESS')}</p>
+                <h2>{pro ? 'Gia Live' : T('Текст + Live-демо', 'Text + Live preview')}</h2>
+              </div>
+              <span className={`account-plan${pro ? ' is-pro' : ''}`}>{pro ? 'LIVE' : 'FREE'}</span>
+            </div>
+            <p>{pro
+              ? T(`Gia Live активен${expiry ? ` до ${expiry}` : ''}. Автопродления нет.`, `Gia Live is active${expiry ? ` until ${expiry}` : ''}. It does not renew automatically.`)
+              : T('Текстовый чат остаётся доступным. 30-дневный пропуск открывает продолжающиеся Live-разговоры с Джиа.', 'Text chat stays available. A 30-day pass opens ongoing Live conversations with Gia.')}</p>
+            {purchase && ['created', 'pending'].includes(purchase.status) ? (
+              <p className="account-feedback" role="status">{T('Платёж ещё проверяется. Gia Live включится только после подтверждения ЮKassa.', 'Payment verification is in progress. Gia Live activates only after YooKassa confirms it.')}</p>
+            ) : purchase?.status === 'canceled' ? (
+              <p className="account-feedback" role="status">{T('Последняя оплата была отменена. Gia Live не активирован.', 'The latest payment was canceled. Gia Live was not activated.')}</p>
+            ) : purchase?.status === 'refunded' ? (
+              <p className="account-feedback" role="status">{T('Последняя оплата возвращена. Live-доступ от неё завершён.', 'The latest payment was refunded. Its Live access has ended.')}</p>
+            ) : null}
+            <div className="account-actions">
+              <a className="account-button account-button--primary" href={pro ? '/live' : '/pricing'}>
+                {pro ? T('Вернуться в Gia Live', 'Return to Gia Live') : T('Посмотреть доступ к Live', 'See Live access')}
+              </a>
+              <a className="account-button" href="/chat">{T('Открыть чат', 'Open text chat')}</a>
+            </div>
+          </section> : <section className="account-panel">
             <div className="account-panel__row">
               <div>
                 <p className="account-panel__kicker">{T('ДОСТУП', 'ACCESS')}</p>
@@ -159,7 +181,7 @@ export default function AccountPage() {
               {pro || !milaTeacher ? <a className="account-button account-button--primary" href="/pricing">{pro ? T('Посмотреть тариф', 'View plan') : T('Открыть Pro', 'See FluentMitra Pro')}</a> : null}
               {pro || !milaTeacher ? <a className="account-button" href="/refunds">{T('Оплата и возвраты', 'Payments and refunds')}</a> : null}
             </div>
-          </section> : null}
+          </section>}
 
           <section className="account-panel">
             <p className="account-panel__kicker">{T('ПРОФИЛЬ', 'PROFILE')}</p>

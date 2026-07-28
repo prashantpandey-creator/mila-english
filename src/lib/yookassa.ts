@@ -58,12 +58,13 @@ export async function createYooKassaPayment(input: {
   userId: number;
   customerEmail: string;
   returnUrl: string;
+  productLabel: string;
 }) {
   const receiptVatCode = process.env.YOOKASSA_VAT_CODE?.trim();
   const receipt = receiptVatCode ? {
     customer: { email: input.customerEmail },
     items: [{
-      description: 'FluentMitra Pro access — 30 days',
+      description: `${input.productLabel} — 30 days`,
       quantity: '1.00',
       amount: { value: amountValue(PRO_30_PRODUCT.amountMinor), currency: PRO_30_PRODUCT.currency },
       vat_code: Number(receiptVatCode),
@@ -79,7 +80,7 @@ export async function createYooKassaPayment(input: {
       amount: { value: amountValue(PRO_30_PRODUCT.amountMinor), currency: PRO_30_PRODUCT.currency },
       capture: true,
       confirmation: { type: 'redirect', return_url: input.returnUrl },
-      description: `FluentMitra Pro — 30 days (${input.purchaseId})`,
+      description: `${input.productLabel} — 30 days (${input.purchaseId})`,
       metadata: {
         purchase_id: input.purchaseId,
         product_code: PRO_30_PRODUCT.code,
