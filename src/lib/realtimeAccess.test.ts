@@ -2,18 +2,18 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { realtimeModeRequiresPaid } from './realtimeAccess';
 
-test('production Realtime voice stays paid for the daily-use tutor even when a stale env says false', () => {
+test('production Realtime voice keeps the tutor paid while Gia launches free', () => {
   assert.equal(realtimeModeRequiresPaid('tutor', {
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'false',
   }), true);
   assert.equal(realtimeModeRequiresPaid('gia', {
     NODE_ENV: 'production',
-    VOICE_REALTIME_PAID_ONLY: 'false',
-  }), true);
+    VOICE_REALTIME_PAID_ONLY: 'true',
+  }), false);
 });
 
-test('assessment and the free front-door companion remain outside the product paywall', () => {
+test('assessment and free companion doors remain outside the product paywall', () => {
   assert.equal(realtimeModeRequiresPaid('assessment', {
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'true',

@@ -17,6 +17,7 @@ import {
   type PresenceId,
 } from "@/lib/presences";
 import { decideVoiceLaunch, hasLiveVoiceAccess } from "@/lib/voiceSurfacePolicy";
+import { GIA_LIVE_FREE_LAUNCH } from "@/lib/giaAccess";
 import { announceCompanionHistoryUpdated } from "@/lib/use-companion-history";
 import {
   appendGiaGuestVoiceTurn,
@@ -91,13 +92,10 @@ function voiceConnectionErrorMessage(problem: unknown, lang: "en" | "ru"): strin
         ? "Слишком много попыток подряд. Подожди немного или продолжи в текстовом чате."
         : "There have been too many attempts. Wait a moment or continue in text chat.";
     case "VOICE_PREVIEW_USED":
-      return ru
-        ? "Бесплатное Live-демо уже использовано. Разговор можно продолжить в текстовом чате."
-        : "Your free Live preview has already been used. You can continue in text chat.";
     case "VOICE_PAID_FEATURE":
       return ru
-        ? "Live-голос доступен в Pro. Пока можно продолжить в текстовом чате."
-        : "Live voice is available with Pro. You can continue in text chat for now.";
+        ? "Бесплатный Gia Live не запустился. Попробуй ещё раз или продолжи в текстовом чате."
+        : "Free Gia Live did not start. Try again or continue in text chat.";
     case "UNAUTHORIZED":
       return ru
         ? "Войди в аккаунт, чтобы запустить Live-голос, или продолжи в текстовом чате."
@@ -121,10 +119,9 @@ export default function VoicePage() {
   const [preferenceUserId, setPreferenceUserId] = useState<number | null>(null);
   const [preferenceLoaded, setPreferenceLoaded] = useState(false);
   const [routeModeReady, setRouteModeReady] = useState(false);
-  const [freePreview, setFreePreview] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
-  const [previewAvailable, setPreviewAvailable] = useState(false);
+  const [hasIdentity, setHasIdentity] = useState(false);
   const [accessCheckFailed, setAccessCheckFailed] = useState(false);
   const [showRealtimeConsent, setShowRealtimeConsent] = useState(false);
   const [isVoicePaused, setIsVoicePaused] = useState(false);
@@ -179,13 +176,12 @@ export default function VoicePage() {
         ? "ember"
         : normalizePresenceId(stored);
     setPresenceId(next);
-    setFreePreview(params.get("free") === "1");
     setRouteModeReady(true);
   }, []);
 
-  // A saved Realtime choice is scoped to a signed-in Pro account. The free
-  // front-door preview always asks again before sending microphone audio to
-  // OpenAI. The unfinished private/local mode is intentionally not exposed.
+  // A saved Realtime choice remains scoped to a signed-in Pro account. During
+  // Gia's free-first launch, free visitors consent again each visit before any
+  // microphone audio is sent to OpenAI.
   useEffect(() => {
     if (!routeModeReady) return;
     let cancelled = false;
@@ -202,15 +198,11 @@ export default function VoicePage() {
       const paid = hasIdentity
         && data?.isGuest !== true
         && data?.subscription?.isPaid === true;
-      const available = hasIdentity && data?.liveVoicePreviewAvailable === true;
 
       setIsPro(paid);
       setIsGuest(data?.isGuest === true);
-      setPreviewAvailable(available);
+      setHasIdentity(hasIdentity);
       setAccessCheckFailed(false);
-      // An unused preview is a real entitlement, not a hidden query-string
-      // mode. Discover it automatically so Gia's front door is actionable.
-      if (!paid && available) setFreePreview(true);
       setPreferenceUserId(hasIdentity ? userId : null);
       if (!hasIdentity || !paid) {
         setVoicePreference("idle");
@@ -224,7 +216,7 @@ export default function VoicePage() {
         if (cancelled) return;
         setIsPro(false);
         setIsGuest(false);
-        setPreviewAvailable(false);
+        setHasIdentity(false);
         setAccessCheckFailed(true);
         setPreferenceUserId(null);
         setVoicePreference("idle");
@@ -377,15 +369,14 @@ export default function VoicePage() {
   }, []);
 
   /**
-   * Optional Pro path: the OpenAI Realtime WebRTC loop. This function is only
-   * called after the learner has explicitly consented to send microphone audio
-   * to OpenAI, or has retained that account-scoped preference from an earlier
-   * call. The unfinished private/local path is not a runtime fallback.
+   * Gia's OpenAI Realtime WebRTC loop. Free launch visitors consent each visit;
+   * an existing paid account may retain its account-scoped preference. The
+   * unfinished private/local path is not a runtime fallback.
    */
   const startRealtimeVoice = useCallback(async (connectionAttempt: number, signal: AbortSignal) => {
     const session = await connectRealtimeVoice({
       lang: lang === "ru" ? "ru" : "en",
-      mode: freePreview && !isPro ? "companion" : "gia",
+      mode: "gia",
       signal,
       openAIAudioConsent: true,
       events: {
@@ -440,13 +431,9 @@ export default function VoicePage() {
           setIsConnected(false);
           setIsVoicePaused(false);
           setPhase("resting");
-          setVoiceError(freePreview && !isPro
-            ? (lang === "ru"
-                ? "Live-демо завершено. Продолжим в текстовом чате?"
-                : "Your Live preview has ended. Continue in text chat?")
-            : (lang === "ru"
-                ? "Связь Live прервалась. Попробуй ещё раз."
-                : "Live voice disconnected. Please try again."));
+          setVoiceError(lang === "ru"
+            ? "Связь Live прервалась. Попробуй ещё раз."
+            : "Live voice disconnected. Please try again.");
         },
       },
     });
@@ -466,8 +453,7 @@ export default function VoicePage() {
     setOtherVoiceTabActive(false);
     setVoiceError("");
     setPhase("listening");
-    if (freePreview && !isPro) setPreviewAvailable(false);
-  }, [freePreview, isGuest, isPro, lang]);
+  }, [isGuest, lang]);
 
   const beginLiveConnection = useCallback(async () => {
     if (isConnecting || connectingRef.current) return;
@@ -520,9 +506,6 @@ export default function VoicePage() {
         setIsConnected(false);
         setIsVoicePaused(false);
         setPhase("resting");
-        if (error instanceof Error && error.message === "VOICE_PREVIEW_USED") {
-          setPreviewAvailable(false);
-        }
         setVoiceError(voiceConnectionErrorMessage(error, lang));
       }
     } finally {
@@ -566,21 +549,21 @@ export default function VoicePage() {
   }, [cancelRealtimeConsent, showRealtimeConsent]);
 
   const confirmRealtimeVoice = useCallback(() => {
-    const isPreview = freePreview && !isPro;
-    if (!preferenceLoaded || (!isPreview && !preferenceUserId)) return;
-    if (!isPreview && preferenceUserId) {
+    const isFreeLive = GIA_LIVE_FREE_LAUNCH && !isPro;
+    if (!preferenceLoaded || !hasIdentity) return;
+    if (!isFreeLive && preferenceUserId) {
       window.localStorage.setItem(voicePreferenceKey(preferenceUserId), REALTIME_CONSENT_VALUE);
     }
     setVoicePreference("realtime");
     setShowRealtimeConsent(false);
     void beginLiveConnection();
-  }, [beginLiveConnection, freePreview, isPro, preferenceLoaded, preferenceUserId]);
+  }, [beginLiveConnection, hasIdentity, isPro, preferenceLoaded, preferenceUserId]);
 
-  const isLivePreview = freePreview && !isPro;
+  const isFreeLive = GIA_LIVE_FREE_LAUNCH && !isPro;
   const canUseLiveVoice = hasLiveVoiceAccess({
+    hasIdentity,
     isPro,
-    freePreview: isLivePreview,
-    previewAvailable,
+    freeLaunch: GIA_LIVE_FREE_LAUNCH,
   });
 
   const connectToVoice = async () => {
@@ -767,18 +750,18 @@ export default function VoicePage() {
             className="voice-consent__card"
           >
             <p className="voice-consent__eyebrow">
-              {isLivePreview
-                ? (lang === "ru" ? "Бесплатное Live-демо Gia" : "Gia free Live preview")
+              {isFreeLive
+                ? (lang === "ru" ? "Gia Live · бесплатный ранний доступ" : "Gia Live · free early access")
                 : (lang === "ru" ? "Gia · живой голос" : "Gia · live voice")}
             </p>
             <h2 id="realtime-consent-title">
               {lang === "ru" ? "Начать живой разговор?" : "Start live voice?"}
             </h2>
             <p id="realtime-consent-description" className="voice-consent__description">
-              {isLivePreview
+              {isFreeLive
                 ? (lang === "ru"
-                    ? "Для этого демо звук с микрофона и расшифровка будут отправлены в OpenAI, чтобы провести разговор в реальном времени. Запуск использует одно бесплатное Live-демо, даже если завершить его раньше. Согласие действует только для текущего посещения; можно отменить и продолжить в текстовом чате."
-                    : "For this preview, your microphone audio and transcript will be sent to OpenAI to run the live conversation. Starting it uses your one free Live preview, even if you leave early. Your choice applies only to this visit; you can cancel and continue in text chat.")
+                    ? "Во время бесплатного раннего доступа звук с микрофона и расшифровка отправляются в OpenAI для разговора в реальном времени. Согласие действует только для текущего посещения; можно отменить и продолжить в текстовом чате. Оплата не требуется."
+                    : "During free early access, your microphone audio and transcript are sent to OpenAI to run the real-time conversation. Your consent applies only to this visit; you can cancel and continue in text chat. No payment is required.")
                 : (lang === "ru"
                     ? "В Live-режиме звук с микрофона и расшифровка отправляются в OpenAI для разговора в реальном времени. Выбирай его, только если согласен. Настройка сохранится на этом устройстве для твоего Pro-аккаунта; вместо этого можно продолжить в текстовом чате."
                     : "Live mode sends your microphone audio and transcript to OpenAI for real-time conversation. Choose it only if you consent. This preference is saved on this device for your Pro account; you can continue in text chat instead.")}
@@ -880,8 +863,8 @@ export default function VoicePage() {
           ) : canUseLiveVoice ? (
             <>
               <strong>
-                {isLivePreview
-                  ? (lang === "ru" ? "Начать бесплатное Live-демо с Джиа" : "Start your free Live preview with Gia")
+                {isFreeLive
+                  ? (lang === "ru" ? "Начать Gia Live бесплатно" : "Start Gia Live free")
                   : (lang === "ru" ? "Нажми, чтобы начать Live с Джиа" : "Tap to start Live with Gia")}
               </strong>
               <span key={invI} className="voice-invoke-line">
@@ -893,12 +876,12 @@ export default function VoicePage() {
               <strong>
                 {accessCheckFailed
                   ? (lang === "ru" ? "Не удалось проверить доступ к Live" : "Live access could not be checked")
-                  : (lang === "ru" ? "Бесплатное Live-демо завершено" : "Your free Live preview is complete")}
+                  : (lang === "ru" ? "Войди, чтобы начать Gia Live бесплатно" : "Sign in to start Gia Live free")}
               </strong>
               <span className="voice-invoke-line">
-                {accessCheckFailed
-                  ? (lang === "ru" ? "Текстовый чат уже готов" : "Text chat is ready")
-                  : (lang === "ru" ? "Продолжай Live с Джиа — спокойно и без автопродления" : "Continue Live with Gia—quietly, with no auto-renewal")}
+                {lang === "ru"
+                  ? "Текстовый чат остаётся доступным — оплата не требуется"
+                  : "Text chat stays available—no payment required"}
               </span>
               <div className="voice-unavailable-actions">
                 <button type="button" className="voice-text-handoff" onClick={exit}>
@@ -910,10 +893,10 @@ export default function VoicePage() {
                   className="voice-access-link"
                   href="/pricing"
                   aria-label={lang === "ru"
-                    ? "Варианты доступа к Gia Live"
-                    : "Gia Live access options"}
+                    ? "Как работает бесплатный доступ к Gia Live"
+                    : "How free Gia Live access works"}
                 >
-                  <span>{lang === "ru" ? "Доступ к Live" : "Live access"}</span>
+                  <span>{lang === "ru" ? "О бесплатном доступе" : "About free access"}</span>
                   <MilaIcon name="arrow" size={14} />
                 </a>
               </div>

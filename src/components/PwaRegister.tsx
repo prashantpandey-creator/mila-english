@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { getLangFromStorage } from '@/lib/i18n'
 import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand'
-import { isGiaHostname, isMiaHostname } from '@/lib/productHosts'
+import { useProduct } from '@/lib/product-context'
 
 const DISMISS_KEY = 'mila_install_dismissed'
 
@@ -30,10 +30,11 @@ function isStandalone() {
 
 export default function PwaRegister() {
   const pathname = usePathname()
+  const product = useProduct()
   const [installEvent, setInstallEvent] = useState<any>(null)
   const [showIOSHint, setShowIOSHint] = useState(false)
   const [lang, setLang] = useState<'ru' | 'en'>('en')
-  const [productName, setProductName] = useState<string>(MILA_PUBLIC_BRAND.shortName)
+  const productName = product === 'gia' ? 'Gia' : product === 'mia' ? 'Mia' : MILA_PUBLIC_BRAND.shortName
 
   useEffect(() => {
     // Production only: dev chunks have STABLE names (layout.js), so the SW's
@@ -46,13 +47,6 @@ export default function PwaRegister() {
     }
 
     setLang(getLangFromStorage())
-    setProductName(
-      isGiaHostname(window.location.hostname)
-        ? 'Gia'
-        : isMiaHostname(window.location.hostname)
-          ? 'Mia'
-          : MILA_PUBLIC_BRAND.shortName,
-    )
     if (localStorage.getItem(DISMISS_KEY) || isStandalone()) return
 
     // Android/Chrome path: the browser tells us installation is possible.
@@ -96,11 +90,11 @@ export default function PwaRegister() {
     dismiss()
   }
 
-  const voiceRoomIsOpen = typeof window !== 'undefined'
-    && isGiaHostname(window.location.hostname)
-    && (pathname === '/' || pathname === '/darshan')
+  const giaPrimaryJourneyIsOpen = typeof window !== 'undefined'
+    && product === 'gia'
+    && (pathname === '/' || pathname === '/darshan' || pathname === '/live' || pathname === '/pricing')
 
-  if (voiceRoomIsOpen || (!installEvent && !showIOSHint)) return null
+  if (giaPrimaryJourneyIsOpen || (!installEvent && !showIOSHint)) return null
 
   const ru = lang === 'ru'
 

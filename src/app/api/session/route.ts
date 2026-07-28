@@ -86,14 +86,13 @@ export async function POST(req: Request) {
     return errorResponse('Too many voice sessions in a short time. Please wait a moment and try again.', 429, 'RATE_LIMITED');
   }
 
-  // Production Realtime voice is always paid, regardless of mutable server env
-  // drift. Local/staging can use VOICE_REALTIME_PAID_ONLY for product testing.
-  // Assessment remains outside this product paywall.
+  // Product policy is enforced server-side: the English tutor remains paid in
+  // production, while assessment and Gia's free-first launch stay open.
   if (realtimeModeRequiresPaid(mode)) {
     const userId = Number(user?.sub);
     const plan = Number.isSafeInteger(userId) && userId > 0 ? await getUserPlan(userId) : resolvePlan({});
     if (!planUnlocks(plan, FEATURES.REALTIME_VOICE)) {
-      return errorResponse('Live voice is a Pro feature. Upgrade to talk with Gia by voice.', 402, 'VOICE_PAID_FEATURE');
+      return errorResponse('Live voice is a Pro feature for this mode.', 402, 'VOICE_PAID_FEATURE');
     }
   }
 

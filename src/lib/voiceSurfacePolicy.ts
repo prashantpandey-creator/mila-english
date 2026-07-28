@@ -5,15 +5,15 @@ export type VoiceLaunchDecision =
   | 'start-live';
 
 export function hasLiveVoiceAccess({
+  hasIdentity,
   isPro,
-  freePreview,
-  previewAvailable,
+  freeLaunch,
 }: {
+  hasIdentity: boolean;
   isPro: boolean;
-  freePreview: boolean;
-  previewAvailable: boolean;
+  freeLaunch: boolean;
 }): boolean {
-  return isPro || (freePreview && previewAvailable);
+  return hasIdentity && (isPro || freeLaunch);
 }
 
 export function decideVoiceLaunch({

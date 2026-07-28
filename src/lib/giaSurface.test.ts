@@ -5,14 +5,18 @@ import test from 'node:test';
 
 const readSource = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
-test('Gia discovers an unused Live preview and keeps a real text fallback', () => {
+test('Gia launches free-first and keeps a real text fallback', () => {
   const voicePage = readSource('src/app/darshan/page.tsx');
 
-  assert.match(voicePage, /if \(!paid && available\) setFreePreview\(true\)/);
+  assert.match(voicePage, /GIA_LIVE_FREE_LAUNCH/);
+  assert.match(voicePage, /mode: "gia"/);
+  assert.match(voicePage, /Start Gia Live free/);
+  assert.match(voicePage, /No payment is required/);
   assert.match(voicePage, /className="voice-text-handoff"/);
-  assert.match(voicePage, /Starting it uses your one free Live preview/);
   assert.match(voicePage, /href="\/pricing"/);
-  assert.match(voicePage, /Gia Live access options/);
+  assert.match(voicePage, /How free Gia Live access works/);
+  assert.doesNotMatch(voicePage, /Your free Live preview is complete/);
+  assert.doesNotMatch(voicePage, /Starting it uses your one free Live preview/);
   assert.doesNotMatch(voicePage, /MILA_ORIGIN/);
   assert.match(voicePage, /const canOperateVoice = isConnected \|\| canUseLiveVoice/);
   assert.doesNotMatch(voicePage, /INVITES\.length/);

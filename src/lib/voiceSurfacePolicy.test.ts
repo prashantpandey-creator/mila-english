@@ -8,19 +8,19 @@ import {
 
 test('the public voice surface exposes Live only', () => {
   assert.equal(hasLiveVoiceAccess({
+    hasIdentity: true,
     isPro: true,
-    freePreview: false,
-    previewAvailable: false,
+    freeLaunch: false,
   }), true);
   assert.equal(hasLiveVoiceAccess({
+    hasIdentity: true,
     isPro: false,
-    freePreview: true,
-    previewAvailable: true,
+    freeLaunch: true,
   }), true);
   assert.equal(hasLiveVoiceAccess({
+    hasIdentity: false,
     isPro: false,
-    freePreview: true,
-    previewAvailable: false,
+    freeLaunch: true,
   }), false);
 
   const decisions: VoiceLaunchDecision[] = [

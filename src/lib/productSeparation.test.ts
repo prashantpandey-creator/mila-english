@@ -28,6 +28,7 @@ const giaTheme = readFileSync('src/app/gia-theme.css', 'utf8');
 const accountPage = readFileSync('src/app/account/page.tsx', 'utf8');
 const pricingPage = readFileSync('src/app/pricing/page.tsx', 'utf8');
 const billingReturn = readFileSync('src/app/billing/return/page.tsx', 'utf8');
+const pwaRegister = readFileSync('src/components/PwaRegister.tsx', 'utf8');
 
 test('Gia owns a public introduction while Live and text remain gated', () => {
   assert.match(nextConfig, /return \{\s*beforeFiles:/);
@@ -153,7 +154,11 @@ test('Gia owns a distinct visual system and account controls', () => {
   assert.match(middleware, /const GIA_OWNED_PREFIXES = \[\s*'\/account'/);
   assert.match(middleware, /'\/billing'/);
   assert.match(middleware, /'\/pricing'/);
-  assert.match(pricingPage, /GIA LIVE · 30 DAYS/);
-  assert.match(pricingPage, /Gia never sees or stores card details/);
+  assert.match(pricingPage, /GIA LIVE · FREE/);
+  assert.match(pricingPage, /Start free\. Pro can wait\./);
+  assert.match(pricingPage, /No payment is needed during early access/);
+  assert.match(pricingPage, /if \(isGia\) \{/);
   assert.match(billingReturn, /Return to Gia Live/);
+  assert.match(pwaRegister, /useProduct\(\)/);
+  assert.match(pwaRegister, /pathname === '\/pricing'/);
 });

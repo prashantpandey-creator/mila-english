@@ -183,7 +183,7 @@ jobs:
                 console.error('Production Realtime paid-only invariant is not active');
                 process.exit(1);
               }
-              console.log('Realtime paid-only invariant active');
+              console.log('Realtime tutor paid gate active; Gia free-launch policy is code-enforced');
             "
             # Gia and Mia are product surfaces served by the same application
             # container. Install their Caddy vhosts only after the new image is

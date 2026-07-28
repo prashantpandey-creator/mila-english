@@ -23,11 +23,18 @@ export default function PricingPage() {
   const T = (ru: string, en: string) => lang === 'ru' ? ru : en;
 
   useEffect(() => {
+    if (isGia) {
+      fetch('/api/users/me', { cache: 'no-store' })
+        .then((response) => response.ok ? response.json() : null)
+        .then(setUser)
+        .catch(() => setUser(null));
+      return;
+    }
     Promise.all([
       fetch('/api/billing/catalog', { cache: 'no-store' }).then((response) => response.json()),
       fetch('/api/users/me', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null),
     ]).then(([nextCatalog, nextUser]) => { setCatalog(nextCatalog); setUser(nextUser); }).catch(() => setError(T('Не удалось загрузить тариф.', 'Could not load the plan.')));
-  }, [lang]);
+  }, [isGia, lang]);
 
   const checkout = async () => {
     if (!user || user.isGuest) {
@@ -59,7 +66,7 @@ export default function PricingPage() {
   const available = !!catalog?.configured;
   const backHref = isGia ? '/live' : '/';
   const freeHref = isGia
-    ? (user ? '/chat' : '/register?returnTo=/chat')
+    ? (user ? '/live' : '/login?returnTo=/live')
     : (user ? '/dashboard' : '/register?returnTo=/dashboard');
   const price = catalog
     ? new Intl.NumberFormat(lang === 'ru' ? 'ru-RU' : 'en-GB', {
@@ -74,25 +81,25 @@ export default function PricingPage() {
       <AppHeader backHref={backHref} title={isGia ? T('Доступ к Live', 'Live access') : T('Тарифы', 'Plans')} actions={<LangToggle />} />
       <AppMain width="wide" className="pricing-page__main">
         <div className="pricing-intro">
-          <p className="pricing-intro__kicker">{isGia ? 'GIA · VOICE + TEXT' : 'FREE + PRO'}</p>
+          <p className="pricing-intro__kicker">{isGia ? 'GIA · FREE EARLY ACCESS' : 'FREE + PRO'}</p>
           <h1>{isGia
-            ? T('Больше времени с Джиа. Только когда ты выбираешь.', 'More time with Gia. Only when you choose it.')
+            ? T('Начни бесплатно. Pro может подождать.', 'Start free. Pro can wait.')
             : T('Сначала почувствуй пользу. Потом решай.', 'Feel the value first. Then decide.')}</h1>
           <p>{isGia
-            ? T('Текстовый чат остаётся доступным. Пропуск на 30 дней открывает продолжающиеся Live-разговоры с Джиа — без подписки и автопродления.', 'Text chat stays available. A 30-day pass opens ongoing Live conversations with Gia—without a subscription or auto-renewal.')
+            ? T('Gia Live и текстовый чат открыты бесплатно во время раннего доступа. Никакой оплаты сейчас — сначала почувствуй разговор.', 'Gia Live and text chat are free during early access. No payment now—experience the conversation first.')
             : T('Основной путь FluentMitra остаётся бесплатным. Pro — это один прозрачный 30-дневный доступ без скрытого автопродления.', 'FluentMitra’s core path stays free. Pro is one transparent 30-day pass with no hidden auto-renewal.')}</p>
         </div>
         <div className="pricing-grid">
-          <article className="pricing-card">
-            <span className="pricing-card__label">{isGia ? 'GIA TEXT' : 'FREE'}</span>
-            <h2>{isGia ? T('Оставайся в чате', 'Stay in text') : T('Практика каждый день', 'Daily practice')}</h2>
-            <div className="pricing-card__price">₽0 <small>{T('навсегда', 'always')}</small></div>
+          <article className={`pricing-card${isGia ? ' pricing-card--gia-free' : ''}`}>
+            <span className="pricing-card__label">{isGia ? 'GIA LIVE · FREE' : 'FREE'}</span>
+            <h2>{isGia ? T('Начни с Джиа', 'Start with Gia') : T('Практика каждый день', 'Daily practice')}</h2>
+            <div className="pricing-card__price">₽0 <small>{isGia ? T('ранний доступ', 'early access') : T('навсегда', 'always')}</small></div>
             {isGia ? (
               <ul>
-                <li>{T('Личный текстовый чат с Джиа', 'Private text conversations with Gia')}</li>
-                <li>{T('Одно бесплатное Live-демо, начатое только тобой', 'One free Live preview, started only by you')}</li>
-                <li>{T('Выбранный образ Джиа сохраняется между режимами', 'Your chosen Gia presence follows between modes')}</li>
-                <li>{T('Всегда ясно, что Джиа — вымышленный ИИ-компаньон', 'Always clear that Gia is a fictional AI companion')}</li>
+                <li>{T('Продолжающиеся Live-разговоры — не одно демо', 'Ongoing Live conversations—not a one-time preview')}</li>
+                <li>{T('Отдельный медленный, интригующий голос Джиа', 'Gia’s distinct slow, intriguing voice')}</li>
+                <li>{T('Микрофон включается только после твоего согласия', 'Microphone starts only after your consent')}</li>
+                <li>{T('Текстовый чат и все четыре образа Джиа', 'Text chat and all four Gia appearances')}</li>
               </ul>
             ) : (
               <ul>
@@ -102,18 +109,18 @@ export default function PricingPage() {
                 <li>{T('Чат и отслеживание прогресса', 'Chat and learning progress')}</li>
               </ul>
             )}
-            <a className="pricing-cta" href={freeHref}>{isGia ? T('Продолжить в чате', 'Continue in text chat') : T('Продолжить бесплатно', 'Continue free')}</a>
+            <a className="pricing-cta" href={freeHref}>{isGia ? T('Начать Gia Live бесплатно', 'Start Gia Live free') : T('Продолжить бесплатно', 'Continue free')}</a>
           </article>
           <article className="pricing-card pricing-card--pro">
-            <span className="pricing-card__label">{isGia ? 'GIA LIVE · 30 DAYS' : 'FLUENTMITRA PRO'}</span>
-            <h2>{isGia ? T('Верни голос Джиа', 'Return to Gia’s voice') : T('Быстрее и лично для тебя', 'Faster and made for you')}</h2>
-            <div className="pricing-card__price">{price} <small>{T('за 30 дней', 'for 30 days')}</small></div>
+            <span className="pricing-card__label">{isGia ? 'PRO · LATER' : 'FLUENTMITRA PRO'}</span>
+            <h2>{isGia ? T('Pro может подождать', 'Pro can wait') : T('Быстрее и лично для тебя', 'Faster and made for you')}</h2>
+            <div className="pricing-card__price">{isGia ? T('Позже', 'Later') : price} <small>{isGia ? T('когда будет готов', 'when it is ready') : T('за 30 дней', 'for 30 days')}</small></div>
             {isGia ? (
               <ul>
-                <li>{T('Продолжающиеся Live-разговоры с Джиа', 'Ongoing Live conversations with Gia')}</li>
-                <li>{T('Её отдельный медленный, интригующий голос', 'Her distinct slow, intriguing voice')}</li>
-                <li>{T('Микрофон включается только после твоего согласия', 'Microphone starts only after your consent')}</li>
-                <li>{T('Доступ следует за аккаунтом, без автопродления', 'Access follows your account, with no auto-renewal')}</li>
+                <li>{T('Бесплатный Gia Live остаётся стартовой точкой', 'Free Gia Live remains the starting point')}</li>
+                <li>{T('Функции и цена будут показаны до запуска Pro', 'Features and price will be shown before Pro launches')}</li>
+                <li>{T('Никакой скрытой подписки или автопродления', 'No hidden subscription or auto-renewal')}</li>
+                <li>{T('Сегодня не нужны карта или платёж', 'No card or payment is needed today')}</li>
               </ul>
             ) : (
               <ul>
@@ -123,23 +130,27 @@ export default function PricingPage() {
                 <li>{T('Доступ привязан к аккаунту, а не устройству', 'Access follows your account, not one device')}</li>
               </ul>
             )}
-            <button className="pricing-cta" type="button" disabled={busy || (!active && !available && !!catalog)} onClick={checkout}>
-              {busy
-                ? T('Открываем оплату…', 'Opening checkout…')
-                : active
-                  ? (isGia ? T('Gia Live уже активен', 'Gia Live is active') : T('Pro уже активен', 'Pro is active'))
-                  : !catalog
-                    ? T('Загружаем…', 'Loading…')
-                    : available
-                      ? (isGia ? T('Открыть Gia Live на 30 дней', 'Unlock 30 days of Gia Live') : T('Получить Pro на 30 дней', 'Get 30 days of Pro'))
-                      : T('Оплата скоро откроется', 'Checkout opening soon')}
-            </button>
+            {isGia ? (
+              <button className="pricing-cta" type="button" disabled>{T('Сейчас не требуется', 'Not required now')}</button>
+            ) : (
+              <button className="pricing-cta" type="button" disabled={busy || (!active && !available && !!catalog)} onClick={checkout}>
+                {busy
+                  ? T('Открываем оплату…', 'Opening checkout…')
+                  : active
+                    ? T('Pro уже активен', 'Pro is active')
+                    : !catalog
+                      ? T('Загружаем…', 'Loading…')
+                      : available
+                        ? T('Получить Pro на 30 дней', 'Get 30 days of Pro')
+                        : T('Оплата скоро откроется', 'Checkout opening soon')}
+              </button>
+            )}
             {error ? <p className="pricing-error" role="alert">{error}</p> : null}
           </article>
         </div>
         <p className="pricing-note">
           {isGia
-            ? T('Оплата проходит на защищённой странице ЮKassa. Джиа не видит и не хранит данные карты. Доступ не продлевается автоматически.', 'Payment happens on YooKassa’s secure page. Gia never sees or stores card details. Access does not renew automatically.')
+            ? T('Во время раннего доступа оплата не нужна. Live включается только после твоего согласия на передачу аудио и расшифровки в OpenAI.', 'No payment is needed during early access. Live starts only after you consent to sending microphone audio and transcripts to OpenAI.')
             : T('Оплата проходит на защищённой странице ЮKassa. FluentMitra не видит и не хранит данные карты. Доступ не продлевается автоматически.', 'Payment happens on YooKassa’s secure page. FluentMitra never sees or stores card details. Access does not renew automatically.')}
           {' '}<a href="/terms">{T('Условия', 'Terms')}</a>
           {!isGia ? <> · <a href="/refunds">{T('Возвраты', 'Refunds')}</a></> : null}
