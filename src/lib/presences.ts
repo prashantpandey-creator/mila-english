@@ -32,12 +32,12 @@ export const MILA_PRESENCES = [
     systemId: 'SYN-03',
     name: { en: 'Nocturne', ru: 'Ноктюрн' },
     description: {
-      en: 'Porcelain nocturne with pitch-black flowing hair.',
-      ru: 'Фарфоровый ноктюрн с длинными иссиня-чёрными волосами.',
+      en: 'Luminous porcelain nocturne with pitch-black flowing hair.',
+      ru: 'Сияющий фарфоровый ноктюрн с длинными иссиня-чёрными волосами.',
     },
     medium: { en: 'Cinematic', ru: 'Кинообраз' },
     animated: true,
-    poster: '/avatar/presences/nocturne-v4/avatar.webp',
+    poster: '/avatar/presences/nocturne-v5/avatar.webp',
     objectPosition: 'center',
   },
   {

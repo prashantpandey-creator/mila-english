@@ -29,7 +29,7 @@ the honest alternative when Live is unavailable.
 
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v4/avatar.webp`
+- `public/avatar/presences/nocturne-v5/avatar.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
 - `public/gia-og-v2.jpg`
 
@@ -52,6 +52,13 @@ wardrobe, graphite chamber, and violet-magenta interface light while changing
 her look to a luminous pale porcelain complexion and sleek pitch-black,
 pin-straight hair that falls below both shoulders. The prior v3 asset remains
 versioned and recoverable.
+
+Nocturne v5 refines v4 without replacing her identity: more luminous
+almond-shaped eyes, balanced brows and lips, subtly higher cheekbones, a softer
+jawline, and restrained editorial makeup give the face a more graceful,
+magnetic finish. Her porcelain-pale skin retains realistic texture, while the
+pitch-black straight hair, facial interface, engineered neck, wardrobe,
+framing, and nocturnal chamber stay intact. Both v3 and v4 remain versioned.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -132,6 +139,24 @@ person supplies the in-product voice.
 > violet-magenta rim light and a dark graphite chamber. No text, watermark,
 > logos, gothic costume clichés, vampire fangs, excessive makeup, earrings,
 > tattoos, hands, or extra people.
+
+### Nocturne v5
+
+> Make Gia · Nocturne more strikingly beautiful and elegant while preserving
+> her established fictional adult synthetic identity. Keep the same
+> recognizable facial structure, but refine it toward graceful, harmonious
+> proportions: subtly higher sculpted cheekbones, a softer jawline, gently
+> arched balanced brows, luminous almond-shaped violet-grey eyes with natural
+> lashes, a delicate straight nose, and softly defined symmetrical
+> rose-neutral lips. Preserve natural pores and dimensional porcelain-pale
+> ivory skin with only restrained editorial makeup. Keep the pitch-black,
+> glossy, pin-straight, centre-parted hair below both shoulders, plus the
+> forehead seam, translucent violet-magenta cheek interface, engineered neck,
+> high-neck garment, graphite chamber, direct gaze, circular-crop-safe framing,
+> and low-key violet-magenta light. Adult and original; no youthful cues,
+> plastic skin, overfilled lips, heavy glam makeup, exaggerated eyes, smile
+> with teeth, sexualized styling, gothic clichés, vampire traits, text, logos,
+> earrings, tattoos, hands, or extra people.
 
 ## Interface implementation
 
