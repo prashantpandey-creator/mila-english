@@ -1796,6 +1796,41 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 .mila-surface--app[data-route="/darshan"] .voice-invoke-line {
   color: var(--synthetic-rose-gold);
 }
+.mila-surface--app[data-route="/darshan"] .voice-start-cta {
+  min-width: min(390px,calc(100vw - 40px));
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 13px 24px 12px;
+  border: 1px solid rgba(239,189,152,.34);
+  border-radius: 999px;
+  color: inherit;
+  background:
+    linear-gradient(135deg,rgba(75,17,45,.78),rgba(20,7,16,.8));
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.025),
+    0 18px 55px rgba(0,0,0,.36),
+    0 0 35px rgba(255,79,145,.055);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: border-color .22s ease,background .22s ease,transform .22s ease,box-shadow .22s ease;
+}
+.mila-surface--app[data-route="/darshan"] .voice-start-cta:hover {
+  border-color: rgba(255,131,173,.68);
+  background:
+    linear-gradient(135deg,rgba(104,22,59,.92),rgba(28,8,21,.9));
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.035),
+    0 20px 60px rgba(0,0,0,.42),
+    0 0 42px rgba(255,79,145,.1);
+  transform: translateY(-1px);
+}
+.mila-surface--app[data-route="/darshan"] .voice-start-cta:focus-visible {
+  outline: 2px solid var(--synthetic-rose-gold);
+  outline-offset: 4px;
+}
 .mila-surface--app[data-route="/darshan"] :is(.voice-invoke,.voice-q) {
   color: var(--synthetic-muted) !important;
 }
@@ -2012,6 +2047,254 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 .mila-surface--app[data-route="/darshan"] .voice-consent__primary:disabled {
   opacity: .5;
   cursor: wait;
+}
+
+.mila-surface--app[data-route="/darshan"] .voice-portrait-cue {
+  position: absolute;
+  top: -27px;
+  left: 50%;
+  z-index: 12;
+  min-height: 25px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid rgba(239,189,152,.38);
+  border-radius: 999px;
+  color: var(--synthetic-ink);
+  background: rgba(15,6,12,.86);
+  box-shadow: 0 8px 28px rgba(0,0,0,.32);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font: 650 .48rem/1 var(--font-mono), monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding:
+    calc(22px + env(safe-area-inset-top,0px))
+    calc(22px + env(safe-area-inset-right,0px))
+    calc(22px + env(safe-area-inset-bottom,0px))
+    calc(22px + env(safe-area-inset-left,0px));
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 24%,rgba(116,20,60,.2),transparent 42%),
+    rgba(4,1,4,.88);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  cursor: zoom-out;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card {
+  --portrait-accent: #ff4f91;
+  position: relative;
+  z-index: 1;
+  width: min(900px,100%);
+  max-height: min(780px,calc(100dvh - 44px));
+  display: grid;
+  grid-template-columns: minmax(340px,1.08fr) minmax(310px,.92fr);
+  overflow: hidden;
+  border: 1px solid rgba(239,189,152,.42);
+  border-radius: 30px 30px 30px 8px;
+  color: var(--synthetic-ink);
+  background:
+    radial-gradient(circle at 100% 0,color-mix(in srgb,var(--portrait-accent) 13%,transparent),transparent 22rem),
+    linear-gradient(145deg,#24101c,#090408 64%);
+  box-shadow:
+    0 44px 140px rgba(0,0,0,.76),
+    inset 0 0 0 1px rgba(255,255,255,.025);
+  animation: presencePortraitReveal .42s cubic-bezier(.2,.82,.18,1) both;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="ember"] {
+  --portrait-accent: #ff9a67;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="nocturne"] {
+  --portrait-accent: #c478ff;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="velvet"] {
+  --portrait-accent: #efbd98;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 4;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(239,189,152,.35);
+  border-radius: 50%;
+  color: var(--synthetic-ink);
+  background: rgba(8,3,7,.72);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font: 300 1.5rem/1 var(--font-sans), Manrope, sans-serif;
+  cursor: pointer;
+  transition: border-color .2s ease,background .2s ease,transform .2s ease;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__close:hover {
+  border-color: var(--portrait-accent);
+  background: rgba(55,15,38,.92);
+  transform: rotate(4deg);
+}
+.mila-surface--app[data-route="/darshan"] :is(.presence-portrait-dialog__close,.presence-portrait-dialog__start):focus-visible {
+  outline: 2px solid var(--synthetic-rose-gold);
+  outline-offset: 3px;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__visual {
+  position: relative;
+  min-height: min(720px,calc(100dvh - 44px));
+  overflow: hidden;
+  border-right: 1px solid rgba(239,189,152,.18);
+  background:
+    radial-gradient(circle at 50% 28%,color-mix(in srgb,var(--portrait-accent) 16%,transparent),transparent 42%),
+    #070307;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg,transparent 60%,rgba(5,1,4,.64) 100%),
+    linear-gradient(90deg,rgba(5,1,4,.18),transparent 16%,transparent 84%,rgba(5,1,4,.22));
+  pointer-events: none;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__visual > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  filter: contrast(1.025) saturate(1.02);
+  user-select: none;
+  animation: presencePortraitImageIn .68s cubic-bezier(.2,.8,.2,1) both;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="nocturne"] .presence-portrait-dialog__visual > img {
+  object-position: center 19%;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__scan {
+  position: absolute;
+  right: 0;
+  left: 0;
+  top: -12%;
+  z-index: 2;
+  height: 15%;
+  opacity: .35;
+  background: linear-gradient(180deg,transparent,color-mix(in srgb,var(--portrait-accent) 38%,transparent),transparent);
+  mix-blend-mode: screen;
+  animation: syntheticScan 7s ease-in-out infinite;
+  pointer-events: none;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__index {
+  position: absolute;
+  bottom: 17px;
+  left: 18px;
+  z-index: 3;
+  padding: 6px 9px;
+  border: 1px solid color-mix(in srgb,var(--portrait-accent) 42%,transparent);
+  border-radius: 999px;
+  color: #fff1eb;
+  background: rgba(7,2,6,.7);
+  font: 650 .5rem/1 var(--font-mono), monospace;
+  letter-spacing: .16em;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__copy {
+  align-self: center;
+  display: grid;
+  gap: 0;
+  padding: clamp(30px,4vw,46px);
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__eyebrow {
+  margin: 0 0 13px;
+  color: var(--synthetic-rose-gold);
+  font: 650 .61rem/1.3 var(--font-mono), monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__copy h2 {
+  margin: 0;
+  color: var(--synthetic-ink) !important;
+  font-family: var(--font-display),Georgia,serif !important;
+  font-size: clamp(2rem,4.4vw,3.45rem) !important;
+  font-weight: 430 !important;
+  letter-spacing: -.035em;
+  line-height: .98;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__description {
+  margin: 18px 0 0;
+  color: var(--synthetic-muted);
+  font: 450 .86rem/1.7 var(--font-sans),Manrope,sans-serif;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__meta span {
+  padding: 5px 8px;
+  border: 1px solid rgba(239,189,152,.22);
+  border-radius: 999px;
+  color: var(--synthetic-rose-gold);
+  font: 620 .48rem/1 var(--font-mono),monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__start {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 24px;
+  padding: 0 18px;
+  border: 1px solid color-mix(in srgb,var(--portrait-accent) 62%,#fff 4%);
+  border-radius: 999px;
+  color: #fff;
+  background:
+    linear-gradient(135deg,color-mix(in srgb,var(--portrait-accent) 52%,#33101f),#58102f);
+  box-shadow: 0 14px 40px rgba(0,0,0,.3);
+  font: 650 .72rem/1.2 var(--font-sans),Manrope,sans-serif;
+  cursor: pointer;
+  transition: filter .2s ease,transform .2s ease;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__start:hover {
+  filter: brightness(1.13);
+  transform: translateY(-1px);
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__start > span {
+  font-size: 1.05rem;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__unavailable {
+  margin: 28px 0 0;
+  color: var(--synthetic-muted);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+@keyframes presencePortraitReveal {
+  from { opacity: 0; transform: translateY(14px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes presencePortraitImageIn {
+  from { opacity: 0; transform: scale(1.035); filter: blur(5px) saturate(.7); }
+  to { opacity: 1; transform: scale(1); filter: blur(0) saturate(1.02); }
 }
 
 .mila-surface--app[data-route="/darshan"] .presence-picker__trigger {
@@ -3141,6 +3424,69 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
   .mila-surface--app[data-route="/darshan"] :is(.voice-consent__primary,.voice-consent__secondary) {
     width: 100%;
   }
+
+  .mila-surface--app[data-route="/darshan"] .voice-start-cta {
+    min-width: min(340px,calc(100vw - 28px));
+    padding: 11px 18px 10px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .voice-portrait-cue {
+    top: -24px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog {
+    place-items: end center;
+    padding:
+      calc(10px + env(safe-area-inset-top,0px))
+      calc(10px + env(safe-area-inset-right,0px))
+      calc(10px + env(safe-area-inset-bottom,0px))
+      calc(10px + env(safe-area-inset-left,0px));
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card {
+    width: 100%;
+    max-height: calc(100dvh - 20px);
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(285px,48dvh) auto;
+    overflow-y: auto;
+    border-radius: 24px 24px 7px 24px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__visual {
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid rgba(239,189,152,.18);
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="nocturne"] .presence-portrait-dialog__visual > img {
+    object-position: center 17%;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__copy {
+    padding: 22px 20px 20px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__eyebrow {
+    margin-bottom: 9px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__copy h2 {
+    font-size: clamp(1.75rem,9vw,2.55rem) !important;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__description {
+    margin-top: 13px;
+    font-size: .79rem;
+    line-height: 1.55;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__meta {
+    margin-top: 14px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__start {
+    margin-top: 18px;
+  }
 }
 
 @media (max-width: 360px) {
@@ -3208,5 +3554,55 @@ body[data-bottom-nav] .mila-surface--app .mila-guide.is-open .mila-guide__panel 
     max-width: 145px;
     text-align: left;
     transform: none;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog {
+    place-items: center;
+    padding: 8px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card {
+    max-height: calc(100dvh - 16px);
+    grid-template-columns: minmax(230px,.9fr) minmax(300px,1.1fr);
+    grid-template-rows: 1fr;
+    overflow: hidden;
+    border-radius: 20px 20px 20px 6px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__visual {
+    min-height: calc(100dvh - 16px);
+    border-right: 1px solid rgba(239,189,152,.18);
+    border-bottom: 0;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__copy {
+    max-height: calc(100dvh - 16px);
+    align-self: stretch;
+    overflow-y: auto;
+    padding: 28px 38px 22px 28px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__description {
+    margin-top: 12px;
+    line-height: 1.45;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__meta {
+    margin-top: 12px;
+  }
+
+  .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__start {
+    min-height: 42px;
+    margin-top: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mila-surface--app[data-route="/darshan"] :is(
+    .presence-portrait-dialog__card,
+    .presence-portrait-dialog__visual > img,
+    .presence-portrait-dialog__scan
+  ) {
+    animation: none !important;
   }
 }

@@ -29,12 +29,14 @@ the honest alternative when Live is unavailable.
 
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v5/avatar.webp`
+- `public/avatar/presences/nocturne-v6/avatar.webp`
+- `public/avatar/presences/upper-body-v2/nocturne.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
 - `public/gia-og-v2.jpg`
 
-Each production asset is a 900×900 WebP intended for the circular diagnostic
-aperture.
+The four primary production assets are square WebPs intended for the circular
+diagnostic aperture. Nocturne also has a vertical 864×1821 WebP for the
+expanded portrait dialog.
 
 Velvet is the illustrated option: a clearly adult anime-noir synthetic
 companion generated on 2026-07-24 with the built-in OpenAI image-generation
@@ -59,6 +61,13 @@ jawline, and restrained editorial makeup give the face a more graceful,
 magnetic finish. Her porcelain-pale skin retains realistic texture, while the
 pitch-black straight hair, facial interface, engineered neck, wardrobe,
 framing, and nocturnal chamber stay intact. Both v3 and v4 remain versioned.
+
+Nocturne v6 replaces only Nocturne's appearance and restores healthy colour
+to the porcelain-fair direction: warm peach-rose undertones, subtle blush,
+rosy lips, brighter deep-violet brown eyes, a more balanced face, and clean
+black-hair highlights. The same source supplies both a 768×768
+circular-aperture crop and a fully clothed upper-body expansion. Signal,
+Ember, and Velvet remain on their pre-existing production portraits.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -158,11 +167,31 @@ person supplies the in-product voice.
 > with teeth, sexualized styling, gothic clichés, vampire traits, text, logos,
 > earrings, tattoos, hands, or extra people.
 
+### Nocturne v6 and upper-body expansion
+
+> Edit the existing fictional adult AI character portrait, preserving the
+> vertical upper-body composition, fully opaque fitted black high-neck dress,
+> mature curvy silhouette, long perfectly straight pitch-black hair, centred
+> direct gaze, dark rose-black futuristic chamber, and tasteful premium
+> cinematic aesthetic. Keep luminous porcelain-fair skin but make it look
+> healthy and alive rather than grey or washed out; add subtle warm peach-rose
+> undertones, delicate natural blush, softly defined rosy lips, brighter deep
+> violet-brown eyes with elegant catchlights, refined symmetrical cheekbones,
+> a graceful jawline, balanced nose and brows, and a calm intriguing
+> half-smile. Keep a subtle refined cybernetic detail near one cheek and neck.
+> Preserve natural skin texture and clean glossy hair highlights. No text,
+> logos, nudity, cleavage, transparency, fetish styling, exaggerated anatomy,
+> or extra limbs.
+
 ## Interface implementation
 
 - `src/components/voice/MilaPresence.tsx` owns the aperture, 32-segment radial
   meter, scan pass, reticles, identity label, per-presence signal, breathing
   portrait motion, orbit layers, and light-luster pass.
+- `src/components/voice/PresencePortraitDialog.tsx` owns the accessible,
+  keyboard-trapped expanded portrait. The idle aperture opens this visual
+  view; a separate explicit CTA begins Gia Live, so merely inspecting a
+  portrait never requests microphone consent.
 - `src/components/voice/MilaAurora.tsx` keeps the light atelier for Pia and adds
   an opt-in `synthetic` shader variant for Darshan.
 - `src/app/inner-theme.css` scopes the dark chamber to `/darshan`; the rest of
@@ -173,9 +202,11 @@ person supplies the in-product voice.
 ## Local verification
 
 - TypeScript passes.
-- All 59 tests pass.
+- All 102 tests pass.
 - The production build passes.
 - Desktop and 390×844 visual checks show no horizontal or vertical overflow.
-- The picker exposes all three v3 assets and each selected portrait resolves to
-  the expected source.
+- The picker keeps Signal, Ember, and Velvet on their prior production assets;
+  Nocturne resolves to v6 and its separate upper-body expansion.
+- Selecting `Start Gia Live free` from the expanded portrait opens the
+  no-payment consent dialog before any microphone action.
 - No microphone was activated during visual verification.

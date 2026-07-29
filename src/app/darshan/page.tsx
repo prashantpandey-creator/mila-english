@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { MilaAurora } from "@/components/voice/MilaAurora";
 import type { OrbState } from "@/components/voice/MilaOrb";
 import { MilaPresence } from "@/components/voice/MilaPresence";
+import { PresencePortraitDialog } from "@/components/voice/PresencePortraitDialog";
 import { PresencePicker } from "@/components/voice/PresencePicker";
 import MilaIcon from "@/components/ui/MilaIcon";
 import { useI18n } from "@/lib/i18n-provider";
@@ -135,6 +136,7 @@ export default function VoicePage() {
   // Presence changes only Gia's visual window. It never selects an LLM,
   // conversation style, or adult mode. Every option is a fictional AI avatar.
   const [presenceId, setPresenceId] = useState<PresenceId>("signal");
+  const [showPortrait, setShowPortrait] = useState(false);
 
   const realtimeRef = useRef<RealtimeVoiceSession | null>(null);
   const engineRef = useRef<"realtime" | null>(null);
@@ -648,10 +650,16 @@ export default function VoicePage() {
     window.localStorage.setItem(PRESENCE_STORAGE_KEY, next);
   }, []);
 
+  const closePortrait = useCallback(() => {
+    setShowPortrait(false);
+    window.requestAnimationFrame(() => voiceOrbRef.current?.focus());
+  }, []);
+
   const showInvocation = phase === "resting";
   const showQuestion = (phase === "listening" || phase === "thinking") && !!liveText;
   const voiceAccessReady = routeModeReady && preferenceLoaded;
   const canOperateVoice = isConnected || canUseLiveVoice;
+  const portraitControlsVoice = isConnected || isConnecting || isVoicePaused;
   const invitePool = INVITES[lang];
   const systemState = isConnecting
     ? "CONNECTING"
@@ -733,6 +741,19 @@ export default function VoicePage() {
         {lang === "ru" ? "ИИ-персонаж · синтетический образ и голос" : "AI character · synthetic image and voice"}
       </p>
 
+      <PresencePortraitDialog
+        open={showPortrait}
+        presenceId={presenceId}
+        lang={lang}
+        canStartLive={voiceAccessReady && canUseLiveVoice && !otherVoiceTabActive}
+        isFreeLive={isFreeLive}
+        onClose={closePortrait}
+        onStartLive={() => {
+          setShowPortrait(false);
+          void connectToVoice();
+        }}
+      />
+
       {showRealtimeConsent && (
         <div className="voice-consent" role="presentation">
           <button
@@ -793,11 +814,13 @@ export default function VoicePage() {
       <button
         ref={voiceOrbRef}
         type="button"
-        onClick={connectToVoice}
-        disabled={!preferenceLoaded || !canOperateVoice}
-        aria-label={!voiceAccessReady
-          ? (lang === "ru" ? "Проверяем доступ к Live-голосу" : "Checking live voice access")
-          : isConnected
+        onClick={portraitControlsVoice ? connectToVoice : () => setShowPortrait(true)}
+        disabled={portraitControlsVoice && (!preferenceLoaded || !canOperateVoice)}
+        aria-haspopup={portraitControlsVoice ? undefined : "dialog"}
+        aria-label={portraitControlsVoice
+          ? !voiceAccessReady
+            ? (lang === "ru" ? "Проверяем доступ к Live-голосу" : "Checking live voice access")
+            : isConnected
             ? isVoicePaused
               ? (lang === "ru" ? "Возобновить разговор с Джиа" : "Resume Gia")
               : phase === "manifesting"
@@ -805,14 +828,15 @@ export default function VoicePage() {
               : (lang === "ru" ? "Говорить с Джиа" : "Speak with Gia")
             : !canUseLiveVoice
               ? (lang === "ru" ? "Live-голос недоступен" : "Live voice unavailable")
-              : (lang === "ru" ? "Начать голосовой разговор" : "Start live voice")}
+              : (lang === "ru" ? "Начать голосовой разговор" : "Start live voice")
+          : (lang === "ru" ? "Открыть расширенный портрет Джиа" : "View Gia’s expanded portrait")}
         className="voice-orb absolute left-1/2 z-10 outline-none"
         style={{
           top: "42%",
           transform: "translate(-50%, -50%)",
           background: "transparent",
           border: "none",
-          cursor: voiceAccessReady && canOperateVoice ? "pointer" : "default",
+          cursor: portraitControlsVoice && (!voiceAccessReady || !canOperateVoice) ? "default" : "pointer",
         }}
       >
         {/* Wordless invitation — a ripple of light that says: touch me */}
@@ -828,6 +852,11 @@ export default function VoicePage() {
         )}
 
         <MilaPresence presenceId={presenceId} state={phase} size={orbSize} lang={lang} />
+        {!portraitControlsVoice ? (
+          <span className="voice-portrait-cue" aria-hidden="true">
+            {lang === "ru" ? "Портрет" : "View portrait"}
+          </span>
+        ) : null}
       </button>
 
       {/* The invitation the orb breathes at rest */}
@@ -861,7 +890,14 @@ export default function VoicePage() {
               </span>
             </>
           ) : canUseLiveVoice ? (
-            <>
+            <button
+              type="button"
+              className="voice-start-cta"
+              onClick={connectToVoice}
+              aria-label={isFreeLive
+                ? (lang === "ru" ? "Начать Gia Live бесплатно" : "Start Gia Live free")
+                : (lang === "ru" ? "Начать Gia Live" : "Start Gia Live")}
+            >
               <strong>
                 {isFreeLive
                   ? (lang === "ru" ? "Начать Gia Live бесплатно" : "Start Gia Live free")
@@ -870,7 +906,7 @@ export default function VoicePage() {
               <span key={invI} className="voice-invoke-line">
                 {invitePool[invI % invitePool.length]}
               </span>
-            </>
+            </button>
           ) : (
             <>
               <strong>

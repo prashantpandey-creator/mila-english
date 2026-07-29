@@ -31,6 +31,19 @@ test('Gia voice and text share the selected synthetic presence', () => {
   assert.match(chatPage, /className="chat-page__presence-image"/);
 });
 
+test('Gia separates portrait inspection from the explicit Live action', () => {
+  const voicePage = readSource('src/app/darshan/page.tsx');
+  const portraitDialog = readSource('src/components/voice/PresencePortraitDialog.tsx');
+
+  assert.match(voicePage, /portraitControlsVoice \? connectToVoice : \(\) => setShowPortrait\(true\)/);
+  assert.match(voicePage, /className="voice-start-cta"/);
+  assert.match(voicePage, /<PresencePortraitDialog/);
+  assert.match(portraitDialog, /aria-modal="true"/);
+  assert.match(portraitDialog, /event\.key === "Escape"/);
+  assert.match(portraitDialog, /Start Gia Live free/);
+  assert.match(portraitDialog, /Only the visual look changes/);
+});
+
 test('Gia silences background tabs and resumes only from a deliberate tap', () => {
   const voicePage = readSource('src/app/darshan/page.tsx');
   const realtimeVoice = readSource('src/lib/realtimeVoice.ts');

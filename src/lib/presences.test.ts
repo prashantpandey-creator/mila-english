@@ -20,8 +20,21 @@ test('Gia Presence uses a closed catalog of four fictional AI avatars', () => {
   assert.equal(presenceById('signal').name.en, 'Gia');
   assert.equal(presenceById('signal').poster, '/avatar/presences/mila-v3/avatar.webp');
   assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v3/avatar.webp');
-  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v5/avatar.webp');
+  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v6/avatar.webp');
   assert.equal(presenceById('velvet').poster, '/avatar/presences/velvet-v1/avatar.webp');
+  assert.deepEqual(
+    MILA_PRESENCES.map((presence) => presence.expandedPortrait),
+    [
+      '/avatar/presences/mila-v3/avatar.webp',
+      '/avatar/presences/ember-v3/avatar.webp',
+      '/avatar/presences/upper-body-v2/nocturne.webp',
+      '/avatar/presences/velvet-v1/avatar.webp',
+    ],
+  );
+  assert.deepEqual(
+    MILA_PRESENCES.map((presence) => presence.expandedFraming),
+    ['portrait', 'portrait', 'upper-body', 'portrait'],
+  );
   assert.equal(presenceById('velvet').medium.en, 'Anime');
   assert.equal(MILA_PRESENCES.every((presence) => presence.animated), true);
   assert.deepEqual(
@@ -29,4 +42,5 @@ test('Gia Presence uses a closed catalog of four fictional AI avatars', () => {
     ['SYN-01', 'SYN-02', 'SYN-03', 'SYN-04'],
   );
   assert.equal(new Set(MILA_PRESENCES.map((presence) => presence.poster)).size, 4);
+  assert.equal(new Set(MILA_PRESENCES.map((presence) => presence.expandedPortrait)).size, 4);
 });

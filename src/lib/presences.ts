@@ -12,6 +12,8 @@ export const MILA_PRESENCES = [
     medium: { en: 'Cinematic', ru: 'Кинообраз' },
     animated: true,
     poster: '/avatar/presences/mila-v3/avatar.webp',
+    expandedPortrait: '/avatar/presences/mila-v3/avatar.webp',
+    expandedFraming: 'portrait',
     objectPosition: 'center',
   },
   {
@@ -25,6 +27,8 @@ export const MILA_PRESENCES = [
     medium: { en: 'Cinematic', ru: 'Кинообраз' },
     animated: true,
     poster: '/avatar/presences/ember-v3/avatar.webp',
+    expandedPortrait: '/avatar/presences/ember-v3/avatar.webp',
+    expandedFraming: 'portrait',
     objectPosition: 'center',
   },
   {
@@ -37,7 +41,9 @@ export const MILA_PRESENCES = [
     },
     medium: { en: 'Cinematic', ru: 'Кинообраз' },
     animated: true,
-    poster: '/avatar/presences/nocturne-v5/avatar.webp',
+    poster: '/avatar/presences/nocturne-v6/avatar.webp',
+    expandedPortrait: '/avatar/presences/upper-body-v2/nocturne.webp',
+    expandedFraming: 'upper-body',
     objectPosition: 'center',
   },
   {
@@ -51,6 +57,8 @@ export const MILA_PRESENCES = [
     medium: { en: 'Anime', ru: 'Аниме' },
     animated: true,
     poster: '/avatar/presences/velvet-v1/avatar.webp',
+    expandedPortrait: '/avatar/presences/velvet-v1/avatar.webp',
+    expandedFraming: 'portrait',
     objectPosition: 'center',
   },
 ] as const;
