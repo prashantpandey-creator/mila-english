@@ -29,8 +29,8 @@ the honest alternative when Live is unavailable.
 
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v6/avatar.webp`
-- `public/avatar/presences/upper-body-v2/nocturne.webp`
+- `public/avatar/presences/nocturne-v7/avatar.webp`
+- `public/avatar/presences/upper-body-v3/nocturne.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
 - `public/gia-og-v2.jpg`
 
@@ -68,6 +68,13 @@ rosy lips, brighter deep-violet brown eyes, a more balanced face, and clean
 black-hair highlights. The same source supplies both a 768×768
 circular-aperture crop and a fully clothed upper-body expansion. Signal,
 Ember, and Velvet remain on their pre-existing production portraits.
+
+Nocturne v7 keeps the v6 palette, wardrobe, body, chamber, and synthetic
+details while correcting the face in response to production review. Its
+slightly lower, softer hairline and restrained face-framing strands reduce the
+apparent forehead. A genuine small smile adds softly lifted cheeks, slight
+natural asymmetry, subtle smile lines, and warmth in the eyes without making
+the established adult character look childish or exaggerated.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -183,6 +190,22 @@ person supplies the in-product voice.
 > logos, nudity, cleavage, transparency, fetish styling, exaggerated anatomy,
 > or extra limbs.
 
+### Nocturne v7 natural smile
+
+> Edit only Nocturne's face and hairline while preserving the same fictional
+> adult identity, body, pose, fully opaque black high-neck dress, cybernetic
+> cheek and neck details, long straight pitch-black hair, chamber, lighting,
+> vertical framing, and image quality. Lower and soften the hairline slightly,
+> balance the upper-face proportions, and add a few subtle straight
+> face-framing strands near the temples without bangs. Replace the posed
+> expression with a genuine gentle adult smile: relaxed lips with a small
+> natural opening, softly lifted cheeks, slight believable asymmetry, faint
+> natural smile lines, and warm smiling eyes. Keep porcelain-fair skin with
+> healthy peach-rose undertones, natural pores, delicate blush, mature adult
+> proportions, and direct gaze. Avoid a forced, broad, childish, doll-like, or
+> exaggerated smile; no oversized teeth, heavy makeup, plastic skin, text,
+> logos, nudity, transparency, or altered body shape.
+
 ## Interface implementation
 
 - `src/components/voice/MilaPresence.tsx` owns the aperture, 32-segment radial
@@ -206,7 +229,7 @@ person supplies the in-product voice.
 - The production build passes.
 - Desktop and 390×844 visual checks show no horizontal or vertical overflow.
 - The picker keeps Signal, Ember, and Velvet on their prior production assets;
-  Nocturne resolves to v6 and its separate upper-body expansion.
+  Nocturne resolves to v7 and its separate upper-body expansion.
 - Selecting `Start Gia Live free` from the expanded portrait opens the
   no-payment consent dialog before any microphone action.
 - No microphone was activated during visual verification.
