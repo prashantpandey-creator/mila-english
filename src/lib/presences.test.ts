@@ -20,7 +20,7 @@ test('Gia Presence uses a closed catalog of four fictional AI avatars', () => {
   assert.equal(presenceById('signal').name.en, 'Gia');
   assert.equal(presenceById('signal').poster, '/avatar/presences/mila-v3/avatar.webp');
   assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v3/avatar.webp');
-  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v3/avatar.webp');
+  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v4/avatar.webp');
   assert.equal(presenceById('velvet').poster, '/avatar/presences/velvet-v1/avatar.webp');
   assert.equal(presenceById('velvet').medium.en, 'Anime');
   assert.equal(MILA_PRESENCES.every((presence) => presence.animated), true);

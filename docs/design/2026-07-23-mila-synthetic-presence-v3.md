@@ -29,7 +29,7 @@ the honest alternative when Live is unavailable.
 
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v3/avatar.webp`
+- `public/avatar/presences/nocturne-v4/avatar.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
 - `public/gia-og-v2.jpg`
 
@@ -44,6 +44,14 @@ portrait with an obsidian and oxblood chamber, rose-gold interfaces, a direct
 gaze, and tasteful midnight glamour; it explicitly excluded youthful cues,
 school uniforms, nudity, fetish styling, exaggerated anatomy, and resemblance
 to copyrighted characters.
+
+Nocturne v4 was regenerated on 2026-07-29 from the existing fictional
+Nocturne v3 portrait with the built-in OpenAI image-generation workflow. It
+keeps the centered direct gaze, synthetic facial seam, engineered neck, black
+wardrobe, graphite chamber, and violet-magenta interface light while changing
+her look to a luminous pale porcelain complexion and sleek pitch-black,
+pin-straight hair that falls below both shoulders. The prior v3 asset remains
+versioned and recoverable.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -108,6 +116,22 @@ person supplies the in-product voice.
 > with a restrained violet-to-magenta halo. Calm, self-possessed editorial
 > sci-fi; no text, watermark, circular mask, gore, horror, helmet, bulky
 > armour, or sexualized styling.
+
+### Nocturne v4
+
+> Regenerate the existing fictional AI character Gia · Nocturne with an
+> extremely fair, pale porcelain-white complexion and pitch-black, straight,
+> very long hair. Preserve the same adult fictional synthetic woman, direct
+> forward gaze, facial proportions, calm self-possessed expression, subtle
+> visible cybernetic facial seam, engineered neck structure, black high-neck
+> garment, and unmistakably artificial character design. Change the hair to
+> sleek, pin-straight, glossy jet black falling well below the shoulders.
+> Retain realistic skin texture and dimensional shading; do not make the skin
+> literally colourless, grey, overexposed, or corpse-like. Keep the centered
+> square composition safe for a circular UI crop, with restrained
+> violet-magenta rim light and a dark graphite chamber. No text, watermark,
+> logos, gothic costume clichés, vampire fangs, excessive makeup, earrings,
+> tattoos, hands, or extra people.
 
 ## Interface implementation
 
