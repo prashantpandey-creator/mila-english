@@ -29,13 +29,13 @@ the honest alternative when Live is unavailable.
 
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v9/avatar.webp`
-- `public/avatar/presences/upper-body-v5/nocturne.webp`
+- `public/avatar/presences/nocturne-v10/avatar.webp`
+- `public/avatar/presences/upper-body-v6/nocturne.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
 - `public/gia-og-v2.jpg`
 
 The four primary production assets are square WebPs intended for the circular
-diagnostic aperture. Nocturne also has a vertical 862×1825 WebP for the
+diagnostic aperture. Nocturne also has a vertical 861×1827 WebP for the
 expanded portrait dialog.
 
 Velvet is the illustrated option: a clearly adult anime-noir synthetic
@@ -85,6 +85,11 @@ Nocturne v9 preserves the v8 identity and proportions while refining only the
 nose. Its bridge, tip, and nostril width are subtly smaller and more delicate,
 with natural adult anatomy, realistic highlight continuity, and no pinched,
 upturned, childlike, or cosmetic-surgery appearance.
+
+Nocturne v10 makes a second, more visible nose-only refinement from v9. The
+bridge is shorter and narrower, projection is reduced, and the tip and alar
+width are finer while the approved adult anatomy, identity, head proportions,
+smile, complexion, body, wardrobe, cybernetics, and chamber stay locked.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -243,6 +248,20 @@ person supplies the in-product voice.
 > facial highlights and shadows. Avoid a tiny, childlike, pinched, strongly
 > upturned, button-like, plastic-surgery, asymmetrical, or over-contoured nose.
 
+### Nocturne v10 smaller nose
+
+> Edit only Nocturne's nose and make it clearly smaller than v9. Reduce its
+> apparent size by a further 15–18%: shorten and narrow the bridge, reduce
+> projection, make the tip distinctly smaller and finer, and narrow the
+> nostril and alar width while retaining a graceful realistic adult slope and
+> natural highlights and shadows. Preserve the v9 identity, compact head,
+> forehead, hairline, face width, jaw, chin, eyes, brows, cheeks, lips, gentle
+> smile, porcelain-fair peach-rose skin, cybernetics, straight pitch-black
+> hair, mature curvy figure, opaque high-neck dress, hands, pose, lighting,
+> chamber, and full-height framing exactly. Avoid pinched or collapsed
+> nostrils, an overly upturned or childlike button nose, an artificial surgical
+> appearance, asymmetry, or any other facial or compositional change.
+
 ## Interface implementation
 
 - `src/components/voice/MilaPresence.tsx` owns the aperture, 32-segment radial
@@ -266,7 +285,7 @@ person supplies the in-product voice.
 - The production build passes.
 - Desktop and 390×844 visual checks show no horizontal or vertical overflow.
 - The picker keeps Signal, Ember, and Velvet on their prior production assets;
-  Nocturne resolves to v9 and its separate upper-body expansion.
+  Nocturne resolves to v10 and its separate upper-body expansion.
 - Selecting `Start Gia Live free` from the expanded portrait opens the
   no-payment consent dialog before any microphone action.
 - No microphone was activated during visual verification.
