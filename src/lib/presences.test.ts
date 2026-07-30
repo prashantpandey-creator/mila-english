@@ -27,9 +27,9 @@ test('Gia Presence uses a closed catalog of seven fictional AI avatars', () => {
   assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v3/avatar.webp');
   assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v15/avatar.webp');
   assert.equal(presenceById('velvet').poster, '/avatar/presences/velvet-v1/avatar.webp');
-  assert.equal(presenceById('aurelia').poster, '/avatar/presences/aurelia-v1/avatar.webp');
-  assert.equal(presenceById('sable').poster, '/avatar/presences/sable-v1/avatar.webp');
-  assert.equal(presenceById('iris').poster, '/avatar/presences/iris-v1/avatar.webp');
+  assert.equal(presenceById('aurelia').poster, '/avatar/presences/aurelia-v2/avatar.webp');
+  assert.equal(presenceById('sable').poster, '/avatar/presences/sable-v2/avatar.webp');
+  assert.equal(presenceById('iris').poster, '/avatar/presences/iris-v2/avatar.webp');
   assert.deepEqual(
     MILA_PRESENCES.map((presence) => presence.expandedPortrait),
     [
@@ -37,9 +37,9 @@ test('Gia Presence uses a closed catalog of seven fictional AI avatars', () => {
       '/avatar/presences/ember-v3/avatar.webp',
       '/avatar/presences/upper-body-v11/nocturne.webp',
       '/avatar/presences/velvet-v1/avatar.webp',
-      '/avatar/presences/aurelia-v1/expanded.webp',
-      '/avatar/presences/sable-v1/expanded.webp',
-      '/avatar/presences/iris-v1/expanded.webp',
+      '/avatar/presences/aurelia-v2/expanded.webp',
+      '/avatar/presences/sable-v2/expanded.webp',
+      '/avatar/presences/iris-v2/expanded.webp',
     ],
   );
   assert.deepEqual(

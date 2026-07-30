@@ -7,9 +7,10 @@
 ## Product direction
 
 Darshan is now a near-future companion chamber rather than a soft portrait
-atelier. Gia, Ember, Nocturne, and Velvet remain visual interfaces for one adult
-language companion. Selecting a presence still changes appearance only; it
-does not select a model, persona, audio pipeline, privacy mode, or adult tone.
+atelier. Gia, Ember, Nocturne, Velvet, Aurelia, Sable, and Iris are visual
+interfaces for one adult language companion. Selecting a presence still
+changes appearance only; it does not select a model, persona, audio pipeline,
+privacy mode, or adult tone.
 
 The design makes the machine visible without making the companion cold:
 
@@ -32,12 +33,12 @@ the honest alternative when Live is unavailable.
 - `public/avatar/presences/nocturne-v15/avatar.webp`
 - `public/avatar/presences/upper-body-v11/nocturne.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
-- `public/avatar/presences/aurelia-v1/avatar.webp`
-- `public/avatar/presences/aurelia-v1/expanded.webp`
-- `public/avatar/presences/sable-v1/avatar.webp`
-- `public/avatar/presences/sable-v1/expanded.webp`
-- `public/avatar/presences/iris-v1/avatar.webp`
-- `public/avatar/presences/iris-v1/expanded.webp`
+- `public/avatar/presences/aurelia-v2/avatar.webp`
+- `public/avatar/presences/aurelia-v2/expanded.webp`
+- `public/avatar/presences/sable-v2/avatar.webp`
+- `public/avatar/presences/sable-v2/expanded.webp`
+- `public/avatar/presences/iris-v2/avatar.webp`
+- `public/avatar/presences/iris-v2/expanded.webp`
 - `public/gia-og-v2.jpg`
 
 The seven primary production assets are square WebPs intended for the circular
@@ -436,6 +437,26 @@ person supplies the in-product voice.
 > proportions and hands, and a vertical crop-safe frame. No real-person
 > likeness, text, logo, watermark, nudity, transparent clothing, exaggerated
 > anatomy, plastic skin, armour, or malformed hands.
+
+### Aurelia, Sable, and Iris v2 couture refinement
+
+The built-in OpenAI image-editing workflow refined the three established
+fictional adult character anchors without changing the rest of the presence
+catalogue. Aurelia now wears asymmetric black-and-champagne off-shoulder
+couture with softly luminous gold makeup. Sable uses one-shoulder
+emerald-black draping, richer emerald eye makeup, and calm magnetic eye
+contact. Iris uses ultraviolet-black shoulder-baring couture with a small
+geometric keyhole, precise violet liner, and an enigmatic restrained
+half-smile. All three retain their original face geometry, head proportions,
+hair, pose, hands, chamber, cybernetic details, camera, and signal palette.
+The edits emphasize realistic adult curves and body-skimming tailoring while
+remaining fully opaque, non-explicit, and production-appropriate. The v1
+assets remain versioned and recoverable.
+
+Shared edit constraints explicitly excluded nudity, transparency, lingerie,
+fetish styling, underboob, extreme cleavage, exaggerated anatomy,
+pornographic posing, youthful cues, malformed hands, facial or mouth
+distortion, text, and watermarks.
 
 ## Interface implementation
 
