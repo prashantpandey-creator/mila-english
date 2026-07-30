@@ -1525,6 +1525,15 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 .mila-surface--app[data-route="/darshan"] .mila-portrait-presence[data-presence="velvet"] {
   --presence-accent: #efbd98;
 }
+.mila-surface--app[data-route="/darshan"] .mila-portrait-presence[data-presence="aurelia"] {
+  --presence-accent: #e0bd78;
+}
+.mila-surface--app[data-route="/darshan"] .mila-portrait-presence[data-presence="sable"] {
+  --presence-accent: #36cfa4;
+}
+.mila-surface--app[data-route="/darshan"] .mila-portrait-presence[data-presence="iris"] {
+  --presence-accent: #9b82ff;
+}
 .mila-surface--app .mila-portrait-presence__aperture {
   position: absolute;
   inset: 0;
@@ -2127,6 +2136,15 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
 .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="velvet"] {
   --portrait-accent: #efbd98;
 }
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="aurelia"] {
+  --portrait-accent: #e0bd78;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="sable"] {
+  --portrait-accent: #36cfa4;
+}
+.mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__card[data-presence="iris"] {
+  --portrait-accent: #9b82ff;
+}
 .mila-surface--app[data-route="/darshan"] .presence-portrait-dialog__close {
   position: absolute;
   top: 15px;
@@ -2341,10 +2359,29 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   color: var(--synthetic-muted);
 }
 .mila-surface--app[data-route="/darshan"] .presence-picker__options > button {
+  --option-accent: var(--synthetic-magenta);
   border-color: var(--synthetic-line);
   border-radius: 15px;
   background: rgba(30,11,22,.72);
   transition: border-color .22s ease,background .22s ease,transform .22s ease;
+}
+.mila-surface--app[data-route="/darshan"] .presence-picker__options > button[data-presence="ember"] {
+  --option-accent: #ff9a67;
+}
+.mila-surface--app[data-route="/darshan"] .presence-picker__options > button[data-presence="nocturne"] {
+  --option-accent: #c478ff;
+}
+.mila-surface--app[data-route="/darshan"] .presence-picker__options > button[data-presence="velvet"] {
+  --option-accent: #efbd98;
+}
+.mila-surface--app[data-route="/darshan"] .presence-picker__options > button[data-presence="aurelia"] {
+  --option-accent: #e0bd78;
+}
+.mila-surface--app[data-route="/darshan"] .presence-picker__options > button[data-presence="sable"] {
+  --option-accent: #36cfa4;
+}
+.mila-surface--app[data-route="/darshan"] .presence-picker__options > button[data-presence="iris"] {
+  --option-accent: #9b82ff;
 }
 .mila-surface--app[data-route="/darshan"] .presence-picker__options > button:hover {
   border-color: var(--synthetic-line-strong);
@@ -2352,8 +2389,10 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   transform: translateX(2px);
 }
 .mila-surface--app[data-route="/darshan"] .presence-picker__options > button.is-selected {
-  border-color: var(--synthetic-magenta);
-  box-shadow: inset 3px 0 0 var(--synthetic-magenta),0 0 24px rgba(255,46,145,.07);
+  border-color: var(--option-accent);
+  box-shadow:
+    inset 3px 0 0 var(--option-accent),
+    0 0 24px color-mix(in srgb,var(--option-accent) 12%,transparent);
 }
 .mila-surface--app[data-route="/darshan"] .presence-picker__thumb {
   border-color: var(--synthetic-line);
@@ -2361,7 +2400,7 @@ body[data-bottom-nav] .mila-surface--app .chat-page__composer { margin-bottom: c
   box-shadow: 0 0 24px rgba(0,0,0,.34);
 }
 .mila-surface--app[data-route="/darshan"] .presence-picker__check {
-  color: var(--synthetic-magenta);
+  color: var(--option-accent);
 }
 .mila-surface--app .presence-picker__title {
   display: flex;

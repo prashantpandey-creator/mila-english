@@ -32,11 +32,17 @@ the honest alternative when Live is unavailable.
 - `public/avatar/presences/nocturne-v15/avatar.webp`
 - `public/avatar/presences/upper-body-v11/nocturne.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
+- `public/avatar/presences/aurelia-v1/avatar.webp`
+- `public/avatar/presences/aurelia-v1/expanded.webp`
+- `public/avatar/presences/sable-v1/avatar.webp`
+- `public/avatar/presences/sable-v1/expanded.webp`
+- `public/avatar/presences/iris-v1/avatar.webp`
+- `public/avatar/presences/iris-v1/expanded.webp`
 - `public/gia-og-v2.jpg`
 
-The four primary production assets are square WebPs intended for the circular
-diagnostic aperture. Nocturne also has a vertical 883×1782 WebP for the
-expanded portrait dialog.
+The seven primary production assets are square WebPs intended for the circular
+diagnostic aperture. Nocturne, Aurelia, Sable, and Iris also have vertical
+883×1782 WebPs for the expanded portrait dialog.
 
 Velvet is the illustrated option: a clearly adult anime-noir synthetic
 companion generated on 2026-07-24 with the built-in OpenAI image-generation
@@ -122,6 +128,16 @@ nose stays small and natural, and the mouth keeps a relaxed, believable shape
 with a softly defined upper lip. Long pitch-black hair now falls from a clean
 centre part without changing her body, dress, chamber, or synthetic details.
 Signal, Ember, and Velvet remain unchanged.
+
+The 2026-07-30 collection adds three original, clearly adult synthetic
+presences generated with the built-in OpenAI image-generation workflow:
+Aurelia uses pearl-gold light, champagne-blonde hair, and a warm, serene
+expression; Sable uses emerald-teal light, deep espresso waves, and a
+quietly powerful expression; Iris uses ultraviolet-silver light, a precise
+ink-black bob, and a self-possessed expression. Each source was exported as a
+768×768 aperture-safe WebP and a fully clothed 883×1782 expanded portrait.
+Their appearance does not select or alter Gia's voice, persona, conversation
+style, memory, privacy mode, or audio processing.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -375,6 +391,52 @@ person supplies the in-product voice.
 > anatomy, enlarged forehead, elongated or narrowed face, oversized nose,
 > plastic skin, or malformed features.
 
+### Aurelia v1
+
+> Create an original fictional adult synthetic companion named Aurelia for
+> Gia's production presence picker. Place one elegant adult woman in a
+> near-black circular diagnostic chamber with restrained pearl-gold signal
+> light. Give her a compact oval face, realistic warm-ivory skin, hazel-gold
+> eyes, small natural nose, balanced lips, subtle closed-mouth smile, and long
+> champagne-blonde hair. Add a fine gold temple interface, engineered neck
+> collar, and fully opaque black high-neck couture dress with gold micro-seams.
+> Use photorealistic cinematic 3D rendering, direct eye contact, correct adult
+> proportions and hands, and a vertical above-hair-to-below-knees frame that
+> supports both square and tall crops. No real-person likeness, text, logo,
+> watermark, nudity, transparent clothing, exaggerated anatomy, plastic skin,
+> armour, or malformed hands.
+
+### Sable v1
+
+> Create an original fictional adult synthetic companion named Sable for
+> Gia's production presence picker. Place one poised adult woman with
+> realistic deep warm-brown skin in a near-black circular diagnostic chamber
+> with restrained emerald-teal signal light. Give her a compact heart-oval
+> face, dark amber eyes, small natural nose, balanced full lips, calm
+> closed-mouth smile, and waist-length centre-parted espresso waves. Add fine
+> emerald cheek circuitry, an engineered neck interface, and a fully opaque
+> black high-neck couture dress with subtle emerald seams. Use photorealistic
+> cinematic 3D rendering, realistic curves, correct adult proportions and
+> hands, direct eye contact, and a vertical crop-safe frame. No real-person
+> likeness, text, logo, watermark, nudity, transparent clothing, exaggerated
+> anatomy, plastic skin, armour, or malformed hands.
+
+### Iris v1
+
+> Create an original fictional adult synthetic companion named Iris for Gia's
+> production presence picker. Place one self-possessed adult East Asian woman
+> in a near-black circular diagnostic chamber with restrained
+> ultraviolet-silver signal light. Give her a compact softly angular face,
+> realistic neutral-beige skin, dark-violet brown eyes, small straight nose,
+> balanced softly full lips, a quiet closed-mouth smile, and a glossy
+> ink-black geometric lob with a precise centre part. Add delicate
+> silver-violet temple circuitry, an engineered neck collar, and a fully
+> opaque graphite-black high-neck couture dress with ultraviolet seams. Use
+> photorealistic cinematic 3D rendering, direct eye contact, correct adult
+> proportions and hands, and a vertical crop-safe frame. No real-person
+> likeness, text, logo, watermark, nudity, transparent clothing, exaggerated
+> anatomy, plastic skin, armour, or malformed hands.
+
 ## Interface implementation
 
 - `src/components/voice/MilaPresence.tsx` owns the aperture, 32-segment radial
@@ -388,7 +450,7 @@ person supplies the in-product voice.
   an opt-in `synthetic` shader variant for Darshan.
 - `src/app/inner-theme.css` scopes the dark chamber to `/darshan`; the rest of
   Mila remains on the Mineral Paper system.
-- `src/lib/presences.ts` is the closed four-presence catalogue and points only
+- `src/lib/presences.ts` is the closed seven-presence catalogue and points only
   at the documented production assets.
 
 ## Local verification
@@ -397,8 +459,9 @@ person supplies the in-product voice.
 - All 102 tests pass.
 - The production build passes.
 - Desktop and 390×844 visual checks show no horizontal or vertical overflow.
-- The picker keeps Signal, Ember, and Velvet on their prior production assets;
-  Nocturne resolves to v15 and its separate upper-body expansion.
+- The picker keeps Signal, Ember, Nocturne, and Velvet on their prior
+  production assets and adds Aurelia, Sable, and Iris as distinct SYN-05
+  through SYN-07 options with separate upper-body expansions.
 - Selecting `Start Gia Live free` from the expanded portrait opens the
   no-payment consent dialog before any microphone action.
 - No microphone was activated during visual verification.

@@ -101,6 +101,7 @@ export function PresencePortraitDialog({
               ? `Джиа, образ ${lookName}: расширенный портрет синтетического взрослого ИИ-персонажа`
               : `Gia, ${lookName}: expanded portrait of a synthetic adult AI character`}
             draggable={false}
+            style={{ objectPosition: presence.expandedObjectPosition }}
           />
           <span className="presence-portrait-dialog__scan" aria-hidden="true" />
           <span className="presence-portrait-dialog__index" aria-hidden="true">
