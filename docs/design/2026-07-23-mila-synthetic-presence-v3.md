@@ -29,8 +29,8 @@ the honest alternative when Live is unavailable.
 
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v14/avatar.webp`
-- `public/avatar/presences/upper-body-v10/nocturne.webp`
+- `public/avatar/presences/nocturne-v13/avatar.webp`
+- `public/avatar/presences/upper-body-v9/nocturne.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
 - `public/gia-og-v2.jpg`
 
@@ -115,14 +115,6 @@ Nocturne image is secondary only for the black-violet chamber, porcelain-fair
 warm complexion, pitch-black hair, restrained cheek circuitry, engineered
 neck interface, and opaque cyber-noir wardrobe treatment. Signal, Ember, and
 Velvet remain unchanged.
-
-Nocturne v14 preserves the corrected v13 identity and proportions while
-refining only the hair and subtle facial finish. Her pitch-black hair now has a
-smooth true centre part, natural root volume, face-framing sections, and a
-silky straight fall past the waist. Her upper lip is modestly fuller with a
-defined natural cupid's bow, balanced against the lower lip and a restrained
-warm expression. The nose, head shape, body, pose, dress, cybernetics, chamber,
-and the other three presences remain unchanged.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -358,25 +350,6 @@ person supplies the in-product voice.
 > and understated luxury. Exclude text, event backdrop, copied tattoos, extra
 > people, exaggerated anatomy, plastic skin, transparency, nudity, gore,
 > armour, and malformed hands.
-
-### Nocturne v14 hair and upper-lip refinement
-
-> Image 1 is the edit target and remains authoritative for Gia Nocturne's
-> identity, corrected compact face and body proportions, pose, wardrobe,
-> cybernetic details, chamber, lighting, and composition. Image 2 remains the
-> supporting identity reference. Change only the hair and subtle facial beauty
-> finish. Replace the swept-back crown with a smooth true centre part; render
-> pitch-black, pin-straight, naturally dense hair falling symmetrically past
-> the waist, with soft face-framing sections, realistic individual strands,
-> gentle root volume, graphite highlights, and restrained violet rim light.
-> Make the upper lip about 12–15% fuller with a graceful cupid's bow, natural
-> rose colour, realistic texture, and balance with the lower lip. Preserve her
-> compact oval head, forehead, eyes, brows, small nose, cheeks, jaw, chin,
-> adult stature, silhouette, arms, hands, dress, neck interface, cheek
-> circuitry, chamber, and framing. Avoid a bouffant, ponytail, helmet hair,
-> artificial hairline, wig texture, identity replacement, reshaped face,
-> overfilled lips, pout, duck lips, painted liner, open mouth, teeth, plastic
-> skin, anatomy changes, text, logos, or watermarks.
 
 ## Interface implementation
 
