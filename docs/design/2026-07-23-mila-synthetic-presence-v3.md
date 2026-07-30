@@ -29,8 +29,8 @@ the honest alternative when Live is unavailable.
 
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v12/avatar.webp`
-- `public/avatar/presences/upper-body-v8/nocturne.webp`
+- `public/avatar/presences/nocturne-v13/avatar.webp`
+- `public/avatar/presences/upper-body-v9/nocturne.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
 - `public/gia-og-v2.jpg`
 
@@ -106,6 +106,15 @@ identity, apartment, pose, and jewellery were explicitly excluded. Nocturne's
 approved fictional v10 face, smaller nose, natural smile, porcelain-fair
 peach-rose colour, straight black hair, cybernetics, opaque high-neck dress,
 and violet-black chamber remain authoritative.
+
+Nocturne v13 corrects the reference mismatch in v12. The project owner's
+separate dark-haired woman-in-black screenshot is now the primary reference
+for facial geometry, compact head proportions, smaller natural nose, poised
+expression, adult body scale, and long black dress silhouette. The prior
+Nocturne image is secondary only for the black-violet chamber, porcelain-fair
+warm complexion, pitch-black hair, restrained cheek circuitry, engineered
+neck interface, and opaque cyber-noir wardrobe treatment. Signal, Ember, and
+Velvet remain unchanged.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -318,6 +327,29 @@ person supplies the in-product voice.
 > clearly adult fictional woman; no text, logo, watermark, extra people,
 > anatomy errors, copied red-haired identity, CGI plasticity, or costume
 > armour.
+
+### Nocturne v13 corrected dark-haired reference
+
+> Image 1, the project owner's dark-haired woman in a long black dress, is the
+> primary authoritative reference for recognizable facial geometry and human
+> proportions: compact oval face, short forehead-to-chin length, naturally
+> arched brows, almond-shaped eyes, small straight refined nose, balanced full
+> lips, softly defined cheekbones and jaw, petite chin, natural adult stature,
+> narrow shoulders, slim waist, curvy hips, realistic head-to-body ratio,
+> poised stance, and subtle natural expression. Image 2 is secondary and
+> authoritative only for Gia's product-world styling: pitch-black long hair,
+> porcelain-fair skin with healthy peach-rose colour, restrained violet cheek
+> circuitry, engineered neck interface, opaque black cyber-noir dress,
+> near-black circular chamber, and violet rim light. Do not preserve Image 2's
+> longer face or elongated body proportions where they conflict with Image 1.
+> Render one adult woman with a compact head, modest forehead, small natural
+> nose, softly smiling eyes, and a gentle believable closed-mouth expression.
+> Use Image 1's compact adult stature and dress silhouette, arms relaxed at the
+> sides, correct hands, and a frame from above the hair to below the knees.
+> Preserve realistic skin and fabric, an 85 mm cinematic portrait perspective,
+> and understated luxury. Exclude text, event backdrop, copied tattoos, extra
+> people, exaggerated anatomy, plastic skin, transparency, nudity, gore,
+> armour, and malformed hands.
 
 ## Interface implementation
 
