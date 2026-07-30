@@ -29,13 +29,13 @@ the honest alternative when Live is unavailable.
 
 - `public/avatar/presences/mila-v3/avatar.webp`
 - `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v11/avatar.webp`
-- `public/avatar/presences/upper-body-v7/nocturne.webp`
+- `public/avatar/presences/nocturne-v12/avatar.webp`
+- `public/avatar/presences/upper-body-v8/nocturne.webp`
 - `public/avatar/presences/velvet-v1/avatar.webp`
 - `public/gia-og-v2.jpg`
 
 The four primary production assets are square WebPs intended for the circular
-diagnostic aperture. Nocturne also has a vertical 862×1825 WebP for the
+diagnostic aperture. Nocturne also has a vertical 883×1782 WebP for the
 expanded portrait dialog.
 
 Velvet is the illustrated option: a clearly adult anime-noir synthetic
@@ -96,6 +96,16 @@ and lower-body length are reduced coherently while her natural-sized head,
 approved v10 face and nose, mature curves, dress design, pose, cybernetics,
 lighting, and chamber remain intact. The composition leaves more surrounding
 space so the reduced height is visible without childlike or distorted anatomy.
+
+Nocturne v12 supersedes that shortened interpretation. It returns to a
+frame-filling, naturally proportioned adult fashion portrait and uses the
+project owner's original woman-in-black photograph only as a reference for
+believable stature, torso-to-leg balance, simple black silhouette, and
+grounded photographic character. The real woman's face, auburn hair,
+identity, apartment, pose, and jewellery were explicitly excluded. Nocturne's
+approved fictional v10 face, smaller nose, natural smile, porcelain-fair
+peach-rose colour, straight black hair, cybernetics, opaque high-neck dress,
+and violet-black chamber remain authoritative.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -281,6 +291,34 @@ person supplies the in-product voice.
 > and vertical frame. Avoid an oversized head, shortened neck, childlike,
 > teenage, chibi, compressed, squat, distorted, or stretched anatomy.
 
+### Nocturne v12 original-reference proportions
+
+> Image 1 is authoritative for the fictional Gia Nocturne identity: preserve
+> her exact established adult face, shorter well-proportioned head, small
+> refined nose, warm brown eyes, gentle natural smile, porcelain-fair skin
+> with healthy peach-rose warmth, long pitch-black straight centre-parted
+> hair, subtle violet-magenta cheek circuitry, temple seam, engineered neck
+> interface, near-black concentric violet chamber, and cinematic lighting.
+> Image 2 is authoritative only for believable natural adult stature,
+> torso-to-leg balance, shoulder/waist/hip proportions, grounded full-frame
+> photographic realism, simple black fashion silhouette, and head-to-thigh
+> framing. Do not copy Image 2's face, red hair, identity, apartment
+> background, pose, or jewellery. Rebuild Nocturne with Image 2's naturally
+> proportioned adult stature instead of the rejected shortened,
+> small-in-frame version. Use a poised straight-on luxury editorial stance
+> with relaxed shoulders and both arms resting naturally at her sides,
+> correct anatomy, and a realistic balanced silhouette. She should fill the
+> portrait confidently from above the hair to mid-thigh, with enough margin
+> for the existing square face crop and no excessive empty space. Dress her
+> in an elegant fully opaque fitted black high-neck sleeveless cyber-noir
+> dress with restrained seam detailing. Keep the chamber ring centred behind
+> her head and shoulders. Render high-end cinematic photorealism with real
+> skin pores, flyaway hairs, subtle asymmetry, realistic lens depth, a soft
+> beauty key, graphite shadow, and restrained violet-magenta rim light. One
+> clearly adult fictional woman; no text, logo, watermark, extra people,
+> anatomy errors, copied red-haired identity, CGI plasticity, or costume
+> armour.
+
 ## Interface implementation
 
 - `src/components/voice/MilaPresence.tsx` owns the aperture, 32-segment radial
@@ -304,7 +342,7 @@ person supplies the in-product voice.
 - The production build passes.
 - Desktop and 390×844 visual checks show no horizontal or vertical overflow.
 - The picker keeps Signal, Ember, and Velvet on their prior production assets;
-  Nocturne resolves to v11 and its separate upper-body expansion.
+  Nocturne resolves to v12 and its separate upper-body expansion.
 - Selecting `Start Gia Live free` from the expanded portrait opens the
   no-payment consent dialog before any microphone action.
 - No microphone was activated during visual verification.
