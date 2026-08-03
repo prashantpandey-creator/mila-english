@@ -488,3 +488,204 @@
     transition: none;
   }
 }
+
+/* Sensual editorial noir atmosphere */
+.gia-home {
+  --gia-home-rose: #ff3f8d;
+  --gia-home-teal: #ffadc8;
+  isolation: isolate;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .022) 1px, transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(rgba(255, 255, 255, .016) 1px, transparent 1px) 0 0 / 72px 72px,
+    radial-gradient(circle at 75% 46%, rgba(255, 56, 132, .13), transparent 27rem),
+    radial-gradient(circle at 6% 70%, rgba(125, 16, 54, .18), transparent 28rem),
+    linear-gradient(135deg, #06070b 0%, #08040a 52%, #10040b 100%);
+}
+
+.gia-home::before,
+.gia-home::after {
+  position: fixed;
+  inset: -28vmax;
+  content: '';
+  pointer-events: none;
+}
+
+.gia-home::before {
+  z-index: -2;
+  opacity: .78;
+  background:
+    conic-gradient(from 215deg at 72% 48%, transparent 0 19%, rgba(255, 45, 127, .2) 25%, transparent 36% 58%, rgba(255, 174, 194, .12) 65%, transparent 74%),
+    radial-gradient(ellipse at 75% 49%, rgba(255, 54, 130, .18), transparent 27%),
+    radial-gradient(ellipse at 54% 120%, rgba(123, 9, 55, .31), transparent 42%);
+  filter: blur(42px);
+  mix-blend-mode: screen;
+  transform-origin: 72% 48%;
+  animation: giaLiquidSilk 18s ease-in-out infinite alternate;
+}
+
+.gia-home::after {
+  z-index: -1;
+  opacity: .38;
+  background-image:
+    radial-gradient(circle, rgba(255, 170, 196, .72) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(255, 55, 133, .48) 0 1px, transparent 1.5px),
+    linear-gradient(112deg, transparent 42%, rgba(255, 255, 255, .035) 49%, transparent 55%);
+  background-position: 0 0, 43px 67px, 0 0;
+  background-size: 151px 151px, 233px 233px, 100% 100%;
+  animation: giaEmberDrift 30s linear infinite;
+}
+
+.gia-home__glow--rose {
+  background: rgba(255, 37, 121, .24);
+  filter: blur(18px);
+  animation: giaGlowBreathe 8s ease-in-out infinite;
+}
+
+.gia-home__glow--teal {
+  background: rgba(255, 155, 188, .12);
+  filter: blur(24px);
+  animation: giaGlowBreathe 11s ease-in-out -4s infinite reverse;
+}
+
+.gia-home__copy::before {
+  position: absolute;
+  top: -18%;
+  left: -28%;
+  z-index: -1;
+  width: 78%;
+  height: 138%;
+  content: '';
+  pointer-events: none;
+  background: radial-gradient(ellipse, rgba(255, 52, 129, .09), transparent 68%);
+  filter: blur(20px);
+  animation: giaCopyAura 7s ease-in-out infinite;
+}
+
+.gia-home h1 {
+  text-shadow:
+    0 0 46px rgba(255, 203, 218, .07),
+    0 12px 80px rgba(255, 45, 124, .08);
+}
+
+.gia-home__button--primary {
+  color: #17050d;
+  background: linear-gradient(118deg, #ffd1df 0%, #ff7ead 37%, #ff3f8d 72%, #ff735f 115%);
+  box-shadow:
+    0 20px 54px rgba(255, 48, 127, .28),
+    0 0 0 1px rgba(255, 255, 255, .42) inset;
+  animation: giaInvitationPulse 4.8s ease-in-out infinite;
+}
+
+.gia-home__button--primary:hover {
+  box-shadow:
+    0 25px 66px rgba(255, 48, 127, .4),
+    0 0 26px rgba(255, 140, 176, .2);
+}
+
+.gia-home__button--secondary {
+  border-color: rgba(255, 155, 189, .24);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(255, 59, 139, .055));
+  box-shadow: 0 14px 44px rgba(0, 0, 0, .32);
+}
+
+.gia-home__portrait-shell::before {
+  position: absolute;
+  inset: -9%;
+  z-index: -1;
+  content: '';
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    conic-gradient(from 40deg, transparent, rgba(255, 55, 133, .25), transparent 31%, rgba(255, 190, 208, .12), transparent 62%);
+  filter: blur(22px);
+  animation: giaHaloTurn 20s linear infinite;
+}
+
+.gia-home__portrait-orbit {
+  border-color: rgba(255, 149, 184, .29);
+  box-shadow:
+    0 0 0 2.8rem rgba(255, 255, 255, .011),
+    0 0 0 2.85rem rgba(255, 47, 128, .105),
+    0 0 95px rgba(255, 55, 133, .16);
+  animation: giaOrbitBreathe 9s ease-in-out infinite;
+}
+
+.gia-home__portrait {
+  border-color: rgba(255, 190, 207, .28);
+  box-shadow:
+    0 34px 100px rgba(0, 0, 0, .68),
+    0 0 48px rgba(255, 50, 132, .14),
+    0 0 0 1px rgba(255, 230, 237, .08) inset;
+}
+
+.gia-home__portrait img {
+  filter: saturate(1.08) contrast(1.035);
+  transition: transform 1.4s cubic-bezier(.2, .7, .2, 1), filter 1.4s ease;
+}
+
+.gia-home__portrait-shell:hover .gia-home__portrait img {
+  filter: saturate(1.16) contrast(1.055);
+  transform: scale(1.065);
+}
+
+.gia-home__presence {
+  border-color: rgba(255, 162, 190, .2);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .38), 0 0 24px rgba(255, 51, 131, .08);
+}
+
+.gia-home__presence span {
+  background: #ff5f9d;
+  box-shadow: 0 0 18px rgba(255, 71, 144, .9);
+  animation: giaPresenceBeat 2.8s ease-in-out infinite;
+}
+
+@keyframes giaLiquidSilk {
+  0% { transform: rotate(-5deg) scale(.97) skewX(-2deg); opacity: .58; }
+  100% { transform: rotate(7deg) scale(1.08) skewX(3deg); opacity: .92; }
+}
+
+@keyframes giaEmberDrift {
+  to { background-position: 151px -151px, -190px 300px, 0 0; }
+}
+
+@keyframes giaGlowBreathe {
+  0%, 100% { opacity: .62; transform: scale(.92); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+@keyframes giaCopyAura {
+  0%, 100% { opacity: .45; transform: translate3d(-2%, 1%, 0) scale(.94); }
+  50% { opacity: .88; transform: translate3d(3%, -2%, 0) scale(1.08); }
+}
+
+@keyframes giaInvitationPulse {
+  0%, 100% { box-shadow: 0 20px 54px rgba(255, 48, 127, .25), 0 0 0 1px rgba(255, 255, 255, .42) inset; }
+  50% { box-shadow: 0 24px 68px rgba(255, 48, 127, .42), 0 0 30px rgba(255, 141, 177, .15), 0 0 0 1px rgba(255, 255, 255, .52) inset; }
+}
+
+@keyframes giaHaloTurn {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes giaOrbitBreathe {
+  0%, 100% { transform: scale(.985); filter: brightness(.9); }
+  50% { transform: scale(1.02); filter: brightness(1.18); }
+}
+
+@keyframes giaPresenceBeat {
+  0%, 100% { transform: scale(.86); opacity: .72; }
+  45% { transform: scale(1.18); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gia-home::before,
+  .gia-home::after,
+  .gia-home__glow,
+  .gia-home__copy::before,
+  .gia-home__button--primary,
+  .gia-home__portrait-shell::before,
+  .gia-home__portrait-orbit,
+  .gia-home__presence span {
+    animation: none !important;
+  }
+}
