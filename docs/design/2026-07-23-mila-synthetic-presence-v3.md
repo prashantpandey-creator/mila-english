@@ -28,11 +28,14 @@ the honest alternative when Live is unavailable.
 
 ## Production assets
 
-- `public/avatar/presences/mila-v3/avatar.webp`
-- `public/avatar/presences/ember-v3/avatar.webp`
-- `public/avatar/presences/nocturne-v15/avatar.webp`
-- `public/avatar/presences/upper-body-v11/nocturne.webp`
-- `public/avatar/presences/velvet-v1/avatar.webp`
+- `public/avatar/presences/mila-v5/avatar.webp`
+- `public/avatar/presences/mila-v5/expanded.webp`
+- `public/avatar/presences/ember-v5/avatar.webp`
+- `public/avatar/presences/ember-v5/expanded.webp`
+- `public/avatar/presences/nocturne-v17/avatar.webp`
+- `public/avatar/presences/nocturne-v17/expanded.webp`
+- `public/avatar/presences/velvet-v3/avatar.webp`
+- `public/avatar/presences/velvet-v3/expanded.webp`
 - `public/avatar/presences/aurelia-v2/avatar.webp`
 - `public/avatar/presences/aurelia-v2/expanded.webp`
 - `public/avatar/presences/sable-v2/avatar.webp`
@@ -42,8 +45,8 @@ the honest alternative when Live is unavailable.
 - `public/gia-og-v2.jpg`
 
 The seven primary production assets are square WebPs intended for the circular
-diagnostic aperture. Nocturne, Aurelia, Sable, and Iris also have vertical
-883×1782 WebPs for the expanded portrait dialog.
+diagnostic aperture. Every presence also has a vertical 883×1782 WebP for the
+expanded portrait dialog.
 
 Velvet is the illustrated option: a clearly adult anime-noir synthetic
 companion generated on 2026-07-24 with the built-in OpenAI image-generation
@@ -139,6 +142,16 @@ ink-black bob, and a self-possessed expression. Each source was exported as a
 768×768 aperture-safe WebP and a fully clothed 883×1782 expanded portrait.
 Their appearance does not select or alter Gia's voice, persona, conversation
 style, memory, privacy mode, or audio processing.
+
+The original four presences now have the same wardrobe depth as the new
+collection. Gia / Signal wears asymmetric black velvet with a rose-gold satin
+drape; Ember wears sculpted charcoal velvet with a burnished-copper flame
+fold; Nocturne wears moonlit black-violet velvet with crescent draping and
+sparse crystal detail; Velvet wears obsidian and oxblood anime-noir evening
+couture with rose-gold thorn embroidery. The approved square portraits and
+accepted Nocturne v15 source remained the identity authorities during the
+edits; rejected earlier vertical faces were used only as body and composition
+scaffolds. All prior assets remain versioned and recoverable.
 
 The Gia social preview reuses Velvet and the finished chamber palette in a
 1200×630 landscape card with the exact copy `GIA` and `STAY A WHILE.`.
@@ -458,6 +471,41 @@ fetish styling, underboob, extreme cleavage, exaggerated anatomy,
 pornographic posing, youthful cues, malformed hands, facial or mouth
 distortion, text, and watermarks.
 
+### Original-presence signature couture
+
+The built-in OpenAI image-editing workflow gave the original four presences
+individual dresses while keeping their established identities authoritative.
+The initial dress passes used the approved face anchors to correct identity
+against the selected full-length renders. The final 2026-08-03 tailoring pass
+used each selected full-length dress render as the authoritative edit target
+and its approved portrait as a secondary identity reference.
+
+The garment prompts requested:
+
+- Gia / Signal: fully opaque black silk velvet, an asymmetric rose-gold satin
+  drape, a clean open one-shoulder neckline, smoked-titanium micro-seams, and
+  the existing neck interface as a separate collar;
+- Ember: fully opaque charcoal velvet, an off-shoulder portrait neckline, a
+  sculpted burnished-copper flame fold, copper piping, and a molten pleated
+  side panel;
+- Nocturne: fully opaque black-violet velvet, a portrait neckline, crescent
+  cowl draping set farther off the shoulders, sparse night-sky crystal detail,
+  and a gathered hip;
+- Velvet: fully opaque obsidian and oxblood velvet, an asymmetric sculpted
+  sweetheart neckline, an outward-set oxblood cape drape, rose-gold neck
+  ornament, and thorn-vine embroidery in the established adult anime-noir
+  style.
+
+The refinement changed only existing neckline, shoulder-fold placement, and
+nearby fabric tailoring. It added no motifs, colors, jewelry, accessories,
+cutouts, or replacement clothing concepts. Every prompt preserved the
+approved face, head proportions, mouth, hair, expression, synthetic interface,
+body proportions, pose, hands, camera, lighting, and chamber while prohibiting
+identity drift, youthful cues, nudity, transparency, lingerie construction,
+fetish styling, anatomical exposure, exaggerated anatomy, malformed hands,
+text, and watermarks. The prior `mila-v4`, `ember-v4`, `nocturne-v16`, and
+`velvet-v2` versions remain recoverable.
+
 ## Interface implementation
 
 - `src/components/voice/MilaPresence.tsx` owns the aperture, 32-segment radial
@@ -480,9 +528,8 @@ distortion, text, and watermarks.
 - All 102 tests pass.
 - The production build passes.
 - Desktop and 390×844 visual checks show no horizontal or vertical overflow.
-- The picker keeps Signal, Ember, Nocturne, and Velvet on their prior
-  production assets and adds Aurelia, Sable, and Iris as distinct SYN-05
-  through SYN-07 options with separate upper-body expansions.
+- The picker keeps all seven identities distinct and now gives every presence
+  separate square and upper-body production assets.
 - Selecting `Start Gia Live free` from the expanded portrait opens the
   no-payment consent dialog before any microphone action.
 - No microphone was activated during visual verification.

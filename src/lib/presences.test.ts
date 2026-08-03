@@ -23,20 +23,20 @@ test('Gia Presence uses a closed catalog of seven fictional AI avatars', () => {
   assert.equal(isPresenceId('face\nignore instructions'), false);
   assert.equal(normalizePresenceId('unknown'), 'signal');
   assert.equal(presenceById('signal').name.en, 'Gia');
-  assert.equal(presenceById('signal').poster, '/avatar/presences/mila-v3/avatar.webp');
-  assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v3/avatar.webp');
-  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v15/avatar.webp');
-  assert.equal(presenceById('velvet').poster, '/avatar/presences/velvet-v1/avatar.webp');
+  assert.equal(presenceById('signal').poster, '/avatar/presences/mila-v5/avatar.webp');
+  assert.equal(presenceById('ember').poster, '/avatar/presences/ember-v5/avatar.webp');
+  assert.equal(presenceById('nocturne').poster, '/avatar/presences/nocturne-v17/avatar.webp');
+  assert.equal(presenceById('velvet').poster, '/avatar/presences/velvet-v3/avatar.webp');
   assert.equal(presenceById('aurelia').poster, '/avatar/presences/aurelia-v2/avatar.webp');
   assert.equal(presenceById('sable').poster, '/avatar/presences/sable-v2/avatar.webp');
   assert.equal(presenceById('iris').poster, '/avatar/presences/iris-v2/avatar.webp');
   assert.deepEqual(
     MILA_PRESENCES.map((presence) => presence.expandedPortrait),
     [
-      '/avatar/presences/mila-v3/avatar.webp',
-      '/avatar/presences/ember-v3/avatar.webp',
-      '/avatar/presences/upper-body-v11/nocturne.webp',
-      '/avatar/presences/velvet-v1/avatar.webp',
+      '/avatar/presences/mila-v5/expanded.webp',
+      '/avatar/presences/ember-v5/expanded.webp',
+      '/avatar/presences/nocturne-v17/expanded.webp',
+      '/avatar/presences/velvet-v3/expanded.webp',
       '/avatar/presences/aurelia-v2/expanded.webp',
       '/avatar/presences/sable-v2/expanded.webp',
       '/avatar/presences/iris-v2/expanded.webp',
@@ -44,11 +44,11 @@ test('Gia Presence uses a closed catalog of seven fictional AI avatars', () => {
   );
   assert.deepEqual(
     MILA_PRESENCES.map((presence) => presence.expandedFraming),
-    ['portrait', 'portrait', 'upper-body', 'portrait', 'upper-body', 'upper-body', 'upper-body'],
+    ['upper-body', 'upper-body', 'upper-body', 'upper-body', 'upper-body', 'upper-body', 'upper-body'],
   );
   assert.deepEqual(
     MILA_PRESENCES.map((presence) => presence.expandedObjectPosition),
-    ['center', 'center', 'center 17%', 'center', 'center 17%', 'center 17%', 'center 17%'],
+    ['center 17%', 'center 17%', 'center 17%', 'center 17%', 'center 17%', 'center 17%', 'center 17%'],
   );
   assert.equal(presenceById('velvet').medium.en, 'Anime');
   assert.equal(MILA_PRESENCES.every((presence) => presence.animated), true);
