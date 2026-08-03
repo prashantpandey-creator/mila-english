@@ -103,9 +103,9 @@ export default function LoginPage() {
     <div className="welcome-auth welcome-auth--login" style={welcomeTheme}>
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
-          <a href="/" className="welcome-auth__brand" aria-label={isGia ? 'Back to Gia' : 'FluentMitra home'}>
+          <a href="/" className="welcome-auth__brand" aria-label={isGia ? 'Back to Gia' : 'Mila home'}>
             <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'F'}</span>
-            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'FluentMitra'}</span>
+            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila'}</span>
           </a>
           {isGia ? <LangToggle /> : <span className="welcome-auth__market">India · English</span>}
         </div>
@@ -119,7 +119,7 @@ export default function LoginPage() {
             <h1 className="welcome-auth__title">
               {isGia
                 ? (lang === 'ru' ? 'Продолжить в Gia' : 'Continue to Gia')
-                : 'Continue to FluentMitra'}
+                : 'Continue to Mila'}
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
@@ -144,7 +144,7 @@ export default function LoginPage() {
               <input id="login-password" name="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="welcome-auth__input" placeholder="••••••••" autoComplete="current-password" maxLength={128} required />
               <a href="/forgot-password" className="welcome-auth__field-link">{isGia && lang === 'ru' ? 'Забыли пароль?' : 'Forgot password?'}</a>
             </div>
-            <button type="submit" disabled={loading} className="welcome-auth__button welcome-auth__button--primary">{loading ? '...' : isGia ? t('login_btn') : 'Sign in to FluentMitra'}</button>
+            <button type="submit" disabled={loading} className="welcome-auth__button welcome-auth__button--primary">{loading ? '...' : isGia ? t('login_btn') : 'Sign in to Mila'}</button>
             <div className="welcome-auth__separator">{isGia && lang==='ru'?'или':'or'}</div>
             <button type="button" onClick={handleGuestLogin} disabled={loading}
               className="welcome-auth__button welcome-auth__button--secondary">
@@ -161,11 +161,11 @@ export default function LoginPage() {
                     : 'A guest session is private: chats aren’t saved. Sign up to keep your history.')
                 : nativeLanguage
                   ? `Guest learning will use ${nativeLanguage} for explanations. Sign up to keep progress across devices.`
-                  : 'Choose your native language on the FluentMitra home page before entering as a guest.'}
+                  : 'Choose your native language on the Mila home page before entering as a guest.'}
             </p>
           </form>
           <p className="welcome-auth__footer">
-            {isGia ? t('login_no_account') : 'New to FluentMitra?'} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}${!isGia && nativeLanguage ? `&nativeLanguage=${encodeURIComponent(nativeLanguage)}` : ''}`} className="welcome-auth__link">{isGia ? t('login_create') : 'Create an account'}</a>
+            {isGia ? t('login_no_account') : 'New to Mila?'} <a href={`/register?returnTo=${encodeURIComponent(returnTo)}${!isGia && nativeLanguage ? `&nativeLanguage=${encodeURIComponent(nativeLanguage)}` : ''}`} className="welcome-auth__link">{isGia ? t('login_create') : 'Create an account'}</a>
           </p>
           <p className="welcome-auth__legal"><a href="/terms">{isGia && lang === 'ru' ? 'Условия' : 'Terms'}</a><span>·</span><a href="/privacy">{isGia && lang === 'ru' ? 'Конфиденциальность' : 'Privacy'}</a></p>
         </div>

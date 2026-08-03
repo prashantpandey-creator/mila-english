@@ -118,7 +118,7 @@ export async function beginCheckout(input: {
     userId: user.id,
     customerEmail: user.email,
     returnUrl,
-    productLabel: isGiaHostname(new URL(returnOrigin).host) ? 'Gia Live access' : 'FluentMitra Pro access',
+    productLabel: isGiaHostname(new URL(returnOrigin).host) ? 'Gia Live access' : 'Mila Pro access',
   });
   const checkoutUrl = remote.confirmation?.confirmation_url;
   if (!remote.id || !checkoutUrl) throw new BillingError('CHECKOUT_UNAVAILABLE', 'The payment page did not open. Try again.', 502);

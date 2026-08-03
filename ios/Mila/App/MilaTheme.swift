@@ -52,7 +52,7 @@ struct MilaMark: View {
             .resizable()
             .scaledToFit()
             .frame(width: size, height: size)
-            .accessibilityLabel("FluentMitra")
+            .accessibilityLabel("Mila")
     }
 }
 
@@ -61,7 +61,7 @@ struct MilaWordmark: View {
         HStack(spacing: 10) {
             MilaMark(size: 42)
             VStack(alignment: .leading, spacing: 0) {
-                Text("FluentMitra")
+                Text("Mila")
                     .font(.system(size: 25, weight: .black, design: .rounded))
                     .foregroundStyle(Color.milaCream)
                 Text("ENGLISH STUDIO")

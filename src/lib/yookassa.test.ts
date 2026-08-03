@@ -31,7 +31,7 @@ test('YooKassa checkout keeps price and product metadata server-side', async () 
       userId: 42,
       customerEmail: 'learner@example.com',
       returnUrl: 'https://mila.example/billing/return?purchase=purchase-1',
-      productLabel: 'FluentMitra Pro access',
+      productLabel: 'Mila Pro access',
     });
     assert.ok(request);
     const captured = request as { url: string; init?: RequestInit };
@@ -45,8 +45,8 @@ test('YooKassa checkout keeps price and product metadata server-side', async () 
     assert.equal(body.confirmation.return_url, 'https://mila.example/billing/return?purchase=purchase-1');
     assert.equal(body.receipt.customer.email, 'learner@example.com');
     assert.equal(body.receipt.items[0].vat_code, 1);
-    assert.equal(body.description, 'FluentMitra Pro access — 30 days (purchase-1)');
-    assert.equal(body.receipt.items[0].description, 'FluentMitra Pro access — 30 days');
+    assert.equal(body.description, 'Mila Pro access — 30 days (purchase-1)');
+    assert.equal(body.receipt.items[0].description, 'Mila Pro access — 30 days');
   } finally {
     globalThis.fetch = previousFetch;
     if (previousShop === undefined) delete process.env.YOOKASSA_SHOP_ID; else process.env.YOOKASSA_SHOP_ID = previousShop;

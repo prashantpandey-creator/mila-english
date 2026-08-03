@@ -6,7 +6,7 @@ import '../auth-recovery.css';
 
 export default function ForgotPasswordPage() {
   const product = useProduct();
-  const brand = product === 'gia' ? 'Gia' : 'FluentMitra';
+  const brand = product === 'gia' ? 'Gia' : 'Mila';
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);

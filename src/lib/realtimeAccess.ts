@@ -1,6 +1,6 @@
 import { GIA_LIVE_FREE_LAUNCH } from '@/lib/giaAccess';
 
-export type RealtimeMode = 'assessment' | 'companion' | 'gia' | 'pia' | 'tutor' | 'kids';
+export type RealtimeMode = 'assessment' | 'companion' | 'gia' | 'mia' | 'pia' | 'tutor' | 'kids';
 
 /**
  * Assessment, the legacy one-time companion preview, and Gia's free-first
@@ -15,6 +15,7 @@ export function realtimeModeRequiresPaid(
     mode === 'assessment'
     || mode === 'companion'
     || mode === 'kids'
+    || mode === 'mia'
     || (mode === 'gia' && GIA_LIVE_FREE_LAUNCH)
   ) return false;
   if (environment.NODE_ENV === 'production') return true;

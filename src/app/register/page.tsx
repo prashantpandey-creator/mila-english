@@ -132,9 +132,9 @@ export default function RegisterPage() {
     <div className="welcome-auth welcome-auth--register" style={welcomeTheme}>
       <nav className="welcome-auth__nav">
         <div className="welcome-auth__nav-inner">
-          <a href="/" className="welcome-auth__brand" aria-label={isGia ? 'Back to Gia' : 'FluentMitra home'}>
+          <a href="/" className="welcome-auth__brand" aria-label={isGia ? 'Back to Gia' : 'Mila home'}>
             <span className="welcome-auth__brand-mark">{isGia ? 'G' : 'F'}</span>
-            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'FluentMitra'}</span>
+            <span className="welcome-auth__brand-name">{isGia ? 'Gia' : 'Mila'}</span>
           </a>
           {isGia ? <LangToggle /> : <span className="welcome-auth__market">India · English</span>}
         </div>
@@ -148,7 +148,7 @@ export default function RegisterPage() {
             <h1 className="welcome-auth__title">
               {isGia
                 ? (lang === 'ru' ? 'Присоединиться к Gia' : 'Join Gia')
-                : 'Create your FluentMitra account'}
+                : 'Create your Mila account'}
             </h1>
             <p className="welcome-auth__subtitle">
               {isGia
@@ -220,7 +220,7 @@ export default function RegisterPage() {
                 ? '...'
                 : isGia
                   ? (lang === 'ru' ? 'Создать аккаунт Gia' : 'Create my Gia account')
-                  : 'Create my FluentMitra account'}
+                  : 'Create my Mila account'}
             </button>
             <div className="welcome-auth__separator">{isGia && lang==='ru'?'или':'or'}</div>
             <button type="button" onClick={handleGuestLogin} disabled={loading || (!isGia && !selectedLanguage)}

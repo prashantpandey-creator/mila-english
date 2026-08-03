@@ -28,11 +28,13 @@ export default function MiaBohoPage() {
         sceneNav: 'Места',
         cultureNav: 'Культура',
         howNav: 'Как это работает',
+        talkNav: 'Поговорить',
         eyebrow: 'ЯЗЫК ДЛЯ МЕСТ, КУДА ВЕДЁТ ЖИЗНЬ',
         title: 'Встречай мир',
         titleAccent: 'на его языке.',
         intro: 'Mia начинает не с урока, а с места. Почувствуй утро в Джайпуре, дождливый Убуд или ночной Токио — а затем выучи слова, которые действительно понадобятся там.',
         primary: 'Выбрать место',
+        talkAction: 'Поговорить с Mia',
         secondary: 'Посмотреть живые моменты',
         assurance: ['Индия и Бали в фокусе', 'Любой уровень', 'Работает на месте'],
         phraseLabel: 'Джайпур · 08:10',
@@ -75,11 +77,13 @@ export default function MiaBohoPage() {
         sceneNav: 'Places',
         cultureNav: 'Culture',
         howNav: 'How it works',
+        talkNav: 'Talk',
         eyebrow: 'LANGUAGE FOR WHERE LIFE TAKES YOU',
         title: 'Meet the world',
         titleAccent: 'in its own words.',
         intro: 'Mia begins with the place, not the lesson. Feel a Jaipur morning, rain-washed Ubud, or Tokyo after dark—then learn the words you will actually need there.',
         primary: 'Choose a place',
+        talkAction: 'Talk with Mia',
         secondary: 'Explore living moments',
         assurance: ['India & Bali in focus', 'Any confidence level', 'Useful on the ground'],
         phraseLabel: 'Jaipur · 08:10',
@@ -139,6 +143,7 @@ export default function MiaBohoPage() {
           <a href="#destinations">{copy.sceneNav}</a>
           <a href="#culture">{copy.cultureNav}</a>
           <a href="#how">{copy.howNav}</a>
+          <Link href="/talk">{copy.talkNav}</Link>
         </nav>
         <div className="mia-boho__nav-actions"><LangToggle /></div>
       </header>
@@ -150,10 +155,10 @@ export default function MiaBohoPage() {
             <h1 id="mia-hero-title">{copy.title}<em>{copy.titleAccent}</em></h1>
             <p className="mia-boho__hero-intro">{copy.intro}</p>
             <div className="mia-boho__actions">
-              <a className="mia-boho__button mia-boho__button--primary" href="#destinations">
-                {copy.primary}<MilaIcon name="arrow" size={19} />
-              </a>
-              <a className="mia-boho__button mia-boho__button--secondary" href="#moments">{copy.secondary}</a>
+              <Link className="mia-boho__button mia-boho__button--primary" href="/talk">
+                <MilaIcon name="voice" size={19} />{copy.talkAction}
+              </Link>
+              <a className="mia-boho__button mia-boho__button--secondary" href="#destinations">{copy.primary}</a>
             </div>
             <ul className="mia-boho__assurance" aria-label={lang === 'ru' ? 'Возможности Mia' : 'What Mia offers'}>
               {copy.assurance.map((item) => <li key={item}>{item}</li>)}

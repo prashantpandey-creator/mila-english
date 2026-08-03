@@ -90,7 +90,7 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
     setMessage(code === 'no-speech' || code === 'transcribe-empty'
       ? (lang==='ru'?'Микрофон не уловил английскую речь. Это технический результат, а не оценка уровня.':'The mic did not capture English speech. This is a technical result, not a level score.')
       : code === 'score-failed' || code === 'score-empty' || code === 'transcribe-failed'
-      ? (lang==='ru'?'Локальный сервис FluentMitra временно не смог обработать запись. Попробуй снова.':'FluentMitra could not process the recording just now. Please try again.')
+      ? (lang==='ru'?'Локальный сервис Mila временно не смог обработать запись. Попробуй снова.':'Mila could not process the recording just now. Please try again.')
       : code === 'auth-required'
       ? (lang==='ru'?'Сессия истекла. Войди снова, чтобы продолжить.':'Your session expired. Sign in again to continue.')
       : (lang==='ru'?'Проверь доступ к микрофону и попробуй снова.':'Check microphone permission and try again.'))
@@ -213,6 +213,6 @@ export default function LocalVoiceAssessment({ lang, busy, error, onComplete, on
           : <><MilaIcon name="voice" size={17}/>{lang==='ru'?'Начать запись':'Start recording'}</>}
       </button>}
     </div>
-    <p style={{fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #65535f)',margin:'14px auto 0',maxWidth:450}}>{lang==='ru'?'Аудио отправляется только на сервер FluentMitra, обрабатывается локальными моделями и удаляется сразу после запроса. Внешний AI-провайдер не используется.':'Audio goes only to FluentMitra, is processed by local models, and is deleted immediately after the request. No external AI provider is used.'}</p>
+    <p style={{fontSize:'0.75rem',lineHeight:1.5,color:'var(--mila-muted, #65535f)',margin:'14px auto 0',maxWidth:450}}>{lang==='ru'?'Аудио отправляется только на сервер Mila, обрабатывается локальными моделями и удаляется сразу после запроса. Внешний AI-провайдер не используется.':'Audio goes only to Mila, is processed by local models, and is deleted immediately after the request. No external AI provider is used.'}</p>
   </div>
 }

@@ -21,6 +21,7 @@ assert.strictEqual(buildRealtimeSession('assessment').max_output_tokens, undefin
 assert.strictEqual(buildRealtimeSession('tutor').model, 'gpt-realtime-2.1-mini', 'tutor → mini');
 assert.strictEqual(buildRealtimeSession('companion').model, 'gpt-realtime-2.1-mini', 'companion → mini');
 assert.strictEqual(buildRealtimeSession('gia').model, 'gpt-realtime-2.1-mini', 'Gia → mini');
+assert.strictEqual(buildRealtimeSession('mia').model, 'gpt-realtime-2.1-mini', 'Mia → mini');
 assert.strictEqual(buildRealtimeSession('tutor').max_output_tokens, 2048, 'chat → output cap');
 assert.strictEqual(buildRealtimeSession('gia').max_output_tokens, 2048, 'Gia → output cap');
 
@@ -38,13 +39,20 @@ assert.match(examiner.instructions, /priority/i);
 assert.strictEqual(buildRealtimeSession('tutor').audio.input.transcription.language, 'en', 'coach still pins English');
 assert.ok(!('language' in buildRealtimeSession('companion').audio.input.transcription), 'free companion auto-detects');
 assert.ok(!('language' in buildRealtimeSession('gia').audio.input.transcription), 'Gia auto-detects');
+assert.ok(!('language' in buildRealtimeSession('mia').audio.input.transcription), 'Mia auto-detects');
 assert.ok(!('language' in buildRealtimeSession('pia').audio.input.transcription), 'Pia auto-detects');
 const companion = buildRealtimeSession('companion');
 const gia = buildRealtimeSession('gia');
+const mia = buildRealtimeSession('mia');
 assert.strictEqual(companion.audio.output.voice, process.env.OPENAI_REALTIME_VOICE_GIA?.trim() || 'marin');
 assert.strictEqual(companion.audio.output.speed, 0.82);
 assert.strictEqual(gia.audio.output.voice, process.env.OPENAI_REALTIME_VOICE_GIA?.trim() || 'marin');
 assert.strictEqual(gia.audio.output.speed, 0.82);
+assert.strictEqual(mia.audio.output.voice, process.env.OPENAI_REALTIME_VOICE_MIA?.trim() || 'coral');
+assert.strictEqual(mia.audio.output.speed, 0.94);
+assert.match(mia.instructions, /You are Mia/);
+assert.match(mia.instructions, /travel-conversation companion/);
+assert.match(mia.instructions, /Never mention Gia, Mila/);
 assert.match(companion.instructions, /poised, intimate, grounded, and quietly mysterious/i);
 assert.match(companion.instructions, /noticeably more slowly than ordinary conversation/i);
 assert.match(companion.instructions, /brief natural pauses/i);

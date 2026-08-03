@@ -87,7 +87,7 @@ export default function PricingPage() {
             : T('Сначала почувствуй пользу. Потом решай.', 'Feel the value first. Then decide.')}</h1>
           <p>{isGia
             ? T('Gia Live и текстовый чат открыты бесплатно во время раннего доступа. Никакой оплаты сейчас — сначала почувствуй разговор.', 'Gia Live and text chat are free during early access. No payment now—experience the conversation first.')
-            : T('Основной путь FluentMitra остаётся бесплатным. Pro — это один прозрачный 30-дневный доступ без скрытого автопродления.', 'FluentMitra’s core path stays free. Pro is one transparent 30-day pass with no hidden auto-renewal.')}</p>
+            : T('Основной путь Mila остаётся бесплатным. Pro — это один прозрачный 30-дневный доступ без скрытого автопродления.', 'Mila’s core path stays free. Pro is one transparent 30-day pass with no hidden auto-renewal.')}</p>
         </div>
         <div className="pricing-grid">
           <article className={`pricing-card${isGia ? ' pricing-card--gia-free' : ''}`}>
@@ -112,7 +112,7 @@ export default function PricingPage() {
             <a className="pricing-cta" href={freeHref}>{isGia ? T('Начать Gia Live бесплатно', 'Start Gia Live free') : T('Продолжить бесплатно', 'Continue free')}</a>
           </article>
           <article className="pricing-card pricing-card--pro">
-            <span className="pricing-card__label">{isGia ? 'PRO · LATER' : 'FLUENTMITRA PRO'}</span>
+            <span className="pricing-card__label">{isGia ? 'PRO · LATER' : 'MILA PRO'}</span>
             <h2>{isGia ? T('Pro может подождать', 'Pro can wait') : T('Быстрее и лично для тебя', 'Faster and made for you')}</h2>
             <div className="pricing-card__price">{isGia ? T('Позже', 'Later') : price} <small>{isGia ? T('когда будет готов', 'when it is ready') : T('за 30 дней', 'for 30 days')}</small></div>
             {isGia ? (
@@ -151,7 +151,7 @@ export default function PricingPage() {
         <p className="pricing-note">
           {isGia
             ? T('Во время раннего доступа оплата не нужна. Live включается только после твоего согласия на передачу аудио и расшифровки в OpenAI.', 'No payment is needed during early access. Live starts only after you consent to sending microphone audio and transcripts to OpenAI.')
-            : T('Оплата проходит на защищённой странице ЮKassa. FluentMitra не видит и не хранит данные карты. Доступ не продлевается автоматически.', 'Payment happens on YooKassa’s secure page. FluentMitra never sees or stores card details. Access does not renew automatically.')}
+            : T('Оплата проходит на защищённой странице ЮKassa. Mila не видит и не хранит данные карты. Доступ не продлевается автоматически.', 'Payment happens on YooKassa’s secure page. Mila never sees or stores card details. Access does not renew automatically.')}
           {' '}<a href="/terms">{T('Условия', 'Terms')}</a>
           {!isGia ? <> · <a href="/refunds">{T('Возвраты', 'Refunds')}</a></> : null}
         </p>

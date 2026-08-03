@@ -1,7 +1,7 @@
 import { MILA_TARGET_LANGUAGE } from '@/lib/learningMarkets';
 
 /**
- * FluentMitra intentionally has one target. Native languages are support
+ * Mila intentionally has one target. Native languages are support
  * languages and live in learningMarkets.ts; they must never become a second
  * course target through a client-supplied chat value.
  */

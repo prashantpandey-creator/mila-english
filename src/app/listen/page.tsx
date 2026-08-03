@@ -114,7 +114,7 @@ export default function ListenPage() {
     const message = e?.message;
     const permissionDenied = e?.name === 'NotAllowedError' || message === 'permission-denied';
     setErrMsg(message === 'unsupported'
-      ? (lang==='ru' ? 'Этот браузер не поддерживает запись. Открой FluentMitra в Chrome или Safari.' : 'This browser cannot record audio. Open FluentMitra in Chrome or Safari.')
+      ? (lang==='ru' ? 'Этот браузер не поддерживает запись. Открой Mila в Chrome или Safari.' : 'This browser cannot record audio. Open Mila in Chrome or Safari.')
       : permissionDenied
       ? (lang==='ru' ? 'Нужен доступ к микрофону. Разреши его в настройках браузера — речь пока не оценивалась.' : 'Microphone permission is needed. Allow it in browser settings — your speech was not graded.')
       : message === 'no-speech'

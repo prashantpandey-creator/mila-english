@@ -5,6 +5,7 @@ import { buildRealtimeSession } from '@/lib/assessment';
 import { getUserPlan } from '@/lib/subscriptionStore';
 import { FEATURES, planUnlocks, resolvePlan } from '@/lib/subscription';
 import { realtimeModeRequiresPaid } from '@/lib/realtimeAccess';
+import { isRealtimeModeAllowedForHostname } from '@/lib/realtimeProductPolicy';
 import { prisma } from '@/lib/prisma';
 import {
   releaseVoicePreview,
@@ -50,15 +51,23 @@ export async function POST(req: Request) {
   const mode = rawMode === 'assessment' ? 'assessment'
     : rawMode === 'companion' ? 'companion'
     : rawMode === 'gia' || rawMode === 'miachat' ? 'gia'
+    : rawMode === 'mia' ? 'mia'
     : rawMode === 'pia' ? 'pia'
     : rawMode === 'kids' ? 'kids'
     : 'tutor';
+
+  if (
+    process.env.NODE_ENV === 'production'
+    && !isRealtimeModeAllowedForHostname(mode, req.headers.get('host'))
+  ) {
+    return errorResponse('This voice mode does not belong to this site.', 403, 'WRONG_PRODUCT_HOST');
+  }
 
   const user = await authenticate(new Request(req.url, { headers: req.headers }) as any);
   // Companion preview is tied to a durable registered/explicit-guest identity.
   // Pia and the legacy kids mode remain separate guest-open products. The
   // coach and assessment also require a signed-in learner at this boundary.
-  if (!user && mode !== 'pia' && mode !== 'kids') {
+  if (!user && mode !== 'mia' && mode !== 'pia' && mode !== 'kids') {
     return errorResponse('You must be logged in to start a voice session.', 401, 'UNAUTHORIZED');
   }
 
@@ -113,7 +122,7 @@ export async function POST(req: Request) {
   if (mode === 'companion') {
     const userId = Number(user?.sub);
     if (!Number.isSafeInteger(userId) || userId <= 0) {
-      return errorResponse('A FluentMitra account is required for the Gia live preview.', 401, 'UNAUTHORIZED');
+      return errorResponse('A Gia account is required for the Gia live preview.', 401, 'UNAUTHORIZED');
     }
     previewReservation = await reserveVoicePreview(prisma.user, userId);
     if (!previewReservation) {
@@ -136,7 +145,7 @@ export async function POST(req: Request) {
   form.set('session', JSON.stringify(buildRealtimeSession(mode)));
 
   const safetyIdentifier = createHash('sha256')
-    .update(`mila-realtime:${identity}`)
+    .update(`realtime:${mode}:${identity}`)
     .digest('hex');
 
   try {

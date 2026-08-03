@@ -142,8 +142,8 @@ struct HomeView: View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "lock.shield.fill").foregroundStyle(Color.milaGreen)
             Text(language == .ru
-                ? "Голос обрабатывается частными сервисами FluentMitra и удаляется после запроса. Без рекламы и трекинга."
-                : "Voice is processed by FluentMitra’s private services and deleted after the request. No ads or tracking.")
+                ? "Голос обрабатывается частными сервисами Mila и удаляется после запроса. Без рекламы и трекинга."
+                : "Voice is processed by Mila’s private services and deleted after the request. No ads or tracking.")
                 .font(.caption)
                 .foregroundStyle(Color.milaMuted)
         }

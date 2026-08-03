@@ -27,7 +27,7 @@ struct SpeakView: View {
         VStack(spacing: 9) {
             MilaMark(size: 86)
                 .shadow(color: Color.milaCyan.opacity(0.25), radius: 28)
-            Text(language == .ru ? "Практика во FluentMitra" : "Practise with FluentMitra")
+            Text(language == .ru ? "Практика во Mila" : "Practise with Mila")
                 .font(.system(size: 29, weight: .black, design: .rounded))
                 .foregroundStyle(Color.milaCream)
             Text(language == .ru
@@ -106,8 +106,8 @@ struct SpeakView: View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "lock.fill").foregroundStyle(Color.milaGreen)
             Text(language == .ru
-                ? "Запись отправляется только во FluentMitra, расшифровывается частной моделью и удаляется сразу после запроса. Текст сохраняется в твоей истории обучения."
-                : "The recording goes only to FluentMitra, is transcribed by a private model, and is deleted immediately after the request. The transcript remains in your learning history.")
+                ? "Запись отправляется только во Mila, расшифровывается частной моделью и удаляется сразу после запроса. Текст сохраняется в твоей истории обучения."
+                : "The recording goes only to Mila, is transcribed by a private model, and is deleted immediately after the request. The transcript remains in your learning history.")
                 .font(.caption)
                 .foregroundStyle(Color.milaMuted)
         }

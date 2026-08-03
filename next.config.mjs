@@ -76,6 +76,11 @@ const config = {
           has: [{ type: 'host', value: MIA_HOST }],
           destination: '/mia',
         },
+        {
+          source: '/talk',
+          has: [{ type: 'host', value: MIA_HOST }],
+          destination: '/mia/talk',
+        },
       ],
       afterFiles: [],
       fallback: [],

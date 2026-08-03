@@ -46,25 +46,25 @@ export default function BillingReturnPage() {
   }, []);
 
   const content = state === 'paid' ? {
-    title: isGia ? 'Gia is waiting.' : 'FluentMitra Pro is ready.',
+    title: isGia ? 'Gia is waiting.' : 'Mila Pro is ready.',
     copy: 'Your verified 30-day access is active on this account.',
     action: isGia ? '/live' : '/dashboard',
-    label: isGia ? 'Return to Gia Live' : 'Continue to FluentMitra',
+    label: isGia ? 'Return to Gia Live' : 'Continue to Mila',
   } : state === 'canceled' ? {
     title: 'No access was activated.',
-    copy: isGia ? 'The payment was canceled or refunded. Gia text chat is still available.' : 'The payment was canceled or refunded. You can continue with FluentMitra Free.',
+    copy: isGia ? 'The payment was canceled or refunded. Gia text chat is still available.' : 'The payment was canceled or refunded. You can continue with Mila Free.',
     action: '/pricing',
     label: isGia ? 'Return to Gia access' : 'Return to plans',
   } : state === 'pending' ? {
     title: 'Payment is still being verified.', copy: 'Some banks take a little longer. Your access activates only after YooKassa confirms the payment.', action: '/account', label: 'Check my account',
   } : state === 'error' ? {
     title: 'We could not match this return.',
-    copy: isGia ? 'No charge is trusted from a browser redirect. Check your Gia account for verified access.' : 'No charge is trusted from a browser redirect. Check your account or contact FluentMitra support.',
+    copy: isGia ? 'No charge is trusted from a browser redirect. Check your Gia account for verified access.' : 'No charge is trusted from a browser redirect. Check your account or contact Mila support.',
     action: isGia ? '/account' : '/support',
     label: isGia ? 'Check my Gia account' : 'Get support',
   } : {
     title: 'Confirming your payment…',
-    copy: isGia ? 'Gia is checking the payment directly with the provider.' : 'FluentMitra is checking the payment directly with the provider.',
+    copy: isGia ? 'Gia is checking the payment directly with the provider.' : 'Mila is checking the payment directly with the provider.',
     action: '',
     label: '',
   };

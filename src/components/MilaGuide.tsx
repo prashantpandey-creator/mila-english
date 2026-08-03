@@ -15,7 +15,6 @@ import { toSpokenText } from '@/lib/spokenText'
 import { hasActiveSession } from '@/lib/guestSession'
 import MilaIcon from '@/components/ui/MilaIcon'
 import MilaVoiceMark from '@/components/ui/MilaVoiceMark'
-import { isMiaHostname } from '@/lib/productHosts'
 
 type GuideContext = {
   authenticated: boolean
@@ -50,7 +49,7 @@ const PAGE_LABELS: Record<string, { en: string; ru: string }> = {
   '/darshan': { en: 'Voice room', ru: 'Голосовая комната' },
 }
 
-const COMPANION_INTEGRATED_ROUTES = ['/assessment', '/chat', '/listen', '/phonetics', '/practice', '/voice-lab', '/darshan', '/mia', '/pia', '/login', '/register', '/privacy', '/support']
+const MILA_GUIDE_INTEGRATED_ROUTES = ['/assessment', '/listen', '/phonetics', '/practice', '/voice-lab', '/login', '/register', '/privacy', '/support']
 
 function pageKey(pathname: string) {
   if (pathname.startsWith('/lessons/')) return '/lessons'
@@ -142,6 +141,18 @@ export default function MilaGuide() {
     })
   }, [context?.authenticated, openTextChat, voiceFallbackNotice])
 
+  const startTextConversation = useCallback(() => {
+    openTextChat()
+    if (context?.authenticated) return
+    void hasActiveSession().then(async (seated) => {
+      if (!seated) return
+      const fresh = await fetch('/api/guide/context')
+        .then((response) => (response.ok ? response.json() : null))
+        .catch(() => null)
+      if (fresh?.authenticated) setContext(fresh)
+    })
+  }, [context?.authenticated, openTextChat])
+
   const startVoiceConversation = useCallback(() => {
     clearLauncherClick()
     setGuideError('')
@@ -188,9 +199,7 @@ export default function MilaGuide() {
   const page = PAGE_LABELS[pageKey(pathname)]
   const teacherName = context?.teacherName || (lang === 'ru' ? 'Твой учитель' : 'Your teacher')
   const agentState = listening ? 'listening' : isLoading || voicePending ? 'thinking' : speaking ? 'speaking' : 'idle'
-  const isMiaApex = mounted && typeof window !== 'undefined' && isMiaHostname(window.location.hostname) && pathname === '/'
-  const isVoiceRoom = isMiaApex
-    || COMPANION_INTEGRATED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
+  const isVoiceRoom = MILA_GUIDE_INTEGRATED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
 
   const welcome = useMemo(() => {
     if (pathname === '/') return lang === 'ru'
@@ -309,6 +318,12 @@ export default function MilaGuide() {
     } catch { /* storage unavailable */ }
     return () => window.removeEventListener('mila-voice-mode', onVoiceMode)
   }, [])
+
+  useEffect(() => {
+    const onTextChat = () => startTextConversation()
+    window.addEventListener('mila-text-chat', onTextChat)
+    return () => window.removeEventListener('mila-text-chat', onTextChat)
+  }, [startTextConversation])
 
   // Voice mode armed while logged out: never sit silent behind the auth gate —
   // seat a guest session, refresh the guide context, and the loop below starts.
@@ -629,7 +644,7 @@ export default function MilaGuide() {
     else if (!open) startVoiceConversation()
   }
 
-  if (!mounted || isVoiceRoom || pathname === '/') return null
+  if (!mounted || isVoiceRoom) return null
 
   const continueLabel = lang === 'ru' ? context?.continueTitleRu : context?.continueTitle
   const status = agentState === 'thinking'
@@ -725,8 +740,8 @@ export default function MilaGuide() {
               <>
                 <button type="button" onClick={() => faqAnswer(
                   lang === 'ru' ? 'Что это за приложение?' : 'What is this app?',
-                  'FluentMitra matches you with an AI English teacher who can explain in your language, give gentle feedback, and build lessons around your goals.',
-                  'FluentMitra подбирает ИИ-учителя английского, который объясняет на твоём языке, мягко исправляет и строит уроки вокруг твоих целей.',
+                  'Mila matches you with an AI English teacher who can explain in your language, give gentle feedback, and build lessons around your goals.',
+                  'Mila подбирает ИИ-учителя английского, который объясняет на твоём языке, мягко исправляет и строит уроки вокруг твоих целей.',
                 )}><MilaIcon name="conversation" size={14}/>{lang === 'ru' ? 'Что это?' : 'What is this?'}</button>
                 <button type="button" onClick={() => faqAnswer(
                   lang === 'ru' ? 'Это бесплатно?' : 'Is it free?',

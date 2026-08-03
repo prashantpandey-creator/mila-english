@@ -137,7 +137,7 @@ function PracticeRoom() {
               await speakTurn(text, turnId);
             } catch {
               if (activeRef.current && turnRef.current === turnId) {
-                setError(lang === "ru" ? "FluentMitra не смогла ответить. Коснись сферы." : "FluentMitra could not answer. Touch the orb.");
+                setError(lang === "ru" ? "Mila не смогла ответить. Коснись сферы." : "Mila could not answer. Touch the orb.");
                 setPhase("resting");
                 setRunning(false);
                 return;
@@ -223,7 +223,7 @@ function PracticeRoom() {
     setRunning(false);
     activeRef.current = false;
     setPhase("resting");
-    setError(lang === "ru" ? "FluentMitra не смогла начать. Попробуй ещё раз." : "FluentMitra could not start. Try again.");
+    setError(lang === "ru" ? "Mila не смогла начать. Попробуй ещё раз." : "Mila could not start. Try again.");
   }, [lang, listenLoop, phase, running, speakTurn]);
 
   const exit = useCallback(() => {
@@ -258,7 +258,7 @@ function PracticeRoom() {
         </button>
       </header>
 
-      <section className="practice-orb" aria-label={lang === "ru" ? "Голосовая практика во FluentMitra" : "Voice practice in FluentMitra"}>
+      <section className="practice-orb" aria-label={lang === "ru" ? "Голосовая практика во Mila" : "Voice practice in Mila"}>
         <button
           type="button"
           onClick={begin}

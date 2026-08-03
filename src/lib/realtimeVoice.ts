@@ -61,7 +61,7 @@ export async function connectRealtimeVoice(options: {
   openAIAudioConsent: true;
   /** Which persona to run: the lesson coach (default), the free English
    * companion, or Pia — the free Hindi/Hinglish companion. */
-  mode?: 'tutor' | 'companion' | 'gia' | 'pia' | 'kids';
+  mode?: 'tutor' | 'companion' | 'gia' | 'mia' | 'pia' | 'kids';
   /** Overall budget for the SDP exchange before falling back. */
   timeoutMs?: number;
   /** Cancels a connection that is still negotiating and releases its mic. */

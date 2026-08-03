@@ -6,10 +6,10 @@
  * future naming change does not require another repository-wide migration.
  */
 export const MILA_PUBLIC_BRAND = Object.freeze({
-  name: 'FluentMitra',
-  shortName: 'FluentMitra',
-  descriptor: 'English explained in the language you know.',
-  title: 'FluentMitra — Learn English in the language you know',
+  name: 'Mila',
+  shortName: 'Mila',
+  descriptor: 'Find your voice in any language.',
+  title: 'Mila — Find your voice in any language',
   description:
-    'India-first English learning with an AI teacher matched to your native language, plus speaking, pronunciation, vocabulary, and progress.',
+    'A multilingual AI conversation companion for speaking with confidence, with structured English learning available when you want it.',
 } as const);

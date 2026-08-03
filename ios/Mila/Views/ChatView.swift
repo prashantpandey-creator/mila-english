@@ -66,7 +66,7 @@ struct ChatView: View {
     private var welcome: some View {
         VStack(spacing: 14) {
             MilaMark(size: 72)
-            Text(language == .ru ? "Твой преподаватель FluentMitra готов" : "Your FluentMitra teacher is ready")
+            Text(language == .ru ? "Твой преподаватель Mila готов" : "Your Mila teacher is ready")
                 .font(.title2.weight(.black)).foregroundStyle(Color.milaCream)
             Text(language == .ru
                 ? "Спроси об английском, разыграй ситуацию или просто поговори. Я мягко исправлю только важную ошибку."

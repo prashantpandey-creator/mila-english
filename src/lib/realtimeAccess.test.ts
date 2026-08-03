@@ -24,6 +24,10 @@ test('assessment and free companion doors remain outside the product paywall', (
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'true',
   }), false);
+  assert.equal(realtimeModeRequiresPaid('mia', {
+    NODE_ENV: 'production',
+    VOICE_REALTIME_PAID_ONLY: 'true',
+  }), false);
 });
 
 test('non-production environments can explicitly exercise either gate state', () => {

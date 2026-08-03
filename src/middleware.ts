@@ -51,7 +51,7 @@ const GIA_OWNED_PREFIXES = [
   '/verify-email',
 ];
 
-const MIA_OWNED_PREFIXES = ['/privacy', '/terms'];
+const MIA_OWNED_PREFIXES = ['/talk', '/privacy', '/terms'];
 
 const MILA_FOREIGN_PREFIXES = ['/chat', '/darshan', '/gia', '/live', '/mia', '/pia'];
 

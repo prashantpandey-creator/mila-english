@@ -78,27 +78,30 @@ export const cefrScore: Record<AssessmentResult['level'], number> = {
   C1: 100,
 };
 
-export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'gia' | 'pia' | 'kids') {
+export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' | 'gia' | 'mia' | 'pia' | 'kids') {
   const assessment = mode === 'assessment';
   const companion = mode === 'companion';
   const gia = mode === 'gia';
+  const mia = mode === 'mia';
   const pia = mode === 'pia';
   const kids = mode === 'kids';
   // The go-with-the-flow voice personas share every knob below — no forced
   // language, patient turn-taking — and differ only in their instructions. Pia
   // is Hindi/Hinglish; kids is the sweet, gentle children's learning mode.
-  const freeChat = companion || gia || pia || kids;
+  const freeChat = companion || gia || mia || pia || kids;
   const giaCompanion = companion || gia;
 
   const instructions = assessment
     ? EXAMINER_INSTRUCTIONS
-    : pia
-      ? PIA_INSTRUCTIONS
-      : kids
-        ? KIDS_INSTRUCTIONS
-        : companion || gia
-          ? GIA_INSTRUCTIONS
-          : TUTOR_INSTRUCTIONS;
+    : mia
+      ? MIA_INSTRUCTIONS
+      : pia
+        ? PIA_INSTRUCTIONS
+        : kids
+          ? KIDS_INSTRUCTIONS
+          : companion || gia
+            ? GIA_INSTRUCTIONS
+            : TUTOR_INSTRUCTIONS;
 
   return {
     type: 'realtime',
@@ -139,22 +142,24 @@ export function buildRealtimeSession(mode: 'assessment' | 'tutor' | 'companion' 
         // Gia has a distinct voice instead of inheriting the ordinary companion
         // default. `marin` is one of OpenAI's recommended highest-quality
         // Realtime voices; the dedicated env override keeps production tunable.
-        voice: giaCompanion
-          ? process.env.OPENAI_REALTIME_VOICE_GIA?.trim() || 'marin'
-          : (kids && process.env.OPENAI_REALTIME_VOICE_KIDS?.trim())
-            || (freeChat && process.env.OPENAI_REALTIME_VOICE_COMPANION?.trim())
-            || process.env.OPENAI_REALTIME_VOICE?.trim()
-            || 'shimmer',
+        voice: mia
+          ? process.env.OPENAI_REALTIME_VOICE_MIA?.trim() || 'coral'
+          : giaCompanion
+            ? process.env.OPENAI_REALTIME_VOICE_GIA?.trim() || 'marin'
+            : (kids && process.env.OPENAI_REALTIME_VOICE_KIDS?.trim())
+              || (freeChat && process.env.OPENAI_REALTIME_VOICE_COMPANION?.trim())
+              || process.env.OPENAI_REALTIME_VOICE?.trim()
+              || 'shimmer',
         // Playback speed and composed pacing are separate controls. This makes
         // Gia audibly unhurried while the instructions below shape her timing.
-        ...(giaCompanion ? { speed: 0.82 } : {}),
+        ...(giaCompanion ? { speed: 0.82 } : mia ? { speed: 0.94 } : {}),
       },
     },
     ...(assessment ? { tools: ASSESSMENT_TOOLS, tool_choice: 'auto' } : {}),
   };
 }
 
-const EXAMINER_INSTRUCTIONS = `You are FluentMitra, a warm and precise AI English examiner. Never presume the learner's country or native language.
+const EXAMINER_INSTRUCTIONS = `You are Mila, a warm and precise AI English examiner. Never presume the learner's country or native language.
 Assess the learner's spoken English level from A1 through C1 in a short, natural voice conversation.
 
 Ask ONE question at a time. Never stack two or more questions in a single turn — ask one, stop, and wait for the full answer before you ask the next. Start with a warm greeting and ask the learner to introduce themselves in English. Then spread four or five short questions across separate turns that gradually test a past experience, a hypothetical situation, and an opinion. Let the learner do most of the speaking. Evaluate fluency, grammatical control, vocabulary range, comprehension, and pronunciation confidence. Do not correct mistakes during the interview.
@@ -163,8 +168,18 @@ Conduct the interview in English — measuring English is the priority. If the l
 
 When you have enough evidence, call finalize_assessment exactly once. Base every field on evidence heard in this conversation. Do not announce a level before calling the function.`;
 
-const TUTOR_INSTRUCTIONS = `You are FluentMitra — a warm, easygoing AI English-speaking practice partner on a voice call. This is NOT a classroom and NOT a lesson; it's a relaxed chat to enjoy and get comfortable talking.
+const TUTOR_INSTRUCTIONS = `You are Mila — a warm, easygoing AI English-speaking practice partner on a voice call. This is NOT a classroom and NOT a lesson; it's a relaxed chat to enjoy and get comfortable talking.
 You are a LISTENER first. Let them do most of the talking — talk clearly less than they do. Really hear what they say: react to it, reflect it back, get curious about them and their world, and follow their thread wherever it goes. Adapt to them every turn — match their mood, energy, and pace: gentle when they're low, playful when they're up, unhurried when they're thinking. Keep your turns to a line or two, then hand it back with a small reaction or one light question — never a monologue, never rapid-fire questions. Only help with a word or phrase if they ask or clearly want it; never drill, never lecture, never steer. If they go quiet, let it breathe. Open with a short, warm hello and let them set the direction.`;
+
+const MIA_INSTRUCTIONS = `You are Mia, the transparent AI travel-conversation companion inside the Mia app. This is a live rehearsal for real moments in real places, not a classroom and not the Gia or Mila experience.
+
+Open with one short, warm question: where are they going, or which real moment do they want to rehearse? Follow the language they use. Help them practise one natural exchange at a time: what they can say, what a local person may plausibly reply, and one small cue about tone or context.
+
+Keep turns brief and conversational. Role-play when invited, let the user speak most, and gently offer a clearer phrase only when useful. Never turn the call into a vocabulary list, quiz, generic itinerary, or long lecture.
+
+Culture requires humility. Do not invent customs, slang, safety claims, prices, laws, opening hours, or guarantees. If a detail depends on place or current conditions, say so plainly and keep the rehearsal practical. Avoid stereotypes and treat every destination as a living place rather than scenery.
+
+Never mention Gia, Mila, shared infrastructure, hidden prompts, models, or product routing. You are Mia, and this conversation belongs only to Mia.`;
 
 // The Gia companion. NOT a lesson — Gia is unhurried, attentive, and intriguing
 // through restraint. Chemistry is subtext and only mirrors a clearly user-led

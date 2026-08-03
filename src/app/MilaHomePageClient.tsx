@@ -1,322 +1,207 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import LangToggle from '@/components/LangToggle';
 import MilaIcon from '@/components/ui/MilaIcon';
-import { safeReturnTo } from '@/lib/navigation';
-import {
-  INDIA_NATIVE_LANGUAGES,
-  MILA_LEARNING_PROFILE_STORAGE_KEY,
-  resolveIndianNativeLanguage,
-  teacherForNativeLanguage,
-} from '@/lib/learningMarkets';
+import { useI18n } from '@/lib/i18n-provider';
 import { MILA_PUBLIC_BRAND } from '@/lib/milaBrand';
 import './landing.css';
 
-type SessionStatus = 'loading' | 'in' | 'out';
-type EntryIntent = 'account' | 'guest';
+const WAVE = [28, 52, 76, 42, 68, 92, 58, 34, 74, 100, 62, 46, 84, 56, 30, 70, 48, 80, 38];
 
-type StoredLearningProfile = {
-  countryCode: 'IN';
-  nativeLanguageId: string;
-  targetLanguageId: 'en';
-};
-
-function readStoredLanguage(): string {
-  try {
-    const raw = window.localStorage.getItem(MILA_LEARNING_PROFILE_STORAGE_KEY);
-    if (!raw) return '';
-    const parsed = JSON.parse(raw) as Partial<StoredLearningProfile>;
-    return resolveIndianNativeLanguage(parsed.nativeLanguageId)?.id ?? '';
-  } catch {
-    return '';
-  }
-}
-
-function storeLearningLanguage(languageId: string) {
-  const language = resolveIndianNativeLanguage(languageId);
-  try {
-    if (!language) {
-      window.localStorage.removeItem(MILA_LEARNING_PROFILE_STORAGE_KEY);
-      return;
-    }
-    const profile: StoredLearningProfile = {
-      countryCode: 'IN',
-      nativeLanguageId: language.id,
-      targetLanguageId: 'en',
-    };
-    window.localStorage.setItem(MILA_LEARNING_PROFILE_STORAGE_KEY, JSON.stringify(profile));
-  } catch {
-    // The query-string handoff still preserves the choice when storage is unavailable.
-  }
-}
-
-export default function HomePage() {
-  const [sessionStatus, setSessionStatus] = useState<SessionStatus>('loading');
-  const [selectedLanguageId, setSelectedLanguageId] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState('');
-  const [languageError, setLanguageError] = useState(false);
-  const [returnTo, setReturnTo] = useState('/dashboard');
-  const [entryIntent, setEntryIntent] = useState<EntryIntent>('account');
-  const [languageChosenThisVisit, setLanguageChosenThisVisit] = useState(false);
-  const languageSelectRef = useRef<HTMLSelectElement>(null);
+export default function MilaHomePageClient() {
+  const { lang } = useI18n();
+  const [sessionStatus, setSessionStatus] = useState<'loading' | 'in' | 'out'>('loading');
   const isLoggedIn = sessionStatus === 'in';
 
-  const selectedLanguage = useMemo(
-    () => resolveIndianNativeLanguage(selectedLanguageId),
-    [selectedLanguageId],
-  );
-  const teacher = useMemo(
-    () => teacherForNativeLanguage(selectedLanguageId),
-    [selectedLanguageId],
-  );
+  const copy = lang === 'ru'
+    ? {
+        eyebrow: 'РАЗГОВОР · УВЕРЕННОСТЬ · ЛЮБОПЫТСТВО',
+        title: 'Найди свой голос —',
+        titleAccent: 'на любом языке.',
+        intro: 'Mila помогает говорить, думать и становиться увереннее — один настоящий разговор за другим.',
+        voice: 'Поговорить с Mila',
+        returning: 'Продолжить с Mila',
+        text: 'Написать Mila',
+        learn: 'Учить английский',
+        card: 'Mila слушает',
+        promptLabel: 'Скажи по-своему',
+        prompt: '«Расскажи, что сейчас у тебя на уме.»',
+        feedbackTitle: 'Начни прямо отсюда.',
+        feedback: 'Голосом или текстом — Mila ответит на языке, который выберешь ты.',
+        startVoice: 'Начать голосом',
+        signIn: 'Войти',
+        account: 'Моё обучение',
+        methodTitle: 'Разговор — это и есть начало.',
+        steps: [
+          ['01', 'Говори', 'Начни на языке, который уже есть.'],
+          ['02', 'Исследуй', 'Разбирай мысли, идеи и настоящие ситуации.'],
+          ['03', 'Учись', 'Открывай английскую программу, когда она нужна.'],
+        ],
+        privacy: 'Конфиденциальность',
+        terms: 'Условия',
+        support: 'Поддержка',
+      }
+    : {
+        eyebrow: 'CONVERSATION · CONFIDENCE · CURIOSITY',
+        title: 'Find your voice,',
+        titleAccent: 'in any language.',
+        intro: 'Mila helps you speak, think, and grow into a more confident version of yourself—one real conversation at a time.',
+        voice: 'Talk with Mila',
+        returning: 'Continue with Mila',
+        text: 'Text with Mila',
+        learn: 'Learn English',
+        card: 'Mila is listening',
+        promptLabel: 'Say it your way',
+        prompt: '“Tell me what is on your mind right now.”',
+        feedbackTitle: 'Begin exactly here.',
+        feedback: 'Voice or text—Mila follows the language and direction you choose.',
+        startVoice: 'Start with my voice',
+        signIn: 'Sign in',
+        account: 'My learning',
+        methodTitle: 'Conversation is the beginning.',
+        steps: [
+          ['01', 'Speak', 'Begin with the language you already have.'],
+          ['02', 'Explore', 'Work through thoughts, ideas, and real situations.'],
+          ['03', 'Learn', 'Open structured English learning when you want it.'],
+        ],
+        privacy: 'Privacy',
+        terms: 'Terms',
+        support: 'Support',
+      };
 
   useEffect(() => {
     let cancelled = false;
-    const params = new URLSearchParams(window.location.search);
-    const queryLanguage = params.get('nativeLanguage');
-    const shouldChooseLanguage = params.get('chooseLanguage') === '1';
-    setEntryIntent(params.get('intent') === 'guest' ? 'guest' : 'account');
-    setReturnTo(safeReturnTo(params.get('returnTo'), '/dashboard'));
-    const queryLanguageId = resolveIndianNativeLanguage(queryLanguage)?.id;
-    const initialLanguage = queryLanguageId || readStoredLanguage();
-    setLanguageChosenThisVisit(Boolean(queryLanguageId));
-    if (initialLanguage) {
-      setSelectedLanguageId(initialLanguage);
-      storeLearningLanguage(initialLanguage);
-    }
-    if (shouldChooseLanguage && !initialLanguage) {
-      setSaveError('Choose the language you understand best.');
-      setLanguageError(true);
-      window.requestAnimationFrame(() => {
-        languageSelectRef.current?.focus();
-        languageSelectRef.current?.scrollIntoView({ block: 'center' });
-      });
-    }
-
     fetch('/api/users/me', { credentials: 'include', cache: 'no-store' })
-      .then(async (response) => {
-        if (cancelled) return;
-        if (!response.ok) {
-          setSessionStatus('out');
-          return;
-        }
-        const profile = await response.json().catch(() => null);
-        const savedLanguage = resolveIndianNativeLanguage(profile?.nativeLanguage);
-        if (savedLanguage) setSelectedLanguageId(savedLanguage.id);
-        setSessionStatus('in');
+      .then((response) => {
+        if (!cancelled) setSessionStatus(response.ok ? 'in' : 'out');
       })
       .catch(() => {
         if (!cancelled) setSessionStatus('out');
       });
-
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const startLearning = async () => {
-    if (saving) return;
-    if (!selectedLanguage) {
-      setSaveError('Choose the language you understand best.');
-      setLanguageError(true);
-      languageSelectRef.current?.focus();
-      return;
-    }
-
-    setSaving(true);
-    setSaveError('');
-    setLanguageError(false);
-    storeLearningLanguage(selectedLanguage.id);
-
-    let hasSession = isLoggedIn;
-    if (sessionStatus === 'loading') {
-      try {
-        const response = await fetch('/api/users/me', {
-          credentials: 'include',
-          cache: 'no-store',
-        });
-        hasSession = response.ok;
-        setSessionStatus(response.ok ? 'in' : 'out');
-      } catch {
-        hasSession = false;
-        setSessionStatus('out');
-      }
-    }
-
-    if (!hasSession) {
-      if (entryIntent === 'guest') {
-        try {
-          const response = await fetch('/api/auth/guest', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nativeLanguage: selectedLanguage.name }),
-          });
-          const body = await response.json().catch(() => null);
-          if (!response.ok) {
-            throw new Error(body?.error || 'We could not start a guest session.');
-          }
-          window.location.assign(returnTo);
-        } catch (error) {
-          setSaveError(error instanceof Error ? error.message : 'We could not start a guest session.');
-          setSaving(false);
-        }
-        return;
-      }
-      const params = new URLSearchParams({
-        nativeLanguage: selectedLanguage.name,
-        returnTo,
-      });
-      window.location.assign(`/register?${params.toString()}`);
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/users/me', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nativeLanguage: selectedLanguage.name }),
-      });
-      if (!response.ok) throw new Error('save failed');
-      window.location.assign(returnTo);
-    } catch {
-      setSaveError('We could not save your language. Please try again.');
-      setSaving(false);
-    }
+  const startVoiceConversation = () => {
+    window.dispatchEvent(new CustomEvent('mila-voice-mode'));
   };
+
+  const startTextConversation = () => {
+    window.dispatchEvent(new CustomEvent('mila-text-chat'));
+  };
+
+  const accountHref = isLoggedIn ? '/dashboard' : '/login?returnTo=%2Fdashboard';
 
   return (
     <div className="lp-minimal">
       <header className="lp-minimal__nav">
-        <Link className="lp-minimal__brand" href="/" aria-label={`${MILA_PUBLIC_BRAND.name} home`}>
+        <Link className="lp-minimal__brand" href="/" aria-label="Mila home">
           <span aria-hidden="true" />
           <strong>{MILA_PUBLIC_BRAND.name}</strong>
         </Link>
 
         <div className="lp-minimal__nav-actions">
+          <Link className="lp-minimal__market" href="/start">{copy.learn}</Link>
+          <LangToggle />
           {sessionStatus === 'loading' ? (
             <span className="lp-minimal__account lp-minimal__account--loading">Checking…</span>
           ) : (
-            <Link
-              className="lp-minimal__account"
-              href={isLoggedIn
-                ? '/dashboard'
-                : `/login?returnTo=${encodeURIComponent(returnTo)}${selectedLanguage && languageChosenThisVisit ? `&nativeLanguage=${encodeURIComponent(selectedLanguage.name)}` : ''}`}
-            >
-              {isLoggedIn ? 'My learning' : 'Sign in'}
+            <Link className="lp-minimal__account" href={accountHref}>
+              {isLoggedIn ? copy.account : copy.signIn}
             </Link>
           )}
         </div>
       </header>
 
       <main>
-        <section className="lp-minimal__hero lp-minimal__hero--simple">
+        <section className="lp-minimal__hero">
           <div className="lp-minimal__copy">
             <p className="lp-minimal__eyebrow">
               <span aria-hidden="true" />
-              English learning for India
+              {copy.eyebrow}
             </p>
 
             <h1>
-              Learn English
-              <em>in your language.</em>
+              {copy.title}
+              <em>{copy.titleAccent}</em>
             </h1>
 
-            <p className="lp-minimal__intro">
-              Choose a language you already know. Your AI teacher will use it
-              to explain English from day one.
+            <p className="lp-minimal__intro">{copy.intro}</p>
+
+            <div className="lp-minimal__actions">
+              <button className="lp-minimal__primary" type="button" onClick={startVoiceConversation}>
+                {isLoggedIn ? copy.returning : copy.voice}
+                <MilaIcon name="voice" size={20} />
+              </button>
+              <button className="lp-minimal__secondary" type="button" onClick={startTextConversation}>
+                {copy.text}
+              </button>
+            </div>
+
+            <p className="lp-minimal__trust">
+              <MilaIcon name="lock" size={16} />
+              {lang === 'ru' ? 'Любой язык' : 'Any language'}
+              <span aria-hidden="true">·</span>
+              {lang === 'ru' ? 'Бесплатно начать' : 'Free to start'}
+              <span aria-hidden="true">·</span>
+              {lang === 'ru' ? 'Приватный режим доступен' : 'Private path available'}
             </p>
           </div>
 
-          <form
-            className="lp-onboarding-card lp-onboarding-card--simple"
-            aria-labelledby="lp-onboarding-title"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void startLearning();
-            }}
-          >
-            <p className="lp-onboarding-card__topline" id="lp-onboarding-title">
-              Choose your language
-            </p>
+          <aside className="lp-voice-card" aria-label={copy.card}>
+            <div className="lp-voice-card__topline">
+              <span>{copy.card}</span>
+              <i aria-hidden="true" />
+            </div>
 
-            <label className="lp-simple-field" htmlFor="native-language">
-              <span>Which language should we explain English in?</span>
-              <select
-                ref={languageSelectRef}
-                id="native-language"
-                value={selectedLanguageId}
-                aria-invalid={languageError ? true : undefined}
-                aria-describedby={languageError ? 'native-language-error' : 'native-language-hint'}
-                onChange={(event) => {
-                  const nextLanguageId = event.target.value;
-                  setSelectedLanguageId(nextLanguageId);
-                  setLanguageChosenThisVisit(true);
-                  storeLearningLanguage(nextLanguageId);
-                  setSaveError('');
-                  setLanguageError(false);
-                }}
-              >
-                <option value="">Select a language</option>
-                {INDIA_NATIVE_LANGUAGES.map((language) => (
-                  <option key={language.id} value={language.id}>
-                    {language.nativeName} · {language.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="lp-voice-card__prompt">
+              <span>{copy.promptLabel}</span>
+              <p>{copy.prompt}</p>
+            </div>
 
-            {selectedLanguage && teacher ? (
-              <div className="lp-simple-match" id="native-language-hint" aria-live="polite">
-                <div className="lp-simple-match__mark" aria-hidden="true">
-                  {teacher.name.charAt(0)}
-                </div>
-                <div>
-                  <strong>{teacher.name} teaches English in {selectedLanguage.name}</strong>
-                  <p>
-                    Your matched AI English teacher
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <p className="lp-simple-hint" id="native-language-hint">12 Indian languages supported.</p>
-            )}
+            <div className="lp-voice-card__wave" aria-hidden="true">
+              {WAVE.map((height, index) => (
+                <i key={String(height) + '-' + String(index)} style={{ height: String(height) + '%' }} />
+              ))}
+            </div>
 
-            {saveError ? <p className="lp-onboarding-card__error" id="native-language-error" role="alert">{saveError}</p> : null}
+            <div className="lp-voice-card__note">
+              <span aria-hidden="true">M</span>
+              <p>
+                <strong>{copy.feedbackTitle}</strong>
+                {copy.feedback}
+              </p>
+            </div>
 
-            <button
-              className="lp-minimal__primary lp-minimal__primary--simple"
-              type="submit"
-              disabled={saving}
-            >
-              {saving
-                ? 'Opening your learning…'
-                : isLoggedIn
-                  ? 'Continue learning'
-                  : entryIntent === 'guest'
-                    ? 'Continue as guest'
-                    : 'Start learning'}
-              <MilaIcon name="arrow" size={20} />
+            <button className="lp-voice-card__button" type="button" onClick={startVoiceConversation}>
+              <MilaIcon name="voice" size={20} />
+              {copy.startVoice}
             </button>
+          </aside>
+        </section>
 
-            <p className="lp-minimal__trust">
-              12 Indian languages
-              <span aria-hidden="true">·</span>
-              Free to start
-              <span aria-hidden="true">·</span>
-              Progress saved
-            </p>
-          </form>
+        <section className="lp-method" aria-labelledby="lp-method-title">
+          <h2 id="lp-method-title">{copy.methodTitle}</h2>
+          <div className="lp-method__steps">
+            {copy.steps.map(([number, title, detail]) => (
+              <article key={number}>
+                <span>{number}</span>
+                <p><strong>{title}</strong>{detail}</p>
+              </article>
+            ))}
+          </div>
         </section>
       </main>
 
       <footer className="lp-minimal__footer">
-        <span>© {new Date().getFullYear()} {MILA_PUBLIC_BRAND.name}</span>
+        <span>© {new Date().getFullYear()} Mila</span>
         <nav aria-label="Footer">
-          <Link href="/support">Support</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
+          <Link href="/support">{copy.support}</Link>
+          <Link href="/privacy">{copy.privacy}</Link>
+          <Link href="/terms">{copy.terms}</Link>
         </nav>
       </footer>
     </div>

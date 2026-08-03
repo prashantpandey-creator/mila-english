@@ -242,7 +242,7 @@ export default function DashboardPage() {
           ) : null}
           <button className="dashboard-bug-report" type="button" onClick={() => router.push('/support')}>
             <span aria-hidden>↗</span>
-            {lang === 'ru' ? 'Сообщить об ошибке в FluentMitra' : 'Report a problem with FluentMitra'}
+            {lang === 'ru' ? 'Сообщить об ошибке в Mila' : 'Report a problem with Mila'}
           </button>
         </section>
       </AppMain>

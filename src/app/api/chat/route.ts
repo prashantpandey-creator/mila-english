@@ -141,7 +141,7 @@ function externalChoice(voice: boolean): ModelChoice | null {
       compatibility: 'compatible',
       headers: {
         'HTTP-Referer': process.env.APP_URL || 'https://mila-english.com',
-        'X-Title': 'FluentMitra',
+        'X-Title': 'Mila',
       },
     });
     return { model: provider(openRouterModel), provider: 'openrouter', modelId: openRouterModel, runtime: 'external' };
@@ -272,7 +272,7 @@ export async function POST(request: NextRequest) {
   const localOnly = surfaceKind === 'voice' && payload?.context?.privacyMode === 'local';
 
   const bugReportDescription = parseBugReportRequest(latestUserMessage);
-  const productName = giaRequest ? 'Gia' : 'FluentMitra';
+  const productName = giaRequest ? 'Gia' : 'Mila';
   if (bugReportDescription !== null && speculative) {
     return dataStreamText('', 'speculative-skip');
   }

@@ -283,7 +283,7 @@ export default function LessonPage() {
                       ? p.ru
                       : matchedTeacher
                         ? `${matchedTeacher.name}, your AI English teacher, can explain this in ${nativeLanguage}.`
-                        : 'Ask your FluentMitra teacher to explain this phrase in your native language.'}
+                        : 'Ask your Mila teacher to explain this phrase in your native language.'}
                   </div>
                 )}
               </button>

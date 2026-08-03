@@ -8,6 +8,7 @@ const giaPage = readFileSync('src/app/gia/page.tsx', 'utf8');
 const giaHomeTheme = readFileSync('src/app/gia/gia-home.css', 'utf8');
 const giaChat = readFileSync('src/app/chat/page.tsx', 'utf8');
 const miaPage = readFileSync('src/app/mia/page.tsx', 'utf8');
+const miaTalk = readFileSync('src/app/mia/talk/page.tsx', 'utf8');
 const miaMetadata = readFileSync('src/app/mia/layout.tsx', 'utf8');
 const sceneStudio = readFileSync('src/components/mia/MiaSceneGenerator.tsx', 'utf8');
 const miaSceneRoute = readFileSync('src/app/api/mia/scene/route.ts', 'utf8');
@@ -29,6 +30,7 @@ const accountPage = readFileSync('src/app/account/page.tsx', 'utf8');
 const pricingPage = readFileSync('src/app/pricing/page.tsx', 'utf8');
 const billingReturn = readFileSync('src/app/billing/return/page.tsx', 'utf8');
 const pwaRegister = readFileSync('src/components/PwaRegister.tsx', 'utf8');
+const realtimeSessionRoute = readFileSync('src/app/api/session/route.ts', 'utf8');
 
 test('Gia owns a public introduction while Live and text remain gated', () => {
   assert.match(nextConfig, /return \{\s*beforeFiles:/);
@@ -62,6 +64,12 @@ test('Mia is an owned travel product with an interactive scene studio', () => {
   assert.match(miaMetadata, /\/mia-og-v2\.jpg/);
   assert.match(miaPage, /India & Bali in focus/);
   assert.match(miaPage, /MiaSceneGenerator/);
+  assert.match(miaPage, /href="\/talk"/);
+  assert.match(miaPage, /Talk with Mia/);
+  assert.match(miaTalk, /mode: 'mia'/);
+  assert.match(miaTalk, /Nothing is sent before/);
+  assert.match(nextConfig, /source: '\/talk',[\s\S]*value: MIA_HOST[\s\S]*destination: '\/mia\/talk'/);
+  assert.match(middleware, /MIA_OWNED_PREFIXES = \['\/talk'/);
   assert.match(miaPage, /src="\/mia-og-v2\.jpg"/);
   assert.match(sceneStudio, /MIA_DESTINATION_GUIDES/);
   assert.match(sceneStudio, /\/api\/mia\/scene/);
@@ -93,7 +101,7 @@ test('Mia and Gia never mount Mila global chrome', () => {
 
 test('Mila owns its learning entry points and shared policies cover every product', () => {
   assert.match(milaHome, /Learn English/);
-  assert.match(milaBrand, /name: 'FluentMitra'/);
+  assert.match(milaBrand, /name: 'Mila'/);
   assert.match(milaHome, /MILA_PUBLIC_BRAND\.name/);
   assert.match(milaHome, /\/dashboard/);
   assert.doesNotMatch(milaHome, /\bGia\b/);
@@ -101,20 +109,18 @@ test('Mila owns its learning entry points and shared policies cover every produc
   assert.match(privacy, /mila\.purangpt\.com/);
   assert.match(privacy, /gia\.purangpt\.com/);
   assert.match(privacy, /mia\.purangpt\.com/);
-  assert.match(terms, /FluentMitra, Gia, and Mia/);
+  assert.match(terms, /Mila, Gia, and Mia/);
 });
 
-test('Mila entry actions lead forward instead of returning learners to the front door', () => {
-  assert.match(milaHome, /Which language should we explain English in/);
-  assert.match(milaHome, /params\.get\('chooseLanguage'\)/);
-  assert.match(milaHome, /params\.get\('intent'\) === 'guest'/);
-  assert.match(milaHome, /entryIntent === 'guest'/);
-  assert.doesNotMatch(milaHome, /disabled=\{!selectedLanguage/);
-  assert.ok(
-    milaHome.indexOf('id="native-language"') < milaHome.indexOf("Opening your learning"),
-    'the required language choice must appear before the primary action',
-  );
-  assert.match(milaLogin, /\/\?chooseLanguage=1&intent=guest/);
+test('Mila exposes immediate voice and text conversation without borrowing Gia routes', () => {
+  assert.match(milaHome, /Talk with Mila/);
+  assert.match(milaHome, /Text with Mila/);
+  assert.match(milaHome, /mila-voice-mode/);
+  assert.match(milaHome, /mila-text-chat/);
+  assert.match(milaGuide, /window\.addEventListener\('mila-text-chat'/);
+  assert.match(milaGuide, /if \(!mounted \|\| isVoiceRoom\) return null/);
+  assert.doesNotMatch(milaHome, /href="\/live"/);
+  assert.doesNotMatch(milaHome, /href="\/chat"/);
   assert.match(milaStart, /nativeLanguage/);
   assert.doesNotMatch(milaDashboard, /router\.push\('\/practice'\)/);
   assert.match(milaDashboard, /router\.push\('\/listen'\)/);
@@ -123,7 +129,7 @@ test('Mila entry actions lead forward instead of returning learners to the front
 test('Mila preserves a deliberate native-language choice through every auth path', () => {
   assert.match(milaLogin, /nativeLanguage \? \{ nativeLanguage \} : \{\}/);
   assert.doesNotMatch(milaLogin, /MILA_LEARNING_PROFILE_STORAGE_KEY/);
-  assert.match(milaHome, /languageChosenThisVisit/);
+  assert.match(milaStart, /nativeLanguage/);
   assert.match(loginRoute, /selectedNativeLanguage/);
   assert.match(loginRoute, /nativeLanguage: selectedNativeLanguage\.name/);
   assert.match(guestRoute, /if \(!isGia && isJsonRequest && !selectedNativeLanguage\)/);
@@ -132,10 +138,10 @@ test('Mila preserves a deliberate native-language choice through every auth path
   assert.doesNotMatch(milaGuide, /fetch\('\/api\/auth\/guest'/);
 });
 
-test('the landing reports language validation separately from submission failures', () => {
-  assert.match(milaHome, /const \[languageError, setLanguageError\]/);
-  assert.match(milaHome, /aria-invalid=\{languageError/);
-  assert.doesNotMatch(milaHome, /aria-invalid=\{saveError/);
+test('Realtime provisioning rejects cross-product host and persona combinations', () => {
+  assert.match(realtimeSessionRoute, /isRealtimeModeAllowedForHostname/);
+  assert.match(realtimeSessionRoute, /WRONG_PRODUCT_HOST/);
+  assert.match(realtimeSessionRoute, /rawMode === 'mia'/);
 });
 
 test('Gia and Mila use separate durable conversation and memory namespaces', () => {

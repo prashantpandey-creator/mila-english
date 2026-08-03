@@ -9,7 +9,7 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const product = useProduct();
   const isGia = product === 'gia';
-  const brand = isGia ? 'Gia' : 'FluentMitra';
+  const brand = isGia ? 'Gia' : 'Mila';
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
