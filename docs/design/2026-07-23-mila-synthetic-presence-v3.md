@@ -28,12 +28,12 @@ the honest alternative when Live is unavailable.
 
 ## Production assets
 
-- `public/avatar/presences/mila-v5/avatar.webp`
-- `public/avatar/presences/mila-v5/expanded.webp`
-- `public/avatar/presences/ember-v5/avatar.webp`
-- `public/avatar/presences/ember-v5/expanded.webp`
-- `public/avatar/presences/nocturne-v17/avatar.webp`
-- `public/avatar/presences/nocturne-v17/expanded.webp`
+- `public/avatar/presences/mila-v6/avatar.webp`
+- `public/avatar/presences/mila-v6/expanded.webp`
+- `public/avatar/presences/ember-v6/avatar.webp`
+- `public/avatar/presences/ember-v6/expanded.webp`
+- `public/avatar/presences/nocturne-v18/avatar.webp`
+- `public/avatar/presences/nocturne-v18/expanded.webp`
 - `public/avatar/presences/velvet-v3/avatar.webp`
 - `public/avatar/presences/velvet-v3/expanded.webp`
 - `public/avatar/presences/aurelia-v2/avatar.webp`
@@ -471,40 +471,37 @@ fetish styling, underboob, extreme cleavage, exaggerated anatomy,
 pornographic posing, youthful cues, malformed hands, facial or mouth
 distortion, text, and watermarks.
 
-### Original-presence signature couture
+### Natural French eveningwear refinement
 
-The built-in OpenAI image-editing workflow gave the original four presences
-individual dresses while keeping their established identities authoritative.
-The initial dress passes used the approved face anchors to correct identity
-against the selected full-length renders. The final 2026-08-03 tailoring pass
-used each selected full-length dress render as the authoritative edit target
-and its approved portrait as a secondary identity reference.
+The 2026-08-03 built-in OpenAI image-editing workflow refined Gia, Ember, and
+Nocturne in two controlled passes. The first pass normalized exposed skin to
+healthy, even, believable colour without flattening natural texture or changing
+identity. The second pass replaced the earlier fantasy-influenced couture with
+contemporary French luxury eveningwear and brandless fine jewelry:
 
-The garment prompts requested:
+- Gia / Signal wears a black silk-crepe one-shoulder gown with clean draping,
+  a body-skimming line, a conventional side slit, pear-cut diamond drop
+  earrings, and a diamond bracelet in platinum;
+- Ember wears a black silk-satin off-shoulder gown with a restrained copper
+  satin fold-over neckline, a conventional side slit, champagne-diamond drop
+  earrings, and a diamond bracelet in platinum;
+- Nocturne wears a deep black-violet silk-satin square-neck gown with a fitted
+  line, a conventional side slit, violet-sapphire and diamond drop earrings,
+  and a diamond bracelet in platinum.
 
-- Gia / Signal: fully opaque black silk velvet, an asymmetric rose-gold satin
-  drape, a clean open one-shoulder neckline, smoked-titanium micro-seams, and
-  the existing neck interface as a separate collar;
-- Ember: fully opaque charcoal velvet, an off-shoulder portrait neckline, a
-  sculpted burnished-copper flame fold, copper piping, and a molten pleated
-  side panel;
-- Nocturne: fully opaque black-violet velvet, a portrait neckline, crescent
-  cowl draping set farther off the shoulders, sparse night-sky crystal detail,
-  and a gathered hip;
-- Velvet: fully opaque obsidian and oxblood velvet, an asymmetric sculpted
-  sweetheart neckline, an outward-set oxblood cape drape, rose-gold neck
-  ornament, and thorn-vine embroidery in the established adult anime-noir
-  style.
+The styling is alluring through shoulder and collarbone exposure and normal
+evening-gown slits, while every garment remains secure, fully opaque, and
+non-explicit. The prompts preserved the approved adult face, head proportions,
+mouth, hair, expression, synthetic interface, body proportions, pose, hands,
+camera, chamber, and lighting. They explicitly prohibited identity drift,
+body reshaping, youthful cues, nudity, transparency, lingerie construction,
+fetish styling, anatomical exposure, exaggerated anatomy, fantasy armour,
+ceremonial sashes, capes, logos, trademarks, malformed hands, text, and
+watermarks.
 
-The refinement changed only existing neckline, shoulder-fold placement, and
-nearby fabric tailoring. It added no motifs, colors, jewelry, accessories,
-cutouts, or replacement clothing concepts. Every prompt preserved the
-approved face, head proportions, mouth, hair, expression, synthetic interface,
-body proportions, pose, hands, camera, lighting, and chamber while prohibiting
-identity drift, youthful cues, nudity, transparency, lingerie construction,
-fetish styling, anatomical exposure, exaggerated anatomy, malformed hands,
-text, and watermarks. The prior `mila-v4`, `ember-v4`, `nocturne-v16`, and
-`velvet-v2` versions remain recoverable.
+Velvet remains on `velvet-v3` and was intentionally unchanged in this phase.
+The preceding `mila-v5`, `ember-v5`, and `nocturne-v17` versions remain
+versioned and recoverable.
 
 ## Interface implementation
 
@@ -525,7 +522,7 @@ text, and watermarks. The prior `mila-v4`, `ember-v4`, `nocturne-v16`, and
 ## Local verification
 
 - TypeScript passes.
-- All 102 tests pass.
+- All 104 tests pass.
 - The production build passes.
 - Desktop and 390×844 visual checks show no horizontal or vertical overflow.
 - The picker keeps all seven identities distinct and now gives every presence
