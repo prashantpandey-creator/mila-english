@@ -5,6 +5,7 @@ import { buildRealtimeSession } from '@/lib/assessment';
 import { getUserPlan } from '@/lib/subscriptionStore';
 import { FEATURES, planUnlocks, resolvePlan } from '@/lib/subscription';
 import { realtimeModeRequiresPaid } from '@/lib/realtimeAccess';
+import { classifyRealtimeFailure } from '@/lib/realtimeFailure';
 import { isRealtimeModeAllowedForHostname } from '@/lib/realtimeProductPolicy';
 import { prisma } from '@/lib/prisma';
 import {
@@ -162,8 +163,17 @@ export async function POST(req: Request) {
     const body = await response.text();
     if (!response.ok) {
       await releasePreviewReservation();
-      console.error('OpenAI Realtime session failed', response.status, body);
-      return errorResponse('OpenAI could not start the voice assessment.', 502, 'OPENAI_SESSION_FAILED');
+      // Do not collapse every upstream failure into one opaque code: a billing
+      // outage told people to "check your network" for a full day on
+      // 2026-08-16. See src/lib/realtimeFailure.ts.
+      const failure = classifyRealtimeFailure(response.status, body);
+      console.error(
+        'OpenAI Realtime session failed',
+        response.status,
+        failure.code,
+        failure.operatorDetail,
+      );
+      return errorResponse(failure.message, failure.status, failure.code);
     }
 
     return new Response(body, {

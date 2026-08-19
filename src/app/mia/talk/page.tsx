@@ -33,6 +33,18 @@ function connectionError(error: unknown, lang: 'en' | 'ru'): string {
       ? 'Живой голос Mia сейчас не настроен.'
       : 'Mia Live voice is not configured right now.';
   }
+  // Mia shares the /api/session boundary with Gia, so she inherited the same
+  // 2026-08-16 lie: a billing outage rendered as "check the network".
+  if (code === 'OPENAI_QUOTA_EXHAUSTED') {
+    return ru
+      ? 'Живой голос недоступен — на нашей стороне закончился сервисный баланс. Дело не в твоей сети.'
+      : 'Live voice is down on our side — our service credit has run out. It is not your network.';
+  }
+  if (code === 'OPENAI_RATE_LIMITED') {
+    return ru
+      ? 'Голосовой сервис сейчас перегружен. Подожди минуту и попробуй снова.'
+      : 'The voice service is busy right now. Wait a minute, then try again.';
+  }
   return ru
     ? 'Mia не смогла подключить живой голос. Проверь сеть и попробуй снова.'
     : 'Mia could not connect Live voice. Check the network and try again.';

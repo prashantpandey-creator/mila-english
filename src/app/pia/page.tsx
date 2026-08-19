@@ -110,9 +110,17 @@ export default function PiaPage() {
       teardown();
       setIsConnected(false);
       setPhase("resting");
-      setError(e instanceof Error && e.message === "VOICE_PAID_FEATURE"
-        ? "Pia live voice needs an active Mila Pro account."
-        : "Pia abhi aa nahi paa rahi. Ek pal ruk ke orb ko phir chhuo.");
+      const code = e instanceof Error ? e.message : "";
+      setError(
+        code === "VOICE_PAID_FEATURE"
+          ? "Pia live voice needs an active Mila Pro account."
+          // Our billing, not their signal — same 2026-08-16 outage that hit Gia.
+          : code === "OPENAI_QUOTA_EXHAUSTED"
+            ? "Pia ki live awaaz abhi band hai — hamari taraf se service credit khatam ho gaya hai."
+            : code === "OPENAI_RATE_LIMITED"
+              ? "Voice service abhi bahut busy hai. Ek minute ruk ke phir try karo."
+              : "Pia abhi aa nahi paa rahi. Ek pal ruk ke orb ko phir chhuo.",
+      );
     } finally {
       setIsConnecting(false);
     }
