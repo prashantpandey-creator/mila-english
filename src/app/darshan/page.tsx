@@ -101,6 +101,21 @@ function voiceConnectionErrorMessage(problem: unknown, lang: "en" | "ru"): strin
       return ru
         ? "Войди в аккаунт, чтобы запустить Live-голос, или продолжи в текстовом чате."
         : "Sign in to start Live voice, or continue in text chat.";
+    // Our bill, not their connection. Saying so plainly is the whole fix: on
+    // 2026-08-16 this failure wore the generic "check your network" message for
+    // a full day while nothing was wrong with anyone's network.
+    case "OPENAI_QUOTA_EXHAUSTED":
+      return ru
+        ? "Live-голос сейчас недоступен — на нашей стороне закончился сервисный баланс. Это не твоя сеть. Текстовый чат работает как обычно."
+        : "Live voice is down on our side — our service credit has run out. This is not your connection. Text chat is working normally.";
+    case "OPENAI_RATE_LIMITED":
+      return ru
+        ? "Голосовой сервис сейчас перегружен. Подожди минуту и попробуй снова."
+        : "The voice service is busy right now. Wait a minute, then try again.";
+    case "OPENAI_NOT_CONFIGURED":
+      return ru
+        ? "Live-голос ещё не настроен на этом сервере."
+        : "Live voice is not configured on this server yet.";
     default:
       return ru
         ? "Не удалось подключить Live-голос. Проверь сеть и попробуй снова."
