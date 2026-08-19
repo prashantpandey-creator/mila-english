@@ -1,0 +1,145 @@
+# Watches the one thing that fails silently: whether OpenAI will still issue a
+# realtime session for Gia / Mia / Pia live voice.
+#
+# On 2026-08-16 the account ran out of credit. Voice was dead for three days
+# and was found only when the owner pressed the orb himself. This turns that
+# three-day silence into roughly an hour.
+#
+# It needs NO new secret. VPS_SSH_KEY already exists for the deploy, and
+# GITHUB_TOKEN is issued to the run automatically. The OpenAI key never leaves
+# the box — the probe runs beside it, inside the container, and only a verdict
+# travels back.
+#
+# Alerting is edge-triggered through a GitHub issue: one issue is opened when
+# voice goes down and closed when it recovers. GitHub's own notifications carry
+# it to email and phone. No new channel to build, no new credential to leak.
+name: Watch Gia voice credit
+
+on:
+  schedule:
+    # Hourly at :17 — off the hour, where scheduled-runner congestion is worst.
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: mila-voice-watch
+  cancel-in-progress: false
+
+permissions:
+  issues: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint a realtime session on the box
+        id: probe
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 209.182.233.163
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 5m
+          # Without this the `stdout` output is empty (it defaults to false),
+          # the envelope would never be found, and this workflow would open a
+          # false "probe did not report" issue every single hour — a false
+          # alarm being exactly what teaches people to ignore the real one.
+          capture_stdout: true
+          # The probe exits 1 when voice is unhealthy. That is the normal,
+          # expected path for this workflow, so swallow it here and let the
+          # envelope — not the exit code — drive the decision below.
+          script: |
+            docker exec mila node --import tsx scripts/voice-credit-probe.mjs || true
+
+      - name: Read the verdict
+        id: verdict
+        env:
+          RAW: ${{ steps.probe.outputs.stdout }}
+        run: |
+          # Recover the single sentinel line from interleaved SSH output. If it
+          # is absent the probe never ran — that is itself an alertable state,
+          # never a pass.
+          line="$(printf '%s\n' "$RAW" | grep -m1 '^VOICE_PROBE_ENVELOPE ' || true)"
+          if [ -z "$line" ]; then
+            echo "status=unreported" >> "$GITHUB_OUTPUT"
+            echo "code=PROBE_DID_NOT_REPORT" >> "$GITHUB_OUTPUT"
+            echo "detail=The probe produced no envelope. The container, the SSH path, or the script is broken." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          json="${line#VOICE_PROBE_ENVELOPE }"
+          printf '%s\n' "$json" > envelope.json
+          echo "status=$(jq -r '.data.status' envelope.json)" >> "$GITHUB_OUTPUT"
+          echo "code=$(jq -r '.data.code' envelope.json)" >> "$GITHUB_OUTPUT"
+          echo "latency=$(jq -r '.data.latencyMs' envelope.json)" >> "$GITHUB_OUTPUT"
+          echo "model=$(jq -r '.data.model' envelope.json)" >> "$GITHUB_OUTPUT"
+          {
+            echo "detail<<EOF"
+            jq -r '.errors[0].message // "none"' envelope.json
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          jq -c . envelope.json
+
+      - name: Open or close the outage issue
+        uses: actions/github-script@v7
+        env:
+          STATUS: ${{ steps.verdict.outputs.status }}
+          CODE: ${{ steps.verdict.outputs.code }}
+          DETAIL: ${{ steps.verdict.outputs.detail }}
+          LATENCY: ${{ steps.verdict.outputs.latency }}
+          MODEL: ${{ steps.verdict.outputs.model }}
+        with:
+          script: |
+            const { STATUS, CODE, DETAIL, LATENCY, MODEL } = process.env;
+            const healthy = STATUS === 'ok';
+            const TITLE = 'Live voice is down';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'open', labels: 'voice-outage', per_page: 100,
+            });
+            const existing = open[0];
+
+            if (healthy) {
+              // Recovery is worth as much as the alarm. An issue that never
+              // closes is an alert everyone learns to scroll past.
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: existing.number,
+                  body: `Recovered. A realtime session minted in ${LATENCY}ms on \`${MODEL}\`.`,
+                });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+                core.notice(`Voice recovered — closed #${existing.number}`);
+              } else {
+                core.info(`Voice healthy (${LATENCY}ms on ${MODEL})`);
+              }
+              return;
+            }
+
+            const isBilling = CODE === 'OPENAI_QUOTA_EXHAUSTED';
+            const body = [
+              `**Gia / Mia / Pia live voice is not working.**`,
+              ``,
+              `| | |`,
+              `|---|---|`,
+              `| verdict | \`${CODE}\` |`,
+              `| status | \`${STATUS}\` |`,
+              `| model | \`${MODEL}\` |`,
+              `| upstream said | ${DETAIL} |`,
+              ``,
+              isBilling
+                ? `This is **billing, not code**. Add credit at https://platform.openai.com/settings/organization/billing/ — nothing needs deploying, and the next hourly check will close this issue on its own.`
+                : `This is not a billing failure. Check \`docker logs mila | grep "OpenAI Realtime session failed"\` on the Mumbai box.`,
+              ``,
+              `_Opened by the hourly voice-credit watch. It closes itself when a session mints again._`,
+            ].join('\n');
+
+            if (existing) {
+              // Do not stack a new issue every hour for one outage.
+              core.notice(`Voice still down (${CODE}) — issue #${existing.number} already open`);
+              return;
+            }
+            const created = await github.rest.issues.create({
+              owner, repo, title: `${TITLE} — ${CODE}`, body, labels: ['voice-outage'],
+            });
+            core.setFailed(`Voice is down (${CODE}) — opened #${created.data.number}`);
