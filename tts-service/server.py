@@ -12,7 +12,32 @@ import wave
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
-from piper import PiperVoice
+
+# ── ONNX Runtime thread-oversubscription fix (ported from purangpt_tts,
+# verified there 2026-08-14) ───────────────────────────────────────────────
+# PiperVoice.load() builds its onnxruntime.SessionOptions() internally with no
+# hook to override threading, so it defaults to sizing its thread pool off the
+# CONTAINER-VISIBLE cpu count (8 on this host) rather than this service's
+# actual `cpus: 2.0` cgroup cap. Measured live on THIS service (2026-08-26): a
+# 1692-char synthesis took 97s under that mismatch — the same oversubscription
+# purangpt_tts hit (258s at ~1800 chars) before capping the thread count.
+# Patching the module-level name before any PiperVoice.load() call is picked
+# up regardless of import order, since Piper resolves onnxruntime.SessionOptions
+# by attribute lookup at call time, not at its own import time.
+import onnxruntime as _ort  # noqa: E402
+
+
+class _ThreadCappedSessionOptions(_ort.SessionOptions):
+    def __init__(self):
+        super().__init__()
+        n = int(os.getenv("TTS_ORT_THREADS", "2"))  # matches this service's `cpus: 2.0` cap
+        self.intra_op_num_threads = n
+        self.inter_op_num_threads = n
+
+
+_ort.SessionOptions = _ThreadCappedSessionOptions
+
+from piper import PiperVoice  # noqa: E402 — must import after the SessionOptions patch
 
 MODEL_PATH = os.environ.get("TTS_MODEL_PATH", "/models/amy/en_US-amy-medium.onnx")
 CONFIG_PATH = os.environ.get("TTS_CONFIG_PATH", MODEL_PATH + ".json")
