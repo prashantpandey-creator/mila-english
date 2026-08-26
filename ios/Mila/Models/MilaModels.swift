@@ -79,14 +79,6 @@ struct ChatMessage: Identifiable, Sendable {
     }
 }
 
-struct TranscriptionResult: Codable, Sendable {
-    let text: String
-    let durationSeconds: Double?
-    let avgLogprob: Double?
-    let noSpeechProbability: Double?
-    let language: String?
-}
-
 struct OfflinePhrase: Identifiable, Sendable {
     let id = UUID()
     let english: String

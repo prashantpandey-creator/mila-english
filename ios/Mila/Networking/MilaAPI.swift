@@ -159,41 +159,6 @@ actor MilaAPI {
         return trimmed
     }
 
-    func transcribe(audioURL: URL, language: AppLanguage) async throws -> TranscriptionResult {
-        guard let url = URL(string: "/api/assessment/transcribe", relativeTo: Self.baseURL)?.absoluteURL else {
-            throw MilaAPIError.invalidURL
-        }
-        let audio = try Data(contentsOf: audioURL)
-        let boundary = "Mila-\(UUID().uuidString)"
-        var body = Data()
-        body.appendUTF8("--\(boundary)\r\n")
-        body.appendUTF8("Content-Disposition: form-data; name=\"language\"\r\n\r\n")
-        body.appendUTF8("\(language.rawValue)\r\n")
-        body.appendUTF8("--\(boundary)\r\n")
-        body.appendUTF8("Content-Disposition: form-data; name=\"audio\"; filename=\"practice.m4a\"\r\n")
-        body.appendUTF8("Content-Type: audio/mp4\r\n\r\n")
-        body.append(audio)
-        body.appendUTF8("\r\n--\(boundary)--\r\n")
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.httpBody = body
-        let (data, response) = try await session.data(for: request)
-        try validate(response: response, data: data)
-        return try decoder.decode(TranscriptionResult.self, from: data)
-    }
-
-    func synthesize(text: String) async throws -> Data {
-        let (data, response) = try await dataRequest(
-            path: "/api/tts",
-            method: "POST",
-            body: ["text": String(text.prefix(1_200))]
-        )
-        try validate(response: response, data: data)
-        return data
-    }
-
     private func jsonRequest<T: Decodable>(
         path: String,
         method: String,

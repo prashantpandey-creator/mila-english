@@ -48,7 +48,10 @@ struct WebModuleView: View {
     }
 }
 
-private struct MilaWebView: UIViewRepresentable {
+/// Reused directly (not just via WebModuleView's sheet chrome) by SpeakView,
+/// which embeds Mila's OpenAI Realtime voice room (/darshan) as a persistent
+/// tab rather than a dismissable module sheet.
+struct MilaWebView: UIViewRepresentable {
     let url: URL
     @Binding var progress: Double
     @Binding var loading: Bool

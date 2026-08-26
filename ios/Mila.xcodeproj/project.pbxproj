@@ -26,7 +26,6 @@
 		BAA871EC20CBC2FE0DFE9F5C /* MilaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B97A4EF88AFBBE12A8499 /* MilaModels.swift */; };
 		E4BF54AAAA157475ADC4BC22 /* SpeakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A67AB97233B4A7E7EE01A5C /* SpeakView.swift */; };
 		E705FA7E8BF7556DCF92FCB9 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F05CFB27FB049FD5154DD /* ChatView.swift */; };
-		EE7F15C1D81241FFC5900E86 /* VoicePracticeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B255A6D4B564542DAAF83A88 /* VoicePracticeModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,7 +50,6 @@
 		7A030EA647F069B19E11B7BF /* MilaTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilaTheme.swift; sourceTree = "<group>"; };
 		8389B8EDBAE5962E1CEB1BBD /* MilaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilaUITests.swift; sourceTree = "<group>"; };
 		AB9C67D2ECF2EED3562E45F9 /* MilaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilaApp.swift; sourceTree = "<group>"; };
-		B255A6D4B564542DAAF83A88 /* VoicePracticeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicePracticeModel.swift; sourceTree = "<group>"; };
 		B55EF50ADC570369E3FAB398 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BD08455DAE1826058C259381 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		C244FE458A7DCA7BDCAB0B49 /* Mila.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Mila.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -176,7 +174,6 @@
 			children = (
 				47E52AC22CE1DA276972B448 /* NetworkMonitor.swift */,
 				D5E2AE3A0EBEE9CB2D8073CC /* SessionStore.swift */,
-				B255A6D4B564542DAAF83A88 /* VoicePracticeModel.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -292,7 +289,6 @@
 				6FE52274C68C91C71F9DE585 /* SessionStore.swift in Sources */,
 				4C38F81F4B0D67621831889C /* SettingsView.swift in Sources */,
 				E4BF54AAAA157475ADC4BC22 /* SpeakView.swift in Sources */,
-				EE7F15C1D81241FFC5900E86 /* VoicePracticeModel.swift in Sources */,
 				6C9DD379395B8BEACB3E339D /* WebModuleView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
