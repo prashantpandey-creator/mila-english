@@ -55,7 +55,12 @@ services:
       - ASR_COMPUTE_TYPE=int8
       - ASR_CPU_THREADS=${ASR_CPU_THREADS:-4}
     mem_limit: 2g
-    cpus: 3.0
+    # whisper-small on CPU runs ~2x realtime here; the 3.0 cap was starving it
+    # under real usage — a live prod request timed out (2026-08-26). Measured
+    # live on the same 5.84s speech clip: 22.3s at 3.0 cores, 12.3s at 6.0,
+    # 10.6s uncapped. 6.0 leaves 2 cores of headroom for co-tenants on this
+    # 8-core host.
+    cpus: 6.0
     networks:
       - root_default
     healthcheck:
