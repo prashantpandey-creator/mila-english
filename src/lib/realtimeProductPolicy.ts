@@ -8,7 +8,8 @@ export function isRealtimeModeAllowedForHostname(
   if (isGiaHostname(hostname)) return mode === 'gia';
   if (isMiaHostname(hostname)) return mode === 'mia';
   if (isMilaHostname(hostname)) {
-    return mode === 'assessment' || mode === 'tutor' || mode === 'kids';
+    return mode === 'assessment' || mode === 'tutor' || mode === 'kids'
+      || mode === 'companion' || mode === 'pia';
   }
   return true;
 }
