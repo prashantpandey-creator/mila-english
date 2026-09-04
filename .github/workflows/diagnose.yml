@@ -45,6 +45,25 @@ jobs:
             cd /root/mila && git log --oneline -1 && git status --short | head -5
             echo "=== non-secret model config lines from .env ==="
             grep -E '^(LOCAL_LLM_MODEL|LOCAL_VOICE_LLM_MODEL|OLLAMA_|LOCAL_LLM_REASONING|ALLOW_EXTERNAL_CHAT_FALLBACK)' /root/mila/.env || echo "(none set — defaults in use)"
+            echo "=== voice stack HTTP health (pron/asr/tts /health, from inside mila) ==="
+            # RUSSIA_RESILIENCE.md's acceptance test rests on these three being
+            # self-hosted and reachable. Mirror deploy.yml's post-up probe: a
+            # plain GET /health over the private network. Read-only, no model load.
+            docker exec mila node -e "
+              const svc=[['pron','http://mila-pron:8000/health'],['asr','http://mila-asr:8001/health'],['tts','http://mila-tts:8002/health']];
+              (async()=>{let allOk=true;for(const [n,u] of svc){try{const r=await fetch(u);if(!r.ok)allOk=false;console.log(n+' '+u+' -> '+r.status);}catch(e){allOk=false;console.log(n+' '+u+' -> ERR '+e.message);}}console.log('voiceStackAll200='+allOk);})();
+            " || echo "mila container unavailable for speech probe"
+            echo "=== chat routing (resolved in the running mila container) ==="
+            # localLlmEnabled = the resident compact model is reachable WITH a
+            # model loaded. externalFallback = the flag chat/route.ts enforces,
+            # read from the LIVE container env (not the .env file) so a forced
+            # value is visible. This is the acceptance-test baseline the doc claims.
+            docker exec mila node -e "
+              const llm=process.env.LOCAL_VOICE_LLM_URL||process.env.LOCAL_LLM_URL||'http://mila-voice-llm:11434';
+              const raw=(process.env.ALLOW_EXTERNAL_CHAT_FALLBACK||'').trim().toLowerCase();
+              const externalFallback=['1','true','yes'].includes(raw);
+              (async()=>{let localLlmEnabled=false,models='';try{const r=await fetch(llm+'/api/tags');const j=await r.json();const list=(j.models||[]);models=list.map(m=>m.name).join(',');localLlmEnabled=r.ok&&list.length>0;}catch(e){models='ERR '+e.message;}console.log('localLlmEnabled='+localLlmEnabled+' (url='+llm+' models=['+models+'])');console.log('externalFallback='+externalFallback+' (ALLOW_EXTERNAL_CHAT_FALLBACK=\"'+raw+'\")');console.log('providerKeysPresent: OPENROUTER='+(!!process.env.OPENROUTER_API_KEY)+' OPENAI='+(!!process.env.OPENAI_API_KEY));})();
+            " || echo "mila container unavailable for routing probe"
             echo "=== kernel OOM kills (last 24h) ==="
             dmesg -T 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' | tail -25 || true
             journalctl -k --since '24 hours ago' 2>/dev/null | grep -i 'oom' | tail -25 || true
