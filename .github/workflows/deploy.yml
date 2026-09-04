@@ -185,18 +185,20 @@ jobs:
               }
               console.log('Realtime tutor paid gate active; Gia free-launch policy is code-enforced');
             "
-            # Gia and Mia are product surfaces served by the same application
-            # container. Install their Caddy vhosts only after the new image is
-            # healthy; the script validates, reloads, and rolls back on failure.
+            # Gia, Mia, and Pia are product surfaces served by the same
+            # application container. Install their Caddy vhosts only after the
+            # new image is healthy; the script validates, reloads, and rolls
+            # back on failure.
             bash scripts/configure-gia-proxy.sh
             for attempt in $(seq 1 30); do
               mia_status=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' https://mia.purangpt.com/ || true)
-              if [ "$mia_status" = "200" ] && curl -fsS --max-time 10 https://gia.purangpt.com/login >/dev/null; then
-                echo "Gia companion and Mia traveler routes are live"
+              pia_status=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' https://pia.purangpt.com/ || true)
+              if [ "$mia_status" = "200" ] && [ "$pia_status" = "200" ] && curl -fsS --max-time 10 https://gia.purangpt.com/login >/dev/null; then
+                echo "Gia companion, Mia traveler, and Pia routes are live"
                 break
               fi
               if [ "$attempt" -eq 30 ]; then
-                echo "Gia or Mia HTTPS route did not become ready"
+                echo "Gia, Mia, or Pia HTTPS route did not become ready"
                 exit 1
               fi
               sleep 2
