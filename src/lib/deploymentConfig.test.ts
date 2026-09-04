@@ -28,8 +28,7 @@ test('production provisions Gia and Mia while preserving the legacy hostname in 
   assert.match(workflow, /bash scripts\/configure-gia-proxy\.sh/);
   assert.match(workflow, /https:\/\/gia\.purangpt\.com\/login/);
   assert.match(workflow, /mia_status=.*https:\/\/mia\.purangpt\.com\//);
-  assert.match(workflow, /Gia companion and Mia traveler routes are live/);
-  assert.match(giaProxy, /gia\.purangpt\.com/);
-  assert.match(giaProxy, /mia\.purangpt\.com/);
+  assert.match(workflow, /Gia companion, Mia traveler, and Pia routes are live/);
+  assert.match(giaProxy, /product_hosts=\(gia mia pia\)/);
   assert.doesNotMatch(giaProxy, /miachat\.purangpt\.com/);
 });
