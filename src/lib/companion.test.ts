@@ -5,6 +5,7 @@ import {
   builtInCompanionReply,
   getLocalLlmConfig,
   isSensitiveMemory,
+  localLlmEnabled,
   ollamaHasModel,
   parseMemoryCommand,
   requestsFreeConversation,
@@ -57,6 +58,11 @@ assert.deepStrictEqual(
     model: 'gpt-oss:20b',
   },
 );
+assert.strictEqual(localLlmEnabled({}), true, 'unset preserves local development');
+assert.strictEqual(localLlmEnabled({ LOCAL_LLM_ENABLED: 'true' }), true);
+assert.strictEqual(localLlmEnabled({ LOCAL_LLM_ENABLED: '1' }), true);
+assert.strictEqual(localLlmEnabled({ LOCAL_LLM_ENABLED: 'false' }), false);
+assert.strictEqual(localLlmEnabled({ LOCAL_LLM_ENABLED: '0' }), false);
 assert.deepStrictEqual(
   parseMemoryCommand('Запомни, что я учу английский для работы.'),
   { kind: 'remember', content: 'я учу английский для работы' },

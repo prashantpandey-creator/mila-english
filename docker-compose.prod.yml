@@ -74,8 +74,7 @@ services:
     container_name: mila-tts
     restart: unless-stopped
     # Piper is a small CPU neural voice (warm US female, en_US-amy-medium).
-    # Hard-bounded so it can never compete with the resident Ollama models for
-    # RAM or cores — synthesis is ~150-250ms and only bursts on spoken lines.
+    # Hard-bounded so synthesis cannot crowd the web app or co-tenant services.
     mem_limit: 1g
     cpus: 2.0
     networks:
