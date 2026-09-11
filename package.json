@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --import tsx --test src/lib/*.test.ts",
+    "test": "node scripts/run-tests.mjs",
     "lint": "next lint",
     "telegram:webhook": "node scripts/telegram-webhook.mjs",
     "clear-chat-history": "node scripts/clear-chat-history.mjs",
