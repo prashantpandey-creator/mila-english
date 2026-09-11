@@ -16,6 +16,7 @@ export function realtimeModeRequiresPaid(
     || mode === 'companion'
     || mode === 'kids'
     || mode === 'mia'
+    || mode === 'pia'
     || (mode === 'gia' && GIA_LIVE_FREE_LAUNCH)
   ) return false;
   if (environment.NODE_ENV === 'production') return true;

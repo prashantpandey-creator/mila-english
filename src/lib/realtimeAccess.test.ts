@@ -28,6 +28,14 @@ test('assessment and free companion doors remain outside the product paywall', (
     NODE_ENV: 'production',
     VOICE_REALTIME_PAID_ONLY: 'true',
   }), false);
+  // Regression guard: a live production probe on 2026-09-12 found POST
+  // /api/session?mode=pia returning 402 VOICE_PAID_FEATURE for a guest — this
+  // function was the only gate that disagreed with route.ts treating pia as
+  // guest-open (see PROJECT_LEDGER row 45).
+  assert.equal(realtimeModeRequiresPaid('pia', {
+    NODE_ENV: 'production',
+    VOICE_REALTIME_PAID_ONLY: 'true',
+  }), false);
 });
 
 test('non-production environments can explicitly exercise either gate state', () => {
